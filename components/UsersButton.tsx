@@ -25,7 +25,6 @@ const UsersButton: React.FC<UsersButtonProps> = ({
   mylink,
   myloading,
   mydisabled,
-  mygigip,
 }) => {
   return (
     <>
