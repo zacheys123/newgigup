@@ -4,6 +4,7 @@ import { useAuth, useUser } from "@clerk/nextjs";
 
 import { useRouter } from "next/navigation";
 import React, { useCallback, useEffect } from "react";
+import { toast } from "sonner";
 const Authenticate = () => {
   const router = useRouter();
   const { user, isSignedIn } = useUser();
@@ -27,9 +28,15 @@ const Authenticate = () => {
 
     const data = await res.json();
     console.log(data);
+    setTimeout(() => {
+      toast.success(
+        "Successfully logged in,Welcome ",
+        data?.results?.firstname
+      );
+    }, 3000);
     window?.localStorage.setItem("user", JSON.stringify(data?.results));
     if (data?.userstatus === false) {
-      return router.push("/gigme/social");
+      return router.push("/");
     }
   }, [user, router]);
 

@@ -1,26 +1,29 @@
 "use client";
 import Image from "next/image";
-import bgImage from "@/public/assets/png/logo-black.png";
-import { Card } from "@/components/ui/card";
+import bgImage from "../../public/assets/png/logo-black.png";
 
-import postimage from "@/public/assets/post.jpg";
+import postimage from "../../public/assets/post.jpg";
 
-import postimag from "@/public/assets/left-image.jpg";
-import reactimage from "@/public/assets/svg/logo-no-background.svg";
+import postimag from "../../public/assets/left-image.jpg";
+import reactimage from "../../public/assets/svg/logo-no-background.svg";
 
 import { CircularProgress } from "@mui/material";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
 import { useRouter } from "next/navigation";
 import UsersButton from "../../components/UsersButton";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 export default function Home() {
   const router = useRouter();
   const { isLoaded, userId } = useAuth();
 
-  let user = true;
+  const {
+    user: { firstname },
+  } = useCurrentUser(userId || null);
+  console.log(firstname);
 
   if (!isLoaded && !userId) {
     localStorage.removeItem("user");
@@ -35,8 +38,8 @@ export default function Home() {
       </div>
     );
   }
-  let name = "Zacharia";
-  let sentence = `Welcome to gigUp, ${name}!`;
+
+  const sentence = `Welcome to gigUp, ${firstname}!`;
   const words = sentence.split(" ");
   const containerVariants = {
     hidden: { opacity: 1 },
@@ -70,7 +73,7 @@ export default function Home() {
           className="flex flex-col items-center justify-center min-h-[520px] text-center bg-cover bg-center bg-no-repeat "
           style={{ backgroundImage: `url(${bgImage})` }}
         >
-          {user && (
+          {firstname && (
             <motion.div
               className="mb-10"
               variants={containerVariants}

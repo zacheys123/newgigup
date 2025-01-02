@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { authReducer } from "@/app/reducers/authReducers";
+import { authReducer } from "../../reducers/authReducers";
 import { createContext, useContext, useMemo, useReducer } from "react";
 
 export const initialState = {

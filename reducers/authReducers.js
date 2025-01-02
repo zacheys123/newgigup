@@ -1,5 +1,5 @@
 import { global } from "../actions";
-import { initialState } from "@/app/Context/store";
+import { initialState } from "../app/Context/store";
 
 export const authReducer = (state = initialState, action) => {
   switch (action.type) {
