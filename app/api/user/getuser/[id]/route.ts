@@ -12,7 +12,7 @@ export async function GET(req: NextRequest, ) {
     const { _id,
   name,
   email,
-  clerkI, // Required and unique
+  clerkId, // Required and unique
   picture,
   firstname,
   lastname,
@@ -35,7 +35,7 @@ export async function GET(req: NextRequest, ) {
     return NextResponse.json({ _id,
   name,
   email,
-  clerkI, // Required and unique
+  clerkId, // Required and unique
   picture,
   firstname,
   lastname,
