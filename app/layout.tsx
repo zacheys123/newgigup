@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 
 import "./globals.css";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; // Import styles for Toastify
 
 import { ClerkLoaded } from "@clerk/nextjs";
 import { GlobalProvider } from "./Context/store";
@@ -24,6 +26,7 @@ export default function RootLayout({
         <html lang="en">
           <body className="min-h-screen bg-gray-200 w-screen overflow-x-hidden ">
             {" "}
+            <ToastContainer />
             <ClerkLoaded>{children} </ClerkLoaded>
           </body>
         </html>

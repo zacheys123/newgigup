@@ -1,15 +1,15 @@
 "use client";
 import { Textarea } from "flowbite-react";
 import React, { useState, ChangeEvent, FormEvent } from "react";
-
 import { Button } from "../ui/button";
-
-// import "react-datepicker/dist/react-datepicker.css";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { CircularProgress } from "@mui/material";
 import { EyeIcon, EyeOff } from "lucide-react";
-import { toast } from "sonner";
+
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAuth } from "@clerk/nextjs";
+import { toast } from "react-toastify";
 // import useStore from "@/app/zustand/useStore";
 // import { useAuth } from "@clerk/nextjs";
 
@@ -35,10 +35,7 @@ interface UserInfo {
 const CreateGig = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [secretpass, setSecretPass] = useState<boolean>(false);
-  const [
-    selectedDate,
-    // setSelectedDate
-  ] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [secretreturn] = useState<string>("");
   const [gigInputs, setGigs] = useState<GigInputs>({
     title: "",
@@ -61,12 +58,22 @@ const CreateGig = () => {
   const {
     user: { _id },
   } = useCurrentUser(userId || null);
-  //   const minDate = new Date("2020-01-01");
-  //   const maxDate = new Date("2025-01-01");
+  const minDate = new Date("2020-01-01");
+  const maxDate = new Date("2026-01-01");
 
-  //   const handleDate = (date: Date) => {
-  //     setSelectedDate(date);
-  //   };
+  const handleDate = (date: Date | null) => {
+    setSelectedDate(date);
+  };
+
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setGigs((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = e.target;
@@ -79,21 +86,6 @@ const CreateGig = () => {
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
-    if (
-      !gigInputs.title ||
-      !gigInputs.description ||
-      !gigInputs.phoneNo ||
-      !gigInputs.price ||
-      !gigInputs.location ||
-      !gigInputs.end ||
-      !gigInputs.start ||
-      !gigInputs.durationfrom ||
-      !gigInputs.durationto
-    ) {
-      alert("Please fill all required fields");
-      return;
-    }
 
     try {
       setIsLoading(true);
@@ -119,8 +111,16 @@ const CreateGig = () => {
         }),
       });
       const data = await res.json();
+
       if (data.gigstatus === "true") {
-        toast.success(data.message);
+        toast.success(data?.message, {
+          position: "top-center",
+          autoClose: 5000, // 5 seconds
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
         setGigs({
           title: "",
           description: "",
@@ -137,6 +137,16 @@ const CreateGig = () => {
         });
         setUserInfo({ prefferences: [] });
       }
+      if (data.gigstatus === "false") {
+        toast.error(data?.message, {
+          position: "top-center",
+          autoClose: 3000, // 5 seconds
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+      }
     } catch (error) {
       console.error(error);
     } finally {
@@ -151,11 +161,7 @@ const CreateGig = () => {
           Enter info to create a gig
         </h6>
         <select
-          onChange={(ev) =>
-            setGigs((prev) => {
-              return { ...prev, bussinesscat: ev.target.value };
-            })
-          }
+          onChange={handleInputChange}
           name="durationfrom"
           value={gigInputs?.bussinesscat}
           className="mb-2 w-[130px]  bg-neutral-300 h-[30px] rounded-md text-[12px] flex justify-center items-center p-2 font-mono"
@@ -175,16 +181,12 @@ const CreateGig = () => {
             <div className="flex items-center gap-2">
               <input
                 autoComplete="off"
-                onChange={(ev) =>
-                  setGigs((prev) => {
-                    return { ...prev, secret: ev.target.value };
-                  })
-                }
+                onChange={handleInputChange}
                 name="secret"
                 value={gigInputs?.secret}
                 type={!secretpass ? "password" : "text"}
                 placeholder="Enter secret,  NB://(valid only once)"
-                className="font-mono  h-[35px] text-[12px]  bg-white mb-2 focus-within:ring-0 outline-none rounded-xl  px-3 text-black"
+                className="font-mono  h-[35px] text-[12px]  bg-zinc-700 border-2 border-neutral-400 mb-2 focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-300"
               />{" "}
               {secretpass ? (
                 <EyeOff
@@ -204,39 +206,27 @@ const CreateGig = () => {
           </div>
           <input
             autoComplete="off"
-            onChange={(ev) =>
-              setGigs((prev) => {
-                return { ...prev, title: ev.target.value };
-              })
-            }
+            onChange={handleInputChange}
             name="title"
             value={gigInputs?.title}
             type="text"
             placeholder="Enter any title"
-            className="font-mono  h-[35px] text-[12px]  bg-white mb-2  focus-within:ring-0 outline-none rounded-xl  px-3 text-black"
+            className="font-mono  h-[35px] text-[12px]  bg-zinc-700 border-2 border-neutral-400 mb-2  focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-300"
           />{" "}
           <Textarea
-            onChange={(ev) =>
-              setGigs((prev) => {
-                return { ...prev, description: ev.target.value };
-              })
-            }
+            onChange={handleInputChange}
             name="description"
             value={gigInputs?.description}
             style={{ resize: "none", height: "fit-content" }}
-            className="min-h-[70px] py-2 mb-2 font-mono"
+            className="min-h-[70px] py-2 mb-2 font-mono  bg-zinc-700 border-2 border-neutral-400 text-neutral-300 px-3 "
             placeholder=" Enter description e.g what songs or the vybe expected in the event/show"
           />
           <input
             autoComplete="off"
             type="text"
             placeholder="Enter phone no: "
-            className="font-mono  h-[35px] text-[12px]  bg-white mb-2  focus-within:ring-0 outline-none rounded-xl  px-3 text-black"
-            onChange={(ev) =>
-              setGigs((prev) => {
-                return { ...prev, phoneNo: ev.target.value };
-              })
-            }
+            className="font-mono  h-[35px] text-[12px]  bg-zinc-700 border-2 border-neutral-400 mb-2  focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-300"
+            onChange={handleInputChange}
             name="phoneNo"
             value={gigInputs?.phoneNo}
           />{" "}
@@ -244,12 +234,8 @@ const CreateGig = () => {
             autoComplete="off"
             type="text"
             placeholder="Enter price range expected  "
-            className="font-mono  h-[35px] text-[12px]  bg-white mb-2  focus-within:ring-0 outline-none rounded-xl  px-3 text-black"
-            onChange={(ev) =>
-              setGigs((prev) => {
-                return { ...prev, price: ev.target.value };
-              })
-            }
+            className="font-mono  h-[35px] text-[12px]  bg-zinc-700 border-2 border-neutral-400 mb-2  focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-300"
+            onChange={handleInputChange}
             name="price"
             value={gigInputs?.price}
           />{" "}
@@ -257,12 +243,8 @@ const CreateGig = () => {
             autoComplete="off"
             type="text"
             placeholder="Enter location  "
-            className="font-mono  h-[35px] text-[12px]  bg-white mb-2  focus-within:ring-0 outline-none rounded-xl  px-3 text-black w-full"
-            onChange={(ev) =>
-              setGigs((prev) => {
-                return { ...prev, location: ev.target.value };
-              })
-            }
+            className="font-mono  h-[35px] text-[12px]  bg-zinc-700 border-2 border-neutral-400 mb-2  focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-300 w-full"
+            onChange={handleInputChange}
             name="location"
             value={gigInputs?.location}
           />{" "}
@@ -274,14 +256,10 @@ const CreateGig = () => {
             )}
             {gigInputs?.bussinesscat === "personal" && (
               <select
-                onChange={(ev) =>
-                  setGigs((prev) => {
-                    return { ...prev, category: ev.target.value };
-                  })
-                }
+                onChange={handleInputChange}
                 name="category"
                 value={gigInputs?.category}
-                className="mb-2 w-full bg-white  h-[40px] rounded-md p-3 text-[15px]  font-mono"
+                className="mb-2 w-full text-neutral-400  bg-zinc-700 border-2 border-neutral-400   h-[40px] rounded-md p-3 text-[12px]  font-mono"
               >
                 <option value="piano">Piano</option>
                 <option value="guitar">Guitar</option>
@@ -405,21 +383,13 @@ const CreateGig = () => {
                 autoComplete="off"
                 type="text"
                 placeholder=" Time e.g 10 means 10:00 "
-                className="mb-2 p-3 focus-within:ring-0 outline-none rounded-xl  px-3 text-black w-[124px] text-[9px]"
-                onChange={(ev) =>
-                  setGigs((prev) => {
-                    return { ...prev, start: ev.target.value };
-                  })
-                }
+                className="mb-2 p-3 focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-800 w-[124px] text-[11px]"
+                onChange={handleInputChange}
                 name="start"
                 value={gigInputs?.start}
               />{" "}
               <select
-                onChange={(ev) =>
-                  setGigs((prev) => {
-                    return { ...prev, durationfrom: ev.target.value };
-                  })
-                }
+                onChange={handleInputChange}
                 name="durationfrom"
                 value={gigInputs?.durationfrom}
                 className="mb-2 w-[55px] bg-zinc-800 text-gray-200 h-[34px] rounded-full text-[11px] flex justify-center items-center p-2 font-mono"
@@ -436,21 +406,13 @@ const CreateGig = () => {
                 autoComplete="off"
                 type="text"
                 placeholder=" Time e.g 10 means 10:00 "
-                className="mb-2 p-3 focus-within:ring-0 outline-none rounded-xl  px-3 text-black w-[124px] text-[9px]"
-                onChange={(ev) =>
-                  setGigs((prev) => {
-                    return { ...prev, end: ev.target.value };
-                  })
-                }
+                className="mb-2 p-3 focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-800 w-[124px] text-[11px]"
+                onChange={handleInputChange}
                 name="end"
                 value={gigInputs?.end}
               />{" "}
               <select
-                onChange={(ev) =>
-                  setGigs((prev) => {
-                    return { ...prev, durationto: ev.target.value };
-                  })
-                }
+                onChange={handleInputChange}
                 name="durationto"
                 value={gigInputs?.durationto}
                 className="mb-2 w-[55px] bg-zinc-800 text-gray-200 h-[34px] rounded-full text-[11px] flex justify-center items-center p-2 font-mono"
@@ -460,15 +422,15 @@ const CreateGig = () => {
               </select>{" "}
             </div>
             {/* date here */}
-            {/* <DatePicker
-                selected={selectedDate}
-                onChange={handleDate}
-                dateFormat="MM/DD/YYYY"
-                minDate={minDate}
-                maxDate={maxDate}
-                placeholderText="Set Event Date"
-                className="font-mono  h-[35px] text-[12px]  bg-white mb-2  focus-within:ring-0 outline-none rounded-xl  px-3 text-black w-[300px]"
-              /> */}
+            <DatePicker
+              selected={selectedDate}
+              onChange={handleDate}
+              dateFormat="DD/MM/YYYY"
+              minDate={minDate}
+              maxDate={maxDate}
+              title="Set Event Date"
+              className="font-mono  h-[35px] text-[12px]  bg-zinc-800 border-2 border-neutral-400 mb-2  focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-300 w-[300px]"
+            />
           </div>{" "}
           <div className="w-full flex justify-center">
             <Button

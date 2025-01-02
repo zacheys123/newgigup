@@ -70,3 +70,21 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Example styles for the Sonner toaster */
+.sonner-toast {
+  background-color: #333 !important;
+  color: #fff !important;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+.sonner-toast-title {
+  font-weight: bold;
+  color: #f0f0f0 !important;
+}
+
+.sonner-toast-message {
+  color: #d0d0d0 !important;
+}
