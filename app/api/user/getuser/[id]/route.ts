@@ -3,11 +3,13 @@ import { NextResponse } from "next/server";
 import connectDb from "@/lib/connectDb";
 import { NextRequest } from "next/server";
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-  console.log(params);
+export async function GET(req: NextRequest, ) {
+    const  id  = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
+  console.log("all id",id );
+
   try {
     await connectDb();
-    const { id,
+    const { _id,
   name,
   email,
   clerkI, // Required and unique
@@ -28,9 +30,9 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   followings , // Array of User IDs
   videos,
   allreviews,
-  myreviews} = await User.findOne({ clerkId: params.id });
+  myreviews} = await User.findOne({ clerkId: id });
 
-    return NextResponse.json({ id,
+    return NextResponse.json({ _id,
   name,
   email,
   clerkI, // Required and unique
