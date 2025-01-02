@@ -1,7 +1,7 @@
 "use client";
-import React from "react";
 import Image from "next/image";
 import bgImage from "@/public/assets/png/logo-black.png";
+import { Card } from "@/components/ui/card";
 
 import postimage from "@/public/assets/post.jpg";
 
@@ -14,13 +14,9 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 
 import { useRouter } from "next/navigation";
-import UsersButton from "@/components/UsersButton";
+import UsersButton from "../../components/UsersButton";
 
 export default function Home() {
-  // const {
-  //   authstate: {},
-  //   setAuthState,
-  // } = useGlobalContext();
   const router = useRouter();
   const { isLoaded, userId } = useAuth();
 

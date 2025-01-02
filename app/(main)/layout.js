@@ -1,7 +1,7 @@
 import { getAuth } from "@clerk/nextjs";
-import Nav from "@/components/Nav";
+import Nav from "@/Nav";
 import React from "react";
-import { checkEnvironment } from "@/utils";
+import { checkEnvironment } from "../../utils";
 
 // export const getCurrentUser = async (userId) => {
 //   try {
@@ -34,13 +34,10 @@ import { checkEnvironment } from "@/utils";
 //       },
 //     };
 //   }
-
 //   // Fetch current user data
 //   const currentUser = await getCurrentUser(userId);
-
 //   // Fetch chats (assuming you have a function to do so)
 //   const chats = await getChats(currentUser?.user?._id);
-
 //   return {
 //     props: {
 //       currentUser,
@@ -48,7 +45,6 @@ import { checkEnvironment } from "@/utils";
 //     },
 //   };
 // };
-
 const MainLayout = ({ children }) => {
   return (
     <div className="h-screen overflow-x-hidden">

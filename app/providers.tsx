@@ -3,7 +3,11 @@ import { dark } from "@clerk/themes";
 import { ClerkProvider } from "@clerk/nextjs";
 
 // ...
-export function Providers({ children }) {
+export function Providers({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <ClerkProvider
       appearance={{
@@ -11,7 +15,6 @@ export function Providers({ children }) {
         variables: {
           colorPrimary: "white",
           fontSize: "16px",
-          width: "300px",
         },
       }}
     >
