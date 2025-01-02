@@ -4,18 +4,20 @@ import { UserButton, useAuth } from "@clerk/nextjs";
 
 // import { Badge, CircularProgress } from "@mui/material";
 // import { useGlobalContext } from "@/app/Context/store";
-import { BiSolidVideos } from "react-icons/bi";
+
 import Link from "next/link";
 import Logo from "./Logo";
 import {
   // Info,
   // MedalIcon,
   MessageCircleQuestion,
+  Music,
   // Music,
   User,
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
+// import { useCurrentUser } from "@/hooks/useCurrentUser";
 // import AvatarComponent from "./Avatar";
 // import { useCurrentUser } from "@/hooks/useCurrentUser";
 // import ChatComponent from "./chat/ChatComponent";
@@ -23,7 +25,7 @@ import { useRouter } from "next/navigation";
 const Nav = () => {
   const { userId } = useAuth();
   const router = useRouter();
-  // const { user } = useCurrentUser(userId);
+  // const { user } = useCurrentUser(userId || null);
   // console.log(chats);
   return (
     <nav className="container shadow-cyan-700 dark:bg-black bg-neutral-500 p-4 shadow-md sticky top-0 mx-auto  xl:w-[100vw]  flex items-center justify-between ">
@@ -32,13 +34,13 @@ const Nav = () => {
         {userId ? (
           <div className="flex flex-grow gap-4 items-center ml-4">
             <Link
-              href="/gigme/social"
+              href={`/gigs/${userId}`}
               className=" text-white  link md:text-[16px] md:font-mono flex flex-col gap-2 items-center md:hover:bg-gray-200 md:hover:text-neutral-800 md:hover:scale-100 md:p-2 rounded-full  transition-all duration-75"
             >
               <span className="hidden ml-2 md:inline-flex">
                 Gigme <span className="hidden ml-2 md:inline-flex">|</span>
               </span>
-              <BiSolidVideos size="20px" className="md:hidden" />
+              <Music size="20px" className="md:hidden" />
             </Link>
 
             <Link

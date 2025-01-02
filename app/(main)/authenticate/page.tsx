@@ -29,11 +29,8 @@ const Authenticate = () => {
     const data = await res.json();
     console.log(data);
     setTimeout(() => {
-      toast.success(
-        "Successfully logged in,Welcome ",
-        data?.results?.firstname
-      );
-    }, 3000);
+      toast.success("Successfully logged in,Welcome ");
+    }, 1500);
     window?.localStorage.setItem("user", JSON.stringify(data?.results));
     if (data?.userstatus === false) {
       return router.push("/");

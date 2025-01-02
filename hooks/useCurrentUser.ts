@@ -17,7 +17,7 @@ interface Review {
 }
 
 interface User {
-  id?: string;
+  _id?: string;
   name?: string;
   email?: string;
   clerkId: string; // Required and unique

@@ -8,23 +8,55 @@ import postimag from "../../public/assets/left-image.jpg";
 import reactimage from "../../public/assets/svg/logo-no-background.svg";
 
 import { CircularProgress } from "@mui/material";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
 import { useRouter } from "next/navigation";
 import UsersButton from "../../components/UsersButton";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useCallback, useEffect } from "react";
 
 export default function Home() {
   const router = useRouter();
   const { isLoaded, userId } = useAuth();
+  const { user, isSignedIn } = useUser();
 
   const {
     user: { firstname },
   } = useCurrentUser(userId || null);
   console.log(firstname);
 
+  const registerUser = useCallback(async () => {
+    if (!user) {
+      console.error("No user data to send.");
+      return;
+    }
+    if (!firstname) {
+      console.log("Sending user to backend:", user);
+      const res = await fetch("/api/user/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ user }),
+      });
+      const data = await res.json();
+      console.log(data);
+      window?.localStorage.setItem("user", JSON.stringify(data?.results));
+      if (data?.userstatus === false) {
+        return router.push("/");
+      }
+    }
+    return;
+  }, [user, router, firstname]);
+  useEffect(() => {
+    if (user && isSignedIn) {
+      registerUser();
+    } else {
+      console.log("User data not available or not signed in.");
+    }
+  }, [user, isSignedIn, registerUser]);
   if (!isLoaded && !userId) {
     localStorage.removeItem("user");
     return (
