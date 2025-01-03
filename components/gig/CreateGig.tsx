@@ -2,8 +2,8 @@
 import { Textarea } from "flowbite-react";
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import { Button } from "../ui/button";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+// import DatePicker from "react-datepicker";
+// import "react-datepicker/dist/react-datepicker.css";
 import { CircularProgress } from "@mui/material";
 import { EyeIcon, EyeOff } from "lucide-react";
 
@@ -35,7 +35,7 @@ interface UserInfo {
 const CreateGig = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [secretpass, setSecretPass] = useState<boolean>(false);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDate] = useState<Date | null>(null);
   const [secretreturn] = useState<string>("");
   const [gigInputs, setGigs] = useState<GigInputs>({
     title: "",
@@ -58,12 +58,12 @@ const CreateGig = () => {
   const {
     user: { _id },
   } = useCurrentUser(userId || null);
-  const minDate = new Date("2020-01-01");
-  const maxDate = new Date("2026-01-01");
+  // const minDate = new Date("2020-01-01");
+  // const maxDate = new Date("2026-01-01");
 
-  const handleDate = (date: Date | null) => {
-    setSelectedDate(date);
-  };
+  // const handleDate = (date: Date | null) => {
+  //   setSelectedDate(date);
+  // };
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -422,7 +422,7 @@ const CreateGig = () => {
               </select>{" "}
             </div>
             {/* date here */}
-            <DatePicker
+            {/* <DatePicker
               selected={selectedDate}
               onChange={handleDate}
               dateFormat="DD/MM/YYYY"
@@ -430,7 +430,7 @@ const CreateGig = () => {
               maxDate={maxDate}
               title="Set Event Date"
               className="font-mono  h-[35px] text-[12px]  bg-zinc-800 border-2 border-neutral-400 mb-2  focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-300 w-[300px]"
-            />
+            /> */}
           </div>{" "}
           <div className="w-full flex justify-center">
             <Button
