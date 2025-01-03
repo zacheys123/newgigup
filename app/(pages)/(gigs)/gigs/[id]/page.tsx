@@ -27,7 +27,7 @@ const GigsPage = () => {
   console.log(gigs?.gigs?.map((gig: GigProps) => console.log(gig)));
 
   return (
-    <div className="h-[90%] w-[90%] mx-auto my-2 overflow-y-scroll">
+    <div className="h-[88%] w-[90%] mx-auto my-2 overflow-y-scroll shadow-md shadow-orange-300">
       {!loading ? (
         <div className="mt-5">
           <Gigheader

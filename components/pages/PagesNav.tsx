@@ -2,7 +2,7 @@
 
 import { IoIosAddCircle } from "react-icons/io";
 import { usePathname } from "next/navigation";
-import { useAuth, UserButton } from "@clerk/nextjs";
+import { useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 import { MdOutlinePersonalInjury } from "react-icons/md";
 import { MdEmojiEvents } from "react-icons/md";
@@ -15,8 +15,8 @@ const PagesNav = () => {
   const activelink =
     "text-yellow-400   hover:text-yellow ml-6 transition transion-duration";
   return (
-    <div className=" h-[60px]  bottom-0 bg-zinc-900 w-full   border border-1 border-t-slate-600 border-b-0border-l-0 border-r-0">
-      <div className="grid grid-cols-6 items-center w-[100%]  h-[100%] px-5 mx-auto ">
+    <div className=" h-[60px] bg-zinc-900 w-full   border border-1 border-t-slate-600 border-b-0 border-l-0 border-r-0">
+      <div className="grid grid-cols-5 items-center w-[100%]  h-[100%] px-5 mx-auto ">
         <Link href={`/gigs/${userId}`}>
           <FaHome
             className={
@@ -37,7 +37,7 @@ const PagesNav = () => {
         </Link>
         <Link href={`/create/${userId}`}>
           <IoIosAddCircle
-            className="text-purple-500 text-2xl hover:text-yellow  ml-5   "
+            className="text-purple-500 text-2xl hover:text-yellow  ml-3  "
             size={43}
             style={{ cursor: "pointer" }}
           />
@@ -60,9 +60,9 @@ const PagesNav = () => {
             style={{ cursor: "pointer" }}
           />
         </Link>
-        <div className="ml-6">
+        {/* <div className="ml-6">
           <UserButton />
-        </div>
+        </div> */}
       </div>
     </div>
   );
