@@ -1,5 +1,3 @@
-import React from "react";
-
 const MyGigs = () => {
   return (
     <div className="h-[90%] w-[90%] mx-auto my-2">

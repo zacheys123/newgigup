@@ -9,6 +9,17 @@ const useStore = create(
     publishedgigs: [],
     mygigs: [],
     bookedgigs: [],
+    search: false,
+    currentUser: {},
+
+    setSearch: (data) =>
+      set(() => ({
+        search: data,
+      })),
+    setCurrentUser: (data) =>
+      set(() => ({
+        currentUser: data,
+      })),
 
     // Action to update user information
     // setUser: (data) =>

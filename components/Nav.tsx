@@ -69,7 +69,13 @@ const Nav = () => {
           </div>
         ) : (
           <div className="flex gap-4">
-            {" "}
+            <Button
+              variant="ghost"
+              className="w-[80px]   border border-yellow-300 rounded-full h-[40px] py-3 text-white  hover:bg-slate-500"
+              onClick={() => router.push("/sign-up")}
+            >
+              SignUp
+            </Button>
             <Button
               variant="ghost"
               className="w-[80px]   border border-yellow-300 rounded-full h-[40px] py-3 text-white  hover:bg-slate-500"

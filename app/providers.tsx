@@ -14,7 +14,7 @@ export function Providers({
         baseTheme: dark,
         variables: {
           colorPrimary: "white",
-          fontSize: "16px",
+          fontSize: "8px",
         },
       }}
     >

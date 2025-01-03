@@ -1,50 +1,20 @@
 "use client";
 
+import useStore from "@/app/zustand/useStore";
+import { UserProps } from "@/types/userinterfaces";
 import { useEffect, useMemo, useState } from "react";
 
 // Define the shape of the user object
-interface Video {
-  title: string;
-  source: string;
-}
-
-interface Review {
-  rating: number;
-  comment: string;
-  gigId: string; // assuming Gig ID is a string
-  updatedAt: Date;
-  createdAt: Date;
-}
-
-interface User {
-  _id?: string;
-  name?: string;
-  email?: string;
-  clerkId: string; // Required and unique
-  picture?: string;
-  firstname?: string;
-  lastname?: string;
-  city?: string;
-  date?: string;
-  month?: string;
-  year?: string;
-  address?: string;
-  instrument?: string;
-  experience?: string;
-  phone?: string;
-  verification?: string;
-  username: string; // Required, unique, and lowercase
-  followers: string[]; // Array of User IDs
-  followings: string[]; // Array of User IDs
-  videos: Video[];
-  allreviews: Review[];
-  myreviews: Review[];
-}
 
 export function useCurrentUser(userId: string | null) {
+  const { setCurrentUser } = useStore();
   const [loading, setLoading] = useState<boolean>(false);
-  const [user, setUser] = useState<User>({
+  const [user, setUser] = useState<UserProps>({
     clerkId: "",
+    firstname: "",
+    lastname: "",
+    experience: "",
+    instrument: "",
     username: "",
     followers: [],
     followings: [],
@@ -65,6 +35,7 @@ export function useCurrentUser(userId: string | null) {
           try {
             const parsedUser = JSON.parse(storedUser);
             setUser(parsedUser);
+            setCurrentUser(parsedUser);
           } catch (e) {
             console.error("Failed to parse user data from localStorage:", e);
           }
@@ -79,6 +50,10 @@ export function useCurrentUser(userId: string | null) {
     if (!userId) {
       setUser({
         clerkId: "",
+        firstname: "",
+        lastname: "",
+        experience: "",
+        instrument: "",
         username: "",
         followers: [],
         followings: [],
@@ -106,6 +81,10 @@ export function useCurrentUser(userId: string | null) {
           if (isMounted)
             setUser({
               clerkId: "",
+              firstname: "",
+              lastname: "",
+              experience: "",
+              instrument: "",
               username: "",
               followers: [],
               followings: [],
@@ -116,13 +95,20 @@ export function useCurrentUser(userId: string | null) {
           return;
         }
 
-        const fetchedUser: User = await res.json();
-        if (isMounted) setUser(fetchedUser);
+        const fetchedUser: UserProps = await res.json();
+        if (isMounted) {
+          setCurrentUser(fetchedUser);
+          setUser(fetchedUser);
+        }
       } catch (error) {
         console.error("Error fetching user:", error);
         if (isMounted)
           setUser({
             clerkId: "",
+            firstname: "",
+            lastname: "",
+            experience: "",
+            instrument: "",
             username: "",
             followers: [],
             followings: [],

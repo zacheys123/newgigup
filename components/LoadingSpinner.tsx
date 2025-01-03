@@ -7,9 +7,7 @@ const LoadingSpinner = () => {
       <div className="flex flex-col items-center gap-2">
         {" "}
         <div className="gigtitle text-white flex flex-col gap-2 items-center">
-          <span className="text-neutral-500 font-sans">
-            Please wait while data loads)..
-          </span>
+          <span className="text-neutral-500 font-sans"> loading gigs...</span>
           <CircularProgress
             sx={{ color: "inherit" }}
             size="10px"

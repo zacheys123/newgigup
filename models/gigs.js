@@ -39,10 +39,6 @@ const gigSchema = new mongoose.Schema(
     isTaken: { type: Boolean, default: false },
     isPending: { type: Boolean, default: false },
 
-    gigRating: {
-      type: Number,
-      default: 0,
-    },
     viewCount: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   },
   { timestamps: true }
