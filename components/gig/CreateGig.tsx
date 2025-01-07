@@ -4,8 +4,8 @@ import React, { useState, ChangeEvent, FormEvent } from "react";
 import { Button } from "../ui/button";
 // import DatePicker from "react-datepicker";
 // import "react-datepicker/dist/react-datepicker.css";
-import { CircularProgress } from "@mui/material";
-import { EyeIcon, EyeOff } from "lucide-react";
+import { Box, CircularProgress } from "@mui/material";
+import { ArrowDown, EyeIcon, EyeOff } from "lucide-react";
 
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAuth } from "@clerk/nextjs";
@@ -31,6 +31,7 @@ interface GigInputs {
 interface UserInfo {
   prefferences: string[];
 }
+type bussinesscat = string | null;
 
 const CreateGig = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -54,6 +55,10 @@ const CreateGig = () => {
   const [userinfo, setUserInfo] = useState<UserInfo>({
     prefferences: [],
   });
+  const [bussinesscat, setBussinessCategory] = useState<bussinesscat>("");
+  // const [errors, setErrors] = useState<string[]>([]);
+  // const [success, setSuccess] = useState<boolean>(false);
+  const [showduration, setshowduration] = useState<boolean>(false);
   const { userId } = useAuth();
   const {
     user: { _id },
@@ -73,6 +78,9 @@ const CreateGig = () => {
       ...prev,
       [name]: value,
     }));
+  };
+  const handleBussinessChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setBussinessCategory(e.target.value);
   };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -107,7 +115,7 @@ const CreateGig = () => {
           to: `${gigInputs.end}${gigInputs.durationto}`,
           from: `${gigInputs.start}${gigInputs.durationfrom}`,
           postedBy: _id,
-          bussinesscat: gigInputs.bussinesscat,
+          bussinesscat: bussinesscat,
         }),
       });
       const data = await res.json();
@@ -136,6 +144,7 @@ const CreateGig = () => {
           bussinesscat: "personal",
         });
         setUserInfo({ prefferences: [] });
+        setBussinessCategory("");
       }
       if (data.gigstatus === "false") {
         toast.error(data?.message, {
@@ -153,17 +162,17 @@ const CreateGig = () => {
       setIsLoading(false);
     }
   };
-
+  console.log(bussinesscat);
   return (
-    <div className="h-[100vh] overflow-y-scroll  w-[85%]  mx-auto">
-      <form onSubmit={onSubmit} className=" overflow-y-scroll mt-[20px] py-3 ">
+    <div className="w-[85%]  mx-auto">
+      <form onSubmit={onSubmit} className="  mt-[20px] py-3 ">
         <h6 className=" text-gray-300 font-sans text-center underline mb-3 -my-4">
           Enter info to create a gig
         </h6>
         <select
-          onChange={handleInputChange}
+          onChange={handleBussinessChange}
           name="durationfrom"
-          value={gigInputs?.bussinesscat}
+          value={bussinesscat ? bussinesscat : ""}
           className="mb-2 w-[130px]  bg-neutral-300 h-[30px] rounded-md text-[12px] flex justify-center items-center p-2 font-mono"
         >
           <option value="full">Full Band</option>
@@ -249,12 +258,12 @@ const CreateGig = () => {
             value={gigInputs?.location}
           />{" "}
           <>
-            {gigInputs?.bussinesscat === "other" ? (
+            {bussinesscat === "other" ? (
               <h6 className="choice mb-2">Choose the setUp of the show</h6>
             ) : (
               ""
             )}
-            {gigInputs?.bussinesscat === "personal" && (
+            {bussinesscat === "personal" && (
               <select
                 onChange={handleInputChange}
                 name="category"
@@ -273,7 +282,7 @@ const CreateGig = () => {
                 <option value="percussion">Percussion</option>{" "}
               </select>
             )}
-            {gigInputs?.bussinesscat === "other" && (
+            {bussinesscat === "other" && (
               <div className="h-[80px] rounded-lg shadow-xl gap-5  bg-zinc-800  p-2 choice flex flex-wrap">
                 <div>
                   <input
@@ -373,56 +382,66 @@ const CreateGig = () => {
               </div>
             )}
           </>
-          <div className="flex items-center flex-col gap-2 mt-5">
-            <div className="flex items-center gap-3">
+          {showduration ? (
+            <div className="flex items-center flex-col gap-2 mt-5 bg-gray-800 pt-2 rounded-md relative ">
               {" "}
-              <h6 className="mb-2 w-[50px] text-white font-mono flex justify-center text-[11px]">
-                from:
-              </h6>
-              <input
-                autoComplete="off"
-                type="text"
-                placeholder=" Time e.g 10 means 10:00 "
-                className="mb-2 p-3 focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-800 w-[124px] text-[11px]"
-                onChange={handleInputChange}
-                name="start"
-                value={gigInputs?.start}
-              />{" "}
-              <select
-                onChange={handleInputChange}
-                name="durationfrom"
-                value={gigInputs?.durationfrom}
-                className="mb-2 w-[55px] bg-zinc-800 text-gray-200 h-[34px] rounded-full text-[11px] flex justify-center items-center p-2 font-mono"
+              <div
+                className="text-white absolute right-2 -top-1 text-[23px]"
+                onClick={() => setshowduration(false)}
               >
-                <option value="pm">PM</option>
-                <option value="am">AM</option>
-              </select>{" "}
-            </div>
-            <div className="flex items-center gap-3 ">
-              <h6 className="mb-2 w-[50px] text-white font-mono flex justify-center text-[11px]">
-                to:
-              </h6>
-              <input
-                autoComplete="off"
-                type="text"
-                placeholder=" Time e.g 10 means 10:00 "
-                className="mb-2 p-3 focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-800 w-[124px] text-[11px]"
-                onChange={handleInputChange}
-                name="end"
-                value={gigInputs?.end}
-              />{" "}
-              <select
-                onChange={handleInputChange}
-                name="durationto"
-                value={gigInputs?.durationto}
-                className="mb-2 w-[55px] bg-zinc-800 text-gray-200 h-[34px] rounded-full text-[11px] flex justify-center items-center p-2 font-mono"
-              >
-                <option value="pm">PM</option>
-                <option value="am">AM</option>
-              </select>{" "}
-            </div>
-            {/* date here */}
-            {/* <DatePicker
+                &times;
+              </div>
+              <Box className="flex items-center flex-col  mt-4">
+                <div className="flex items-center gap-3">
+                  {" "}
+                  <h6 className="mb-2 w-[50px] text-white font-mono flex justify-center text-[11px]">
+                    from:
+                  </h6>
+                  <input
+                    autoComplete="off"
+                    type="text"
+                    placeholder=" Time e.g 10 means 10:00 "
+                    className="mb-2 p-3 focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-800 w-[124px] text-[11px]"
+                    onChange={handleInputChange}
+                    name="start"
+                    value={gigInputs?.start}
+                  />{" "}
+                  <select
+                    onChange={handleInputChange}
+                    name="durationfrom"
+                    value={gigInputs?.durationfrom}
+                    className="mb-2 w-[55px] bg-zinc-800 text-gray-200 h-[34px] rounded-full text-[11px] flex justify-center items-center p-2 font-mono"
+                  >
+                    <option value="pm">PM</option>
+                    <option value="am">AM</option>
+                  </select>{" "}
+                </div>
+                <div className="flex items-center gap-3 ">
+                  <h6 className="mb-2 w-[50px] text-white font-mono flex justify-center text-[11px]">
+                    to:
+                  </h6>
+                  <input
+                    autoComplete="off"
+                    type="text"
+                    placeholder=" Time e.g 10 means 10:00 "
+                    className="mb-2 p-3 focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-800 w-[124px] text-[11px]"
+                    onChange={handleInputChange}
+                    name="end"
+                    value={gigInputs?.end}
+                  />{" "}
+                  <select
+                    onChange={handleInputChange}
+                    name="durationto"
+                    value={gigInputs?.durationto}
+                    className="mb-2 w-[55px] bg-zinc-800 text-gray-200 h-[34px] rounded-full text-[11px] flex justify-center items-center p-2 font-mono"
+                  >
+                    <option value="pm">PM</option>
+                    <option value="am">AM</option>
+                  </select>{" "}
+                </div>
+              </Box>
+              {/* date here */}
+              {/* <DatePicker
               selected={selectedDate}
               onChange={handleDate}
               dateFormat="DD/MM/YYYY"
@@ -431,7 +450,23 @@ const CreateGig = () => {
               title="Set Event Date"
               className="font-mono  h-[35px] text-[12px]  bg-zinc-800 border-2 border-neutral-400 mb-2  focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-300 w-[300px]"
             /> */}
-          </div>{" "}
+            </div>
+          ) : (
+            <Box
+              onClick={() => setshowduration(true)}
+              className="flex justify-center items-center w-[70%] my-3  mx-auto bg-gray-500 py-3 rounded-md"
+            >
+              <h6 className="text-[14px] text-gray-400 font-sans">
+                Enter Duration
+              </h6>
+              <ArrowDown
+                size="22"
+                style={{
+                  color: "gray",
+                }}
+              />
+            </Box>
+          )}
           <div className="w-full flex justify-center">
             <Button
               variant="destructive"

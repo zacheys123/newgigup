@@ -5,7 +5,7 @@ import React from "react";
 
 const GigPage = () => {
   return (
-    <div className="overflow-hidden h-[92%] w-full">
+    <div className="overflow-hidden h-[84%] w-full">
       <CreateGig />
     </div>
   );

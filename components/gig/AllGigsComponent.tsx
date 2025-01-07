@@ -47,13 +47,12 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
   };
   return (
     <>
-      {" "}
       {gigdesc && (
         <GigDescription gig={gig} open={open} handleClose={handleClose} />
       )}
       <section
-        className="flex flex-col rounded-md   w-[95%] mx-auto shadow-md  shadow-zinc-600 bg-zinc-700 py-3
-  h-[98x] my-4  px-3 z-00"
+        className=" flex flex-col rounded-md   w-[95%] mx-auto shadow-md  shadow-zinc-600 bg-zinc-700 py-3
+  h-[98x] my-4  px-3"
       >
         <div className="flex items-center justify-between h-full w-full relative ">
           <Box>

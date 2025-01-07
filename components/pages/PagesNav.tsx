@@ -15,7 +15,7 @@ const PagesNav = () => {
   const activelink =
     "text-yellow-400   hover:text-yellow ml-6 transition transion-duration";
   return (
-    <div className=" h-[60px] bg-zinc-900 w-full   border border-1 border-t-slate-600 border-b-0 border-l-0 border-r-0">
+    <div className="z-50 h-[60px] bg-zinc-900 w-full   border border-1 border-t-slate-600 border-b-0 border-l-0 border-r-0">
       <div className="grid grid-cols-5 items-center w-[100%]  h-[100%] px-5 mx-auto ">
         <Link href={`/gigs/${userId}`}>
           <FaHome
