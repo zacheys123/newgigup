@@ -12,10 +12,15 @@ const useStore = create(
     search: false,
     currentUser: {},
     currentgig: {},
-
+    searchQuery: "",
+    follow: false,
     setSearch: (data) =>
       set(() => ({
         search: data,
+      })),
+    setFollow: (data) =>
+      set(() => ({
+        follow: data,
       })),
     setCurrentUser: (data) =>
       set(() => ({
@@ -24,6 +29,10 @@ const useStore = create(
     setCurrentGig: (data) =>
       set(() => ({
         currentgig: data,
+      })),
+    setSearchQuery: (data) =>
+      set(() => ({
+        searchQuery: data,
       })),
 
     // Action to update user information

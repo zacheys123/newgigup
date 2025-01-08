@@ -1,3 +1,5 @@
+import { UserProps } from "./types/userinterfaces";
+
 const randomId = Math.floor(Math.random() * 1000000000);
 export const postedBy = {
   _id: "",
@@ -115,3 +117,30 @@ export const instruments = [
     value: "tuba",
   },
 ];
+export const checkEnvironment = () => {
+  const base_url =
+    process.env.NODE_ENV === "development"
+      ? "http://localhost:3000"
+      : "https://newgigup.vercel.app"; // https://v2ds.netlify.app
+
+  return base_url;
+};
+
+export const searchFunc = (users: UserProps[], searchQuery: string) => {
+  let sortedData = users;
+  console.log(sortedData);
+  if (searchQuery) {
+    sortedData = sortedData?.filter((user: UserProps) => {
+      if (
+        user?.firstname?.toLowerCase().includes(searchQuery) ||
+        user?.lastname?.toLowerCase().includes(searchQuery) ||
+        // user?.username?.toLowerCase().includes(searchQuery) ||
+        user?.email?.toLowerCase().includes(searchQuery) ||
+        user?.instrument?.toLowerCase().includes(searchQuery)
+      ) {
+        return sortedData;
+      }
+    });
+  }
+  return sortedData;
+};

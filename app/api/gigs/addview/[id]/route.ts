@@ -1,6 +1,7 @@
 import connectDb from "@/lib/connectDb";
 import Gigs from "@/models/gigs";
 import User from "@/models/user";
+import { getAuth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function PUT(req: NextRequest) {
@@ -8,7 +9,10 @@ export async function PUT(req: NextRequest) {
   const id = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
   console.log("all id", id);
 
-  console.log(userid);
+  const { userId } = getAuth(req);
+  if (!userId) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
   try {
     await connectDb();
     const newGig = await Gigs.findById(id);

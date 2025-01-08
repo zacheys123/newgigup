@@ -23,7 +23,6 @@ interface AllGigsComponentProps {
 }
 
 const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
-  console.log(gig?.postedBy?.picture);
   const { userId } = useAuth();
   const [loadingPostId, setLoadingPostId] = useState<string>("");
   const [gigdesc, setGigdesc] = useState<boolean>(false);

@@ -1,6 +1,7 @@
 import connectDb from "@/lib/connectDb";
 
 import Gigs from "@/models/gigs";
+import { getAuth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 // import ioClient from "socket.io-client"; // Import Socket.io client
@@ -12,10 +13,10 @@ export async function PUT(req: NextRequest) {
   const { userid } = await req.json();
   const id = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
 
-  if (!id) {
-    return NextResponse.redirect(new URL("/sign-in", req.url));
-  } // Get the start and end of the current day
-
+  const { userId } = getAuth(req);
+  if (!userId) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
   try {
     await connectDb();
     // Find the event and ensure it's not already booked

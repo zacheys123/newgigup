@@ -1,6 +1,6 @@
+import MobileSheet from "@/components/pages/MobileSheet";
 import PagesNav from "@/components/pages/PagesNav";
 import { UserButton } from "@clerk/nextjs";
-import { Menu } from "lucide-react";
 import { Toaster } from "sonner";
 
 export default function GigLayout({
@@ -10,9 +10,8 @@ export default function GigLayout({
 }>) {
   return (
     <div className="bg-black h-screen w-full overflow-hidden">
-      <div className="flex items-center justify-between mt-4 mx-6  ">
-        <Menu size="25px" style={{ color: "gray" }} />
-
+      <div className="flex items-center justify-between mt-1 mx-6  ">
+        <MobileSheet />
         <UserButton />
       </div>
       <Toaster

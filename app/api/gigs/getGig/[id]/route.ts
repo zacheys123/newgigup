@@ -1,5 +1,6 @@
 import Gig from "@/models/gigs";
 import User from "@/models/user";
+import { getAuth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export const GET = async (req: NextRequest) => {
@@ -9,6 +10,10 @@ export const GET = async (req: NextRequest) => {
   if (!id) {
     console.log("Invalid gig ID");
     return null;
+  }
+  const { userId } = getAuth(req);
+  if (!userId) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
   try {
     const gig = await Gig.findOne({ _id: id })

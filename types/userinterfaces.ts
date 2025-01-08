@@ -34,3 +34,12 @@ export interface UserProps {
   allreviews: Review[];
   myreviews: Review[];
 }
+export interface Users {
+  users: UserProps[]; // Optional}
+}
+
+export interface FetchResponse {
+  result: UserProps; //
+  message?: string;
+  status: number;
+}
