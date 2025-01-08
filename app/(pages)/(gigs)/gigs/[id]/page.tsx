@@ -47,9 +47,11 @@ const GigsPage = () => {
           </h1>
         )}
         {!loading ? (
-          gigs?.gigs?.map((gig: GigProps) => (
-            <AllGigsComponent key={gig?._id} gig={gig} />
-          ))
+          gigs?.gigs
+            ?.filter((gig: GigProps) => gig?.isTaken === false)
+            ?.map((gig: GigProps) => (
+              <AllGigsComponent key={gig?._id} gig={gig} />
+            ))
         ) : (
           <LoadingSpinner />
         )}

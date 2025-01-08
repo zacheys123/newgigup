@@ -11,6 +11,7 @@ const useStore = create(
     bookedgigs: [],
     search: false,
     currentUser: {},
+    currentgig: {},
 
     setSearch: (data) =>
       set(() => ({
@@ -19,6 +20,10 @@ const useStore = create(
     setCurrentUser: (data) =>
       set(() => ({
         currentUser: data,
+      })),
+    setCurrentGig: (data) =>
+      set(() => ({
+        currentgig: data,
       })),
 
     // Action to update user information

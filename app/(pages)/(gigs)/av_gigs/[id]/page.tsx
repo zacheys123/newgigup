@@ -40,9 +40,18 @@ const PublishedGigs = () => {
       </div>
       {/* Scrollable Gigs List */}
       <div className="h-[83%] overflow-y-scroll bg-gray-900">
+        {" "}
+        {gigs?.gigs?.length === 0 && (
+          <h1 className="text-white text-center font-bold py-5">
+            No gigs found
+          </h1>
+        )}
         {!loading ? (
           gigs?.gigs
-            ?.filter((gig: GigProps) => gig?.postedBy?._id !== user?._id)
+            ?.filter(
+              (gig: GigProps) =>
+                gig?.postedBy?._id !== user?._id && gig?.isTaken === false
+            )
             ?.map((gig: GigProps) => (
               <AllGigsComponent key={gig?._id} gig={gig} />
             ))

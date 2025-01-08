@@ -31,3 +31,7 @@ export interface GigProps {
 export interface Gigs {
   gigs: GigProps[]; // Optional}
 }
+export interface FetchResponse {
+  gigstatus: boolean;
+  message?: string;
+}

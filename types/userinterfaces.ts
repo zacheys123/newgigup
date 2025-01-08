@@ -15,7 +15,7 @@ export interface UserProps {
   _id?: string;
   email?: string;
   clerkId: string; // Required and unique
-  picture?: string;
+  picture?: string | null;
   firstname?: string | undefined;
   lastname?: string;
   city?: string;

@@ -1,7 +1,6 @@
 import connectDb from "@/lib/connectDb";
 
 import Gigs from "@/models/gigs";
-import User from "@/models/user";
 import { NextRequest, NextResponse } from "next/server";
 
 // import ioClient from "socket.io-client"; // Import Socket.io client
@@ -12,7 +11,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function PUT(req: NextRequest) {
   const { userid } = await req.json();
   const id = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
-  console.log(userid);
+
   if (!id) {
     return NextResponse.redirect(new URL("/sign-in", req.url));
   } // Get the start and end of the current day
@@ -28,27 +27,26 @@ export async function PUT(req: NextRequest) {
         message: "Cannot Book this Gig,already booked? ",
       });
     }
+    if (!newGig?.viewCount.includes(userid)) {
+      await newGig.updateOne(
+        {
+          $push: {
+            viewCount: userid,
+          },
+        },
+        { new: true }
+      );
+    }
     await newGig.updateOne(
       {
         $set: {
           isPending: true,
           bookedBy: userid,
         },
-        $push: {
-          viewCount: userid,
-        },
       },
       { new: true }
     );
-    const currentgig = await Gigs.findById(newGig._id)
-      .populate({
-        path: "postedBy",
-        model: User,
-      })
-      .populate({
-        path: "bookedBy",
-        model: User,
-      });
+
     // Notify Socket.io server directly
     // socket.emit("book-gig", {
     //   _id: currentgig?._id,
@@ -74,9 +72,8 @@ export async function PUT(req: NextRequest) {
     //   `Gig "${currentgig.title}" has been booked.`
     // );
     return NextResponse.json({
-      gigstatus: "true",
-      message: "Updated Gig successfully",
-      results: currentgig,
+      gigstatus: true,
+      message: "Booked the gig successfully",
     });
   } catch (error) {
     console.log(error);
