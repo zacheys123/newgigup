@@ -10,7 +10,7 @@ export default function GigLayout({
 }>) {
   return (
     <div className="bg-black h-screen w-full overflow-hidden">
-      <div className="flex items-center justify-between my-4 mx-6  ">
+      <div className="flex items-center justify-between mt-4 mx-6  ">
         <MobileSheet />
         <UserButton />
       </div>
