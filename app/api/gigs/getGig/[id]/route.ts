@@ -9,7 +9,7 @@ export const GET = async (req: NextRequest) => {
 
   if (!id) {
     console.log("Invalid gig ID");
-    return null;
+    return NextResponse.json({ error: "Invalid gig ID" }, { status: 400 });
   }
   const { userId } = getAuth(req);
   if (!userId) {

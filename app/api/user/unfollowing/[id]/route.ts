@@ -14,11 +14,9 @@ export async function PUT(req: NextRequest) {
   }
   try {
     await connectDb();
-
     const newUser = await User.findByIdAndUpdate(following, {
       $pull: { followings: id },
     });
-
     return NextResponse.json({ result: newUser, status: 200 });
   } catch (error) {
     console.log(error);
