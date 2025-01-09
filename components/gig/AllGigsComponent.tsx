@@ -308,9 +308,9 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
           ) : (
             <div>
               <span className="titler text-red-700 font-bold line-clamp-1 ">
-                {gig?.bookedBy?.picture && (
+                {gig?.postedBy?.picture && (
                   <Image
-                    src={gig?.bookedBy?.picture}
+                    src={gig?.postedBy?.picture}
                     alt="p"
                     width={25}
                     height={25}
