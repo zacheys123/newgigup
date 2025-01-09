@@ -1,7 +1,6 @@
 "use client";
 import { Avatar } from "@mui/material";
 import React from "react";
-import Transition from "./Transition";
 import { useRouter } from "next/navigation";
 import { UserProps } from "@/types/userinterfaces";
 
@@ -10,27 +9,22 @@ import { useAllUsers } from "@/hooks/useAllUsers";
 const OverlaySearch = () => {
   const { users } = useAllUsers();
   const router = useRouter();
-  const variant = {
-    initial: {
-      y: ["-1000px", "-500px", "-400px", "-200px", "0px", ""],
-      opacity: [-10, -7, 0],
-    },
-    animate: {
-      y: 0,
-      opacity: [-10, -7, -5, -3, 1],
-    },
-    transition: {
-      ease: "easeInOut",
-      duration: 0.75,
-    },
-  };
+  // const variant = {
+  //   initial: {
+  //     y: ["-1000px", "-500px", "-400px", "-200px", "0px", ""],
+  //     opacity: [-10, -7, 0],
+  //   },
+  //   animate: {
+  //     y: 0,
+  //     opacity: [-10, -7, -5, -3, 1],
+  //   },
+  //   transition: {
+  //     ease: "easeInOut",
+  //     duration: 0.75,
+  //   },
+  // };
   return (
-    <Transition
-      variant={variant}
-      className="absolute bg-green-500"
-      navStates={false}
-      onClick={() => console.log("clicked")}
-    >
+    <div>
       <div className="md:flex flex-col  md:z-50  md:bg-black md:h-screen md:w-screen  ">
         {users?.users?.map((user: UserProps) => {
           return (
@@ -59,7 +53,7 @@ const OverlaySearch = () => {
           );
         })}
       </div>
-    </Transition>
+    </div>
   );
 };
 
