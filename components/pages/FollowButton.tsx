@@ -1,0 +1,154 @@
+import { useEffect, useState } from "react";
+import { IoMdAdd } from "react-icons/io";
+import { useRouter } from "next/navigation";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import useStore from "@/app/zustand/useStore";
+import { useAuth } from "@clerk/nextjs";
+import { FetchResponse } from "@/types/userinterfaces";
+
+// The FollowButton component that supports optimistic UI updates
+const FollowButton = ({
+  _id,
+  followers,
+}: {
+  _id: string;
+  followers: string[];
+}) => {
+  const { userId } = useAuth();
+  const { user } = useCurrentUser(userId || null);
+  const { setFollow, follow } = useStore();
+  const router = useRouter();
+
+  // Local state to handle the optimistic update
+  const [optimisticFollow, setOptimisticFollow] = useState(
+    followers.includes(user?._id || "")
+  );
+  console.log(optimisticFollow);
+  // Function to handle the follow action
+  const handleFollow = async () => {
+    // Optimistically set follow status
+    setOptimisticFollow(true);
+    setFollow(true); // Update global state as well
+
+    try {
+      const res = await fetch(`/api/user/follower/${_id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ follower: user?._id }),
+      });
+
+      if (res.ok) {
+        // Refresh the page or update the followers in the UI
+        router.refresh();
+      } else {
+        throw new Error("Failed to follow");
+      }
+    } catch (error) {
+      // Revert optimistic update on failure
+      setOptimisticFollow(false);
+      setFollow((prev: boolean) => !prev); // Update global state as well
+      console.error("Error following:", error);
+    }
+  };
+
+  // Function to handle unfollow action
+  const handleUnfollow = async () => {
+    // Optimistically set unfollow status
+    setOptimisticFollow(false);
+    setFollow(false); // Update global state as well
+
+    try {
+      const res = await fetch(`/api/user/unfollower/${_id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ follower: user?._id }),
+      });
+
+      if (res.ok) {
+        // Refresh the page or update the followers in the UI
+        router.refresh();
+      } else {
+        throw new Error("Failed to unfollow");
+      }
+    } catch (error) {
+      // Revert optimistic update on failure
+      setOptimisticFollow(true);
+      setFollow((prev: boolean) => !prev); // Update global state as well
+      console.error("Error unfollowing:", error);
+    }
+  };
+
+  const handleUnFollowingCurrent = async () => {
+    try {
+      setFollow(false);
+      const res = await fetch(`/api/user/unfollowing/${_id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ following: user?._id }),
+      });
+      const followingData: FetchResponse = await res.json();
+      console.log(followingData);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const handleFollowing = async () => {
+    try {
+      const res = await fetch(`/api/user/following/${_id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ following: user?._id }),
+      });
+      const followingData: FetchResponse = await res.json();
+      console.log(followingData);
+      if (res.ok) {
+        console.log("following!!!", followingData);
+        router.refresh();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    console.log("Initial optimisticFollow:", optimisticFollow);
+    console.log("Followers array:", followers);
+    console.log("Current User ID:", user?._id);
+  }, [optimisticFollow, followers, user]);
+  const isFollowing = followers.includes(user?._id || "");
+  return (
+    <div>
+      {/* Conditional rendering based on optimistic follow state */}{" "}
+      {(!follow && isFollowing) || optimisticFollow ? (
+        <button
+          onClick={() => {
+            handleUnfollow();
+            handleUnFollowingCurrent();
+          }}
+          className="flex items-center gap-1 text-gray-200 hover:text-red-800 text-[12px] p-1    bg-red-800  px-2 -py-6 rounded-md  min-w-[50px]"
+        >
+          following
+        </button>
+      ) : (
+        <button
+          onClick={() => {
+            handleFollow();
+            handleFollowing();
+          }}
+          className="flex items-center gap-1 text-green-700 hover:text-red-800 text-[12px] p-1     bg-neutral-200  px-2 -py-6 rounded-md  min-w-[50px]"
+        >
+          Follow <IoMdAdd style={{ fontSize: "16px" }} />
+        </button>
+      )}
+    </div>
+  );
+};
+
+export default FollowButton;
