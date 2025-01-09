@@ -1,19 +1,17 @@
-"use client";
-
-import { motion } from "framer-motion";
+import { motion, MotionValue } from "framer-motion";
 
 interface TransitionProps {
   children: React.ReactNode;
   variant: {
-    initial: object;
-    animate: object;
+    initial: MotionValue | { [key: string]: null } | undefined; // Handle motion values or object values
+    animate: MotionValue | { [key: string]: null };
     transition: object;
   };
   className: string;
   navStates: boolean;
   onClick: () => void;
-  // initialStyle: any;
 }
+
 export default function Transition({
   children,
   variant,
@@ -21,12 +19,21 @@ export default function Transition({
   navStates,
   onClick,
 }: TransitionProps) {
+  const initial =
+    variant.initial instanceof MotionValue
+      ? variant.initial.get()
+      : variant.initial;
+  const animate =
+    variant.animate instanceof MotionValue
+      ? variant.animate.get()
+      : variant.animate;
+
   return (
     <>
       {navStates ? (
         <motion.div
-          initial={variant.initial || {}}
-          animate={variant.animate}
+          initial={initial || undefined}
+          animate={animate}
           transition={variant.transition}
           className={className}
         >
@@ -34,11 +41,8 @@ export default function Transition({
         </motion.div>
       ) : (
         <motion.div
-          //   initial={initialStyle}
-          //   animate={animateStyle}
-          //   transition={transitionStyle}
-          initial={variant.initial}
-          animate={variant.animate}
+          initial={initial}
+          animate={animate}
           transition={variant.transition}
           className={className}
           onClick={onClick}
