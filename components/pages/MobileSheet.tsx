@@ -66,7 +66,7 @@ const MobileSheet = () => {
           <Search size="20" /> <SheetDescription>Search</SheetDescription>
         </Link>{" "}
         <Link
-          href={`/v1/profile/${userId}`}
+          href={`/profile`}
           className="flex flex-row  items-center gap-2 min-w-[30%] mx-auto whitespace-pre-line"
         >
           <User size="20" /> <SheetDescription>Profile</SheetDescription>
