@@ -26,7 +26,7 @@ const PublishedGigs = () => {
   // console.log(gigs?.gigs?.map((gig: GigProps) => console.log(gig)));
 
   return (
-    <div className="h-[83%] w-[90%] mx-auto my-2 shadow-md shadow-orange-300 relative">
+    <div className="h-[85%] w-[90%] mx-auto my-2 shadow-md shadow-orange-300 relative">
       {/* Fixed Gigheader */}
       <div className="sticky top-0 z-10 shadow-md">
         <Gigheader
