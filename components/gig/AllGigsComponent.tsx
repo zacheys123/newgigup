@@ -298,10 +298,10 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
           gig?.bookedBy?._id !== myId &&
           gig?.postedBy?._id === myId ? (
             <div
-              className="flex-1 bg-gray-300 px-3 py-1 rounded-tl-sm rounded-r-3xl rounded-b-2xl rounded-br-md"
+              className="flex-1 bg-yellow-600 px-3 py-1 rounded-tl-sm rounded-r-3xl rounded-b-2xl rounded-br-md"
               onClick={() => router.push(`/execute/${gig?._id}`)}
             >
-              <h4 className="text-[10px] !text-orange-500 font-bold  ">
+              <h4 className="text-[10px] !text-orange-100 font-bold  ">
                 Review Musician
               </h4>
             </div>
