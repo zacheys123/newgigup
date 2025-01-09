@@ -8,7 +8,7 @@ import React, { FormEvent, useState } from "react";
 import { RiCornerDownRightLine } from "react-icons/ri";
 import { Button } from "../ui/button";
 import Rating from "./Rating";
-import { ArrowDown, ArrowUp, EyeIcon, MessageCircle, X } from "lucide-react";
+import { ArrowDown, ArrowUp, MessageCircle, X } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
 import { useBookMusician, useForgetBookings } from "@/hooks/useForgetBooking";
 import { Textarea } from "flowbite-react";
@@ -141,7 +141,7 @@ const AcceptPage = () => {
         <h4 className="text-gray-400 text-[13px] font-serif underline underline-offset-2">
           Personal
         </h4>
-        <div className="w-full h-[30px] flex justify-end  items-center gap-[110px] ">
+        <div className="w-full h-[30px] flex justify-end  items-center gap-[90px] ">
           {currentgig?.bookedBy?.picture && (
             <Image
               src={currentgig?.bookedBy?.picture}
@@ -155,17 +155,10 @@ const AcceptPage = () => {
 
           <div className="flex gap-4 items-center">
             <div className="flex items-center ">
-              <h4 className="text-gray-400 text-[14px] font-mono font-bold">
-                {currentgig?.viewCount?.length}
+              <h4 className="text-gray-300 text-[14px] font-mono font-bold flex items-center gap-1">
+                {currentgig?.viewCount?.length}{" "}
+                <span className="text-gray-400">views</span>
               </h4>
-              <EyeIcon
-                size="17"
-                style={{
-                  marginLeft: "5px",
-                  cursor: "pointer",
-                  color: "white",
-                }}
-              />
             </div>
             <div className="flex  items-center">
               <h4 className="text-gray-400 text-[13px] font-sans">follow</h4>

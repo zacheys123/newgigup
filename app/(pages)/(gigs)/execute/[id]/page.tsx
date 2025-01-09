@@ -39,8 +39,12 @@ const ViewGigDetails = () => {
     return (
       <div className="h-[85%] w-full flex justify-center items-center">
         <div>
-          <Button onClick={() => router.push(`/gigs/${id}/booking`)}>
-            loading...
+          <Button
+            onClick={() => router.push(`/gigs/${id}/booking`)}
+            variant="default"
+            className="text-orange-400 font-bold"
+          >
+            loading Gig Info...
           </Button>
         </div>
       </div>
@@ -48,7 +52,7 @@ const ViewGigDetails = () => {
   }
   if (currentgig?.bookedBy == null || currentgig.postedBy == null) {
     return (
-      <div className="h-[84%] w-full flex  flex-col justify-center items-center">
+      <div className="h-[84%] w-full flex p-2  flex-col justify-center items-center">
         <h4 className="text-gray-400">No Gig Info found, try later </h4>
         <div className="flex justify-around">
           <Button onClick={() => router.push(`/gigs/${userId}`)}>

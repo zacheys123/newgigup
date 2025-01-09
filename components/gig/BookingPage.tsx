@@ -2,7 +2,7 @@ import useStore from "@/app/zustand/useStore";
 import { useForgetBookings } from "@/hooks/useForgetBooking";
 import { useAuth } from "@clerk/nextjs";
 import { CircularProgress } from "@mui/material";
-import { EyeIcon, MessageCircle, X } from "lucide-react";
+import { MessageCircle, X } from "lucide-react";
 import Image from "next/image";
 import React from "react";
 import { MdAdd } from "react-icons/md";
@@ -60,17 +60,10 @@ const BookingPage = () => {
 
           <div className="flex gap-4 items-center">
             <div className="flex items-center ">
-              <h4 className="text-gray-400 text-[14px] font-mono font-bold">
-                {currentgig?.viewCount?.length}
+              <h4 className="text-gray-300 text-[14px] font-mono font-bold flex items-center gap-1">
+                {currentgig?.viewCount?.length}{" "}
+                <span className="text-gray-400">views</span>
               </h4>
-              <EyeIcon
-                size="17"
-                style={{
-                  marginLeft: "5px",
-                  cursor: "pointer",
-                  color: "white",
-                }}
-              />
             </div>
             <div className="flex  items-center">
               <h4 className="text-gray-400 text-[13px] font-sans">follow</h4>
