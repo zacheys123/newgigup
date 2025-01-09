@@ -53,13 +53,16 @@ const ViewGigDetails = () => {
   if (currentgig?.bookedBy == null || currentgig.postedBy == null) {
     return (
       <div className="h-[84%] w-full flex p-2  flex-col justify-center items-center">
-        <h4 className="text-gray-400">No Gig Info found, try later </h4>
-        <div className="flex justify-around">
-          <Button onClick={() => router.push(`/gigs/${userId}`)}>
+        <h4 className="text-gray-400 mb-2">No Gig Info found, try later </h4>
+        <div className="flex w-full gap-2">
+          <Button
+            onClick={() => router.push(`/gigs/${userId}`)}
+            className="!bg-yellow-700 text-gray-200"
+          >
             Go to Main Page
           </Button>
-          <Button onClick={() => window.location.reload()}>
-            reload page
+          <Button onClick={() => window.location.reload()} variant="primary">
+            Reload page
             <TfiReload />
           </Button>
         </div>
