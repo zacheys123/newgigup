@@ -42,11 +42,11 @@ const BookingPage = () => {
           />
         )}
       </div>
-      <div className="h-[130px] w-[90%] mx-auto p-4 bg-slate-700  shadow-md shadow-zinc-700 my-4 flex flex-col gap-3">
+      <div className="min-h-[130px] w-[90%] mx-auto p-4 bg-zinc-800  shadow-md shadow-zinc-700 my-2 flex flex-col gap-3 rounded-md">
         <h4 className="text-gray-400 text-[13px] font-serif underline underline-offset-2">
           Personal
         </h4>
-        <div className="w-full h-[30px] flex justify-end  items-center gap-[110px] ">
+        <div className="w-full h-[30px] flex justify-end  items-center gap-[86px] ">
           {currentgig?.postedBy?.picture && (
             <Image
               src={currentgig.postedBy.picture}
@@ -65,10 +65,10 @@ const BookingPage = () => {
                 <span className="text-gray-400">views</span>
               </h4>
             </div>
-            <div className="flex  items-center">
-              <h4 className="text-gray-400 text-[13px] font-sans">follow</h4>
+            <div className="flex  items-center bg-neutral-500 py-1 px-2 rounded-md">
+              <h4 className="text-gray-300 text-[13px] font-sans">follow</h4>
               <MdAdd
-                size="21px"
+                size="13px"
                 style={{
                   marginLeft: "5px",
                   cursor: "pointer",
@@ -86,7 +86,7 @@ const BookingPage = () => {
             />
           </div>
         </div>
-        <div className="w-full  h-full flex justify-around">
+        <div className="w-full  h-full flex gap-2 mt-3">
           <h4 className="text-gray-300 text-[13px] font-bold">
             {currentgig?.postedBy?.firstname}
           </h4>{" "}
@@ -94,8 +94,13 @@ const BookingPage = () => {
             {currentgig?.postedBy?.lastname}
           </h4>
         </div>
+        <div className="w-full  h-full flex gap-2 ">
+          <h4 className="text-gray-300 text-[13px] font-bold">
+            {currentgig?.postedBy?.username}
+          </h4>{" "}
+        </div>
       </div>
-      <div className="min-h-[130px] w-[90%] mx-auto p-4 bg-orange-900   shadow-md shadow-zinc-700 my-4">
+      <div className="min-h-[160px] w-[90%] mx-auto p-4    shadow-md shadow-zinc-700 my-2">
         {" "}
         <h4 className="text-gray-400 text-[13px] font-serif underline underline-offset-2">
           GigInfo
@@ -112,7 +117,7 @@ const BookingPage = () => {
           </h4>{" "}
         </div>
       </div>
-      <div className="min-h-[130px] w-[90%] mx-auto p-4 bg-rose-900  shadow-md shadow-zinc-700 my-4">
+      <div className="min-h-[160px] w-[90%] mx-auto p-4   shadow-md shadow-zinc-700 my-2">
         {" "}
         <h4 className="text-gray-400 text-[13px] font-serif underline underline-offset-2">
           BussinessInfo
@@ -129,13 +134,13 @@ const BookingPage = () => {
           </h4>{" "}
         </div>
       </div>
-      <div className="min-h-[130px] w-[90%] mx-auto p-4 bg-gray-300  shadow-md shadow-zinc-700 my-4">
+      <div className="min-h-[160px] w-[90%] mx-auto p-4   shadow-md shadow-zinc-700 my-2">
         {" "}
         <h4 className="text-gray-500 text-[13px] font-serif underline underline-offset-2">
           More Info
         </h4>
         <div className="w-full  h-full flex flex-col justify-around">
-          <h4 className="text-gray-600 text-[13px] font-bold mt-2">
+          <h4 className="text-gray-500 text-[13px] font-bold mt-2">
             Gig type:{" "}
             {currentgig?.bussinesscat === "full"
               ? "Full Band"
@@ -146,16 +151,16 @@ const BookingPage = () => {
               currentgig?.bandCategory &&
               currentgig?.bandCategory.map((bnd: string) => (
                 <ul key={bnd}>
-                  <li className="text-gray-600 text-[13px] font-bold mt-2">
+                  <li className="text-gray-500 text-[13px] font-bold mt-2">
                     {bnd}
                   </li>
                 </ul>
               ))}
           </h4>{" "}
-          <h4 className="text-gray-700 text-[13px] font-bold mt-2">
+          <h4 className="text-gray-500 text-[13px] font-bold mt-2">
             Start time: {currentgig?.time?.from}
           </h4>{" "}
-          <h4 className="text-gray-700 text-[13px] font-bold mt-2">
+          <h4 className="text-gray-500 text-[13px] font-bold mt-2">
             Finish time: {currentgig?.time?.to}
           </h4>{" "}
         </div>

@@ -37,7 +37,7 @@ const ViewGigDetails = () => {
   console.log(currentgig);
   if (loading) {
     return (
-      <div className="h-[85%] w-full flex justify-center items-center">
+      <div className="h-[85%] w-full flex justify-center items-center animate-pulse">
         <div>
           <Button
             onClick={() => router.push(`/gigs/${id}/booking`)}
