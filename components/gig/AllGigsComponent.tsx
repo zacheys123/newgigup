@@ -129,7 +129,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                     <div className="w-full text-right ">
                       <ButtonComponent
                         variant="secondary"
-                        classname="!bg-gray-200 h-[20px] text-[8px]  font-bold w-[60px] text-gray-700 mt-5 "
+                        classname="!bg-gray-200 h-[20px] text-[8px]  font-bold w-[60px] text-gray-700 mt-5  rounded-b-md rounded-br-xl"
                         onclick={() => {
                           setLoadingPostId(gig?._id || "");
 
@@ -165,7 +165,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                     <div className="w-full text-right p-1  ">
                       <ButtonComponent
                         variant="secondary"
-                        classname="!bg-red-400 h-[20px] text-[8px]  font-bold w-[60px] text-white  mt-5"
+                        classname="!bg-red-400 h-[20px] text-[8px]  font-bold w-[60px] text-white  mt-5 rounded-b-md rounded-br-xl"
                         onclick={() => {
                           setLoadingPostId(gig?._id || "");
                           setTimeout(() => {
@@ -196,7 +196,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                     <div className="w-full text-right">
                       <ButtonComponent
                         variant="secondary"
-                        classname=" h-[20px] text-[8px] m-2 font-bold"
+                        classname=" h-[20px] text-[8px] mt-5 font-bold   rounded-b-md rounded-br-xl"
                         onclick={() => {
                           setLoadingPostId(gig?._id || "");
 
@@ -294,12 +294,14 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
               </>
             )}
           </div>
-          {gig?.isTaken ? (
+          {gig?.isTaken &&
+          gig?.bookedBy?._id !== myId &&
+          gig?.postedBy?._id === myId ? (
             <div
-              className="flex-1 bg-gray-300 px-3  rounded-tl-sm rounded-r-3xl rounded-b-2xl"
+              className="flex-1 bg-gray-300 px-3 py-1 rounded-tl-sm rounded-r-3xl rounded-b-2xl rounded-br-md"
               onClick={() => router.push(`/execute/${gig?._id}`)}
             >
-              <h4 className="text-[10px] !text-orange-500 font-bold ">
+              <h4 className="text-[10px] !text-orange-500 font-bold  ">
                 Review Musician
               </h4>
             </div>

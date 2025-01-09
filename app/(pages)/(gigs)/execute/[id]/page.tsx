@@ -42,7 +42,7 @@ const ViewGigDetails = () => {
           <Button
             onClick={() => router.push(`/gigs/${id}/booking`)}
             variant="default"
-            className="text-orange-400 font-bold"
+            className="text-orange-400 font-semibold"
           >
             loading Gig Info...
           </Button>
