@@ -1,6 +1,6 @@
 // app/api/upload/route.js
 import { NextResponse } from "next/server";
-import cloudinary from "cloudinary";
+import { v2 as cloudinary } from "cloudinary";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -8,6 +8,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+const apiSecret = process.env.CLOUDINARY_API_SECRET;
 export async function GET() {
   try {
     const signature = cloudinary.utils.api_sign_request(
@@ -15,7 +16,7 @@ export async function GET() {
         timestamp: Math.floor(Date.now() / 1000),
         upload_preset: process.env.CLOUDINARY_UPLOAD_PRESET, // Set to your signed preset
       },
-      process.env.CLOUDINARY_API_SECRET
+      apiSecret || ""
     );
 
     return NextResponse.json({
