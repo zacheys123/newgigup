@@ -6,7 +6,6 @@ import { getAuth } from "@clerk/nextjs/server";
 
 export async function GET(req: NextRequest) {
   const id = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
-  console.log("all id", id);
   const { userId } = getAuth(req);
   if (!userId) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });

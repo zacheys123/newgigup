@@ -9,7 +9,6 @@ import moment from "moment";
 
 export async function PUT(req: NextRequest) {
   const id = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
-  console.log("current id", id);
 
   const { comment, rating } = await req.json();
 

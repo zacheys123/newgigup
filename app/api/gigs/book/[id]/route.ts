@@ -5,7 +5,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function PUT(req: NextRequest) {
   const id = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
-  console.log("current id", id);
   const { userId } = getAuth(req);
   if (!userId) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });

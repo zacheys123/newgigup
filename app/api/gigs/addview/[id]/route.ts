@@ -7,7 +7,6 @@ import { NextRequest, NextResponse } from "next/server";
 export async function PUT(req: NextRequest) {
   const { userid } = await req.json();
   const id = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
-  console.log("all id", id);
 
   const { userId } = getAuth(req);
   if (!userId) {

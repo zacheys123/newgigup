@@ -15,7 +15,6 @@ export async function GET(req: NextRequest) {
     const users = AllOtherUsersNotLoggedIn?.filter(
       (user: UserProps) => user.clerkId !== userId
     );
-    console.log(users);
     return NextResponse.json({ users });
   } catch (error) {
     console.log(error);

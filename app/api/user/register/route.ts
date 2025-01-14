@@ -1,4 +1,3 @@
-
 import connectDb from "@/lib/connectDb";
 import User from "@/models/user";
 import { getAuth } from "@clerk/nextjs/server";
@@ -24,14 +23,11 @@ interface UserInput {
   phoneNumbers: UserPhone[];
 }
 
-
 export async function POST(req: NextRequest): Promise<Response> {
   try {
     const { userId } = getAuth(req); // Use getAuth for server-side authentication
     const body = await req.json(); // Parse JSON body
     const { user } = body as { user: UserInput }; // Use defined type for the user object
-
-    console.log("Parsed user from request:", user);
 
     if (!userId) {
       return NextResponse.json({
@@ -71,7 +67,6 @@ export async function POST(req: NextRequest): Promise<Response> {
     );
 
     if (userId && existingUser) {
-      console.log("User exists");
       return NextResponse.json({
         userstatus: false,
         message: "User already exists",
@@ -106,4 +101,3 @@ export async function POST(req: NextRequest): Promise<Response> {
     });
   }
 }
-
