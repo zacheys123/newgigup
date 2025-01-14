@@ -72,7 +72,7 @@ const MobileSheet = () => {
           <User size="20" /> <SheetDescription>Profile</SheetDescription>
         </Link>
         <Link
-          href={`/gigme/gigs/${userId}`}
+          href={`/reviews/${user?._id}/*${user?.firstname}${user?.lastname}`}
           className="flex flex-row  items-center gap-2 min-w-[30%] mx-auto whitespace-pre-line"
         >
           <Music size="20" /> <SheetDescription>My Reviews</SheetDescription>

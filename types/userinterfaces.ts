@@ -4,6 +4,7 @@ export interface Video {
 }
 
 export interface Review {
+  _id: string;
   rating: number;
   comment: string;
   gigId: string; // assuming Gig ID is a string

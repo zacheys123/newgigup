@@ -13,6 +13,8 @@ import { toast } from "react-toastify";
 import { useAuth } from "@clerk/nextjs";
 // import { ArrowRight } from "lucide-react";
 import Image from "next/image";
+import { motion } from "framer-motion";
+import { Review } from "@/types/userinterfaces";
 interface FetchResponse {
   success: boolean;
   message?: string;
@@ -61,6 +63,22 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
   };
   const handleEdit = async (id: string) => {
     router.push(`/editpage/edit/${id}`);
+  };
+
+  const [showModal, setShowModal] = useState(false);
+  const [selectedReview, setSelectedReview] = useState<Review | null>(null);
+
+  const handleClick = () => {
+    const review = gig?.postedBy?.myreviews.find(
+      (review) => review.gigId === gig?._id
+    );
+
+    if (review) {
+      setSelectedReview(review); // Set the selected review for modal
+      setShowModal(true); // Show the modal
+    } else {
+      router.push(`/execute/${gig?._id}`); // Redirect if no review
+    }
   };
   return (
     <>
@@ -298,11 +316,15 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
           gig?.bookedBy?._id !== myId &&
           gig?.postedBy?._id === myId ? (
             <div
-              className="flex-1 bg-yellow-600 px-3 py-1 rounded-tl-sm rounded-r-3xl rounded-b-2xl rounded-br-md"
-              onClick={() => router.push(`/execute/${gig?._id}`)}
+              className="flex-1 flex justify-end bg-yellow-600 px-3 py-1 rounded-tl-sm rounded-r-3xl rounded-b-2xl rounded-br-md"
+              onClick={handleClick}
             >
-              <h4 className="text-[10px] !text-orange-100 font-bold  ">
-                Review Musician
+              <h4 className="text-[10px] !text-orange-100 font-bold">
+                {gig?.postedBy?.myreviews?.some(
+                  (review) => review.gigId === gig?._id
+                )
+                  ? "Already Reviewed"
+                  : "Review Musician"}
               </h4>
             </div>
           ) : (
@@ -318,6 +340,20 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                   />
                 )}
               </span>
+            </div>
+          )}{" "}
+          {!showModal && selectedReview && (
+            <div className="relative h-full w-full flex justify-center items-center">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+                className="bg-white shadow-md p-5 rounded-md w-[300px] h-[200px] absolute flex flex-col gap-2"
+              >
+                <h6 className="flex justify-end text-[19px] font-bold">
+                  &times;
+                </h6>
+              </motion.div>
             </div>
           )}
         </div>

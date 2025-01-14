@@ -57,7 +57,7 @@ export async function PUT(req: NextRequest) {
             allreviews: {
               rating: rating,
               comment: comment,
-
+              gigId: id,
               createdAt: moment().toISOString(),
               updatedAt: moment().toISOString(),
             },
