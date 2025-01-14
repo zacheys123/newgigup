@@ -6,7 +6,7 @@ import React from "react";
 const ReviewComponent = () => {
   const { userId } = useAuth();
   const { user } = useCurrentUser(userId || null);
-  console.log(user?.allreviews);
+  console.log(user?._id);
   return (
     <div>
       <h2 className="text-gray-300">user?.all</h2>
@@ -15,3 +15,4 @@ const ReviewComponent = () => {
 };
 
 export default ReviewComponent;
+// 67766d6efcde8ba309c2fb75

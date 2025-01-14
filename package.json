@@ -19,6 +19,7 @@
     "@radix-ui/react-slot": "^1.1.1",
     "@types/react-toastify": "^4.1.0",
     "class-variance-authority": "^0.7.1",
+    "cloudinary": "^2.5.1",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
     "flowbite-react": "^0.10.2",

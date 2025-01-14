@@ -17,7 +17,9 @@ const MyGigs = () => {
   const [location, setLocation] = useState<string>(() =>
     user?.city ? user?.city : "all"
   );
-
+  console.log(
+    gigs?.gigs?.filter((gig: GigProps) => gig?.postedBy?._id === user?._id)
+  );
   return (
     <div className="h-[83%] w-[90%] mx-auto my-2 shadow-md shadow-orange-300 relative">
       {/* Fixed Gigheader */}
