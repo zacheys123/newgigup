@@ -1,4 +1,4 @@
-import ReviewComponent from "@/components/reviews/allreviews/ReviewComponent";
+import ReviewComponent from "@/components/reviews/ReviewComponent";
 import React from "react";
 
 const AllReviews = ({
@@ -9,7 +9,7 @@ const AllReviews = ({
   const { id } = params;
   console.log("my logged in", id);
   return (
-    <div>
+    <div className=" w-[100vw] h-[86%] bg-slate-900 overflow-y-auto">
       <ReviewComponent />
     </div>
   );
