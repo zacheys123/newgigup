@@ -3,9 +3,7 @@ import React from "react";
 import { PropTypes } from "prop-types";
 import Image from "next/image";
 import { Avatar } from "@mui/material";
-import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
-import AvatarComponent from "../Avatar";
 
 const DisplayAllGigs = ({ gigs = {}, user = {} }) => {
   const router = useRouter();

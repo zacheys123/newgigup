@@ -1,8 +1,8 @@
 "use client";
 import useStore from "@/app/zustand/useStore";
-import { FollowTheSigns, People } from "@mui/icons-material";
+import { People } from "@mui/icons-material";
 import { Badge } from "@mui/material";
-import { Edit2, Music, Text, User, Users } from "lucide-react";
+import { Edit2, Music, Text, Users } from "lucide-react";
 import React from "react";
 import { PropTypes } from "prop-types";
 const SideBar = ({ user }) => {

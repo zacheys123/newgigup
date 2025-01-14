@@ -2,10 +2,8 @@
 import useStore from "@/app/zustand/useStore";
 import React, { useEffect, useState } from "react";
 import { PropTypes } from "prop-types";
-import ProfileComponent from "../userprofile/ProfileComponent";
 import { useRouter } from "next/navigation";
 import { dataObject } from "@/lib/largeDisplay";
-import { getAllUsers } from "@/app/server-actions/getAllUsers";
 const InfoComponent = ({ user, allUsers }) => {
   const [allGigs, setAllgigs] = useState({});
   const router = useRouter();

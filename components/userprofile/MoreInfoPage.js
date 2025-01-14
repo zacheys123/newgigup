@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import FriendList from "./FriendList";
 import clsx from "clsx";
 import BookedGigList from "./BookedGigList";
