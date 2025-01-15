@@ -55,6 +55,7 @@ export async function PUT(req: NextRequest) {
         {
           $push: {
             allreviews: {
+              userid: booker,
               rating: rating,
               comment: comment,
               gigId: id,
@@ -69,6 +70,7 @@ export async function PUT(req: NextRequest) {
         {
           $push: {
             myreviews: {
+              userid: poster,
               rating: rating,
               comment: comment,
               gigId: id,
@@ -80,6 +82,11 @@ export async function PUT(req: NextRequest) {
         },
         { new: true }
       );
+
+      return NextResponse.json({
+        gigstatus: true,
+        message: "Reviewed Gig successfully",
+      });
 
       return NextResponse.json({
         gigstatus: true,

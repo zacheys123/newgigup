@@ -1,7 +1,7 @@
 "use client";
 
 import useStore from "@/app/zustand/useStore";
-import { UserProps } from "@/types/userinterfaces";
+import { Review, UserProps } from "@/types/userinterfaces";
 import { useEffect, useMemo, useState } from "react";
 
 // Define the shape of the user object
@@ -9,6 +9,8 @@ import { useEffect, useMemo, useState } from "react";
 export function useCurrentUser(userId: string | null) {
   const { setCurrentUser } = useStore();
   const [loading, setLoading] = useState<boolean>(false);
+  const [reviews, setReviews] = useState<Review[]>();
+
   const [user, setUser] = useState<UserProps>({
     clerkId: "",
     firstname: "",
@@ -99,6 +101,7 @@ export function useCurrentUser(userId: string | null) {
         if (isMounted) {
           setCurrentUser(fetchedUser);
           setUser(fetchedUser);
+          setReviews(fetchedUser?.myreviews);
         }
       } catch (error) {
         console.error("Error fetching user:", error);
@@ -129,5 +132,5 @@ export function useCurrentUser(userId: string | null) {
     };
   }, [url, userId]);
 
-  return { loading, user, setUser };
+  return { loading, user, setUser, setReviews, reviews };
 }

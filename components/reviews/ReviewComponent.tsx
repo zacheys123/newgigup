@@ -7,13 +7,14 @@ import MainReview from "./myreviews/MainReview";
 
 const ReviewComponent = () => {
   const { userId } = useAuth();
-  const { user } = useCurrentUser(userId || null);
-  console.log(user?._id);
+  const { reviews } = useCurrentUser(userId || null);
+  // const { reviews } = useStore();
+
   return (
     <div className="text-gray-300 h-full mt-4">
-      {user?.myreviews?.length > 0 ? (
+      {reviews && reviews?.length > 0 ? (
         <>
-          {user?.myreviews.map((review: Review) => (
+          {reviews.map((review: Review) => (
             <MainReview key={review?._id} {...review} />
           ))}
         </>
