@@ -44,7 +44,7 @@ const ViewGigDetails = () => {
       </div>
     );
   }
-  if (currentgig?.bookedBy == null || currentgig.postedBy == null) {
+  if (currentgig?.bookedBy == null || currentgig?.postedBy == null) {
     return (
       <div className="h-[84%] w-full flex p-2  flex-col justify-center items-center">
         <h4 className="text-gray-400 mb-2">No Gig Info found, try later </h4>

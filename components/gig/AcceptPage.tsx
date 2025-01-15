@@ -16,6 +16,7 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { MdAdd } from "react-icons/md";
 import { FetchResponse } from "@/types/giginterface";
+// import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 const AcceptPage = () => {
   const { userId } = useAuth();
@@ -25,6 +26,18 @@ const AcceptPage = () => {
   const { loading, forgetBookings } = useForgetBookings();
   const { bookloading, bookgig } = useBookMusician();
   const [loadingreview, setLoadingreview] = useState(false);
+  // const { user } = useCurrentUser(userId || null);
+  const [rate] = useState<number>(
+    currentgig?.bookedBy?.allreviews.reduce(
+      (acc: number, review: { rating: number }) => acc + review.rating,
+      0
+    ) / (currentgig?.postedBy?.allreviews.length || 1)
+  );
+  const [comm] = useState<string>(
+    currentgig?.bookedBy?.allreviews
+      .filter((review: { gigId: string }) => review.gigId === currentgig?._id)
+      ?.map((review: { comment: string }) => review.comment)
+  );
 
   const router = useRouter();
   const book = () => bookgig(router, currentgig, userId || "");
@@ -36,15 +49,15 @@ const AcceptPage = () => {
 
   useEffect(() => {
     if (currentgig?.isPending === true && currentgig?.isTaken === false) {
-      router.refresh();
+      return;
     }
     if (currentgig?.isPending === false && currentgig?.isTaken === true) {
-      router.refresh();
+      return;
     }
     if (currentgig?.isPending === false && currentgig?.isTaken === false) {
       router.push(`/gigs/${userId}/`);
     }
-  }, [currentgig?.isTaken]);
+  }, [currentgig?.isTaken, currentgig?.isPending]);
   const handleRatingChange = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -269,7 +282,7 @@ const AcceptPage = () => {
         <div className="w-full flex justify-between gap-4 my-8 p-3 rounded-lg shadow-md shadow-amber-600">
           <Box className="flex flex-col gap-3">
             <h6 className="text-neutral-400 font-semibold ">Rate Musician</h6>
-            <Rating rating={rating} setRating={setRating} />
+            <Rating rating={rating ? rating : rate} setRating={setRating} />
           </Box>
 
           {currentgig.bookedBy && (
@@ -290,10 +303,9 @@ const AcceptPage = () => {
             onSubmit={handleRatingChange}
           >
             <Textarea
-              placeholder="
-                  Write a review here...
+              placeholder="Write a review here...
               "
-              value={comment}
+              value={comment ? comment : comm}
               onChange={(e) => setComment(e.target.value)}
               className="w-[88%] mx-auto h-[80px] py-2 px-3 rounded-md shadow-md focus-within:ring-0 outline-none"
             />
