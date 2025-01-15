@@ -14,7 +14,7 @@ const MainReview = ({ gigId, comment, rating, createdAt }: Review) => {
   return (
     <>
       {!loading || !gig ? (
-        <div className="h-fit bg-neutral-700 w-[300px] rounded-md my-1 mx-auto py-2 pb-3">
+        <div className="h-fit bg-neutral-700 w-[300px] rounded-md my-2 mx-auto py-2 pb-3">
           <div className="flex items-center gap-3 flex-col px-2">
             <Box className="flex  items-center justify-between w-full">
               <h6 className="rounded-full w-[30px] h-[30px] bg-neutral-500 flex justify-center items-center text-[12px]">

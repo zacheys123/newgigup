@@ -11,9 +11,17 @@ const AllReviewComponent = () => {
   console.log(user?._id);
   return (
     <div className="text-gray-300 h-full">
-      {user?.myreviews.map((review: Review) => (
-        <MainReview key={review?._id} {...review} />
-      ))}
+      {user?.allreviews?.length > 0 ? (
+        <>
+          {user?.allreviews.map((review: Review) => (
+            <MainReview key={review?._id} {...review} />
+          ))}
+        </>
+      ) : (
+        <div className="flex justify-center items-center h-full">
+          <h2 className="text-gray-500">No reviews found.</h2>
+        </div>
+      )}
     </div>
   );
 };

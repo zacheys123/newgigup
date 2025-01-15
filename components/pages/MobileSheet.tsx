@@ -52,7 +52,7 @@ const MobileSheet = () => {
           </Link>
         )}
         <Link
-          href={`/reviews/${user?._id}/*${user?.username}`}
+          href={`/allreviews/${user?._id}/*${user?.firstname}${user?.lastname}`}
           className="flex flex-row  items-center gap-2 min-w-[30%] mx-auto whitespace-pre-line"
         >
           {" "}

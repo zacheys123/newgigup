@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import ProfileComponent from "./ProfileComponent";
 const FriendList = ({ user, allUsers }) => {
   const router = useRouter();
-  const lastUser = allUsers[allUsers.length - 1];
+  // const lastUser = allUsers[allUsers.length - 1];
 
   return (
     <div

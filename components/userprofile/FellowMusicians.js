@@ -1,14 +1,13 @@
-import { useAuth } from "@clerk/nextjs";
-import Image from "next/image";
-import { PropTypes } from "prop-types";
+// import { useAuth } from "@clerk/nextjs";
+// import Image from "next/image";
 
-import { Button } from "../ui/button";
+// import { Button } from "../ui/button";
 import { useEffect, useState } from "react";
-import { CircularProgress } from "@mui/material";
+// import { CircularProgress } from "@mui/material";
 import useStore from "@/app/zustand/useStore";
 import { useRouter } from "next/navigation";
 import ProfileComponent from "./ProfileComponent";
-import { motion } from "framer-motion";
+// import { motion } from "framer-motion";
 const FellowMusicians = ({ user, allUsers }) => {
   const { setFollow, follows } = useStore();
   const router = useRouter();

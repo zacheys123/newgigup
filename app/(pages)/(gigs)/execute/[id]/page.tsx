@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useGetGigs } from "@/hooks/useGetGig";
 import { useAuth } from "@clerk/nextjs";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { use, useEffect } from "react";
 import { TfiReload } from "react-icons/tfi";
 const ViewGigDetails = () => {
   const { userId } = useAuth();
@@ -29,11 +29,13 @@ const ViewGigDetails = () => {
   // handle data validation
   // handle error handling
   useEffect(() => {
-    if (currentgig?.isPending === false && currentgig?.isTaken === false) {
-      router.push(`/gigs/${userId}/`);
-      return;
+    if (currentgig?.isPending === true && currentgig?.isTaken === false) {
+      router.refresh();
     }
-  }, [currentgig?.isPending]);
+    if (currentgig?.isPending === false && currentgig?.isTaken === true) {
+      router.push(`/gigs/${userId}/`);
+    }
+  }, [currentgig?.isPending, router, userId]);
   console.log(currentgig);
   if (loading) {
     return (

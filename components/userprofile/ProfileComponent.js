@@ -4,7 +4,7 @@ import { PropTypes } from "prop-types";
 import { Button } from "../ui/button";
 import { motion } from "framer-motion";
 import { Add } from "@mui/icons-material";
-import useStore from "@/app/zustand/useStore";
+// import useStore from "@/app/zustand/useStore";
 const ProfileComponent = ({
   otheruser,
   user,
