@@ -3,7 +3,7 @@
 import { useAllGigs } from "@/hooks/useAllGigs";
 import { Review } from "@/types/userinterfaces";
 import { Box, Divider } from "@mui/material";
-import { Edit, Trash, Trash2Icon } from "lucide-react";
+import { Edit, Trash2Icon } from "lucide-react";
 import moment from "moment";
 import { useRouter } from "next/navigation";
 import React from "react";
