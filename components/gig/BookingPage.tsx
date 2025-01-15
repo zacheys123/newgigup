@@ -25,7 +25,7 @@ const BookingPage = () => {
     if (currentgig?.isPending === false && currentgig?.isTaken === false) {
       router.push(`/gigs/${userId}/`);
     }
-  }, [currentgig?.isTaken]);
+  }, [currentgig?.isPending]);
   return (
     <div className="h-[83%] w-full overflow-y-auto relative">
       <div className="absolute w-[40px] h-[40px] flex  justify-center items-center right-5 top-[460px] opacity-85 rounded-md  animate-pulse  shadow shadow-slate-400   bg-gray-800">
