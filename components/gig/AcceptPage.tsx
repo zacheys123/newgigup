@@ -3,7 +3,7 @@ import { Box, CircularProgress, Divider } from "@mui/material";
 import { motion } from "framer-motion";
 // import { EyeIcon, MessageCircle, X } from "lucide-react";
 import Image from "next/image";
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 // import { MdAdd } from "react-icons/md";
 import { RiCornerDownRightLine } from "react-icons/ri";
 import { Button } from "../ui/button";
@@ -34,6 +34,17 @@ const AcceptPage = () => {
     animate: { opacity: 1, y: 0, transition: { duration: 0.5 } },
   };
 
+  useEffect(() => {
+    if (currentgig?.isPending === true && currentgig?.isTaken === false) {
+      router.refresh();
+    }
+    if (currentgig?.isPending === false && currentgig?.isTaken === true) {
+      router.push(`/gigs/${userId}/`);
+    }
+    if (currentgig?.isPending === false && currentgig?.isTaken === false) {
+      router.push(`/gigs/${userId}/`);
+    }
+  }, [currentgig?.isTaken]);
   const handleRatingChange = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
