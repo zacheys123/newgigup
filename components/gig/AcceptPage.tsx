@@ -39,7 +39,7 @@ const AcceptPage = () => {
       router.refresh();
     }
     if (currentgig?.isPending === false && currentgig?.isTaken === true) {
-      router.push(`/gigs/${userId}/`);
+      router.refresh();
     }
     if (currentgig?.isPending === false && currentgig?.isTaken === false) {
       router.push(`/gigs/${userId}/`);

@@ -3,10 +3,11 @@ import { useAllGigs } from "@/hooks/useAllGigs";
 import { Review } from "@/types/userinterfaces";
 import { Box, Divider } from "@mui/material";
 import moment from "moment";
+import Image from "next/image";
 import React from "react";
 import { FaStar } from "react-icons/fa";
 
-const MainReview = ({ gigId, comment, rating, createdAt }: Review) => {
+const AllReview = ({ gigId, comment, rating, createdAt }: Review) => {
   const { gigs, loading } = useAllGigs();
   //   const [currentgig] = useStore();
   const gig = gigs?.gigs?.find((gig) => gig._id === gigId);
@@ -17,14 +18,29 @@ const MainReview = ({ gigId, comment, rating, createdAt }: Review) => {
         <div className="h-fit bg-neutral-700 w-[300px] rounded-md my-1 mx-auto py-2 pb-3">
           <div className="flex items-center gap-3 flex-col px-2">
             <Box className="flex  items-center justify-between w-full">
-              <h6 className="rounded-full w-[30px] h-[30px] bg-neutral-500 flex justify-center items-center text-[12px]">
-                {gig?.postedBy?.firstname &&
-                  gig?.postedBy?.firstname.split("")[0].toUpperCase()}
+              {
+                // image
+                gig?.postedBy?.picture ? (
+                  <>
+                    <Image
+                      src={gig.postedBy.picture}
+                      alt="Profile Pic"
+                      width={30}
+                      height={30}
+                      objectFit="cover"
+                      className="rounded-full text-center"
+                    />
+                  </>
+                ) : (
+                  <h6 className="rounded-full w-[30px] h-[30px] bg-neutral-500 flex justify-center items-center text-[12px]">
+                    {gig?.postedBy?.firstname &&
+                      gig?.postedBy?.firstname.split("")[0].toUpperCase()}
 
-                {gig?.postedBy?.lastname &&
-                  gig?.postedBy?.lastname.split("")[0].toUpperCase()}
-              </h6>
-
+                    {gig?.postedBy?.lastname &&
+                      gig?.postedBy?.lastname.split("")[0].toUpperCase()}
+                  </h6>
+                )
+              }
               <div className="flex gap-1 my-3 items-center ">
                 <div className="flex">
                   {[...Array(5)].map((star, index) => {
@@ -81,4 +97,4 @@ const MainReview = ({ gigId, comment, rating, createdAt }: Review) => {
   );
 };
 
-export default MainReview;
+export default AllReview;

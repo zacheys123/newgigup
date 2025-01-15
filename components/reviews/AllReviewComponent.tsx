@@ -3,7 +3,7 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { Review } from "@/types/userinterfaces";
 import { useAuth } from "@clerk/nextjs";
 import React from "react";
-import MainReview from "./myreviews/MainReview";
+import AllReview from "./allreviews/AllReview";
 
 const AllReviewComponent = () => {
   const { userId } = useAuth();
@@ -14,7 +14,7 @@ const AllReviewComponent = () => {
       {user?.allreviews?.length > 0 ? (
         <>
           {user?.allreviews.map((review: Review) => (
-            <MainReview key={review?._id} {...review} />
+            <AllReview key={review?._id} {...review} />
           ))}
         </>
       ) : (
