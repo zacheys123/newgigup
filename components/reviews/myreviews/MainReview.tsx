@@ -3,7 +3,7 @@
 import { useAllGigs } from "@/hooks/useAllGigs";
 import { Review } from "@/types/userinterfaces";
 import { Box, Divider } from "@mui/material";
-import { Edit } from "lucide-react";
+import { Edit, Trash, Trash2Icon } from "lucide-react";
 import moment from "moment";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -68,6 +68,7 @@ const MainReview = ({ gigId, comment, rating, createdAt }: Review) => {
                   Edit
                   <Edit size="15" />
                 </p>
+                <Trash2Icon size="15" style={{ color: "red" }} />
               </div>
               <Divider
                 variant="middle"
