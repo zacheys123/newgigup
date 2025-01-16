@@ -397,7 +397,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
             }}
             animate={{ opacity: 1, x: 0, y: "-100px" }}
             transition={{ duration: 0.3 }}
-            className="h-screen bg-opacity-0 absolute top-40 w-[280px] mb-[140px] z-50"
+            className="h-screen bg-zinc-700 absolute top-40 w-[90%] mb-[140px] z-50 mx-auto"
           >
             <Videos setShowVideo={setShowVideo} gigId={gig?._id || ""} />
           </motion.div>

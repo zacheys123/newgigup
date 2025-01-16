@@ -111,10 +111,10 @@ const Videos = ({ setShowVideo, gigId }: videosProps) => {
   );
 
   return (
-    <motion.div className=" bg-neutral-300 h-[70%] rounded-md p-3">
+    <motion.div className=" bg-neutral-900 h-[75%] rounded-md p-3">
       {!addvideo ? (
         <div className="h-[380px]">
-          <h6 className="text-neutral-800 text-xl underline underline-offset-1 text-center my-3">
+          <h6 className="text-neutral-300 text-xl underline underline-offset-1 text-center my-3">
             Adding Videos Guideline
           </h6>
 
@@ -125,17 +125,25 @@ const Videos = ({ setShowVideo, gigId }: videosProps) => {
             &times;
           </span>
           <ul className="custom-list ml-4">
-            <h6 className="text black font-bold -ml-2 mt-2">
+            <h6 className="text-neutral-400 ">
               By Adding videos to your profile you:
             </h6>
-            <li>You create a portfolio for future jobs</li>
-            <li>
+            <li className="text-neutral-500 ">
+              You create a portfolio for future jobs
+            </li>
+            <li className="text-neutral-500">
               Depending on reviews this can make people see if reviews are true
               or not
             </li>
-            <li>you create a following of clients that like your work</li>
-            <li>You also allow clients to judge you by your work</li>
-            <li>It adds alot to your online presence</li>
+            <li className="text-neutral-500 ">
+              you create a following of clients that like your work
+            </li>
+            <li className="text-neutral-500 ">
+              You also allow clients to judge you by your work
+            </li>
+            <li className="text-neutral-500 ">
+              It adds alot to your online presence
+            </li>
           </ul>
         </div>
       ) : (
@@ -143,7 +151,7 @@ const Videos = ({ setShowVideo, gigId }: videosProps) => {
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4 }}
-          className="h-[100%] bg-neutral-900 bg-opacity-20"
+          className="h-[100%] bg-neutral-400 bg-opacity-20"
           onClick={(ev) => {
             ev.stopPropagation();
           }}
