@@ -1,6 +1,8 @@
 export interface Video {
   title: string;
   source: string;
+  description: string;
+  gigId: string;
 }
 
 export interface Review {

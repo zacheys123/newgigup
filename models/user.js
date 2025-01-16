@@ -59,7 +59,10 @@ const userSchema = new mongoose.Schema(
           type: String,
           required: true,
         },
-        gigId: [{ type: mongoose.Schema.Types.ObjectId, ref: "Gig" }],
+        gigId: {
+          type: String,
+          required: true,
+        },
       },
     ],
     allreviews: [

@@ -60,6 +60,7 @@ export const fileupload = async (
     const { signature, timestamp, upload_preset, cloud_name } =
       await response.json();
 
+    console.log(signature, timestamp, upload_preset, cloud_name);
     // Step 2: Upload the ${dep} file to Cloudinary
     const formData = new FormData();
     formData.append("file", file);

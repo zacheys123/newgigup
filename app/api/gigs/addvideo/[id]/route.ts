@@ -9,8 +9,10 @@ export async function PUT(req: NextRequest) {
 
   const { title, description, media, postedBy } = await req.json();
 
-  console.log("Rating from front End", title);
-  console.log("Comment from front End", description);
+  console.log("title from front End", title);
+  console.log("description from front End", description);
+  console.log("media from front End", media);
+  console.log("postedBy from front End", postedBy);
 
   // if (!userId) {
   //   return NextResponse.redirect(new URL("/sign-in", req.url));

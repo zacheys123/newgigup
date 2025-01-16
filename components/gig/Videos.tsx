@@ -50,11 +50,16 @@ const Videos = ({ setShowVideo, gigId }: videosProps) => {
       description: videos.description,
       postedBy: user?._id,
     };
+    console.log("title from front End", videoUrl);
+    console.log("description from front End", videos.title);
+    console.log("media from front End", videos.description);
+    console.log("postedBy from front End", user?._id);
+
     if (videoUrl) {
       try {
         setIsLoading(true);
         const res = await fetch(baseUrl, {
-          method: "POST",
+          method: "PUT",
           headers: {
             "Content-Type": "application/json", // Correctly specify headers here
           },
@@ -69,12 +74,14 @@ const Videos = ({ setShowVideo, gigId }: videosProps) => {
         setFileUrl("");
         setIsLoading(false);
       } catch (error) {
+        setIsLoading(false);
         console.log(error);
       }
+    } else {
+      alert("Please provide all required fields");
     }
-    alert("Please provide all required fields");
   };
-
+  console.log(videoUrl);
   const handleFileChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const dep = "video";
@@ -174,76 +181,82 @@ const Videos = ({ setShowVideo, gigId }: videosProps) => {
                 className="p-2 w-full text-[13px] bg-gray-300 rounded-md focus-within:ring-o outline-none"
               />
             </div>
-            {!videoUrl ? (
-              <div className="flex justify-between items-center w-full mx-auto mt-4">
-                {/* <VideoUploadWidget /> */}
-                <label
-                  htmlFor="postvideo"
-                  className="bg-neutral-400 flex justify-center title py-2 px-3 mt-2 min-w-[115px] rounded-xl whitespace-nowrap"
-                >
-                  {!loading ? (
-                    <p> Upload Video</p>
-                  ) : (
-                    <CircularProgress
-                      size="13px"
-                      sx={{ color: "white", fontBold: "500" }}
-                      className="bg-orange-700 rounded-tr-full text-[15px] font-bold"
-                    />
-                  )}
-                </label>
+            {user?.videos?.length < 4 && (
+              <>
+                {!videoUrl ? (
+                  <div className="flex justify-between items-center w-full mx-auto mt-4">
+                    {/* <VideoUploadWidget /> */}
+                    <label
+                      htmlFor="postvideo"
+                      className="bg-neutral-400 flex justify-center title py-2 px-3 mt-2 min-w-[115px] rounded-xl whitespace-nowrap"
+                    >
+                      {!loading ? (
+                        <p> Upload Video</p>
+                      ) : (
+                        <CircularProgress
+                          size="13px"
+                          sx={{ color: "white", fontBold: "500" }}
+                          className="bg-orange-700 rounded-tr-full text-[15px] font-bold"
+                        />
+                      )}
+                    </label>
 
-                <input
-                  id="postvideo"
-                  className="hidden"
-                  type="file"
-                  accept="video/*"
-                  onChange={handleFileChange}
-                  disabled={loading}
-                />
-
-                <BsArrowLeftShort
-                  className="  text-gray-600"
-                  size="17px"
-                  style={{ fontSize: "19px", color: "gray" }}
-                  onClick={(ev) => {
-                    ev.stopPropagation();
-                    setShowVideo(false);
-                  }}
-                />
-              </div>
-            ) : (
-              <div className="h-[200px] md:h-[320px] bg-gray-800 mt-7">
-                <video
-                  className="w-full h-[100%] object-cover"
-                  src={fileUrl}
-                  autoPlay
-                  loop
-                  muted
-                />
-              </div>
-            )}
-            <h6 className="my-5 text-[15px] text-orange-700 font-mono font-bold">
-              {videos.description.length > 0 ? `#${videos.description}` : ""}
-            </h6>
-            {videoUrl && (
-              <div className="h-[30px] w-[100%] text-center">
-                <Button
-                  disabled={isloading}
-                  variant="secondary"
-                  type="submit"
-                  className="h-full w-[80%]   text-[15px]  p-4 !bg-amber-700 font-sans text-gray-200"
-                >
-                  {!isloading ? (
-                    "  Upload Video"
-                  ) : (
-                    <CircularProgress
-                      size="13px"
-                      sx={{ color: "white", fontBold: "500" }}
-                      className="bg-orange-700 rounded-tr-full text-[15px] font-bold"
+                    <input
+                      id="postvideo"
+                      className="hidden"
+                      type="file"
+                      accept="video/*"
+                      onChange={handleFileChange}
+                      disabled={loading}
                     />
-                  )}
-                </Button>
-              </div>
+
+                    <BsArrowLeftShort
+                      className="  text-gray-600"
+                      size="24px"
+                      style={{ fontSize: "19px", color: "gray" }}
+                      onClick={(ev) => {
+                        ev.stopPropagation();
+                        setShowVideo(false);
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div className="h-[200px] md:h-[320px] bg-gray-800 mt-7">
+                    <video
+                      className="w-full h-[100%] object-cover"
+                      src={fileUrl}
+                      autoPlay
+                      loop
+                      muted
+                    />
+                  </div>
+                )}
+                <h6 className="my-5 text-[15px] text-orange-700 font-mono font-bold">
+                  {videos.description.length > 0
+                    ? `#${videos.description}`
+                    : ""}
+                </h6>
+                {videoUrl && (
+                  <div className="h-[30px] w-[100%] text-center">
+                    <Button
+                      disabled={isloading}
+                      variant="secondary"
+                      type="submit"
+                      className="h-full w-[80%]   text-[15px]  p-4 !bg-amber-700 font-sans text-gray-200"
+                    >
+                      {!isloading ? (
+                        "  Upload Video"
+                      ) : (
+                        <CircularProgress
+                          size="13px"
+                          sx={{ color: "white", fontBold: "500" }}
+                          className="bg-orange-700 rounded-tr-full text-[15px] font-bold"
+                        />
+                      )}
+                    </Button>
+                  </div>
+                )}
+              </>
             )}
           </form>
         </motion.div>
