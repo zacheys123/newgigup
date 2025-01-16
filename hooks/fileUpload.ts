@@ -51,7 +51,7 @@ export const fileupload = async (
 
   try {
     // Step 1: Get the signed upload URL from your API
-    const response = await fetch("/api/posts/sign-upload", {
+    const response = await fetch("/api/image/sign-upload", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

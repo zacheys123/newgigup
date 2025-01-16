@@ -90,6 +90,12 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
       <section
         className=" flex flex-col rounded-md   w-[95%] mx-auto shadow-md  shadow-zinc-600 bg-zinc-700 py-3
   h-[98x] my-4  px-3"
+        onClick={() => {
+          if (showvideo === true) {
+            setShowVideo(false);
+          }
+          return;
+        }}
       >
         <div className="flex items-center justify-between h-full w-full relative ">
           <Box>
@@ -381,11 +387,11 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
               x: "-200px",
               y: "-200px",
             }}
-            animate={{ opacity: 1, x: 0, y: "-10px" }}
+            animate={{ opacity: 1, x: 0, y: "-100px" }}
             transition={{ duration: 0.3 }}
             className="h-screen bg-opacity-0 absolute top-40 w-[280px] mb-[140px] z-50"
           >
-            <Videos setShowVideo={setShowVideo} />
+            <Videos setShowVideo={setShowVideo} gigId={gig?._id || ""} />
           </motion.div>
         )}
       </section>
