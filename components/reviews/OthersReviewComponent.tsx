@@ -5,15 +5,15 @@ import { useAuth } from "@clerk/nextjs";
 import React from "react";
 import AllReview from "./allreviews/AllReview";
 
-const AllReviewComponent = () => {
+const OthersReviewComponent = () => {
   const { userId } = useAuth();
   const { user } = useCurrentUser(userId || null);
   console.log(user?._id);
   return (
-    <div className="text-gray-300 h-full">
+    <div className="text-gray-300 h-full py-2 bg-neutral-900">
       {user?.allreviews?.length > 0 ? (
         <>
-          {user?.allreviews.map((review: Review) => (
+          {user?.allreviews?.map((review: Review) => (
             <AllReview key={review?._id} {...review} />
           ))}
         </>
@@ -26,5 +26,5 @@ const AllReviewComponent = () => {
   );
 };
 
-export default AllReviewComponent;
+export default OthersReviewComponent;
 // 67766d6efcde8ba309c2fb75

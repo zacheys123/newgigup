@@ -492,3 +492,6 @@ input[type="radio"] {
 .sonner-toast-message {
   color: #d0d0d0 !important;
 }
+.custom-list {
+  list-style-type: disc;
+}

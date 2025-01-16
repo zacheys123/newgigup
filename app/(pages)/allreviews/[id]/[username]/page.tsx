@@ -1,4 +1,4 @@
-import AllReviewComponent from "@/components/reviews/AllReviewComponent";
+import AllReviewComponent from "@/components/reviews/OthersReviewComponent";
 import React from "react";
 
 const AllReviews = () => {

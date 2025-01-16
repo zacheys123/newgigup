@@ -15,6 +15,7 @@ import { useAuth } from "@clerk/nextjs";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Review } from "@/types/userinterfaces";
+import Videos from "./Videos";
 interface FetchResponse {
   success: boolean;
   message?: string;
@@ -30,7 +31,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
   const [gigdesc, setGigdesc] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
   const { gigs } = useAllGigs() || { gigs: [] }; // Default to empty array if null or undefined
-
+  const [showvideo, setShowVideo] = useState<boolean>(false);
   const handleClose = () => {
     setOpen(false);
     console.log("close", gigdesc);
@@ -80,6 +81,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
       router.push(`/execute/${gig?._id}`); // Redirect if no review
     }
   };
+  const [currentId, setCurrentId] = useState<string | null>();
   return (
     <>
       {gigdesc && (
@@ -356,7 +358,36 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
               </motion.div>
             </div>
           )}
-        </div>
+        </div>{" "}
+        {gig?.isTaken &&
+          gig?.bookedBy?._id === myId &&
+          gig?.postedBy?._id !== myId && (
+            <div
+              className="flex-1 my-3 flex justify-center bg-yellow-600 px-3 py-1  rounded-r-3xl rounded-b-2xl rounded-br-md"
+              onClick={() => {
+                setCurrentId(gig._id);
+                setShowVideo(true);
+              }}
+            >
+              <h4 className="text-[10px] !text-orange-100 font-bold">
+                Add Gig Videos
+              </h4>
+            </div>
+          )}{" "}
+        {showvideo && currentId === gig?._id && (
+          <motion.div
+            initial={{
+              opacity: 0,
+              x: "-200px",
+              y: "-200px",
+            }}
+            animate={{ opacity: 1, x: 0, y: "-10px" }}
+            transition={{ duration: 0.3 }}
+            className="h-screen bg-opacity-0 absolute top-40 w-[280px] mb-[140px] z-50"
+          >
+            <Videos setShowVideo={setShowVideo} />
+          </motion.div>
+        )}
       </section>
     </>
   ); // Example: Displaying the title

@@ -57,7 +57,7 @@ const MobileSheet = () => {
         >
           {" "}
           <MdDashboard size="20" />
-          <SheetDescription>All Reviews</SheetDescription>
+          <SheetDescription>Reviews</SheetDescription>
         </Link>
         <Link
           href={`/search`}
@@ -75,7 +75,8 @@ const MobileSheet = () => {
           href={`/reviews/${user?._id}/*${user?.firstname}${user?.lastname}`}
           className="flex flex-row  items-center gap-2 min-w-[30%] mx-auto whitespace-pre-line"
         >
-          <Music size="20" /> <SheetDescription>My Reviews</SheetDescription>
+          <Music size="20" />{" "}
+          <SheetDescription>Personal Reviews</SheetDescription>
         </Link>{" "}
         <Link
           href="/gigme/chat"

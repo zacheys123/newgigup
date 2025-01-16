@@ -11,7 +11,7 @@ const ReviewComponent = () => {
   // const { reviews } = useStore();
 
   return (
-    <div className="text-gray-300 h-full mt-4">
+    <div className="text-gray-300 h-full mt-4 py-2 bg-neutral-900">
       {reviews && reviews?.length > 0 ? (
         <>
           {reviews.map((review: Review) => (
