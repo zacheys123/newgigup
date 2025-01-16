@@ -395,7 +395,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
               x: "-200px",
               y: "-200px",
             }}
-            animate={{ opacity: 1, x: 0, y: "-100px" }}
+            animate={{ opacity: 1, x: 0, y: "-150px" }}
             transition={{ duration: 0.3 }}
             className="h-screen bg-zinc-700 absolute top-40 w-[90%] mb-[140px] z-50 mx-auto"
           >
