@@ -2,11 +2,13 @@ import React from "react";
 import { Toaster } from "sonner";
 
 export default function FriendLayout({
+  chat,
   reviews,
   children,
 }: Readonly<{
   children: React.ReactNode;
   reviews: React.ReactNode; // Add Review type here
+  chat: React.ReactNode; // Add Chat type here
 }>) {
   return (
     <div className="bg-black shadow-md shadow-gray-300 h-screen w-full overflow-hidden">
@@ -17,6 +19,7 @@ export default function FriendLayout({
           duration: 3000,
         }}
       />
+      {chat}
       {reviews}
       {children}
     </div>
