@@ -10,7 +10,7 @@ import moment from "moment";
 export async function PUT(req: NextRequest) {
   const id = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
 
-  const { comment, rating } = await req.json();
+  const { comment, rating, postedBy, postedTo } = await req.json();
 
   console.log("Rating from front End", rating);
   console.log("Comment from front End", comment);
@@ -55,9 +55,9 @@ export async function PUT(req: NextRequest) {
         {
           $push: {
             allreviews: {
-              userid: booker,
-              rating: rating,
-              comment: comment,
+              postedBy,
+              rating,
+              comment,
               gigId: id,
               createdAt: moment().toISOString(),
               updatedAt: moment().toISOString(),
@@ -70,9 +70,9 @@ export async function PUT(req: NextRequest) {
         {
           $push: {
             myreviews: {
-              userid: poster,
-              rating: rating,
-              comment: comment,
+              postedTo,
+              rating,
+              comment,
               gigId: id,
               // updatedAt
               createdAt: moment().toISOString(),

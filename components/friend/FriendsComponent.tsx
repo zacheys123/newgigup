@@ -39,7 +39,7 @@ const FriendsComponent = () => {
       } catch (error: unknown) {
         console.error("Error fetching friend data:", error);
         // handle the error appropriately, e.g., redirect to a 404 page or show an error message to the user
-
+        alert("Error fetching friend data");
         if (isMounted) {
           setFriend({
             clerkId: "",
@@ -105,21 +105,21 @@ const FriendsComponent = () => {
         <div className=" flex justify-center items-center">
           {friend && friend?.followers?.includes(user?._id || "") ? (
             <Button
-              className="min-w-[50px] h-[30px] text-white  text-[11px] bg-blue-600 hover:bg-blue-700"
-              onClick={() => {
-                console.log("Follow button clicked");
-              }}
-            >
-              Follow <MdAdd />
-            </Button>
-          ) : (
-            <Button
               className="min-w-[50px] h-[30px] text-white  text-[11px] bg-gray-400 hover:bg-blue-700"
               onClick={() => {
                 console.log("Follow button clicked");
               }}
             >
               UnFollow <IoCheckmarkDone />
+            </Button>
+          ) : (
+            <Button
+              className="min-w-[50px] h-[30px] text-white  text-[11px] bg-blue-600 hover:bg-blue-700"
+              onClick={() => {
+                console.log("Follow button clicked");
+              }}
+            >
+              Follow <MdAdd />
             </Button>
           )}
         </div>

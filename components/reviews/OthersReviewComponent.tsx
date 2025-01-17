@@ -14,7 +14,7 @@ const OthersReviewComponent = () => {
       {user?.allreviews?.length > 0 ? (
         <>
           {user?.allreviews?.map((review: Review) => (
-            <AllReview key={review?._id} {...review} />
+            <AllReview key={review?._id} {...review} w="240px" />
           ))}
         </>
       ) : (

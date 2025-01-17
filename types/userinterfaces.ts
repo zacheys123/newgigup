@@ -10,6 +10,8 @@ export interface Review {
   rating: number;
   comment: string;
   gigId: string; // assuming Gig ID is a string
+  postedBy: string;
+  postedTo: string;
   updatedAt?: Date;
   createdAt?: Date;
 }

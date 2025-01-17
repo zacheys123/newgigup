@@ -29,8 +29,8 @@ const FriendReviewComponent = () => {
           setFriendReviews(friendData?.allreviews || []);
         }
       } catch (error) {
-        console.error("Error fetching friend data:", error);
-
+        console.error("Error fetching reviews data:", error);
+        alert("Error fetching reviews data");
         if (isMounted) {
           setFriendReviews([
             {
@@ -38,6 +38,8 @@ const FriendReviewComponent = () => {
               comment: "",
               gigId: "",
               rating: 0,
+              postedBy: "",
+              postedTo: "",
               createdAt: new Date(),
               updatedAt: new Date(),
             },
@@ -60,7 +62,7 @@ const FriendReviewComponent = () => {
         {friendReviews && friendReviews?.length > 0 ? (
           <>
             {friendReviews?.map((review: Review) => (
-              <AllReview key={review?._id} {...review} />
+              <AllReview key={review?._id} {...review} w="380px" />
             ))}
           </>
         ) : (

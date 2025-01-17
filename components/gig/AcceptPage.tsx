@@ -16,10 +16,12 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { MdAdd } from "react-icons/md";
 import { FetchResponse } from "@/types/giginterface";
+
 // import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 const AcceptPage = () => {
   const { userId } = useAuth();
+
   const { currentgig } = useStore();
   const [comment, setComment] = useState<string>("");
   const [rating, setRating] = useState<number>(0);
@@ -78,7 +80,12 @@ const AcceptPage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ rating, comment }),
+        body: JSON.stringify({
+          rating,
+          comment,
+          postedBy: currentgig?.postedBy?._id,
+          postedTo: currentgig?.bookedBy?._id,
+        }),
       });
 
       if (!res.ok) {

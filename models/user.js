@@ -67,6 +67,8 @@ const userSchema = new mongoose.Schema(
     ],
     allreviews: [
       {
+        postedBy: { type: Schema.Types.ObjectId, ref: "User" },
+        postedTo: { type: Schema.Types.ObjectId, ref: "User" },
         rating: { type: Number },
         comment: { type: String },
         gigId: { type: Schema.Types.ObjectId, ref: "Gig" }, // Add User model reference here
@@ -82,6 +84,8 @@ const userSchema = new mongoose.Schema(
     ],
     myreviews: [
       {
+        postedBy: { type: Schema.Types.ObjectId, ref: "User" },
+        postedTo: { type: Schema.Types.ObjectId, ref: "User" },
         rating: { type: Number },
         comment: { type: String },
         gigId: { type: Schema.Types.ObjectId, ref: "Gig" }, // Add User model reference here

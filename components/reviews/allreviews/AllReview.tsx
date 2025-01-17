@@ -1,46 +1,55 @@
 // import useStore from "@/app/zustand/useStore";
 import { useAllGigs } from "@/hooks/useAllGigs";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { Review } from "@/types/userinterfaces";
+import { useAuth } from "@clerk/nextjs";
 import { Box, Divider } from "@mui/material";
+import { Video } from "lucide-react";
 import moment from "moment";
-import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { FaStar } from "react-icons/fa";
 
-const AllReview = ({ gigId, comment, rating, createdAt }: Review) => {
+const AllReview = ({
+  gigId,
+  comment,
+  rating,
+  createdAt,
+  postedBy,
+
+  w,
+}: Review & { w: string }) => {
+  const { userId } = useAuth();
   const { gigs, loading } = useAllGigs();
+  const { user } = useCurrentUser(userId || null);
   //   const [currentgig] = useStore();
   const gig = gigs?.gigs?.find((gig) => gig._id === gigId);
-
+  const router = useRouter();
   return (
     <>
       {!loading || !gig ? (
-        <div className="h-fit bg-neutral-700 w-[340px] rounded-md my-1 mx-auto py-2 pb-3">
+        <div
+          className={
+            w
+              ? `h-fit bg-neutral-700 w-[${w}] rounded-md my-1 mx-auto py-2 pb-3`
+              : "h-fit bg-neutral-700 w-[340px] rounded-md my-1 mx-auto py-2 pb-3"
+          }
+        >
           <div className="flex items-center gap-3 flex-col px-2">
             <Box className="flex  items-center justify-between w-full">
-              {
-                // image
-                gig?.postedBy?.picture ? (
-                  <>
-                    <Image
-                      src={gig.postedBy.picture}
-                      alt="Profile Pic"
-                      width={30}
-                      height={30}
-                      objectFit="cover"
-                      className="rounded-full text-center"
-                    />
-                  </>
-                ) : (
-                  <h6 className="rounded-full w-[30px] h-[30px] bg-neutral-500 flex justify-center items-center text-[12px]">
-                    {gig?.postedBy?.firstname &&
-                      gig?.postedBy?.firstname.split("")[0].toUpperCase()}
+              <h6 className="rounded-full w-[30px] h-[30px] bg-neutral-500 flex justify-center items-center text-[12px]">
+                <span className="text-md font-bold">
+                  {" "}
+                  {gig?.postedBy?.firstname &&
+                    gig?.postedBy?.firstname.split("")[0].toUpperCase()}
+                </span>
+                <span className="text-[9px] ">
+                  {" "}
+                  {gig?.postedBy?.lastname &&
+                    gig?.postedBy?.lastname.split("")[0].toUpperCase()}
+                </span>
+              </h6>
 
-                    {gig?.postedBy?.lastname &&
-                      gig?.postedBy?.lastname.split("")[0].toUpperCase()}
-                  </h6>
-                )
-              }
               <div className="flex gap-1 my-3 items-center ">
                 <div className="flex">
                   {[...Array(5)].map((star, index) => {
@@ -68,9 +77,26 @@ const AllReview = ({ gigId, comment, rating, createdAt }: Review) => {
               <p className="text-gray-300 text-[12px]">{comment}</p>
             </div>{" "}
             <div className="flex items-center gap-2 flex-col px-2">
-              <p className="text-amber-600 text-[12px]">
-                {gig ? gig.title : "No title"}
-              </p>
+              <div className="flex justify-around items-center w-full">
+                {" "}
+                <p className="text-amber-600 text-[12px]">
+                  {gig ? gig.title : "No title"}
+                </p>{" "}
+                {postedBy !== user?._id && gig?.bookedBy?._id !== user?._id && (
+                  <div
+                    className="flex gap-2 items-center justify-around "
+                    onClick={() => {
+                      router.push(`/videos/${gigId}/${gig?.bookedBy?._id}`);
+                    }}
+                  >
+                    <p className="bg-neutral-600 py-1 px-2 rounded-md text-yellow-400 text-[12px] whitespace-nowrap flex items-center gap-2">
+                      watch clips
+                      <Video size="15" />
+                    </p>
+                  </div>
+                )}
+              </div>
+
               <Divider
                 variant="middle"
                 sx={{

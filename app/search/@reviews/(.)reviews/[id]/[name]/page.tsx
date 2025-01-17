@@ -21,7 +21,7 @@ const ReviewPage = () => {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Reviews</DialogTitle>
+            <DialogTitle style={{ color: "lightgray" }}>Reviews</DialogTitle>
           </DialogHeader>
           <FriendReviewComponent />
         </DialogContent>
