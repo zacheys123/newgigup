@@ -11,7 +11,7 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { Box } from "@mui/material";
 import { BsChatDots } from "react-icons/bs";
 import { MdRateReview } from "react-icons/md";
-import { Music } from "lucide-react";
+import { Music, Video } from "lucide-react";
 const FriendsComponent = () => {
   const { userId } = useAuth();
   const { username } = useParams();
@@ -131,7 +131,15 @@ const FriendsComponent = () => {
           style={{ color: "lightgrey" }}
           onClick={() => router.push(`/gigs/${userId}`)}
         />
-
+        <Video
+          size="19"
+          style={{ color: "lightgrey" }}
+          onClick={() =>
+            router.push(
+              `/search/allvideos/${friend?._id}/*${user?.firstname}${user?.lastname}`
+            )
+          }
+        />
         <MdRateReview
           size="19"
           style={{ color: "lightgrey" }}

@@ -1,13 +1,17 @@
 "use client";
 import AllReview from "@/components/reviews/allreviews/AllReview";
 import { Review, UserProps } from "@/types/userinterfaces";
-import { useParams } from "next/navigation";
+import { ArrowBigLeftIcon } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
-const FriendReviewComponent = () => {
+type friend = {
+  rev: boolean;
+};
+const FriendReviewComponent = ({ rev }: friend) => {
   const { id } = useParams();
   const [friendReviews, setFriendReviews] = useState<Review[]>();
-
+  const router = useRouter();
   useEffect(() => {
     if (!id) {
       // Guard: Do not run the effect if `id` is undefined or null
@@ -58,6 +62,15 @@ const FriendReviewComponent = () => {
 
   return (
     <div className=" w-[100%] h-[100%] bg-slate-900 overflow-y-auto">
+      {rev && (
+        <div className="h-[40px] bg-neutral-800 w-full flex pl-3 items-center">
+          <ArrowBigLeftIcon
+            className="cursor-pointer hover:text-amber-500 text-neutral-400 "
+            size="28"
+            onClick={() => router.back()}
+          />
+        </div>
+      )}
       <div className="text-gray-300 h-full py-2 bg-neutral-900">
         {friendReviews && friendReviews?.length > 0 ? (
           <>

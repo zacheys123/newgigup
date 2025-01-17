@@ -6,14 +6,14 @@ import moment from "moment";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
-const VideosPage = () => {
-  const { gigid, userid } = useParams();
+const AllVideosPage = () => {
+  const { userid } = useParams();
   //   const { userId } = useAuth();
   const [friendvideos, setFriendVideos] = useState<Video[]>();
   const [loading, setLoading] = useState<boolean>(false);
   //   const { user } = useCurrentUser(userId || null);
   const router = useRouter();
-  console.log(gigid, userid);
+
   useEffect(() => {
     if (!userid) {
       // Guard: Do not run the effect if `id` is undefined or null
@@ -83,7 +83,7 @@ const VideosPage = () => {
   }
   return (
     <div className="overflow-y-auto h-screen w-[90%] mx-auto  shadow-md shadow-orange-300 flex flex-col gap-2 bg-slate-900">
-      <div className="h-[40px] bg-neutral-800 w-full flex pl-3 items-center">
+      <div className="h-[20px] bg-neutral-800 w-full flex pl-3 items-center">
         <ArrowBigLeftIcon
           className="cursor-pointer hover:text-amber-500 text-neutral-400 "
           size="28"
@@ -91,30 +91,26 @@ const VideosPage = () => {
         />
       </div>
       {friendvideos &&
-        friendvideos
-          ?.filter((video: Video) => {
-            return video.gigId === gigid;
-          })
-          ?.map((video: Video) => (
-            <div
-              key={video._id}
-              className="flex flex-col gap-2 bg-slate-900 h-[360px] shadow-sm shadow-slate-500 py-2 px-3"
-            >
-              <h3 className="text-amber-300 m-2">{video.title}</h3>
-              <div className="flex-1">
-                <video controls className="w-full h-full object-cover">
-                  <source src={video.source} />
-                  Your browser does not support the video tag.
-                </video>
-              </div>
-              <p className="text-amber-600 m-2">{video.description}</p>
-              <h5 className="text-neutral-400 ">
-                posted {moment(Date.now()).fromNow()}
-              </h5>
+        friendvideos?.map((video: Video) => (
+          <div
+            key={video._id}
+            className=" flex flex-col gap-2 bg-slate-900 h-fit shadow-sm shadow-slate-500 py-2 px-3"
+          >
+            <h3 className="text-amber-300 m-2">{video.title}</h3>
+            <div className="flex-1">
+              <video controls className="w-full h-full object-cover">
+                <source src={video.source} />
+                Your browser does not support the video tag.
+              </video>
             </div>
-          ))}
+            <p className="text-amber-600 m-2">{video.description}</p>
+            <h5 className="text-neutral-400 ">
+              posted {moment(Date.now()).fromNow()}
+            </h5>
+          </div>
+        ))}
     </div>
   );
 };
 
-export default VideosPage;
+export default AllVideosPage;

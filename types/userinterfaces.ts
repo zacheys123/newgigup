@@ -1,8 +1,10 @@
 export interface Video {
+  _id: string;
   title: string;
   source: string;
-  description: string;
-  gigId: string;
+  description?: string;
+  gigId?: string;
+  // createdAt?.Date;
 }
 
 export interface Review {
