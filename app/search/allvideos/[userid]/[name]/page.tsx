@@ -82,7 +82,7 @@ const AllVideosPage = () => {
     </div>;
   }
   return (
-    <div className="overflow-y-auto h-screen w-[90%] mx-auto  shadow-md shadow-orange-300 flex flex-col gap-2 bg-slate-900">
+    <div className="overflow-y-auto h-screen w-[90%] mx-auto  shadow-md shadow-orange-300 flex flex-col gap-2 bg-black">
       <div className="h-[20px] bg-neutral-800 w-full flex pl-3 items-center">
         <ArrowBigLeftIcon
           className="cursor-pointer hover:text-amber-500 text-neutral-400 "
@@ -94,7 +94,7 @@ const AllVideosPage = () => {
         friendvideos?.map((video: Video) => (
           <div
             key={video._id}
-            className=" flex flex-col gap-2 bg-slate-900 h-fit shadow-sm shadow-slate-500 py-2 px-3"
+            className=" flex flex-col  gap-2 bg-zinc-900 h-fit shadow-sm shadow-slate-500 py-2 px-3"
           >
             <h3 className="text-amber-300 m-2">{video.title}</h3>
             <div className="flex-1">
