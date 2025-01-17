@@ -23,7 +23,7 @@ const ReviewPage = () => {
           <DialogHeader>
             <DialogTitle style={{ color: "lightgray" }}>Reviews</DialogTitle>
           </DialogHeader>
-          <FriendReviewComponent />
+          <FriendReviewComponent rev={false} />
         </DialogContent>
       </Dialog>{" "}
     </div>
