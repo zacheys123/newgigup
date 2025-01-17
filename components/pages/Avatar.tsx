@@ -10,20 +10,10 @@ interface AvatarProps {
   firstname: string;
 }
 const AvatarComponent = ({ picture, posts, firstname }: AvatarProps) => {
-  const { setLogout, setName } = useStore();
-  const showName = () => {
-    setName(true);
-  };
-  const RemoveName = () => {
-    setName(false);
-  };
+  const { setLogout } = useStore();
+
   return (
-    <div
-      className=""
-      onClick={() => setLogout(true)}
-      onMouseOver={showName}
-      onMouseLeave={RemoveName}
-    >
+    <div className="" onClick={() => setLogout(true)}>
       <Avatar>
         <AvatarImage
           src={picture}

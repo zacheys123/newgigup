@@ -30,7 +30,7 @@ const MainUser = ({
           {" "}
           <div
             className=" flex-1 flex items-center gap-1"
-            onClick={() => router.push(`/friends/${username}`)}
+            onClick={() => router.push(`/search/${username}`)}
           >
             <AvatarComponent
               picture={picture || ""}

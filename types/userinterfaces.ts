@@ -10,8 +10,8 @@ export interface Review {
   rating: number;
   comment: string;
   gigId: string; // assuming Gig ID is a string
-  updatedAt: Date;
-  createdAt: Date;
+  updatedAt?: Date;
+  createdAt?: Date;
 }
 
 export interface UserProps {

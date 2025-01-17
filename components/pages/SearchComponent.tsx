@@ -35,27 +35,16 @@ const SearchComponent = () => {
 
       <div className="bg-black w-[100vw] h-[calc(100vh-80px)] lg:hidden overflow-hidden">
         <div className="overflow-y-auto h-full w-full my-4 py-10 space-y-4">
-          {
-            users &&
-              searchFunc(users?.users, searchQuery)
-                .filter((user: UserProps) => user.clerkId !== userId)
-                .map((user: UserProps) => (
-                  <MainUser
-                    key={user._id}
-                    {...user}
-                    //   handleSendNotification={() => handleSendNotification(user)}
-                  />
-                ))
-            // : users?.users
-            //     ?.filter((user: UserProps) => user.clerkId !== userId)
-            //     .map((user: UserProps) => (
-            //       <MainUser
-            //         key={user._id}
-            //         {...user}
-            //         // searchquery={searchQuery}
-            //         //   handleSendNotification={() => handleSendNotification(user)}
-            //       />
-          }
+          {users &&
+            searchFunc(users?.users, searchQuery)
+              .filter((user: UserProps) => user.clerkId !== userId)
+              .map((user: UserProps) => (
+                <MainUser
+                  key={user._id}
+                  {...user}
+                  //   handleSendNotification={() => handleSendNotification(user)}
+                />
+              ))}
         </div>
       </div>
     </>
