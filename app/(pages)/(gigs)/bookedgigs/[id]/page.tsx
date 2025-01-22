@@ -34,7 +34,7 @@ const BookedGigs = () => {
       {/* Scrollable Gigs List */}
       <div className="h-[83%] overflow-y-scroll bg-gray-900">
         {" "}
-        {gigs?.gigs?.length === 0 && (
+        {gigs && gigs?.gigs?.length === 0 && (
           <h1 className="text-white text-center font-bold py-5">
             No gigs found
           </h1>

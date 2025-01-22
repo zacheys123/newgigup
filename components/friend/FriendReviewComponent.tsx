@@ -63,9 +63,9 @@ const FriendReviewComponent = ({ rev }: friend) => {
   return (
     <div className=" w-[100%] h-[100%] bg-slate-900 overflow-y-auto">
       {rev && (
-        <div className="h-[40px] bg-neutral-800 w-full flex pl-3 items-center">
+        <div className="h-[40px] bg-slate-400 w-full flex pl-3 items-center">
           <ArrowBigLeftIcon
-            className="cursor-pointer hover:text-amber-500 text-neutral-400 "
+            className="cursor-pointer hover:text-amber-500 text-neutral-200 "
             size="28"
             onClick={() => router.back()}
           />

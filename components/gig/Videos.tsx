@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useCallback, useState } from "react";
+import React, { ChangeEvent, useCallback, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 // import { Textarea } from "flowbite-react";
 import { fileupload } from "@/hooks/fileUpload";
@@ -10,13 +10,16 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAuth } from "@clerk/nextjs";
 import { Button } from "../ui/button";
 import { CircularProgress } from "@mui/material";
-import { FetchResponse } from "@/types/giginterface";
+import { FetchResponse, GigProps } from "@/types/giginterface";
+import { VideoProps } from "@/types/userinterfaces";
+import { useVideos } from "@/hooks/useVideos";
 
 interface videosProps {
   setShowVideo: (showvideo: boolean) => void;
   gigId: string;
+  gig: GigProps;
 }
-const Videos = ({ setShowVideo, gigId }: videosProps) => {
+const Videos = ({ setShowVideo, gigId, gig }: videosProps) => {
   const [addvideo, setAddVideo] = useState<boolean>();
   const { userId } = useAuth();
   const { user } = useCurrentUser(userId || null);
@@ -29,6 +32,10 @@ const Videos = ({ setShowVideo, gigId }: videosProps) => {
     description: "",
   });
   const baseUrl = `/api/gigs/addvideo/${gigId}`;
+  const validGigid = typeof gigId === "string" ? gigId : ""; // Default to empty string if undefined
+
+  const { friendvideos } = useVideos(validGigid);
+
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
@@ -48,18 +55,19 @@ const Videos = ({ setShowVideo, gigId }: videosProps) => {
       media: videoUrl,
       title: videos.title,
       description: videos.description,
-      postedBy: user?._id,
+      postedBy: gig?.bookedBy?._id,
     };
     console.log("title from front End", videoUrl);
     console.log("description from front End", videos.title);
     console.log("media from front End", videos.description);
-    console.log("postedBy from front End", user?._id);
+    console.log("postedBy from front End", gig?.bookedBy?._id);
+    console.log("Logged In user from front End", user?._id);
 
     if (videoUrl) {
       try {
         setIsLoading(true);
         const res = await fetch(baseUrl, {
-          method: "PUT",
+          method: "POST",
           headers: {
             "Content-Type": "application/json", // Correctly specify headers here
           },
@@ -109,39 +117,44 @@ const Videos = ({ setShowVideo, gigId }: videosProps) => {
     },
     []
   );
+  const filteredVideos = useMemo(() => {
+    return friendvideos?.videos?.filter((video: VideoProps) => {
+      return video?.postedBy === user?._id;
+    });
+  }, [friendvideos?.videos, user?._id]);
 
   return (
-    <motion.div className=" bg-neutral-900 h-[75%] rounded-md p-3">
+    <motion.div className=" bg-neutral-900 h-[75%] rounded-xl p-3">
       {!addvideo ? (
-        <div className="h-[380px]">
+        <div className="h-[380px] ">
           <h6 className="text-neutral-300 text-xl underline underline-offset-1 text-center my-3">
             Adding Videos Guideline
           </h6>
 
           <span
-            className="absolute top-2 right-4 text-[15px] font-bold"
+            className="absolute top-2 right-4 text-[15px] font-bold text-gray-200"
             onClick={() => setShowVideo(false)}
           >
             &times;
           </span>
-          <ul className="custom-list ml-4">
+          <ul className="custom-list ml-4 py-4">
             <h6 className="text-neutral-400 ">
-              By Adding videos to your profile you:
+              -)-By Adding videos to your profile -)-:you:
             </h6>
-            <li className="text-neutral-500 ">
+            <li className="text-neutral-500 my-7 ">
               You create a portfolio for future jobs
             </li>
-            <li className="text-neutral-500">
+            <li className="text-neutral-500 my-7">
               Depending on reviews this can make people see if reviews are true
               or not
             </li>
-            <li className="text-neutral-500 ">
+            <li className="text-neutral-500 my-7 ">
               you create a following of clients that like your work
             </li>
-            <li className="text-neutral-500 ">
+            <li className="text-neutral-500 my-7 ">
               You also allow clients to judge you by your work
             </li>
-            <li className="text-neutral-500 ">
+            <li className="text-neutral-500 my-7 ">
               It adds alot to your online presence
             </li>
           </ul>
@@ -189,7 +202,7 @@ const Videos = ({ setShowVideo, gigId }: videosProps) => {
                 className="p-2 w-full text-[13px] bg-gray-300 rounded-md focus-within:ring-o outline-none"
               />
             </div>
-            {user?.videos?.length < 4 && (
+            {filteredVideos && filteredVideos?.length < 4 && (
               <>
                 {!videoUrl ? (
                   <div className="flex justify-between items-center w-full mx-auto mt-4">
@@ -270,7 +283,7 @@ const Videos = ({ setShowVideo, gigId }: videosProps) => {
         </motion.div>
       )}{" "}
       {!addvideo && (
-        <div className="bg-amber-600 w-[80%] mx-auto my-5 rounded-sm py-2">
+        <div className="bg-amber-600 w-[80%] mx-auto my-[72px] rounded-sm py-2 ">
           <h6
             className="text-white text-1xl font-bold flex justify-center font-sans"
             onClick={(ev) => {

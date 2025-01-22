@@ -16,7 +16,8 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { Review } from "@/types/userinterfaces";
 import Videos from "./Videos";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { Video } from "lucide-react";
+// import { useCurrentUser } from "@/hooks/useCurrentUser";
 interface FetchResponse {
   success: boolean;
   message?: string;
@@ -31,7 +32,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
   const [loadingPostId, setLoadingPostId] = useState<string>("");
   const [gigdesc, setGigdesc] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
-  const { user } = useCurrentUser(userId || null);
+  // const { user } = useCurrentUser(userId || null);
   const { gigs } = useAllGigs() || { gigs: [] }; // Default to empty array if null or undefined
   const [showvideo, setShowVideo] = useState<boolean>(false);
   const handleClose = () => {
@@ -57,7 +58,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
 
       console.log(data);
     } catch (error) {
-      console.log("error adding count for gigs", error);
+      console.log("error adding view for gigs", error);
     }
   };
   // Booking function it updates the isPending state
@@ -85,13 +86,11 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
   };
   const [currentId, setCurrentId] = useState<string | null>();
   const canShowAddGigVideos =
-    gig?.isTaken &&
-    gig?.bookedBy?._id === myId &&
-    gig?.postedBy?._id !== myId &&
-    user?.videos.length < 4;
+    gig?.isTaken && gig?.bookedBy?._id === myId && gig?.postedBy?._id !== myId;
+  // user?.videos.length < 4;
 
   // user?.videos.some((video) => video.gigId === gig._id);
-  console.log(user?.videos);
+  // console.log(user?.videos);
   return (
     <>
       {gigdesc && (
@@ -375,19 +374,21 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
             </div>
           )}
         </div>{" "}
-        {canShowAddGigVideos && (
-          <div
-            className="flex-1 my-3 flex justify-center bg-yellow-600 px-3 py-1 rounded-r-3xl rounded-b-2xl rounded-br-md"
-            onClick={() => {
-              setCurrentId(gig._id);
-              setShowVideo(true);
-            }}
-          >
-            <h4 className="text-[10px] !text-orange-100 font-bold">
-              Add Gig Videos
-            </h4>
-          </div>
-        )}
+        <div className=" w-full flex justify-end">
+          {canShowAddGigVideos && (
+            <div
+              className=" my-3 flex  bg-yellow-600 px-3 py-1 rounded-r-3xl rounded-b-[10px] rounded-br-md min-w-[120px] "
+              onClick={() => {
+                setCurrentId(gig._id);
+                setShowVideo(true);
+              }}
+            >
+              <h4 className="text-[10px] !text-orange-100 font-bold flex  items-center gap-2">
+                Add Gig Videos <Video />
+              </h4>
+            </div>
+          )}
+        </div>
         {showvideo && currentId === gig?._id && (
           <motion.div
             initial={{
@@ -399,7 +400,11 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
             transition={{ duration: 0.3 }}
             className="h-screen bg-zinc-700 absolute top-40 w-[90%] mb-[140px] z-50 mx-auto"
           >
-            <Videos setShowVideo={setShowVideo} gigId={gig?._id || ""} />
+            <Videos
+              setShowVideo={setShowVideo}
+              gigId={currentId || ""}
+              gig={gig}
+            />
           </motion.div>
         )}
       </section>

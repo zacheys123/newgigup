@@ -1,9 +1,10 @@
-export interface Video {
+export interface VideoProps {
   _id: string;
   title: string;
   source: string;
   description?: string;
-  gigId?: string;
+  gigId: string;
+  postedBy?: string;
   // createdAt?.Date;
 }
 
@@ -37,12 +38,14 @@ export interface UserProps {
   username: string; // Required, unique, and lowercase
   followers: string[]; // Array of User IDs
   followings: string[]; // Array of User IDs
-  videos: Video[];
   allreviews: Review[];
   myreviews: Review[];
 }
 export interface Users {
   users: UserProps[]; // Optional}
+}
+export interface Videos {
+  videos: VideoProps[]; // Optional}
 }
 
 export interface FetchResponse {

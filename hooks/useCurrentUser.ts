@@ -20,7 +20,6 @@ export function useCurrentUser(userId: string | null) {
     username: "",
     followers: [],
     followings: [],
-    videos: [],
     allreviews: [],
     myreviews: [],
   });
@@ -59,7 +58,6 @@ export function useCurrentUser(userId: string | null) {
         username: "",
         followers: [],
         followings: [],
-        videos: [],
         allreviews: [],
         myreviews: [],
       });
@@ -90,7 +88,6 @@ export function useCurrentUser(userId: string | null) {
               username: "",
               followers: [],
               followings: [],
-              videos: [],
               allreviews: [],
               myreviews: [],
             });
@@ -115,7 +112,6 @@ export function useCurrentUser(userId: string | null) {
             username: "",
             followers: [],
             followings: [],
-            videos: [],
             allreviews: [],
             myreviews: [],
           });

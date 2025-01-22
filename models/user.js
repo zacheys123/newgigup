@@ -45,27 +45,7 @@ const userSchema = new mongoose.Schema(
     },
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     followings: [{ type: Schema.Types.ObjectId, ref: "User" }],
-    videos: [
-      {
-        title: {
-          type: String,
-          lowercase: true,
-        },
-        source: {
-          type: String,
-          required: true,
-        },
-        description: {
-          type: String,
-          required: true,
-        },
-        gigId: {
-          type: String,
-          required: true,
-        },
-      },
-      { timestamps: true },
-    ],
+
     allreviews: [
       {
         postedBy: { type: Schema.Types.ObjectId, ref: "User" },

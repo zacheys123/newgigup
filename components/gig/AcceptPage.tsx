@@ -59,7 +59,7 @@ const AcceptPage = () => {
     if (currentgig?.isPending === false && currentgig?.isTaken === false) {
       router.push(`/gigs/${userId}/`);
     }
-  }, [currentgig?.isTaken, currentgig?.isPending]);
+  }, [currentgig?.isTaken, currentgig?.isPending, userId]);
   const handleRatingChange = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
