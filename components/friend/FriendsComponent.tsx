@@ -50,7 +50,7 @@ const FriendsComponent = () => {
             username: "",
             followers: [],
             followings: [],
-            videos: [],
+            
             allreviews: [],
             myreviews: [],
           });
