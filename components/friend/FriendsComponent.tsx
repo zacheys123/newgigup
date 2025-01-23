@@ -50,6 +50,10 @@ const FriendsComponent = () => {
             username: "",
             followers: [],
             followings: [],
+<<<<<<< HEAD
+=======
+            
+>>>>>>> dbff18b3be184e672744fd42950f2c54fea1d582
             allreviews: [],
             myreviews: [],
           });
