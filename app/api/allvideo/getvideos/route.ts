@@ -6,7 +6,6 @@ import { getAuth } from "@clerk/nextjs/server";
 import User from "@/models/user";
 
 export async function GET(req: NextRequest) {
-  const id = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
   const { userId } = getAuth(req);
   if (!userId) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -15,14 +14,11 @@ export async function GET(req: NextRequest) {
 
   try {
     await connectDb();
-    console.log("My Id", id);
-    const vids = await Video.find().populate({ path: "postedBy", model: User });
-    console.log("all my gigs", vids);
-
-    const videos = vids.filter((video) => {
-      console.log("video objects", video);
-      return video.postedBy._id.toString() === id;
+    const videos = await Video.find().populate({
+      path: "postedBy",
+      model: User,
     });
+    console.log(videos);
     return NextResponse.json({
       videos,
     });

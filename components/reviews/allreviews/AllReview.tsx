@@ -1,13 +1,14 @@
+"use client";
 // import useStore from "@/app/zustand/useStore";
 import { useAllGigs } from "@/hooks/useAllGigs";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { Review } from "@/types/userinterfaces";
+import { Review, VideoProps, Videos } from "@/types/userinterfaces";
 import { useAuth } from "@clerk/nextjs";
 import { Box, Divider } from "@mui/material";
 import { Video } from "lucide-react";
 import moment from "moment";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FaStar } from "react-icons/fa";
 
 const AllReview = ({
@@ -25,6 +26,76 @@ const AllReview = ({
   //   const [currentgig] = useStore();
   const gig = gigs?.gigs?.find((gig) => gig._id === gigId);
   const router = useRouter();
+  const [Isloading, setLoading] = useState<boolean>(false);
+  console.log(Isloading);
+  const [friendvideos, setFriendVideos] = useState<{
+    videos: VideoProps[];
+  } | null>({
+    videos: [
+      {
+        _id: "",
+        postedBy: "",
+        title: "",
+        description: "",
+        source: "",
+        gigId: "",
+      },
+    ],
+  });
+  const url = `/api/allvideo/getvideos`;
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function getFriendVideos() {
+      try {
+        setLoading(true);
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const videos: Videos = await response.json();
+        console.log(videos);
+        if (isMounted) {
+          setFriendVideos(videos);
+        }
+      } catch (error) {
+        console.error("Error fetching friend videos:", error);
+        if (isMounted) {
+          setFriendVideos({
+            videos: [
+              {
+                _id: "",
+                postedBy: "",
+                title: "",
+                description: "",
+                source: "",
+                gigId: "",
+              },
+            ],
+          });
+        }
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    }
+
+    getFriendVideos();
+    return () => {
+      isMounted = false;
+    };
+  }, [url]);
+
+  const video = friendvideos?.videos?.filter((video) => video.gigId === gigId);
+  console.log(video);
+
   return (
     <>
       {!loading || !gig ? (
@@ -82,19 +153,22 @@ const AllReview = ({
                 <p className="text-amber-600 text-[12px]">
                   {gig ? gig.title : "No title"}
                 </p>{" "}
-                {postedBy !== user?._id && gig?.bookedBy?._id !== user?._id && (
-                  <div
-                    className="flex gap-2 items-center justify-around "
-                    onClick={() => {
-                      router.push(`/videos/${gigId}/${gig?.bookedBy?._id}`);
-                    }}
-                  >
-                    <p className="bg-neutral-600 py-1 px-2 rounded-md text-yellow-400 text-[12px] whitespace-nowrap flex items-center gap-2">
-                      watch clips
-                      <Video size="15" />
-                    </p>
-                  </div>
-                )}
+                {postedBy !== user?._id &&
+                  gig?.bookedBy?._id !== user?._id &&
+                  video?.length !== 0 && (
+                    <div
+                      className="flex gap-2 items-center justify-around "
+                      onClick={() => {
+                        router.push(`/videos/${gigId}/${gig?.bookedBy?._id}`);
+                      }}
+                    >
+                      <p className="bg-neutral-600 py-1 px-2 rounded-md text-yellow-400 text-[12px] whitespace-nowrap flex items-center gap-2">
+                        <span className="text-[12px]">{video?.length}</span>
+                        watch clips
+                        <Video size="15" />
+                      </p>
+                    </div>
+                  )}
               </div>
 
               <Divider

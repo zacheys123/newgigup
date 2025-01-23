@@ -33,8 +33,10 @@ const Videos = ({ setShowVideo, gigId, gig }: videosProps) => {
   });
   const baseUrl = `/api/gigs/addvideo/${gigId}`;
   const validGigid = typeof gigId === "string" ? gigId : ""; // Default to empty string if undefined
+  const validUserId =
+    typeof gig?.bookedBy?._id === "string" ? gig?.bookedBy?._id : ""; // Default to empty string if undefined
 
-  const { friendvideos } = useVideos(validGigid);
+  const { friendvideos, setRefetch } = useVideos(validGigid, validUserId);
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -76,6 +78,7 @@ const Videos = ({ setShowVideo, gigId, gig }: videosProps) => {
 
         const data: FetchResponse = await res.json();
         console.log(data);
+        setRefetch((prev) => !prev);
         toast.success(data?.message);
         setVideos({ title: "", description: "" });
         setVideoUrl("");
@@ -119,10 +122,10 @@ const Videos = ({ setShowVideo, gigId, gig }: videosProps) => {
   );
   const filteredVideos = useMemo(() => {
     return friendvideos?.videos?.filter((video: VideoProps) => {
-      return video?.postedBy === user?._id;
+      return video?.gigId === gig?._id;
     });
-  }, [friendvideos?.videos, user?._id]);
-
+  }, [friendvideos?.videos, gig?._id]);
+  console.log(filteredVideos);
   return (
     <motion.div className=" bg-neutral-900 h-[75%] rounded-xl p-3">
       {!addvideo ? (
@@ -202,7 +205,7 @@ const Videos = ({ setShowVideo, gigId, gig }: videosProps) => {
                 className="p-2 w-full text-[13px] bg-gray-300 rounded-md focus-within:ring-o outline-none"
               />
             </div>
-            {filteredVideos && filteredVideos?.length < 4 && (
+            {filteredVideos && filteredVideos?.length < 4 ? (
               <>
                 {!videoUrl ? (
                   <div className="flex justify-between items-center w-full mx-auto mt-4">
@@ -278,6 +281,13 @@ const Videos = ({ setShowVideo, gigId, gig }: videosProps) => {
                   </div>
                 )}
               </>
+            ) : (
+              <div className="flex flex-col gap-2 my-3 p-2">
+                <span className="text-neutral-400 mb-1 text center">{`You've reached a maximum no of clips to upload`}</span>
+                <h5 className="text-1xl font bold font-mono bg-amber-600 text-gray-300 my-[20px] rounded-lg text-center p-2">
+                  Click to return
+                </h5>
+              </div>
             )}
           </form>
         </motion.div>

@@ -55,7 +55,7 @@ const CreateGig = () => {
   const [userinfo, setUserInfo] = useState<UserInfo>({
     prefferences: [],
   });
-  const [bussinesscat, setBussinessCategory] = useState<bussinesscat>("");
+  const [bussinesscat, setBussinessCategory] = useState<bussinesscat>("full");
   // const [errors, setErrors] = useState<string[]>([]);
   // const [success, setSuccess] = useState<boolean>(false);
   const [showduration, setshowduration] = useState<boolean>(false);

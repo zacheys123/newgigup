@@ -13,16 +13,18 @@ const VideosPage = () => {
 
   const validGigid = typeof gigid === "string" ? gigid : ""; // Default to empty string if undefined
 
-  const { loading, friendvideos } = useVideos(validGigid);
+  const validUserId = typeof userid === "string" ? userid : ""; // Default to empty string if undefined
+
+  const { loading, friendvideos } = useVideos(validGigid, validUserId);
 
   const router = useRouter();
 
   const filteredVideos = useMemo(() => {
     return friendvideos?.videos?.filter((video: VideoProps) => {
       console.log(gigid);
-      return video.gigId === gigid && video?.postedBy === userid;
+      return video.gigId === gigid;
     });
-  }, [friendvideos?.videos, gigid, userid]);
+  }, [friendvideos?.videos, gigid]);
 
   console.log(filteredVideos);
   if (loading) {
@@ -45,13 +47,14 @@ const VideosPage = () => {
   }
 
   return (
-    <div className="overflow-y-auto h-screen w-[90%] mx-auto shadow-md shadow-orange-300 flex flex-col gap-2 bg-slate-900">
-      <div className="h-[40px] bg-inherit w-full flex pl-3 items-center">
+    <div className="overflow-y-auto h-screen  mx-auto shadow-md shadow-orange-300 flex flex-col gap-2 bg-slate-900 w-full">
+      <div className="h-[40px] bg-inherit w-full flex pl-3 items-center justify-around my-3">
         <ArrowBigLeftIcon
           className="cursor-pointer hover:text-amber-500 text-neutral-400"
           size={28}
           onClick={() => router.back()}
         />
+        <h1 className="text-white text-2xl font-bold m-2">My Posted Videos</h1>
       </div>
       {filteredVideos && filteredVideos.length > 0 ? (
         filteredVideos.map((video: VideoProps) => (

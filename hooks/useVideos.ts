@@ -2,8 +2,9 @@
 import { VideoProps, Videos } from "@/types/userinterfaces";
 import { useEffect, useState } from "react";
 
-export function useVideos(gigid: string) {
+export function useVideos(gigid: string, userid: string) {
   const [loading, setLoading] = useState<boolean>(false);
+  const [refetch, setRefetch] = useState<boolean>(false);
   const [friendvideos, setFriendVideos] = useState<{
     videos: VideoProps[];
   } | null>({
@@ -18,10 +19,11 @@ export function useVideos(gigid: string) {
       },
     ],
   });
-  const url = `/api/videos/getvideos`;
+  const url = `/api/videos/getvideos/${userid}`;
 
   useEffect(() => {
     if (!gigid) return; // Guard against missing params
+    if (!userid) return; // Guard against missing params
 
     let isMounted = true;
 
@@ -69,9 +71,10 @@ export function useVideos(gigid: string) {
     return () => {
       isMounted = false;
     };
-  }, [gigid, url]);
+  }, [gigid, url, userid, refetch]);
   return {
     loading,
     friendvideos,
+    setRefetch,
   };
 }

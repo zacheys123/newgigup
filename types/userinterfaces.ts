@@ -4,8 +4,9 @@ export interface VideoProps {
   source: string;
   description?: string;
   gigId: string;
-  postedBy?: string;
-  // createdAt?.Date;
+  postedBy?: string | { _id: string; [key: string]: string }; // Object with _id and optional additional fields
+
+  createdAt?: Date;
 }
 
 export interface Review {

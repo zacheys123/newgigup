@@ -17,6 +17,7 @@ import { motion } from "framer-motion";
 import { Review } from "@/types/userinterfaces";
 import Videos from "./Videos";
 import { Video } from "lucide-react";
+import { useVideos } from "@/hooks/useVideos";
 // import { useCurrentUser } from "@/hooks/useCurrentUser";
 interface FetchResponse {
   success: boolean;
@@ -84,13 +85,26 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
       router.push(`/execute/${gig?._id}`); // Redirect if no review
     }
   };
+
+  const validGigid = typeof gig?._id === "string" ? gig?._id : ""; // Default to empty string if undefined
+  const validUserId =
+    typeof gig?.bookedBy?._id === "string" ? gig?.bookedBy?._id : ""; // Default to empty string if undefined
+
+  const { friendvideos } = useVideos(validGigid, validUserId);
+  const testfilteredvids = friendvideos?.videos.filter(
+    (video) => video.gigId === gig._id
+  );
   const [currentId, setCurrentId] = useState<string | null>();
   const canShowAddGigVideos =
-    gig?.isTaken && gig?.bookedBy?._id === myId && gig?.postedBy?._id !== myId;
+    gig?.isPending === false &&
+    gig?.isTaken === true &&
+    testfilteredvids &&
+    gig?.bookedBy?._id === myId &&
+    gig?.postedBy?._id !== myId &&
+    testfilteredvids?.length < 4;
   // user?.videos.length < 4;
 
-  // user?.videos.some((video) => video.gigId === gig._id);
-  // console.log(user?.videos);
+  console.log();
   return (
     <>
       {gigdesc && (
@@ -374,21 +388,36 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
             </div>
           )}
         </div>{" "}
-        <div className=" w-full flex justify-end">
-          {canShowAddGigVideos && (
-            <div
-              className=" my-3 flex  bg-yellow-600 px-3 py-1 rounded-r-3xl rounded-b-[10px] rounded-br-md min-w-[120px] "
-              onClick={() => {
-                setCurrentId(gig._id);
-                setShowVideo(true);
-              }}
-            >
-              <h4 className="text-[10px] !text-orange-100 font-bold flex  items-center gap-2">
-                Add Gig Videos <Video />
-              </h4>
-            </div>
-          )}
-        </div>
+        {gig?.bookedBy?._id == myId && (
+          <div className=" w-full flex justify-end">
+            {canShowAddGigVideos ? (
+              <div
+                className=" my-3 flex  bg-yellow-600 px-3 py-1 rounded-r-3xl rounded-b-[10px] rounded-br-md min-w-[120px] "
+                onClick={() => {
+                  setCurrentId(gig._id);
+                  setShowVideo(true);
+                }}
+              >
+                <h4 className="text-[10px] !text-orange-100 font-bold flex  items-center gap-2">
+                  Add Gig Videos <Video />
+                </h4>
+              </div>
+            ) : (
+              <div
+                className=" my-3 flex  bg-red-700 px-3 py-1 rounded-r-3xl rounded-b-[10px] rounded-br-md min-w-[120px] "
+                onClick={() => {
+                  router.push(
+                    `/search/allvideos/${gig?.bookedBy?._id}/*${gig?.bookedBy?.firstname}${gig?.bookedBy?.lastname}`
+                  );
+                }}
+              >
+                <h4 className="text-[10px] !text-orange-100 font-bold flex  items-center gap-2">
+                  Review Your Gig Videos <Video />
+                </h4>
+              </div>
+            )}
+          </div>
+        )}
         {showvideo && currentId === gig?._id && (
           <motion.div
             initial={{
