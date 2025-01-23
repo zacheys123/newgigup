@@ -15,7 +15,7 @@ const Musicians = ({ _id }: UserProps) => {
         Musicians you may know
       </h2>
 
-      <div className="flex bg-zinc-800 h-full w-full overflow-x-auto overflow-y-hidden">
+      <div className="flex bg-zinc-800 h-full w-full rounded-md overflow-x-auto overflow-y-hidden items-center">
         {allusers?.users
           ?.filter(
             (myuser: UserProps) => myuser?._id !== _id && myuser?.instrument

@@ -189,17 +189,17 @@ const FriendsComponent = () => {
             </span>
             {friend?.address ? friend?.address : "-null"}
           </span>
-          <span className="text-[12px] font-bold text-gray-500">
+          <span className="text-[12px] font-bold text-gray-400">
             {friend?.followers?.length} followers
           </span>
-          <span className="text-[12px] font-bold text-gray-500">
+          <span className="text-[12px] font-bold text-gray-400">
             {friend?.followings?.length} followings
           </span>
         </div>
       </Box>
       <Box className="h-fit bg-neutral-800 w-[100%] px-2 py-3">
         <h4 className="text-[16px] font-bold text-gray-400 mt-3 mb-1 ">
-          Personal Info
+          Personal Info(Date of birth)
         </h4>
         <div className="flex flex-col">
           <span className="text-[12px] font-bold text-gray-500">

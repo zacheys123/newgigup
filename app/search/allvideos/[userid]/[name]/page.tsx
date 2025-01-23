@@ -1,11 +1,11 @@
 "use client";
 import { VideoProps } from "@/types/userinterfaces";
 import { CircularProgress } from "@mui/material";
-import { ArrowBigLeftIcon, Trash2Icon } from "lucide-react";
+import { ArrowBigLeftIcon } from "lucide-react";
 import moment from "moment";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-
+import { BsThreeDotsVertical } from "react-icons/bs";
 const AllVideosPage = () => {
   const { userid } = useParams();
   //   const { userId } = useAuth();
@@ -13,6 +13,10 @@ const AllVideosPage = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [deleteloading, setDeleteLoading] = useState<boolean>(false);
   const [refetch, setRefetch] = useState<boolean>(false);
+  const [videoactions, setVideoActions] = useState<boolean>(false);
+
+  const [currentVideo, setCurrentVideo] = useState<string | null>("");
+
   //   const { user } = useCurrentUser(userId || null);
   const router = useRouter();
 
@@ -110,8 +114,12 @@ const AllVideosPage = () => {
           <div
             key={video._id}
             className=" flex flex-col  gap-2 bg-zinc-900 h-fit shadow-sm shadow-slate-500 py-2 px-3"
+            onClick={() => {
+              setCurrentVideo(null);
+              setVideoActions(false);
+            }}
           >
-            <div className="flex items-center justify-around p-2">
+            <div className="flex items-center justify-between p-2">
               <h3 className=" m-2 flex items-center px-2 ">
                 <span className="text-amber-400  mx-1"> Gig Title: </span>
                 <span className="text-purple-200  mx-1"> {video.title}</span>
@@ -120,12 +128,45 @@ const AllVideosPage = () => {
                 video.postedBy?._id &&
                 video.postedBy &&
                 video.postedBy?._id === userid && (
-                  <Trash2Icon
-                    className="cursor-pointer text-red-500 "
-                    size={24}
-                    onClick={() => deleteVideo(video?._id)}
+                  <BsThreeDotsVertical
+                    className="cursor-pointer hover:text-amber-500 text-neutral-400"
+                    size={22}
+                    onClick={(ev) => {
+                      setCurrentVideo(video?._id);
+                      setVideoActions(true);
+                      ev.stopPropagation();
+                    }}
                   />
+                  // <Menu
+                  //   className="cursor-pointer text-red-500 "
+                  //   size={24}
+                  //   onClick={() => deleteVideo(video?._id)}
+                  // />
                 )}
+            </div>
+            <div className="flex justify-end z-50 relative">
+              {currentVideo === video?._id && videoactions && (
+                <div
+                  className="absolute  h-[180px] bg-neutral-200 opacity-80  w-[100px]"
+                  onClick={() => {
+                    setVideoActions(true);
+                    setCurrentVideo(video._id);
+                  }}
+                >
+                  <ul className="py-2 px-4">
+                    <li className="title my-3"> Edit Video</li>
+                    <li className="title my-3"> Public</li>{" "}
+                    <li className="title my-3"> Private</li>
+                    <li
+                      className="title my-3"
+                      onClick={() => deleteVideo(video?._id)}
+                    >
+                      delete
+                    </li>
+                    <li className="title my-3"> </li>
+                  </ul>
+                </div>
+              )}
             </div>
             <div className="flex-1">
               <video controls className="w-full h-full object-cover">
