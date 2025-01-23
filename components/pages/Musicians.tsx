@@ -18,7 +18,7 @@ const Musicians = ({ _id }: UserProps) => {
       <div className="flex bg-zinc-800 h-full w-full overflow-x-auto overflow-y-hidden">
         {allusers?.users
           ?.filter(
-            (myuser: UserProps) => myuser?._id !== _id && !myuser?.instrument
+            (myuser: UserProps) => myuser?._id !== _id && myuser?.instrument
           )
           .map((myuser: UserProps) => {
             return (
@@ -42,7 +42,7 @@ const Musicians = ({ _id }: UserProps) => {
                  */}
                 <div className="text-gray-600  font-bold bg-neutral-500 w-[90px] h-[120px] p-3 rounded-full flex justify-center items-center border border-b-4 border-b-orange-300">
                   <span className="text-red-300 text-[20px]">
-                    {myuser?.firstname?.split("")[0].toUpperCase()}
+                    {myuser?.firstname?.split("")[0]?.toUpperCase()}
                   </span>
                   <span className="text-neutral-300">
                     {myuser?.lastname?.split("")[0]}

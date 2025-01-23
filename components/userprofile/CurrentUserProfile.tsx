@@ -9,6 +9,7 @@ import useStore from "@/app/zustand/useStore";
 import { toast } from "sonner";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { experiences, instruments } from "@/data";
+import { ArrowDown, ArrowUp } from "lucide-react";
 
 interface UpdateResponse {
   updateStatus: boolean;
@@ -28,7 +29,7 @@ const CurrentUserProfile = () => {
   const [firstname, setFirstname] = useState<string | null>("");
   const [lastname, setLastname] = useState<string | null>("");
   const [email, setEmail] = useState<string | null>("");
-  const [phone, setPhone] = useState<string | null>("");
+  // const [phone, setPhone] = useState<string | null>("");
   const [username, setUsername] = useState<string | null>("");
   const [address, setAddress] = useState<string | null>("");
   const [instrument, setInstrument] = useState<string>("Piano");
@@ -41,8 +42,9 @@ const CurrentUserProfile = () => {
     error: "",
     success: "",
   });
-
+  const [otherinfo, setOtherinfo] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const { setRefetchData } = useStore();
 
   const months = [
     "January",
@@ -65,7 +67,7 @@ const CurrentUserProfile = () => {
     if (user) {
       setFirstname(user.firstname || "");
       setLastname(user.lastname || "");
-      setPhone(user.phone || "");
+      // setPhone(user.phone || "");
       setUsername(user.username || "");
       setEmail(user.email || "");
       setCity(user.city || "");
@@ -102,7 +104,8 @@ const CurrentUserProfile = () => {
 
         if (resData.updateStatus) {
           toast.success(resData.message);
-          window.location.reload();
+          // window.location.reload();
+          setRefetchData((prev: boolean) => !prev);
         } else {
           toast.error(resData.message);
         }
@@ -137,7 +140,7 @@ const CurrentUserProfile = () => {
 
   return (
     <>
-      <div className="container flex justify-between items-center  shadow-sm shadow-red-500 h-[100vh]">
+      <div className="container flex justify-between items-center  shadow-sm shadow-red-500 h-[100vh] overflow-y-auto">
         {/* <Logo /> */}
         <h3 className="text-white font-bold hidden md:block text-[12px]">
           Add More Info
@@ -151,10 +154,10 @@ const CurrentUserProfile = () => {
         </div> */}
       </div>
 
-      <Box className="block w-full lg:flex gap-3 h-full">
+      <Box className="block w-full lg:flex gap-3 h-full mb-5">
         <div className="w-full py-7 h-[800px] lg:ml-[70px]">
           {!loadingUser && (
-            <div className="text-red-300 text-[14px] font-bold font-mono my-3 ml-8 flex items-center justify-between">
+            <div className="text-red-300 text-[14px] font-bold font-mono my-3 ml-8 flex items-center justify-between -mt-4">
               {user?.followers?.length === 0 ? (
                 <h6 className="text-red-300">No followers</h6>
               ) : (
@@ -174,12 +177,15 @@ const CurrentUserProfile = () => {
               )}
             </div>
           )}
-          <form className="w-full sm:w-11/12 md:w-1/2 lg:w-0 lg:hidden">
+          <form className="w-full sm:w-11/12 md:w-1/2 lg:w-0 lg:hidden -mt-2">
             {/* Personal Information */}
             <div className="h-[165px] mt-3 w-full">
               <div className="flex flex-col gap-2">
-                <span className="text-gray-400 font-bold font-mono mt-2 mx-2 mb-1 text-[13px]">
-                  Full Names
+                <span
+                  className="w-full text-[17px] px-2 font-bold flex items-center bg-amber-600 my-1 p-1 rounded-xl justify-between
+                 text-gray-300"
+                >
+                  Personal Info
                 </span>
                 <Input
                   type="text"
@@ -198,9 +204,6 @@ const CurrentUserProfile = () => {
 
             {/* Authorization Info */}
             <div className="h-[165px] mt-3 w-full">
-              <span className="text-gray-400 font-bold font-mono m-3 text-[13px]">
-                Authorization Info
-              </span>
               <Input
                 type="text"
                 className="md:text-slate-200 text-blue-100 md:w-[80%] mx-auto font-bold text-[12px] my-3"
@@ -213,23 +216,20 @@ const CurrentUserProfile = () => {
                 value={username || ""}
                 disabled
               />
-              <Input
+              {/* <Input
                 type="text"
                 placeholder="Phone No"
                 className="md:text-slate-200 text-blue-100 md:w-[80%] mx-auto font-bold text-[12px] my-3"
                 value={phone || ""}
                 disabled
-              />
+              /> */}
             </div>
 
             {/* Geographical Info */}
-            <div className="h-[170px] mt-4 w-full">
-              <span className="text-gray-400 font-bold font-mono m-3 text-[13px]">
-                Geographical Info
-              </span>
+            <div className="h-[170px]  w-full -mt-[79px]">
               <Input
                 type="text"
-                className="md:text-slate-500 text-gray-200 md:w-[80%] mx-auto font-bold text-[12px] my-3"
+                className="md:text-slate-500 text-gray-400 md:w-[80%] mx-auto font-bold text-[12px] my-3"
                 placeholder="City"
                 value={city || ""}
                 onChange={(ev: ChangeEvent<HTMLInputElement>) =>
@@ -238,7 +238,7 @@ const CurrentUserProfile = () => {
               />
               <Input
                 type="text"
-                className="md:text-slate-200 text-gray-200 md:w-[80%] mx-auto font-bold text-[12px] my-3"
+                className="md:text-slate-200 text-gray-400 md:w-[80%] mx-auto font-bold text-[12px] my-3"
                 placeholder="Address"
                 value={address || ""}
                 onChange={(ev: ChangeEvent<HTMLInputElement>) =>
@@ -246,103 +246,116 @@ const CurrentUserProfile = () => {
                 }
               />
             </div>
-
-            {/* Instrument and Experience Selection */}
-            <div className="w-full flex flex-col mb-2 h-[65px]">
-              <span className="text-[11px] font-bold font-mono text-gray-400 mb-2">
-                Instrument
-              </span>
-              <select
-                className="my-2 text-gray-200 w-[80%] mx-auto pl-2 rounded-md text-[9px] font-mono h-full"
-                value={instrument || ""}
-                onChange={(ev: ChangeEvent<HTMLSelectElement>) =>
-                  setInstrument(ev.target.value)
-                }
+            {!otherinfo && (
+              <div
+                onClick={() => setOtherinfo((prev: boolean) => !prev)}
+                className="bg-amber-900 text-[11px] font-bold font-mono text-gray-400   p-2 rounded-full mt-2"
               >
-                {instruments().map((ins) => (
-                  <option key={ins.id} value={ins.name}>
-                    {ins.val}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="w-[80%] mx-auto flex flex-col my-2 h-[65px]">
-              <span className="text-[11px] text-gray-400 mb-2 font-bold font-mono">
-                Experience
-              </span>
-              <select
-                className="my-2 text-gray-200 w-[100%] mx-auto pl-2 rounded-md text-[9px] font-mono h-full"
-                value={experience || ""}
-                onChange={(ev: ChangeEvent<HTMLSelectElement>) =>
-                  setExperience(ev.target.value)
-                }
-              >
-                {experiences().map((ex) => (
-                  <option key={ex.id} value={ex.name}>
-                    {ex.val}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Date Selection */}
-            <div className="w-[80%] mx-auto flex flex-col h-[65px]">
-              <span className="text-[11px] font-bold font-mono text-gray-400">
-                Date
-              </span>
-              <select
-                className="my-2 text-gray-200 w-[100%] mx-auto pl-2 rounded-md text-[9px] font-mono h-full"
-                value={age || ""}
-                onChange={(ev: ChangeEvent<HTMLSelectElement>) =>
-                  setAge(ev.target.value)
-                }
-              >
-                {daysOfMonth.map((i) => (
-                  <option key={i} value={i.toString()}>
-                    {i}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="w-full   flex flex-col  my-2">
-              <span className="text-[11px] text-gray-400 mb-2  font-bold font-mono   ">
-                Month
-              </span>
-              <select
-                className="text-gray-200 titler text-[10px] w-full  pl-2 element-with-overflow  h-[35px] rounded-md   font-bold  font-mono"
-                value={month !== undefined ? month : ""}
-                onChange={(ev: ChangeEvent<HTMLSelectElement>) =>
-                  setMonth(ev.target.value)
-                }
-              >
-                {months.map((ex) => {
-                  return (
-                    <option key={ex} value={ex}>
-                      {ex}
-                    </option>
-                  );
-                })}
-              </select>
-            </div>
-            <div className="w-full   flex flex-col  my-2">
-              <span className="text-[11px] text-gray-400 mb-2  font-bold font-mono   ">
-                Year
-              </span>
-              <Input
-                value={year !== undefined ? year : ""}
-                onChange={(ev: ChangeEvent<HTMLInputElement>) =>
-                  setYear(ev.target.value)
-                }
-                type="text"
-                className={
-                  message?.error?.split(" ").includes("year") && year === ""
-                    ? "border-2 border-red-500 rounded-xl  outline-none focus:ring-0 text-blue-600 md:text-gray-400 font-bold "
-                    : "mt-1 border-neutral-300    focus:ring-0 text-blue-600 md:text-gray-200 md:w-[80%] mx-auto font-bold "
-                }
-                placeholder="Year,e.g 1992=>92 or 2024 =>24"
-              />
-            </div>
+                <div
+                  className="w-full text-[17px] px-2 font-bold flex items-center justify-between
+                 text-gray-300 "
+                >
+                  Instrument{" "}
+                  <ArrowDown
+                    style={{
+                      transform: "rotate(180deg)",
+                      transition: "transform 0.3s ease-in-out",
+                      color: "white",
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+            {otherinfo && (
+              <div>
+                {/* Instrument and Experience Selection */}
+                <div className="w-full flex flex-col mb-2 h-[65px] -mt-10">
+                  <span
+                    className="w-full text-[13px] px-2 font-bold flex items-center bg-amber-800 -mt-6 p-1 rounded-xl justify-between
+                 text-gray-300 my-2"
+                    onClick={() => setOtherinfo((prev: boolean) => !prev)}
+                  >
+                    Instrument <ArrowUp />
+                  </span>
+                  <select
+                    className="my-2 text-gray-700 w-[80%] mx-auto pl-2 rounded-md text-[9px] font-mono h-[30px]"
+                    value={instrument || ""}
+                    onChange={(ev: ChangeEvent<HTMLSelectElement>) =>
+                      setInstrument(ev.target.value)
+                    }
+                  >
+                    {instruments().map((ins) => (
+                      <option key={ins.id} value={ins.name}>
+                        {ins.val}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="w-[80%] mx-auto flex flex-col  h-[65px]">
+                  <select
+                    className=" text-gray-700 w-[100%] mx-auto pl-2 rounded-md text-[9px] font-mono h-[30px] -mt-4 my-2"
+                    value={experience || ""}
+                    onChange={(ev: ChangeEvent<HTMLSelectElement>) =>
+                      setExperience(ev.target.value)
+                    }
+                  >
+                    {experiences().map((ex) => (
+                      <option key={ex.id} value={ex.name}>
+                        {ex.val}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {/* Date Selection */}
+                <div className="w-[80%] mx-auto flex flex-col h-[65px]">
+                  <select
+                    className=" text-gray-700 w-[100%] mx-auto pl-2 rounded-md text-[9px] font-mono  h-[30px] -mt-11 my-2"
+                    value={age || ""}
+                    onChange={(ev: ChangeEvent<HTMLSelectElement>) =>
+                      setAge(ev.target.value)
+                    }
+                  >
+                    {daysOfMonth.map((i) => (
+                      <option key={i} value={i.toString()}>
+                        {i}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="w-full   flex flex-col  mt-1">
+                  <select
+                    className="text-gray-700 titler text-[10px] w-full  pl-2 element-with-overflow  h-[35px] rounded-md   font-bold  font-mono -mt-16"
+                    value={month !== undefined ? month : ""}
+                    onChange={(ev: ChangeEvent<HTMLSelectElement>) =>
+                      setMonth(ev.target.value)
+                    }
+                  >
+                    {months.map((ex) => {
+                      return (
+                        <option key={ex} value={ex}>
+                          {ex}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+                <div className="w-full   flex flex-col  -mt-5">
+                  <Input
+                    value={year !== undefined ? year : ""}
+                    onChange={(ev: ChangeEvent<HTMLInputElement>) =>
+                      setYear(ev.target.value)
+                    }
+                    type="text"
+                    className={
+                      message?.error?.split(" ").includes("year") && year === ""
+                        ? "border-2 border-red-500 rounded-xl  outline-none focus:ring-0 text-blue-600 md:text-gray-400 font-bold "
+                        : "mt-1 border-neutral-300    focus:ring-0 text-gray-200 md:text-gray-200 md:w-[80%] mx-auto font-bold "
+                    }
+                    placeholder="Year,e.g 1992=>92 or 2024 =>24"
+                  />
+                </div>{" "}
+              </div>
+            )}
             <div className="w-full flex justify-center items-center mt-4">
               <Button
                 variant="destructive"

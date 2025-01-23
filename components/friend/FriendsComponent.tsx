@@ -154,10 +154,10 @@ const FriendsComponent = () => {
           Fullname
         </h4>
         <div className="flex gap-2">
-          <span className="text-[12px] font-bold text-gray-300">
+          <span className="text-[12px] font-bold text-gray-500">
             {friend?.firstname}
           </span>
-          <span className="text-[12px] font-bold text-gray-300 ">
+          <span className="text-[12px] font-bold text-gray-500 ">
             {friend?.lastname}
           </span>
         </div>
@@ -167,7 +167,7 @@ const FriendsComponent = () => {
           Contact Info
         </h4>
         <div className="flex flex-col">
-          <span className="text-[12px] font-bold text-gray-300">
+          <span className="text-[12px] font-bold text-gray-500">
             {friend?.email}
           </span>
         </div>
@@ -177,16 +177,22 @@ const FriendsComponent = () => {
           General Info
         </h4>
         <div className="flex flex-col">
-          <span className="text-[12px] font-bold text-gray-300">
+          <span className="text-[12px] font-bold text-gray-500">
+            <span className="text-[15px] font-bold text-neutral-200 font-mono">
+              City:{" "}
+            </span>
             {friend?.city ? friend?.city : "-null"}
           </span>
-          <span className="text-[12px] font-bold text-gray-300">
+          <span className="text-[12px] font-bold text-gray-500">
+            <span className="text-[15px] font-bold text-neutral-200 font-mono">
+              Address:{" "}
+            </span>
             {friend?.address ? friend?.address : "-null"}
           </span>
-          <span className="text-[12px] font-bold text-gray-300">
+          <span className="text-[12px] font-bold text-gray-500">
             {friend?.followers?.length} followers
           </span>
-          <span className="text-[12px] font-bold text-gray-300">
+          <span className="text-[12px] font-bold text-gray-500">
             {friend?.followings?.length} followings
           </span>
         </div>
@@ -196,13 +202,22 @@ const FriendsComponent = () => {
           Personal Info
         </h4>
         <div className="flex flex-col">
-          <span className="text-[12px] font-bold text-gray-300">
+          <span className="text-[12px] font-bold text-gray-500">
+            <span className="text-[15px] font-bold text-neutral-200 font-mono">
+              Date:{" "}
+            </span>
             {friend?.date ? friend?.date : "-null"}
           </span>
-          <span className="text-[12px] font-bold text-gray-300">
+          <span className="text-[12px] font-bold text-gray-500">
+            <span className="text-[15px] font-bold text-neutral-200 font-mono">
+              Month:
+            </span>{" "}
             {friend?.month ? friend?.month : "-null"}
           </span>
-          <span className="text-[12px] font-bold text-gray-300">
+          <span className="text-[12px] font-bold text-gray-500">
+            <span className="text-[15px] font-bold text-neutral-200 font-mono">
+              Year:
+            </span>{" "}
             {friend?.year ? friend?.year : "-null"}
           </span>
         </div>

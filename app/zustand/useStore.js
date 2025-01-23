@@ -14,7 +14,11 @@ const useStore = create(
     currentgig: {},
     searchQuery: "",
     follow: false,
-
+    refetchdata: false,
+    setRefetchData: (data) =>
+      set(() => ({
+        refetchdata: data,
+      })),
     setSearch: (data) =>
       set(() => ({
         search: data,

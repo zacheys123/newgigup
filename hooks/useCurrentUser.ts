@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 // Define the shape of the user object
 
 export function useCurrentUser(userId: string | null) {
-  const { setCurrentUser } = useStore();
+  const { setCurrentUser, refetchdata } = useStore();
   const [loading, setLoading] = useState<boolean>(false);
   const [reviews, setReviews] = useState<Review[]>();
 
@@ -126,7 +126,7 @@ export function useCurrentUser(userId: string | null) {
     return () => {
       isMounted = false;
     };
-  }, [url, userId]);
+  }, [url, userId, refetchdata]);
 
   return { loading, user, setUser, setReviews, reviews };
 }
