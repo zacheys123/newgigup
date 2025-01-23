@@ -1,5 +1,6 @@
 "use client";
 
+import Musicians from "@/components/pages/Musicians";
 // import { getAllUsers } from "@/app/server-actions/getAllUsers";
 // import InfoComponent from "@/components/largedevices/InfoComponent";
 // import SideBar from "@/components/largedevices/Sidebar";
@@ -16,7 +17,7 @@ const ProfilePage = () => {
   console.log(user);
   return (
     <div className="container h-[100vh] w-screen md:w-[70vw]  overflow-auto flex flex-col gap-2">
-      <div className="text-2xl text-white mt-[35px]">
+      <div className="text-2xl text-white mt-[35px]  ml-4">
         Profile Landing Page
         <br />
         <span className="text-sm text-gray-400">
@@ -32,6 +33,7 @@ const ProfilePage = () => {
         <Divider />
         <SideBar user={user} allUsers={allUsers} />{" "}
       </div> */}
+      <Musicians {...user} />
     </div>
   );
 };
