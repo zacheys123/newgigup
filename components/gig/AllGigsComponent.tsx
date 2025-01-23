@@ -388,9 +388,9 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
             </div>
           )}
         </div>{" "}
-        {gig?.bookedBy?._id == myId && (
+        {gig && gig?.bookedBy?._id == myId && (
           <div className=" w-full flex justify-end">
-            {canShowAddGigVideos ? (
+            {canShowAddGigVideos && (
               <div
                 className=" my-3 flex  bg-yellow-600 px-3 py-1 rounded-r-3xl rounded-b-[10px] rounded-br-md min-w-[120px] "
                 onClick={() => {
@@ -400,19 +400,6 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
               >
                 <h4 className="text-[10px] !text-orange-100 font-bold flex  items-center gap-2">
                   Add Gig Videos <Video />
-                </h4>
-              </div>
-            ) : (
-              <div
-                className=" my-3 flex  bg-red-700 px-3 py-1 rounded-r-3xl rounded-b-[10px] rounded-br-md min-w-[120px] "
-                onClick={() => {
-                  router.push(
-                    `/search/allvideos/${gig?.bookedBy?._id}/*${gig?.bookedBy?.firstname}${gig?.bookedBy?.lastname}`
-                  );
-                }}
-              >
-                <h4 className="text-[10px] !text-orange-100 font-bold flex  items-center gap-2">
-                  Review Your Gig Videos <Video />
                 </h4>
               </div>
             )}

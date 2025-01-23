@@ -15,6 +15,7 @@ import {
   Search,
   Settings,
   User,
+  VideoIcon,
 } from "lucide-react";
 
 import { useAuth } from "@clerk/nextjs";
@@ -79,10 +80,18 @@ const MobileSheet = () => {
           <SheetDescription>Personal Reviews</SheetDescription>
         </Link>{" "}
         <Link
-          href="/gigme/chat"
+          href="gigs/chats"
           className="flex flex-row  items-center gap-2 min-w-[30%] mx-auto whitespace-pre-line"
         >
-          <MessageCircle size="20" /> <SheetDescription>Chat</SheetDescription>
+          <MessageCircle size="20" />{" "}
+          <SheetDescription>My Chats</SheetDescription>
+        </Link>{" "}
+        <Link
+          href={`/search/allvideos/${user?._id}/*${user?.firstname}${user?.lastname}`}
+          className="flex flex-row  items-center gap-2 min-w-[30%] mx-auto whitespace-pre-line"
+        >
+          <VideoIcon size="20" />{" "}
+          <SheetDescription>My Videoos</SheetDescription>
         </Link>{" "}
         <Link
           href="/settings"

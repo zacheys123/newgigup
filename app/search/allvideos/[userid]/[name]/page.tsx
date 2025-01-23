@@ -97,6 +97,13 @@ const AllVideosPage = () => {
         />
         <h1 className="text-white text-2xl font-bold m-2">All My Videos</h1>
       </div>
+      {!friendvideos && (
+        <div className=" flex flex-col  gap-2 bg-zinc-900 h-fit shadow-sm shadow-slate-500 py-2 px-3">
+          <p className="text-center text-neutral-400 mt-10">
+            No videos available for this user.
+          </p>
+        </div>
+      )}
       {friendvideos &&
         friendvideos?.map((video: VideoProps) => (
           <div

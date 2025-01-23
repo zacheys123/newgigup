@@ -269,7 +269,7 @@ const Videos = ({ setShowVideo, gigId, gig }: videosProps) => {
                       className="h-full w-[80%]   text-[15px]  p-4 !bg-amber-700 font-sans text-gray-200"
                     >
                       {!isloading ? (
-                        "  Upload Video"
+                        "Upload Video"
                       ) : (
                         <CircularProgress
                           size="13px"
@@ -284,7 +284,13 @@ const Videos = ({ setShowVideo, gigId, gig }: videosProps) => {
             ) : (
               <div className="flex flex-col gap-2 my-3 p-2">
                 <span className="text-neutral-400 mb-1 text center">{`You've reached a maximum no of clips to upload`}</span>
-                <h5 className="text-1xl font bold font-mono bg-amber-600 text-gray-300 my-[20px] rounded-lg text-center p-2">
+                <h5
+                  onClick={() => {
+                    setShowVideo(false);
+                    setAddVideo(false);
+                  }}
+                  className="text-1xl font bold font-mono bg-amber-600 text-gray-300 my-[20px] rounded-lg text-center p-2"
+                >
                   Click to return
                 </h5>
               </div>
