@@ -21,7 +21,6 @@ export const postedBy = {
   username: "", // Required, unique, and lowercase
   followers: [], // Array of User IDs
   followings: [], // Array of User IDs
-  videos: [],
   allreviews: [],
   myreviews: [],
 };

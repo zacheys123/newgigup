@@ -6,7 +6,7 @@ import { ArrowBigLeftIcon } from "lucide-react";
 
 // import moment from "moment";
 import { useParams, useRouter } from "next/navigation";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 const VideosPage = () => {
   const { gigid, userid } = useParams();
@@ -16,14 +16,24 @@ const VideosPage = () => {
   const validUserId = typeof userid === "string" ? userid : ""; // Default to empty string if undefined
 
   const { loading, friendvideos } = useVideos(validGigid, validUserId);
-
+  const [videocreator, setVideoCreator] = useState<string | null>();
   const router = useRouter();
 
+  useEffect(() => {
+    if (friendvideos && friendvideos?.videos?.length > 0) {
+      const firstVideo = friendvideos.videos[0];
+      if (typeof firstVideo?.postedBy === "object" && firstVideo?.postedBy) {
+        setVideoCreator(firstVideo?.postedBy?.firstname || null);
+      } else {
+        setVideoCreator(null);
+      }
+    }
+  }, [friendvideos]);
+
   const filteredVideos = useMemo(() => {
-    return friendvideos?.videos?.filter((video: VideoProps) => {
-      console.log(gigid);
-      return video.gigId === gigid;
-    });
+    return friendvideos?.videos?.filter(
+      (video: VideoProps) => video.gigId === gigid
+    );
   }, [friendvideos?.videos, gigid]);
 
   console.log(filteredVideos);
@@ -54,7 +64,12 @@ const VideosPage = () => {
           size={28}
           onClick={() => router.back()}
         />
-        <h1 className="text-white text-2xl font-bold m-2">My Posted Videos</h1>
+        <h1 className="text-white text-2xl font-bold m-2">
+          <span className="text-gray-300 mx-2 capitalize">
+            {`${videocreator}'s`}
+          </span>
+          Posted Videos
+        </h1>
       </div>
       {filteredVideos && filteredVideos.length > 0 ? (
         filteredVideos.map((video: VideoProps) => (

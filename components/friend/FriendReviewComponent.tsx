@@ -61,21 +61,27 @@ const FriendReviewComponent = ({ rev }: friend) => {
   }, [id]);
 
   return (
-    <div className=" w-[100%] h-[100%] bg-slate-900 overflow-y-auto">
+    <div
+      className={
+        rev
+          ? `w-[90%] h-[90vh] bg-slate-900 overflow-y-auto mx-auto`
+          : `w-[100%] h-[70vh] bg-slate-900 overflow-y-auto mx-auto`
+      }
+    >
       {rev && (
-        <div className="h-[40px] bg-slate-400 w-full flex pl-3 items-center">
+        <div className="h-[30px] bg-slate-900 w-full flex pl-3 items-center">
           <ArrowBigLeftIcon
-            className="cursor-pointer hover:text-amber-500 text-neutral-200 "
-            size="28"
+            className="cursor-pointer hover:text-amber-500 text-neutral-400 "
+            size="24"
             onClick={() => router.back()}
           />
         </div>
       )}
-      <div className="text-gray-300 h-full py-2 bg-neutral-900">
+      <div className="text-gray-300 h-full py-2 bg-neutral-900  overflow-y-auto">
         {friendReviews && friendReviews?.length > 0 ? (
           <>
             {friendReviews?.map((review: Review) => (
-              <AllReview key={review?._id} {...review} w="380px" />
+              <AllReview key={review?._id} {...review} w={"350px"} />
             ))}
           </>
         ) : (

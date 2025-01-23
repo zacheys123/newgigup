@@ -25,7 +25,7 @@ export function useAllUsers() {
         username: "",
         followers: [],
         followings: [],
-        videos: [],
+
         allreviews: [],
         myreviews: [],
       },
@@ -72,7 +72,7 @@ export function useAllUsers() {
                   username: "",
                   followers: [],
                   followings: [],
-                  videos: [],
+
                   allreviews: [],
                   myreviews: [],
                 },
@@ -108,7 +108,7 @@ export function useAllUsers() {
                 username: "",
                 followers: [],
                 followings: [],
-                videos: [],
+
                 allreviews: [],
                 myreviews: [],
               },

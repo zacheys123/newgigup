@@ -44,7 +44,6 @@ export async function GET(req: NextRequest) {
       username, // Required, unique, and lowercase
       followers, // Array of User IDs
       followings, // Array of User IDs
-      videos,
       allreviews,
       myreviews,
     } = await User.findOne(query);
@@ -70,7 +69,7 @@ export async function GET(req: NextRequest) {
       username, // Required, unique, and lowercase
       followers, // Array of User IDs
       followings, // Array of User IDs
-      videos,
+
       allreviews,
       myreviews,
     });

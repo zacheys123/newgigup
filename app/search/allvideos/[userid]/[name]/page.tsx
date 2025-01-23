@@ -26,6 +26,7 @@ const AllVideosPage = () => {
       .then((response) => response.json())
       .then((data) => {
         setFriendVideos(data.videos);
+
         setLoading(false);
       })
       .catch((error) => {

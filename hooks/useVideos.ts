@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 export function useVideos(gigid: string, userid: string) {
   const [loading, setLoading] = useState<boolean>(false);
   const [refetch, setRefetch] = useState<boolean>(false);
+
   const [friendvideos, setFriendVideos] = useState<{
     videos: VideoProps[];
   } | null>({

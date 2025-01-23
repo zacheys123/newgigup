@@ -4,7 +4,7 @@ export interface VideoProps {
   source: string;
   description?: string;
   gigId: string;
-  postedBy?: string | { _id: string; [key: string]: string }; // Object with _id and optional additional fields
+  postedBy?: string | { _id: string; firstname: string; [key: string]: string };
 
   createdAt?: Date;
 }

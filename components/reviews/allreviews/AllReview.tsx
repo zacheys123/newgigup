@@ -102,11 +102,11 @@ const AllReview = ({
         <div
           className={
             w
-              ? `h-fit bg-neutral-700 w-[${w}] rounded-md my-1 mx-auto py-2 pb-3`
-              : "h-fit bg-neutral-700 w-[340px] rounded-md my-1 mx-auto py-2 pb-3"
+              ? `h-fit bg-neutral-800 w-[300px] rounded-md my-2 mx-auto py-2 pb-3`
+              : "h-fit bg-neutral-700 w-[300px] rounded-md my-1 mx-auto py-2 pb-3"
           }
         >
-          <div className="flex items-center gap-3 flex-col px-2">
+          <div className="flex items-center gap-3 flex-col px-2 w-full">
             <Box className="flex  items-center justify-between w-full">
               <h6 className="rounded-full w-[30px] h-[30px] bg-neutral-500 flex justify-center items-center text-[12px]">
                 <span className="text-md font-bold">
