@@ -20,7 +20,7 @@ const FollowButton = ({
   const router = useRouter();
 
   // Local state to handle the optimistic update
-  const [optimisticFollow, setOptimisticFollow] = useState(
+  const [optimisticFollow, setOptimisticFollow] = useState<boolean>(
     followers.includes(user?._id || "")
   );
   console.log(optimisticFollow);

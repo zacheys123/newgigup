@@ -1,4 +1,4 @@
-import { UserProps } from "./types/userinterfaces";
+import { FetchResponse, UserProps } from "./types/userinterfaces";
 
 const randomId = Math.floor(Math.random() * 1000000000);
 export const postedBy = {
@@ -167,3 +167,88 @@ export const searchFunc = (users: UserProps[], searchQuery: string) => {
 //     console.error("Error deleting video:", error);
 //   }
 // };
+
+// Function to handle the follow action
+export const handleFollow = async (
+  _id: string,
+  user: UserProps,
+  router: {
+    push: (url: string) => void;
+    replace: (url: string) => void;
+    refresh: () => void;
+  }
+) => {
+  // Optimistically set follow status
+
+  const res = await fetch(`/api/user/follower/${_id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ follower: user?._id }),
+  });
+
+  if (res.ok) {
+    // Refresh the page or update the followers in the UI
+    router.refresh();
+  } else {
+    throw new Error("Failed to follow");
+  }
+};
+
+// Function to handle unfollow action
+export const handleUnfollow = async (
+  _id: string,
+  user: UserProps,
+  router: {
+    push: (url: string) => void;
+    replace: (url: string) => void;
+    refresh: () => void;
+  }
+) => {
+  // Optimistically set unfollow status
+
+  const res = await fetch(`/api/user/unfollower/${_id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ follower: user?._id }),
+  });
+
+  if (res.ok) {
+    // Refresh the page or update the followers in the UI
+    router.refresh();
+  } else {
+    throw new Error("Failed to unfollow");
+  }
+};
+
+export const handleUnFollowingCurrent = async (
+  _id: string,
+  user: UserProps
+) => {
+  const res = await fetch(`/api/user/unfollowing/${_id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ following: user?._id }),
+  });
+  const followingData: FetchResponse = await res.json();
+  console.log("data", followingData);
+};
+export const handleFollowing = async (_id: string, user: UserProps) => {
+  const res = await fetch(`/api/user/following/${_id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ following: user?._id }),
+  });
+  const followingData: FetchResponse = await res.json();
+  console.log(followingData);
+  if (res.ok) {
+    console.log("following!!!", followingData);
+  }
+};

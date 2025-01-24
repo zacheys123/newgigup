@@ -12,13 +12,21 @@ import { Box } from "@mui/material";
 import { BsChatDots } from "react-icons/bs";
 import { MdRateReview } from "react-icons/md";
 import { Music, Video } from "lucide-react";
+import useStore from "@/app/zustand/useStore";
+import {
+  handleFollow,
+  handleFollowing,
+  handleUnFollowingCurrent,
+} from "@/utils";
 const FriendsComponent = () => {
   const { userId } = useAuth();
   const { username } = useParams();
+  const { follow, setFollow } = useStore();
   const [friend, setFriend] = useState<UserProps>();
   const [loading, setLoading] = useState<boolean>(false);
   const { user } = useCurrentUser(userId || null);
   const router = useRouter();
+
   useEffect(() => {
     if (!username) {
       // Guard: Do not run the effect if `id` is undefined or null
@@ -66,7 +74,13 @@ const FriendsComponent = () => {
       isMounted = false;
     };
   }, [username]);
+
+  const [optimisticFollow, setOptimisticFollow] = useState<boolean>(
+    friend?.followers?.includes(user?._id || "") ?? false
+  );
+
   console.log(friend?.picture);
+  const isFollowing = friend?.followers.includes(user?._id || "");
   if (loading) return <div>loading....</div>;
   return (
     <div className="overflow-y-auto h-[95%] w-[90%] mx-auto  shadow-md shadow-orange-300 flex flex-col gap-2">
@@ -102,11 +116,23 @@ const FriendsComponent = () => {
         </div>
 
         <div className=" flex justify-center items-center">
-          {friend && friend?.followers?.includes(user?._id || "") ? (
+          {(friend && !follow && isFollowing) || optimisticFollow ? (
             <Button
               className="min-w-[50px] h-[30px] text-white  text-[11px] bg-gray-400 hover:bg-blue-700"
               onClick={() => {
-                console.log("Follow button clicked");
+                if (friend?._id) {
+                  // Ensure _id is defined
+                  try {
+                    handleFollow(friend?._id, user, router);
+                    handleUnFollowingCurrent(friend?._id, user);
+                    setOptimisticFollow(false);
+                    setFollow(false); // Update global state as well
+                  } catch (error) {
+                    setOptimisticFollow(true);
+                    setFollow(true); // Update global state as well
+                    console.error("Error following:", error);
+                  }
+                }
               }}
             >
               UnFollow <IoCheckmarkDone />
@@ -115,7 +141,19 @@ const FriendsComponent = () => {
             <Button
               className="min-w-[50px] h-[30px] text-white  text-[11px] bg-blue-600 hover:bg-blue-700"
               onClick={() => {
-                console.log("Follow button clicked");
+                if (friend?._id) {
+                  // Ensure _id is defined
+                  try {
+                    handleFollow(friend?._id, user, router);
+                    handleFollowing(friend?._id, user);
+                    setOptimisticFollow(true);
+                    setFollow(true); // Update global state as well
+                  } catch (error) {
+                    setOptimisticFollow(false);
+                    setFollow((prev: boolean) => !prev); // Update global state as well
+                    console.error("Error following:", error);
+                  }
+                }
               }}
             >
               Follow <MdAdd />
