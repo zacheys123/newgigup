@@ -267,6 +267,7 @@ const AllVideosPage = () => {
                         onClick={(ev) => {
                           setCurrentVideo(null);
                           setVideoActions(false);
+                          setEditVideo(false);
                           ev.stopPropagation();
                         }}
                         className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-md shadow hover:bg-gray-200 focus:ring focus:ring-gray-300 focus:outline-none"
@@ -279,7 +280,7 @@ const AllVideosPage = () => {
                         type="submit"
                         className="px-4 py-2 text-sm font-medium text-white bg-amber-600 rounded-md shadow hover:bg-blue-700 focus:ring focus:ring-blue-300 focus:outline-none"
                       >
-                        {!editloading ? (
+                        {editloading ? (
                           "Save Changes"
                         ) : (
                           <CircularProgress
