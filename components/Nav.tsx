@@ -44,7 +44,7 @@ const Nav = () => {
             </Link>
 
             <Link
-              href={`/v1/profile/${userId}`}
+              href={`/profile`}
               className=" text-white  link md:text-[16px] md:font-mono flex flex-col gap-2 items-center md:hover:bg-gray-200 md:hover:text-neutral-800 md:hover:scale-100 p-2 rounded-full  transition-all duration-75"
             >
               <span className="hidden ml-2 md:inline-flex">

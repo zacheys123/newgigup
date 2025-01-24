@@ -143,3 +143,27 @@ export const searchFunc = (users: UserProps[], searchQuery: string) => {
   }
   return sortedData;
 };
+
+// export const fetchVideos = async (userid: string) => {
+//   const response = await fetch(`/api/videos/getvideos/${userid}`);
+//   if (!response.ok) throw new Error("Failed to fetch videos");
+//   return response.json();
+// };
+
+// export const deleteVideo = async (
+//   id: string,
+//   setVideos: () => void,
+//   videos: VideoProps[]
+// ) => {
+//   try {
+//     await fetch(`/api/videos/deletevideo/${id}`, {
+//       method: "DELETE",
+//       headers: { "Content-Type": "application/json" },
+//     });
+//     setRefetch((prev) => !prev);
+//     setVideos(videos?.filter((v: VideoProps) => v._id !== id));
+//     setDeleteLoading(false);
+//   } catch (error) {
+//     console.error("Error deleting video:", error);
+//   }
+// };

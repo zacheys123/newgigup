@@ -27,7 +27,7 @@ const Musicians = ({ _id }: UserProps) => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.2 }}
                 key={myuser._id}
-                className="flex justify-center items-center flex-col h-[80px] w-[90px] rounded-full  shadow-md cursor-pointer hover:shadow-xl mx-2"
+                className="flex justify-center items-center flex-col h-[80px] w-[70px] rounded-full  shadow-md cursor-pointer hover:shadow-xl mx-2"
                 onClick={() => router.push(`/search/${myuser?.username}`)}
               >
                 {/* {myuser?.picture && (
@@ -40,7 +40,7 @@ const Musicians = ({ _id }: UserProps) => {
                   />
                 )}
                  */}
-                <div className="text-gray-600  font-bold bg-neutral-500 w-[90px] h-[120px] p-3 rounded-full flex justify-center items-center border border-b-4 border-b-orange-300">
+                <div className="text-gray-600  font-bold bg-neutral-800 w-[70px] h-[80px] p-3 rounded-full flex justify-center items-center border border-b-4 border-b-orange-300">
                   <span className="text-red-300 text-[20px]">
                     {myuser?.firstname?.split("")[0]?.toUpperCase()}
                   </span>
@@ -48,7 +48,10 @@ const Musicians = ({ _id }: UserProps) => {
                     {myuser?.lastname?.split("")[0]}
                   </span>
                 </div>
-                <h2 className="text-gray-400 text-sm">{myuser?.firstname}</h2>
+                <h2 className="text-gray-400 text-sm">
+                  {myuser?.firstname?.slice(0, 4)}
+                  {myuser?.lastname?.slice(0)}
+                </h2>{" "}
               </motion.div>
             );
           })}

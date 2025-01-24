@@ -23,6 +23,16 @@ const VideoSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    isPublic: {
+      type: Boolean,
+      default: true,
+      required: true,
+    },
+    isPrivate: {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
   },
   { timestamps: true }
 );

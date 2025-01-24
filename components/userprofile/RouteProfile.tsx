@@ -129,13 +129,7 @@ const RouteProfile = () => {
             {user && user?.picture && (
               <Image
                 priority
-                src={
-                  !fileUrl && !user?.picture
-                    ? ""
-                    : fileUrl
-                    ? fileUrl
-                    : user?.picture
-                }
+                src={user?.picture}
                 className="object-cover w-[680px] h-[680px] rounded-xl"
                 alt={user?.firstname ? user?.firstname.split("")[0] : ""}
                 width={200}
@@ -214,7 +208,7 @@ const RouteProfile = () => {
           <Pencil
             color="white"
             size="14px"
-            onClick={() => router.push(`profile/${userId}/user`)}
+            onClick={() => router.push(`/profile/${userId}/user`)}
           />
         </div>
         <p className="text-sm text-gray-400">{user?.email}</p>
