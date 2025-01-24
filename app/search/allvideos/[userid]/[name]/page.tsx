@@ -51,10 +51,12 @@ const AllVideosPage = () => {
 
   const deleteVideo = async (id: string) => {
     try {
-      await fetch(`/api/videos/deletevideo/${id}`, {
+      const res = await fetch(`/api/videos/deletevideo/${id}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
       });
+      const data: UpdateResponse = await res.json();
+      toast.success(data?.message);
       setRefetch((prev) => !prev);
       setFriendVideos(friendvideos?.filter((v: VideoProps) => v._id !== id));
     } catch (error) {
@@ -116,18 +118,18 @@ const AllVideosPage = () => {
   }
 
   return (
-    <div className="overflow-y-auto h-screen w-full mx-auto  shadow-md shadow-orange-300 flex flex-col gap-2 bg-black">
-      <div className="h-[40px] bg-inherit w-full flex pl-3 items-center justify-around my-3">
+    <div className="overflow-y-auto h-screen w-full mx-auto shadow-lg shadow-orange-400 flex flex-col gap-4 bg-gradient-to-br from-black via-zinc-900 to-black">
+      <div className="h-[50px] bg-inherit w-full flex items-center justify-between px-6 shadow-md">
         <ArrowBigLeftIcon
-          className="cursor-pointer hover:text-amber-500 text-neutral-400"
+          className="cursor-pointer hover:text-amber-500 text-neutral-400 transition duration-200"
           size={28}
           onClick={() => router.back()}
         />
-        <h1 className="text-white text-2xl font-bold m-2">All My Videos</h1>
+        <h1 className="text-white text-2xl font-extrabold">All My Videos</h1>
       </div>
       {!friendvideos && (
-        <div className=" flex flex-col  gap-2 bg-zinc-900 h-fit shadow-sm shadow-slate-500 py-2 px-3">
-          <p className="text-center text-neutral-400 mt-10">
+        <div className="flex flex-col gap-4 bg-zinc-800 rounded-lg shadow-md shadow-slate-500 py-8 px-6 text-center">
+          <p className="text-neutral-400 text-lg">
             No videos available for this user.
           </p>
         </div>
@@ -136,7 +138,7 @@ const AllVideosPage = () => {
         friendvideos?.map((video: VideoProps) => (
           <div
             key={video._id}
-            className=" flex flex-col  gap-2 bg-zinc-900 h-fit shadow-sm shadow-slate-500 py-2 px-3"
+            className="flex flex-col gap-4 bg-zinc-900 rounded-lg shadow-md shadow-slate-600 py-6 px-4 hover:shadow-lg hover:scale-[1.02] transition-transform"
             onClick={(ev) => {
               setCurrentVideo(null);
               setVideoActions(false);
@@ -144,10 +146,12 @@ const AllVideosPage = () => {
               ev.stopPropagation();
             }}
           >
-            <div className="flex items-center justify-between p-2">
-              <h3 className=" m-2 flex items-center px-2 ">
-                <span className="text-amber-400  mx-1"> Gig Title: </span>
-                <span className="text-purple-200  mx-1"> {video.title}</span>
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm title font-semibold text-purple-200">
+                <span className="choice text-amber-400 font-bold">
+                  Gig Title:
+                </span>{" "}
+                {video.title}
               </h3>
               {user?._id === userid && (
                 <BsThreeDotsVertical
@@ -289,20 +293,17 @@ const AllVideosPage = () => {
                 </motion.div>
               )}
             </div>
-
-            <div className="flex-1">
-              <video controls className="w-full h-full object-cover">
-                <source src={video.source} />
-                Your browser does not support the video tag.
-              </video>
-            </div>
-            <p className="text-amber-600 m-2">{video.description}</p>
-            <h5 className="gigtile text-neutral-400 last:mb-4 ">
-              posted{" "}
-              {moment(video.createdAt).format(
-                "              MMMM Do YYYY, h:mm:ss a"
-              )}
-              {/* posted {moment(video.createdAt).fromNow()} */}
+            <video
+              controls
+              className="w-full h-auto rounded-lg shadow-md"
+              src={video.source}
+            >
+              Your browser does not support the video tag.
+            </video>
+            <p className="text-amber-500">{video.description}</p>
+            <h5 className="text-neutral-400 text-sm">
+              Posted on{" "}
+              {moment(video.createdAt).format("MMMM Do YYYY, h:mm:ss a")}
             </h5>
           </div>
         ))}
