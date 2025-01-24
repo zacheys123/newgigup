@@ -302,7 +302,7 @@ const AllVideosPage = () => {
               Your browser does not support the video tag.
             </video>
             <p className="text-amber-500">{video.description}</p>
-            <h5 className="text-neutral-400 text-sm">
+            <h5 className="title text-neutral-400 text-sm">
               Posted on{" "}
               {moment(video.createdAt).format("MMMM Do YYYY, h:mm:ss a")}
             </h5>

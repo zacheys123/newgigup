@@ -33,72 +33,100 @@ const MobileSheet = () => {
   return (
     <Sheet>
       <SheetTrigger>
-        <Menu className={`font-extrabold  text-neutral-400 `} />
+        <Menu className="text-white hover:text-teal-300 font-bold text-2xl transition-colors duration-200" />
       </SheetTrigger>
 
       <SheetContent
         side="left"
-        className="w-[60%] flex flex-col gap-2 justify-evenly items-center"
+        className="w-[75%] sm:w-[60%] bg-zink-700  bg-opacity-25 p-6 flex flex-col gap-6 justify-start items-start rounded-br-[140px] shadow-3xl backdrop-blur-lg"
       >
-        <SheetTitle>Access More Info here</SheetTitle>
+        <SheetTitle className="text-3xl font-semibold text-white mb-6">
+          Access More Info
+        </SheetTitle>
+
         {pathname === `/gigs/${userId}` ? (
           ""
         ) : (
           <Link
             href={`/gigs/${userId}`}
-            className="flex flex-row  items-center gap-2 min-w-[30%] mx-auto whitespace-pre-line"
+            className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 rounded-md transition-all"
           >
-            <Home size="20" />
-            <SheetDescription>Home</SheetDescription>
+            <Home size="20" className="text-white" />
+            <SheetDescription className="text-lg font-medium title ">
+              Home
+            </SheetDescription>
           </Link>
         )}
+
         <Link
           href={`/allreviews/${user?._id}/*${user?.firstname}${user?.lastname}`}
-          className="flex flex-row  items-center gap-2 min-w-[30%] mx-auto whitespace-pre-line"
+          className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 rounded-md transition-all"
         >
-          {" "}
-          <MdDashboard size="20" />
-          <SheetDescription>Reviews</SheetDescription>
+          <MdDashboard size="20" className="text-white" />
+          <SheetDescription className="text-lg font-medium title ">
+            Reviews
+          </SheetDescription>
         </Link>
+
         <Link
           href={`/search`}
-          className="flex flex-row  items-center gap-2 min-w-[30%] mx-auto whitespace-pre-line"
+          className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 rounded-md transition-all"
         >
-          <Search size="20" /> <SheetDescription>Search</SheetDescription>
-        </Link>{" "}
+          <Search size="20" className="text-white" />
+          <SheetDescription className="text-lg font-medium title ">
+            Search
+          </SheetDescription>
+        </Link>
+
         <Link
           href={`/profile`}
-          className="flex flex-row  items-center gap-2 min-w-[30%] mx-auto whitespace-pre-line"
+          className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 rounded-md transition-all"
         >
-          <User size="20" /> <SheetDescription>Profile</SheetDescription>
+          <User size="20" className="text-white" />
+          <SheetDescription className="text-lg font-medium title ">
+            Profile
+          </SheetDescription>
         </Link>
+
         <Link
           href={`/reviews/${user?._id}/*${user?.firstname}${user?.lastname}`}
-          className="flex flex-row  items-center gap-2 min-w-[30%] mx-auto whitespace-pre-line"
+          className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 rounded-md transition-all"
         >
-          <Music size="20" />{" "}
-          <SheetDescription>Personal Reviews</SheetDescription>
-        </Link>{" "}
+          <Music size="20" className="text-white" />
+          <SheetDescription className="text-lg font-medium title ">
+            Personal Reviews
+          </SheetDescription>
+        </Link>
+
         <Link
           href="gigs/chats"
-          className="flex flex-row  items-center gap-2 min-w-[30%] mx-auto whitespace-pre-line"
+          className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 rounded-md transition-all"
         >
-          <MessageCircle size="20" />{" "}
-          <SheetDescription>My Chats</SheetDescription>
-        </Link>{" "}
+          <MessageCircle size="20" className="text-white" />
+          <SheetDescription className="text-lg font-medium title ">
+            My Chats
+          </SheetDescription>
+        </Link>
+
         <Link
           href={`/search/allvideos/${user?._id}/*${user?.firstname}${user?.lastname}`}
-          className="flex flex-row  items-center gap-2 min-w-[30%] mx-auto whitespace-pre-line"
+          className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 rounded-md transition-all"
         >
-          <VideoIcon size="20" />{" "}
-          <SheetDescription>My Videoos</SheetDescription>
-        </Link>{" "}
+          <VideoIcon size="20" className="text-white" />
+          <SheetDescription className="text-lg font-medium title ">
+            My Videos
+          </SheetDescription>
+        </Link>
+
         <Link
           href="/settings"
-          className="flex flex-row  items-center gap-2 min-w-[30%] mx-auto whitespace-pre-line"
+          className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 rounded-md transition-all"
         >
-          <Settings size="20" /> <SheetDescription>Settings</SheetDescription>
-        </Link>{" "}
+          <Settings size="20" className="text-white" />
+          <SheetDescription className="text-lg font-medium title ">
+            Settings
+          </SheetDescription>
+        </Link>
       </SheetContent>
     </Sheet>
   );
