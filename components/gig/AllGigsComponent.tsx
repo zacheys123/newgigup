@@ -79,7 +79,10 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
     );
 
     if (review) {
-      setSelectedReview(review); // Set the selected review for modal
+      if (typeof review?.postedBy === "object" && review?.postedBy) {
+        setSelectedReview(review); // Set the selected review for modal
+      }
+
       setShowModal(true); // Show the modal
     } else {
       router.push(`/execute/${gig?._id}`); // Redirect if no review
@@ -373,20 +376,23 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
               </span>
             </div>
           )}{" "}
-          {!showModal && selectedReview && (
-            <div className="relative h-full w-full flex justify-center items-center">
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.3 }}
-                className="bg-white shadow-md p-5 rounded-md w-[300px] h-[200px] absolute flex flex-col gap-2"
-              >
-                <h6 className="flex justify-end text-[19px] font-bold">
-                  &times;
-                </h6>
-              </motion.div>
-            </div>
-          )}
+          {showModal &&
+            selectedReview &&
+            selectedReview?.postedBy?._id === gig?.postedBy._id && (
+              <div className="relative h-full w-full flex justify-center items-center">
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                  className="bg-white shadow-md p-5 rounded-md w-[300px] h-[200px] absolute flex flex-col gap-2"
+                >
+                  <h6 className="flex justify-end text-[19px] font-bold">
+                    {/* {/* &times; */}
+                    helooo{" "}
+                  </h6>
+                </motion.div>
+              </div>
+            )}
         </div>{" "}
         {gig && gig?.bookedBy?._id == myId && (
           <div className=" w-full flex justify-end">

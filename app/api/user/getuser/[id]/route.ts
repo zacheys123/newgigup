@@ -46,7 +46,9 @@ export async function GET(req: NextRequest) {
       followings, // Array of User IDs
       allreviews,
       myreviews,
-    } = await User.findOne(query);
+    } = await User.findOne(query).populate({
+      path: "allreviews myreviews",
+    });
 
     console.log(firstname);
     return NextResponse.json({

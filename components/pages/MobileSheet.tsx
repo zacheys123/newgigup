@@ -38,7 +38,7 @@ const MobileSheet = () => {
 
       <SheetContent
         side="left"
-        className="w-[75%] sm:w-[60%] bg-zink-700  bg-opacity-25 p-6 flex flex-col gap-6 justify-start items-start rounded-br-[140px] shadow-3xl backdrop-blur-lg"
+        className="w-[75%] sm:w-[60%] bg-zink-700  bg-opacity-25 p-6 flex flex-col gap-6 justify-start items-start rounded-br-[40px] shadow-3xl backdrop-blur-lg"
       >
         <SheetTitle className="text-3xl font-semibold text-white mb-6">
           Access More Info
@@ -49,7 +49,7 @@ const MobileSheet = () => {
         ) : (
           <Link
             href={`/gigs/${userId}`}
-            className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 rounded-md transition-all"
+            className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 hover:text-white rounded-md transition-all"
           >
             <Home size="20" className="text-white" />
             <SheetDescription className="text-lg font-medium title ">
@@ -60,7 +60,7 @@ const MobileSheet = () => {
 
         <Link
           href={`/allreviews/${user?._id}/*${user?.firstname}${user?.lastname}`}
-          className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 rounded-md transition-all"
+          className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 hover:text-white rounded-md transition-all"
         >
           <MdDashboard size="20" className="text-white" />
           <SheetDescription className="text-lg font-medium title ">
@@ -70,7 +70,7 @@ const MobileSheet = () => {
 
         <Link
           href={`/search`}
-          className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 rounded-md transition-all"
+          className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 hover:text-white rounded-md transition-all"
         >
           <Search size="20" className="text-white" />
           <SheetDescription className="text-lg font-medium title ">
@@ -80,7 +80,7 @@ const MobileSheet = () => {
 
         <Link
           href={`/profile`}
-          className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 rounded-md transition-all"
+          className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 hover:text-white rounded-md transition-all"
         >
           <User size="20" className="text-white" />
           <SheetDescription className="text-lg font-medium title ">
@@ -90,7 +90,7 @@ const MobileSheet = () => {
 
         <Link
           href={`/reviews/${user?._id}/*${user?.firstname}${user?.lastname}`}
-          className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 rounded-md transition-all"
+          className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 hover:text-white rounded-md transition-all"
         >
           <Music size="20" className="text-white" />
           <SheetDescription className="text-lg font-medium title ">
@@ -100,7 +100,7 @@ const MobileSheet = () => {
 
         <Link
           href="gigs/chats"
-          className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 rounded-md transition-all"
+          className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 hover:text-white rounded-md transition-all"
         >
           <MessageCircle size="20" className="text-white" />
           <SheetDescription className="text-lg font-medium title ">
@@ -110,7 +110,7 @@ const MobileSheet = () => {
 
         <Link
           href={`/search/allvideos/${user?._id}/*${user?.firstname}${user?.lastname}`}
-          className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 rounded-md transition-all"
+          className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 hover:text-white rounded-md transition-all"
         >
           <VideoIcon size="20" className="text-white" />
           <SheetDescription className="text-lg font-medium title ">
@@ -120,7 +120,7 @@ const MobileSheet = () => {
 
         <Link
           href="/settings"
-          className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 rounded-md transition-all"
+          className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 hover:text-white rounded-md transition-all"
         >
           <Settings size="20" className="text-white" />
           <SheetDescription className="text-lg font-medium title ">
