@@ -19,7 +19,7 @@ export async function PUT(req: NextRequest) {
 
     await friend.updateOne({ $push: { followers: follower } });
     friend = await User.findById(id);
-    console.log("YOU HAVE FOLLOWED THIS::::::", friend);
+    // console.log("YOU HAVE FOLLOWED THIS::::::", friend);
     return NextResponse.json({ result: friend, status: 200 });
   } catch (error) {
     console.log(error);

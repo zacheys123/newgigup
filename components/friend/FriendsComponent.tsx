@@ -11,11 +11,12 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { Box } from "@mui/material";
 import { BsChatDots } from "react-icons/bs";
 import { MdRateReview } from "react-icons/md";
-import { Music, Video } from "lucide-react";
+import { ArrowLeftIcon, Music, Video } from "lucide-react";
 import useStore from "@/app/zustand/useStore";
 import {
   handleFollow,
   handleFollowing,
+  handleUnfollow,
   handleUnFollowingCurrent,
 } from "@/utils";
 const FriendsComponent = () => {
@@ -24,6 +25,7 @@ const FriendsComponent = () => {
   const { follow, setFollow } = useStore();
   const [friend, setFriend] = useState<UserProps>();
   const [loading, setLoading] = useState<boolean>(false);
+  const [refetch, setRefetch] = useState<boolean>(false);
   const { user } = useCurrentUser(userId || null);
   const router = useRouter();
 
@@ -73,7 +75,7 @@ const FriendsComponent = () => {
     return () => {
       isMounted = false;
     };
-  }, [username]);
+  }, [username, refetch]);
 
   const [optimisticFollow, setOptimisticFollow] = useState<boolean>(
     friend?.followers?.includes(user?._id || "") ?? false
@@ -118,13 +120,14 @@ const FriendsComponent = () => {
         <div className=" flex justify-center items-center">
           {(friend && !follow && isFollowing) || optimisticFollow ? (
             <Button
-              className="min-w-[50px] h-[30px] text-white  text-[11px] bg-gray-400 hover:bg-blue-700"
+              className="min-w-[50px] h-[30px] text-white  text-[11px] bg-transparent border-2 border-gray-300 "
               onClick={() => {
                 if (friend?._id) {
                   // Ensure _id is defined
                   try {
-                    handleFollow(friend?._id, user, router);
+                    handleUnfollow(friend?._id, user, router);
                     handleUnFollowingCurrent(friend?._id, user);
+                    setRefetch((prev) => !prev);
                     setOptimisticFollow(false);
                     setFollow(false); // Update global state as well
                   } catch (error) {
@@ -135,7 +138,7 @@ const FriendsComponent = () => {
                 }
               }}
             >
-              UnFollow <IoCheckmarkDone />
+              following <IoCheckmarkDone />
             </Button>
           ) : (
             <Button
@@ -146,6 +149,7 @@ const FriendsComponent = () => {
                   try {
                     handleFollow(friend?._id, user, router);
                     handleFollowing(friend?._id, user);
+                    setRefetch((prev) => !prev);
                     setOptimisticFollow(true);
                     setFollow(true); // Update global state as well
                   } catch (error) {
@@ -162,6 +166,11 @@ const FriendsComponent = () => {
         </div>
       </div>
       <div className="h-[70px] flex gap-2 justify-around items-center">
+        <ArrowLeftIcon
+          size="19"
+          style={{ color: "lightgrey" }}
+          onClick={() => router.back()}
+        />
         <BsChatDots size="19" style={{ color: "lightgrey" }} />
         <Music
           size="19"
@@ -214,7 +223,7 @@ const FriendsComponent = () => {
         <h4 className="text-[16px] font-bold text-gray-400 mt-3 mb-1 ">
           General Info
         </h4>
-        <div className="flex flex-col">
+        <div className="flex flex-col h-fit py-2">
           <span className="text-[12px] font-bold text-gray-500">
             <span className="text-[15px] font-bold text-neutral-200 font-mono">
               City:{" "}
@@ -227,12 +236,34 @@ const FriendsComponent = () => {
             </span>
             {friend?.address ? friend?.address : "-null"}
           </span>
-          <span className="text-[12px] font-bold text-gray-400">
-            {friend?.followers?.length} followers
-          </span>
-          <span className="text-[12px] font-bold text-gray-400">
-            {friend?.followings?.length} followings
-          </span>
+          <div className="flex justify-around my-3 gap-2">
+            <span className="text-[12px] font-bold text-red-500 bg-gray-200 opacity-80 rounded-md py-1 px-2">
+              {friend?.followers?.length === 1
+                ? `${friend?.followers?.length} follower`
+                : `${friend?.followers?.length} followers`}
+            </span>
+            <span className="text-gray-400">|</span>
+            <span className="text-[12px] font-bold text-red-500 bg-gray-200 opacity-80 rounded-md py-1 px-2">
+              {friend?.followings?.length === 1 ||
+              friend?.followings?.length === 0
+                ? `${friend?.followings?.length} following`
+                : `${friend?.followings?.length} followings`}
+            </span>
+          </div>
+          <div className="flex flex-col gap-2">
+            <span className="text-[12px] font-bold text-gray-500">
+              <span className="text-[15px] font-bold text-neutral-200 font-mono">
+                Instrument of choice:
+              </span>
+              {friend?.instrument ? friend?.instrument : "-null"}
+            </span>
+            <span className="text-[12px] font-bold text-gray-500">
+              <span className="text-[15px] font-bold text-neutral-200 font-mono">
+                Experience:
+              </span>
+              {friend?.experience ? friend?.experience : "-null"}
+            </span>
+          </div>
         </div>
       </Box>
       <Box className="h-fit bg-neutral-800 w-[100%] px-2 py-3">

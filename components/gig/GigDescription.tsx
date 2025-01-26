@@ -24,8 +24,10 @@ const GigDescription = ({ gig, open, handleClose }: DescriptionProps) => {
           </DialogHeader>
           <div className="flex">
             {" "}
-            <span className="titler tracking-tighter">Gig Type:</span>
-            <span className="titler text-red-700 font-mono font-bold line-clamp-1  ">
+            <span className="titler tracking-tighter text-white text-[15px] mx-2">
+              Gig Type:
+            </span>
+            <span className="gigtitle text-blue-300 font-mono font-bold line-clamp-1  ">
               {gig?.bussinesscat}
             </span>
             &nbsp;
@@ -46,41 +48,51 @@ const GigDescription = ({ gig, open, handleClose }: DescriptionProps) => {
           </div>
           <div className="flex">
             {" "}
-            <span className="titler tracking-tighter">Time:</span>
-            <span className="titler text-red-700 font-mono font-bold line-clamp-1  ">
+            <span className="titler tracking-tighter text-white text-[15px] mx-2">
+              Time:
+            </span>
+            <span className="gigtitle text-blue-300 font-mono font-bold line-clamp-1  ">
               {gig?.time?.from}
             </span>
             &nbsp;
-            <span className="titler">to</span> &nbsp;
-            <span className="titler text-red-700 font-mono font-bold line-clamp-1  ">
+            <span className="titler text-gray-300">to</span> &nbsp;
+            <span className="gigtitle text-blue-300 font-mono font-bold line-clamp-1  ">
               {gig?.time?.to}
             </span>
           </div>
           <div className="flex">
             {" "}
-            <span className="titler tracking-tighter">Contact:</span>
-            <span className="titler text-red-700 font-mono font-bold line-clamp-1 blur-sm ">
+            <span className=" tracking-tighter text-white text-[12px] mx-2">
+              Contact:
+            </span>
+            <span className="gigtitle text-blue-300 font-mono font-bold line-clamp-1 blur-sm ">
               {gig?.phone}
             </span>
           </div>
           <div className="flex">
             {" "}
-            <span className="titler tracking-tighter">Pay:</span>
-            <span className="titler text-red-700 font-mono font-bold line-clamp-1  ">
+            <span className="titler tracking-tighter text-white text-[15px] mx-2">
+              Pay:
+            </span>
+            <span className="gigtitle text-blue-300 font-mono font-bold line-clamp-1  ">
               {gig?.price}
             </span>
           </div>
           <div className="flex items-center gap-1">
             {" "}
-            <span className="titler tracking-tighter">Description:</span>
-            <span className="text-blue-500 titler">{gig?.description}</span>
+            <span className=" tracking-tighter text-white text-[12px] mx-2">
+              Description:
+            </span>
+            <span className="text-blue-300 text-[11px] ">
+              {gig?.description}
+            </span>
           </div>{" "}
           {gig?.category && gig?.bussinesscat === "personal" && (
             <div className="flex">
               <span className="titler">Instrument: </span>
 
               {gig?.category && gig?.category !== null && (
-                <h6 className="titler text-red-700 font-mono">
+                <h6 className="gigtitle text-blue-300 font-mono">
                   {gig?.category}
                 </h6>
               )}
@@ -88,7 +100,7 @@ const GigDescription = ({ gig, open, handleClose }: DescriptionProps) => {
           )}
           {!gig?.category && gig?.bussinesscat === "full" && (
             <div className="flex">
-              <span className="titler text-purple-700 font-bold">
+              <span className="titler text-purple-200 font-bold">
                 FullBand(vocalist,instrumentalists etc){" "}
               </span>
             </div>
