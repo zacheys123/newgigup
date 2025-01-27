@@ -18,7 +18,7 @@ const ContactPage = () => {
     setOpen(false);
   };
   return (
-    <div className=" w-[100vw] h-[86%] bg-slate-900 overflow-y-auto">
+    <div className=" w-[100vw] h-[86%] bg-slate-900 overflow-y-auto flex justify-center items-center">
       <Dialog
         open={open}
         onOpenChange={handleClose} // use onOpenChange to handle closing the dialog
@@ -27,7 +27,7 @@ const ContactPage = () => {
           <DialogHeader>
             <DialogTitle style={{ color: "lightgray" }}>Reviews</DialogTitle>
           </DialogHeader>
-          <EmailForm />
+          <EmailForm handleClose={handleClose} />
         </DialogContent>
         <DialogFooter>
           <Button variant="secondary" onClick={handleClose}>

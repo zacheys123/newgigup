@@ -147,30 +147,24 @@ export default function Home() {
           initial={{ opacity: 0, scale: 0 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.5 }}
-          className="container bg-neutral-900 shadow-md  shadow-slate-600 rounded-md mx-auto max-w-[80vw] h-[180px] p-4 text-center flex flex-col gap-4 xl:w-[60vw] mt-[17px] mb-9"
+          className="container bg-neutral-900 shadow-md  shadow-slate-600 rounded-md mx-auto max-w-[80vw] h-[180px] p-4 text-center flex flex-col gap-4 xl:w-[60vw] mt-[17px] mb-9 items-center"
         >
           <span className=" tracking-wider  font-sans text-[17px] ">
             For more information on what gigup is,contact us here.Send us ur
             feedback or concern.
           </span>
-          <form>
-            <input
-              type="text"
-              placeholder="Ask a Question..."
-              className=" w-[85%] mx-auto p-3 h-[35px]  bg-gray-300 text-black focus-within:ring-0 outline-none rounded-xl"
-            />
-            <UsersButton
-              myonClick={() => console.log("Email Button clicked!!!")}
-              title="Send FeedBack"
-              myclassName="w-[140px]  bg-purple-600 border border-yellow-300 rounded-full py-3  text-white my-3 hover:bg-slate-500"
-              myimage=""
-              myspan=""
-              mylink=""
-              myloading={false}
-              mydisabled={false}
-              mygigip="" // If gigip is optional, add it as well
-            />
-          </form>
+
+          <UsersButton
+            myonClick={() => router.push("./contact")}
+            title="Send FeedBack"
+            myclassName="w-[140px]  bg-purple-600 border border-yellow-300 rounded-full py-3  text-white my-3 hover:bg-slate-500"
+            myimage=""
+            myspan=""
+            mylink=""
+            myloading={false}
+            mydisabled={false}
+            mygigip="" // If gigip is optional, add it as well
+          />
         </motion.div>
         {/* Features Section */}
         <section className="py-16 px-8">

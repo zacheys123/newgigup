@@ -2,8 +2,14 @@
 // components/EmailForm.tsx
 import React, { useState } from "react";
 import emailjs from "@emailjs/browser";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
-const EmailForm: React.FC = () => {
+interface EmailFormProps {
+  handleClose: () => void;
+}
+
+const EmailForm: React.FC<EmailFormProps> = ({ handleClose }) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -12,6 +18,7 @@ const EmailForm: React.FC = () => {
 
   const [isSending, setIsSending] = useState(false);
   const [responseMessage, setResponseMessage] = useState("");
+  const router = useRouter();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -31,8 +38,10 @@ const EmailForm: React.FC = () => {
         process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || ""
       );
       console.log(result);
-      setResponseMessage("Email sent successfully!");
+      toast.success("Email sent successfully!");
       setFormData({ name: "", email: "", message: "" });
+      handleClose(); // Close the form after submission
+      router.push("/");
     } catch (error) {
       setResponseMessage("Failed to send email. Please try again later.");
       console.error(error);
@@ -42,7 +51,14 @@ const EmailForm: React.FC = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white shadow rounded">
+    <div className=" relative max-w-md mx-auto p-6 bg-white shadow rounded">
+      {" "}
+      <span
+        className="flex justify-end right-3 top-5 font-bold text-[20px]"
+        onClick={handleClose}
+      >
+        &times;
+      </span>
       <h2 className="text-2xl font-bold mb-4">Contact Us</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
@@ -95,7 +111,9 @@ const EmailForm: React.FC = () => {
           {isSending ? "Sending..." : "Send"}
         </button>
       </form>
-      {responseMessage && <p className="mt-4 text-center">{responseMessage}</p>}
+      {responseMessage && (
+        <p className="mt-4 text-center text-red-500">{responseMessage}</p>
+      )}
     </div>
   );
 };
