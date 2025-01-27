@@ -8,6 +8,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import {
+  BookCopy,
   Home,
   Menu,
   MessageCircle,
@@ -92,7 +93,7 @@ const MobileSheet = () => {
           href={`/reviews/${user?._id}/*${user?.firstname}${user?.lastname}`}
           className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 hover:text-white rounded-md transition-all"
         >
-          <Music size="20" className="text-white" />
+          <BookCopy size="20" className="text-white" />
           <SheetDescription className="text-lg font-medium title ">
             Personal Reviews
           </SheetDescription>
@@ -117,7 +118,15 @@ const MobileSheet = () => {
             My Videos
           </SheetDescription>
         </Link>
-
+        <Link
+          href={`/gigs/${userId}`}
+          className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 hover:text-white rounded-md transition-all"
+        >
+          <Music size="20" className="text-white" />
+          <SheetDescription className="text-lg font-medium title ">
+            Gigs
+          </SheetDescription>
+        </Link>
         <Link
           href="/settings"
           className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 hover:text-white rounded-md transition-all"
