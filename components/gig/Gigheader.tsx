@@ -89,7 +89,7 @@ const Gigheader = ({
     <div className="flex flex-col gap-6 p-2 shadow-lg shadow-zinc-700 bg-gradient-to-r from-zinc-800 via-neutral-700 to-black rounded-xl">
       <div className="flex flex-wrap items-center justify-between gap-6 -mb-3">
         <motion.div
-          className="flex gap-4 items-center bg-zinc-700 px-6 py-3 rounded-full shadow-xl w-full md:w-[320px] transition-all duration-300"
+          className="flex gap-4 items-center bg-zinc-700 px-6 py-3 rounded-full shadow-xl w-full md:w-[320px] transition-all duration-300 h-[57px]"
           variants={variant}
         >
           <input
@@ -99,14 +99,15 @@ const Gigheader = ({
             onChange={(ev) => setTypeOfGig(ev.target.value)}
             onKeyDown={gigQuery}
           />
-          <div className="bg-gray-300 p-2 rounded-full transition-all hover:bg-gray-200">
-            <Search size="18px" className="text-gray-600" />
+          <div className="bg-gray-300 p-2 rounded-full transition-all hover:bg-gray-200 ">
+            <Search size="15px" className="text-gray-600" />
           </div>
         </motion.div>
       </div>
 
       <div className="overflow-x-hidden w-full flex items-center justify-between p-4 bg-neutral-800 rounded-lg">
         <select
+          defaultValue={"all"}
           className="w-[85px] h-[35px] bg-neutral-800 text-gray-300 pl-4 pr-2 rounded-md text-[11px] font-semibold cursor-pointer focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300"
           value={location || ""}
           onChange={(ev) => setLocation(ev.target.value)}

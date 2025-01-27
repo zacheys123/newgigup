@@ -974,7 +974,7 @@ input[type="radio"] {
   font-size: 25px;
   -webkit-box-sizing: content-box;
   box-sizing: content-box;
-  height: 40px;
+  height: 60px;
   padding: 10px 10px;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -986,6 +986,8 @@ input[type="radio"] {
   overflow: hidden;
   position: relative;
   font-family: monospace;
+  font-size: 36px;
+  font-weight: 600;
 }
 .words::after {
   content: "";
