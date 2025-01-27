@@ -3,64 +3,58 @@ import { IoIosAddCircle } from "react-icons/io";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import Link from "next/link";
-import { MdOutlinePersonalInjury } from "react-icons/md";
-import { MdEmojiEvents } from "react-icons/md";
+import {
+  MdOutlinePersonalInjury,
+  MdEmojiEvents,
+  MdComment,
+} from "react-icons/md";
 import { FaHome } from "react-icons/fa";
-import { MdComment } from "react-icons/md";
+import { motion } from "framer-motion";
 
 const PagesNav = () => {
   const { userId } = useAuth();
   const pathname = usePathname();
-  const inactivelink = "text-gray-300 ml-6 hover:text-yellow-400 text-[23px]";
-  const activelink =
-    "text-yellow-400 hover:text-yellow ml-6 transition duration-200";
+
+  const linkStyles = (isActive: boolean) =>
+    isActive
+      ? "text-amber-300 hover:text-yellow-500"
+      : "text-gray-300 hover:text-yellow-400";
+
+  const linkAnimation = {
+    initial: { scale: 1, opacity: 0.8 },
+    hover: { scale: 1.2, opacity: 1 },
+    tap: { scale: 1, opacity: 0.9 },
+  };
 
   return (
-    <div className="fixed bottom-0 w-full z-50 bg-zinc-900 border-t border-slate-600">
-      <div className="grid grid-cols-5 items-center w-full h-[60px] px-5 mx-auto">
-        <Link href={`/gigs/${userId}`}>
-          <FaHome
-            className={
-              pathname === `/gigs/${userId}` ? activelink : inactivelink
-            }
-            style={{ cursor: "pointer" }}
-            size={pathname === `/gigs/${userId}` ? 26 : 25}
-          />
-        </Link>
-        <Link href={`/av_gigs/${userId}`}>
-          <MdComment
-            className={
-              pathname === `/av_gigs/${userId}` ? activelink : inactivelink
-            }
-            size={pathname === `/av_gigs/${userId}` ? 26 : 25}
-            style={{ cursor: "pointer" }}
-          />
-        </Link>
-        <Link href={`/create/${userId}`}>
-          <IoIosAddCircle
-            className="text-purple-500 text-2xl hover:text-yellow ml-3"
-            size={43}
-            style={{ cursor: "pointer" }}
-          />
-        </Link>
-        <Link href={`/my_gig/${userId}`}>
-          <MdOutlinePersonalInjury
-            className={
-              pathname === `/my_gig/${userId}` ? activelink : inactivelink
-            }
-            size={pathname === `/my_gig/${userId}` ? 26 : 25}
-            style={{ cursor: "pointer" }}
-          />
-        </Link>
-        <Link href={`/bookedgigs/${userId}`}>
-          <MdEmojiEvents
-            className={
-              pathname === `/bookedgigs/${userId}` ? activelink : inactivelink
-            }
-            size={pathname === `/bookedgigs/${userId}` ? 26 : 25}
-            style={{ cursor: "pointer" }}
-          />
-        </Link>
+    <div className="fixed bottom-0 w-full z-50 bg-gradient-to-t from-amber-900 via-gray-800 to-indigo-650 border-t border-slate-900 shadow-lg">
+      <div className="grid grid-cols-5 items-center w-full h-[60px] px-6 mx-auto">
+        {[
+          { href: `/gigs/${userId}`, Icon: FaHome },
+          { href: `/av_gigs/${userId}`, Icon: MdComment },
+          {
+            href: `/create/${userId}`,
+            Icon: IoIosAddCircle,
+            size: 43,
+            extraStyle: "text-purple-500",
+          },
+          { href: `/my_gig/${userId}`, Icon: MdOutlinePersonalInjury },
+          { href: `/bookedgigs/${userId}`, Icon: MdEmojiEvents },
+        ].map(({ href, Icon, size = 26, extraStyle }, index) => (
+          <Link key={index} href={href}>
+            <motion.div
+              variants={linkAnimation}
+              initial="initial"
+              whileHover="hover"
+              whileTap="tap"
+              className={` cursor-pointer duration-200 ${linkStyles(
+                pathname === href
+              )} ${extraStyle || ""}`}
+            >
+              <Icon size={size} />
+            </motion.div>
+          </Link>
+        ))}
       </div>
     </div>
   );

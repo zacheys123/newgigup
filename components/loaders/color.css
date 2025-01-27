@@ -5,8 +5,8 @@
   --front-color-in: #fbb216;
   --back-color: #c3c8de;
   --text-color: #414856;
-  width: 44px;
-  height: 44px;
+  width: 24px;
+  height: 24px;
   border-radius: 50px;
   position: relative;
   display: flex;
@@ -40,8 +40,8 @@
 }
 
 #wifi-loader svg.circle-outer {
-  height: 46px;
-  width: 46px;
+  height: 36px;
+  width: 36px;
 }
 
 #wifi-loader svg.circle-outer circle {
@@ -57,8 +57,8 @@
 }
 
 #wifi-loader svg.circle-middle {
-  height: 60px;
-  width: 60px;
+  height: 30px;
+  width: 30px;
 }
 
 #wifi-loader svg.circle-middle circle {
@@ -98,8 +98,8 @@
   justify-content: center;
   align-items: center;
   text-transform: lowercase;
-  font-weight: 500;
-  font-size: 14px;
+  font-weight: 300;
+  font-size: 9px;
   letter-spacing: 0.2px;
 }
 

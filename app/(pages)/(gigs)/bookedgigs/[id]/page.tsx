@@ -39,7 +39,7 @@ const BookedGigs = () => {
             No gigs found
           </h1>
         )}
-        {loading ? (
+        {!loading ? (
           gigs?.gigs
             ?.filter((gig: GigProps) => gig.bookedBy?._id === user?._id)
             ?.map((gig: GigProps) => (
