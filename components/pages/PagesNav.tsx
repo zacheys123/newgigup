@@ -27,7 +27,7 @@ const PagesNav = () => {
   };
 
   return (
-    <div className="fixed bottom-0 w-full z-50 bg-gradient-to-t from-amber-900 via-gray-800 to-indigo-650 border-t border-slate-900 shadow-lg">
+    <div className="fixed bottom-0 w-full z-50 bg-gradient-to-t from-zinc-900 via-blue-900 to-yellow-750  shadow-xl shadow-teal-600">
       <div className="grid grid-cols-5 items-center w-full h-[60px] px-1 mx-auto">
         {[
           { href: `/gigs/${userId}`, Icon: FaHome },
