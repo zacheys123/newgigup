@@ -15,9 +15,19 @@ const useStore = create(
     searchQuery: "",
     follow: false,
     refetchdata: false,
+    showModal: false,
+    selectedReview: null,
     setRefetchData: (data) =>
       set(() => ({
         refetchdata: data,
+      })),
+    setShowModal: (data) =>
+      set(() => ({
+        showModal: data,
+      })),
+    setSelectedReview: (data) =>
+      set(() => ({
+        selectedReview: data,
       })),
     setSearch: (data) =>
       set(() => ({

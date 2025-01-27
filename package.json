@@ -36,6 +36,7 @@
     "react-toastify": "^11.0.2",
     "sonner": "^1.7.1",
     "tailwind-merge": "^2.6.0",
+    "tailwind-scrollbar-hide": "^2.0.0",
     "tailwindcss-animate": "^1.0.7",
     "zustand": "^5.0.2"
   },

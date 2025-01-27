@@ -15,8 +15,8 @@ export interface Review {
   comment: string;
   gigId: string; // assuming Gig ID is a string
   postedBy?: string | { _id: string; firstname: string; [key: string]: string };
+  postedTo?: string | { _id: string; firstname: string; [key: string]: string };
 
-  postedTo: string;
   updatedAt?: Date;
   createdAt?: Date;
 }

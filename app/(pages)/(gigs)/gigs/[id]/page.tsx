@@ -1,7 +1,8 @@
 "use client";
 import AllGigsComponent from "@/components/gig/AllGigsComponent";
 import Gigheader from "@/components/gig/Gigheader";
-import LoadingSpinner from "@/components/LoadingSpinner";
+import Clockwise from "@/components/loaders/Clockwise";
+// import LoadingSpinner from "@/components/LoadingSpinner";
 import { useAllGigs } from "@/hooks/useAllGigs";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { GigProps } from "@/types/giginterface";
@@ -53,7 +54,10 @@ const GigsPage = () => {
               <AllGigsComponent key={gig?._id} gig={gig} />
             ))
         ) : (
-          <LoadingSpinner />
+          // <LoadingSpinner />
+          <div className="flex justify-center items-center h-full w-full">
+            <Clockwise />
+          </div>
         )}
       </div>
     </div>

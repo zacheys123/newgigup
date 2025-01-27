@@ -1,20 +1,22 @@
 import { Piano, Search } from "lucide-react";
-
 import { motion } from "framer-motion";
 import React from "react";
 import { UserProps } from "@/types/userinterfaces";
 import { Button } from "../ui/button";
 import { instruments } from "@/utils";
 import { FaGuitar } from "react-icons/fa";
-import { GiGuitar } from "react-icons/gi";
+import {
+  GiGuitar,
+  GiSaxophone,
+  GiViolin,
+  GiDrumKit,
+  GiTrumpet,
+  GiHarp,
+  GiTrombone,
+  GiTuba,
+} from "react-icons/gi";
 import { LuGuitar } from "react-icons/lu";
-import { GiSaxophone } from "react-icons/gi";
-import { GiViolin } from "react-icons/gi";
-import { GiDrumKit } from "react-icons/gi";
-import { GiTrumpet } from "react-icons/gi";
-import { GiHarp } from "react-icons/gi";
-import { GiTrombone } from "react-icons/gi";
-import { GiTuba } from "react-icons/gi";
+
 interface HeaderProps {
   typeOfGig: string;
   setTypeOfGig: (typeOfGig: string) => void;
@@ -25,6 +27,7 @@ interface HeaderProps {
   setLocation: (location: string) => void;
   myuser?: UserProps;
 }
+
 const Gigheader = ({
   typeOfGig,
   setTypeOfGig,
@@ -33,21 +36,15 @@ const Gigheader = ({
   category,
   setLocation,
 }: HeaderProps) => {
-  console.log(category);
   const variant = {
-    initial: {
-      x: ["-200px"],
-      opacity: 0,
-    },
+    initial: { x: ["-200px"], opacity: 0 },
     animate: {
       opacity: 1,
-
       x: ["-200px", "-100px", "-50px", "0px", "50px", "0px"],
     },
-    transition: {
-      duration: 1.3,
-    },
+    transition: { duration: 1.2, ease: "easeInOut" },
   };
+
   const dataCounties = [
     "Nairobi",
     "Mombasa",
@@ -80,75 +77,64 @@ const Gigheader = ({
     "Vihiga",
     "All",
   ];
-  // random id
-
-  // const randomId = "123456789";
 
   const activeFilter =
-    "gigtitle h-[20px] w-[70px] !text-[8px] mx-2 mb-1 !bg-orange-600 text-white";
-  const inactiveFilter = "gigtitle h-[20px] w-[70px] !text-[8px] mx-2 mb-1 ";
+    "gigtitle h-[27px] w-[90px] text-[9px] mx-2 mb-2 bg-teal-500 text-white rounded-md shadow-md whitespace-nowrap";
+
+  const inactiveFilter =
+    "gigtitle h-[27px] w-[90px] text-[11px] mx-2 mb-2 text-gray-700 rounded-md hover:bg-gray-100 transition duration-300";
+
   return (
-    <div className="flex flex-col gap-4 h-[107px]  p-3 shadow-md shadow-slate-400">
-      <div className="flex items-center justify-around gap-3">
+    <div className="flex flex-col gap-6 p-2 shadow-lg shadow-zinc-700 bg-gradient-to-r from-zinc-800 via-neutral-700 to-black rounded-xl">
+      <div className="flex flex-wrap items-center justify-between gap-6">
         <motion.div
-          className="flex gap-3 items-center bg-zinc-600 px-2 rounded-full h-[40px]  w-[210px] "
+          className="flex gap-4 items-center bg-zinc-700 px-6 py-3 rounded-full shadow-xl w-full md:w-[320px] transition-all duration-300"
           variants={variant}
         >
           <input
-            placeholder="SearchBy: title,time('from' or 'to'),"
-            className="h-[28px] w-[60px]  flex-1 ml-2 text-orange-300 placeholder-orange-200 bg-inherit   text-[11px] focus-within:right-0 outline-none placeholder-muted-foreground"
+            placeholder="Search by title, time ('from' or 'to')"
+            className="h-[27px] gigtitle  w-full pl-4 pr-6 rounded-lg text-sm text-gray-200 placeholder:text-gray-500 bg-transparent focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-50 transition-all duration-300"
             value={typeOfGig}
-            onChange={(ev) => {
-              setTypeOfGig(ev.target.value);
-            }}
-            // onKeyDown={gigQuery}
+            onChange={(ev) => setTypeOfGig(ev.target.value)}
           />
-          <div className="bg-gray-300 p-1 rounded-full">
-            <Search
-              size="12px"
-              style={{
-                color: "gray",
-              }}
-            />
+          <div className="bg-gray-300 p-2 rounded-full transition-all hover:bg-gray-200">
+            <Search size="18px" className="text-gray-600" />
           </div>
         </motion.div>
+      </div>
 
+      <div className="overflow-x-hidden w-full flex items-center justify-between p-4 bg-neutral-800 rounded-lg">
         <select
-          className=" w-[66px] bg-zinc-700 text-gray-300 pl-2 element-with-overflow  h-[30px] rounded-md  text-[10px] font-bold  font-mono"
-          value={location}
-          onChange={(ev) => {
-            setLocation(ev.target.value);
-          }}
+          className="w-[100px] h-[35px] bg-neutral-700 text-gray-300 pl-4 pr-2 rounded-md text-sm font-semibold cursor-pointer focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300"
+          value={location || ""}
+          onChange={(ev) => setLocation(ev.target.value)}
         >
-          {dataCounties?.map((d, idx) => (
-            <option key={idx} value={d}>
+          {/* Disabled first option as a placeholder */}
+          <option value="" disabled className="text-gray-500">
+            Select County/State
+          </option>
+          {dataCounties.map((d, idx) => (
+            <option key={idx} value={d} className="text-sm">
               {d}
             </option>
           ))}
         </select>
-      </div>
-      {/* <select
-        className=" w-[50px] bg-white pl-2  h-[20px] rounded-md  text-[9px] font-bold  font-mono"
-        value={category}
-        onChange={(ev) => {
-          setCategory(ev.target.value);
-        }}
-      > */}
-      <div className="overflow-x-auto w-full overflow-y-hidden">
-        <div className="flex gap-2 whitespace-nowrap">
+
+        <div className="flex gap-3 whitespace-nowrap overflow-x-auto scrollbar-hide">
           {instruments.map((ins) => (
             <Button
               type="button"
               variant="secondary"
-              className={ins.value === category ? activeFilter : inactiveFilter}
+              className={`${
+                ins.value === category ? activeFilter : inactiveFilter
+              } group relative flex items-center justify-center px-6 py-3 rounded-lg text-sm font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-xl h-[27px] max-w-[100px] whitespace-nowrap`}
               key={ins.value}
               onClick={(ev) => {
                 ev.preventDefault();
                 setCategory(ins.value);
               }}
             >
-              {" "}
-              <span>
+              <span className="absolute left-2 transition-all group-hover:scale-110 group-hover:text-teal-500">
                 {ins.value === "piano" && <Piano />}
                 {ins.value === "guitar" && <FaGuitar />}
                 {ins.value === "bass" && <GiGuitar />}
@@ -160,14 +146,12 @@ const Gigheader = ({
                 {ins.value === "trumpet" && <GiTrumpet />}
                 {ins.value === "harp" && <GiHarp />}
                 {ins.value === "trombone" && <GiTrombone />}
-                {ins.value === "tuba" && <GiTuba />}{" "}
+                {ins.value === "tuba" && <GiTuba />}
               </span>
               <span
-                className={
-                  ins.value === category
-                    ? "  text-white font-bold"
-                    : "text-black font-bold"
-                }
+                className={`ml-10 transition-all duration-300 gigtitle ${
+                  ins.value === category ? "text-white" : "text-gray-700"
+                } group-hover:text-teal-500 whitespace-nowrap`}
               >
                 {ins.name}
               </span>
@@ -175,7 +159,6 @@ const Gigheader = ({
           ))}
         </div>
       </div>
-      {/* </select> */}
     </div>
   );
 };

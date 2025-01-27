@@ -1,7 +1,7 @@
 "use client";
 import AllGigsComponent from "@/components/gig/AllGigsComponent";
 import Gigheader from "@/components/gig/Gigheader";
-import LoadingSpinner from "@/components/LoadingSpinner";
+import ColorLoading from "@/components/loaders/ColorLoading";
 import { useAllGigs } from "@/hooks/useAllGigs";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { GigProps } from "@/types/giginterface";
@@ -39,14 +39,17 @@ const BookedGigs = () => {
             No gigs found
           </h1>
         )}
-        {!loading ? (
+        {loading ? (
           gigs?.gigs
             ?.filter((gig: GigProps) => gig.bookedBy?._id === user?._id)
             ?.map((gig: GigProps) => (
               <AllGigsComponent key={gig?._id} gig={gig} />
             ))
         ) : (
-          <LoadingSpinner />
+          <div className="flex justify-center items-center h-full w-full">
+            <ColorLoading />
+          </div>
+          // <LoadingSpinner />
         )}
       </div>
     </div>

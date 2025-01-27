@@ -13,11 +13,13 @@ import { toast } from "react-toastify";
 import { useAuth } from "@clerk/nextjs";
 // import { ArrowRight } from "lucide-react";
 import Image from "next/image";
-import { motion } from "framer-motion";
-import { Review } from "@/types/userinterfaces";
 import Videos from "./Videos";
 import { Video } from "lucide-react";
 import { useVideos } from "@/hooks/useVideos";
+import AlreadyReviewModal from "../modals/AlreadyReviewModall";
+import { motion } from "framer-motion";
+import { Review } from "@/types/userinterfaces";
+import { isCreatorIsCurrentUserAndTaken } from "@/constants";
 // import { useCurrentUser } from "@/hooks/useCurrentUser";
 interface FetchResponse {
   success: boolean;
@@ -40,7 +42,8 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
     setOpen(false);
     console.log("close", gigdesc);
   };
-  const { currentUser } = useStore();
+  const { currentUser, showModal, setShowModal } = useStore();
+  const [selectedReview, setSelectedReview] = useState<Review | null>(null);
   const myId = currentUser?._id;
   const router = useRouter();
   // conditionsl styling
@@ -70,18 +73,13 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
     router.push(`/editpage/edit/${id}`);
   };
 
-  const [showModal, setShowModal] = useState(false);
-  const [selectedReview, setSelectedReview] = useState<Review | null>(null);
-
-  const handleClick = () => {
+  const handleReviewModal = () => {
     const review = gig?.postedBy?.myreviews.find(
       (review) => review.gigId === gig?._id
     );
 
     if (review) {
-      if (typeof review?.postedBy === "object" && review?.postedBy) {
-        setSelectedReview(review); // Set the selected review for modal
-      }
+      setSelectedReview(review); // Set the selected review for modal
 
       setShowModal(true); // Show the modal
     } else {
@@ -120,10 +118,19 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
           if (showvideo === true) {
             setShowVideo(false);
           }
+
           return;
         }}
       >
-        <div className="flex items-center justify-between h-full w-full relative ">
+        <div
+          className="flex items-center justify-between h-full w-full relative "
+          onClick={(ev) => {
+            ev.stopPropagation();
+            setSelectedReview(null); // Set the selected review for modal
+
+            setShowModal(false); // Show the modal
+          }}
+        >
           <Box>
             <div className="flex gap-2">
               <span className="gigtitle text-orange-300"> gigtitle:</span>
@@ -346,12 +353,10 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
               </>
             )}
           </div>
-          {gig?.isTaken &&
-          gig?.bookedBy?._id !== myId &&
-          gig?.postedBy?._id === myId ? (
+          {isCreatorIsCurrentUserAndTaken(gig, myId) ? (
             <div
               className="flex-1 flex justify-end bg-yellow-600 px-3 py-1 rounded-tl-sm rounded-r-3xl rounded-b-2xl rounded-br-md"
-              onClick={handleClick}
+              onClick={handleReviewModal}
             >
               <h4 className="text-[10px] !text-orange-100 font-bold">
                 {gig?.postedBy?.myreviews?.some(
@@ -378,20 +383,12 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
           )}{" "}
           {showModal &&
             selectedReview &&
-            selectedReview?.postedBy?._id === gig?.postedBy._id && (
-              <div className="relative h-full w-full flex justify-center items-center">
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                  className="bg-white shadow-md p-5 rounded-md w-[300px] h-[200px] absolute flex flex-col gap-2"
-                >
-                  <h6 className="flex justify-end text-[19px] font-bold">
-                    {/* {/* &times; */}
-                    helooo{" "}
-                  </h6>
-                </motion.div>
-              </div>
+            selectedReview?.postedTo === gig?.bookedBy?._id && (
+              <AlreadyReviewModal
+                {...gig}
+                setSelectedReview={setSelectedReview}
+                selectedReview={selectedReview}
+              />
             )}
         </div>{" "}
         {gig && gig?.bookedBy?._id == myId && (

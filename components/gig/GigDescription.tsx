@@ -12,7 +12,7 @@ const GigDescription = ({ gig, open, handleClose }: DescriptionProps) => {
   // const router = useRouter();
 
   return (
-    <div className="w-[300px] inset-0 flex items-center justify-center bg-black bg-opacity-30 ">
+    <div className="w-[300px] inset-0 flex items-center justify-center bg-black bg-opacity-30  ">
       <Dialog
         open={open}
         onOpenChange={handleClose} // use onOpenChange to handle closing the dialog
@@ -20,7 +20,9 @@ const GigDescription = ({ gig, open, handleClose }: DescriptionProps) => {
         <DialogContent>
           {" "}
           <DialogHeader>
-            <DialogTitle>More Info</DialogTitle>
+            <DialogTitle className="title tracking-tighter text-gray-200">
+              More Info
+            </DialogTitle>
           </DialogHeader>
           <div className="flex">
             {" "}
@@ -89,7 +91,9 @@ const GigDescription = ({ gig, open, handleClose }: DescriptionProps) => {
           </div>{" "}
           {gig?.category && gig?.bussinesscat === "personal" && (
             <div className="flex">
-              <span className="titler">Instrument: </span>
+              <span className="gigtitle text-white font-bold">
+                Instrument:{" "}
+              </span>
 
               {gig?.category && gig?.category !== null && (
                 <h6 className="gigtitle text-blue-300 font-mono">
@@ -100,7 +104,7 @@ const GigDescription = ({ gig, open, handleClose }: DescriptionProps) => {
           )}
           {!gig?.category && gig?.bussinesscat === "full" && (
             <div className="flex">
-              <span className="titler text-purple-200 font-bold">
+              <span className="title text-purple-200 font-bold">
                 FullBand(vocalist,instrumentalists etc){" "}
               </span>
             </div>
@@ -109,7 +113,7 @@ const GigDescription = ({ gig, open, handleClose }: DescriptionProps) => {
             (gig?.bussinesscat !== "full" && (
               <div>
                 {" "}
-                <h6 className="titler text-center underline mt-2">
+                <h6 className="title text-center underline mt-2">
                   Band Selection
                 </h6>
                 {gig?.bandCategory &&
