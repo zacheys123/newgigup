@@ -35,6 +35,7 @@ const Gigheader = ({
   location,
   category,
   setLocation,
+  gigQuery,
 }: HeaderProps) => {
   const variant = {
     initial: { x: ["-200px"], opacity: 0 },
@@ -96,6 +97,7 @@ const Gigheader = ({
             className="h-[27px] gigtitle  w-full pl-4 pr-6 rounded-lg text-sm text-gray-200 placeholder:text-gray-500 bg-transparent focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-50 transition-all duration-300"
             value={typeOfGig}
             onChange={(ev) => setTypeOfGig(ev.target.value)}
+            onKeyDown={gigQuery}
           />
           <div className="bg-gray-300 p-2 rounded-full transition-all hover:bg-gray-200">
             <Search size="18px" className="text-gray-600" />

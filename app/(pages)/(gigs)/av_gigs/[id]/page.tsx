@@ -5,6 +5,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { useAllGigs } from "@/hooks/useAllGigs";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { GigProps } from "@/types/giginterface";
+import { searchfunc } from "@/utils/index";
 import { useAuth } from "@clerk/nextjs";
 import React, { useState } from "react";
 
@@ -22,7 +23,7 @@ const PublishedGigs = () => {
   const [location, setLocation] = useState<string>(() =>
     user?.city ? user?.city : "all"
   );
-
+  let gigQuery;
   // console.log(gigs?.gigs?.map((gig: GigProps) => console.log(gig)));
 
   return (
@@ -47,7 +48,7 @@ const PublishedGigs = () => {
           </h1>
         )}
         {!loading ? (
-          gigs?.gigs
+          searchfunc(gigs?.gigs, typeOfGig, category, gigQuery, location)
             ?.filter(
               (gig: GigProps) =>
                 gig?.postedBy?._id !== user?._id && gig?.isTaken === false

@@ -28,7 +28,7 @@ const PagesNav = () => {
 
   return (
     <div className="fixed bottom-0 w-full z-50 bg-gradient-to-t from-amber-900 via-gray-800 to-indigo-650 border-t border-slate-900 shadow-lg">
-      <div className="grid grid-cols-5 items-center w-full h-[60px] px-6 mx-auto">
+      <div className="grid grid-cols-5 items-center w-full h-[60px] px-1 mx-auto">
         {[
           { href: `/gigs/${userId}`, Icon: FaHome },
           { href: `/av_gigs/${userId}`, Icon: MdComment },
@@ -47,7 +47,7 @@ const PagesNav = () => {
               initial="initial"
               whileHover="hover"
               whileTap="tap"
-              className={` cursor-pointer duration-200 ${linkStyles(
+              className={` ml-4 cursor-pointer duration-200 ${linkStyles(
                 pathname === href
               )} ${extraStyle || ""}`}
             >

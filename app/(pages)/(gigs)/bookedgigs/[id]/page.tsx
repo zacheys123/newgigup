@@ -5,6 +5,7 @@ import ColorLoading from "@/components/loaders/ColorLoading";
 import { useAllGigs } from "@/hooks/useAllGigs";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { GigProps } from "@/types/giginterface";
+import { searchfunc } from "@/utils/index";
 import { useAuth } from "@clerk/nextjs";
 import React, { useState } from "react";
 
@@ -18,6 +19,7 @@ const BookedGigs = () => {
     user?.city ? user?.city : "all"
   );
 
+  let gigQuery;
   return (
     <div className="h-[85%] w-[90%] mx-auto my-2 shadow-md shadow-orange-300 relative">
       {/* Fixed Gigheader */}
@@ -40,7 +42,7 @@ const BookedGigs = () => {
           </h1>
         )}
         {!loading ? (
-          gigs?.gigs
+          searchfunc(gigs?.gigs, typeOfGig, category, gigQuery, location)
             ?.filter((gig: GigProps) => gig.bookedBy?._id === user?._id)
             ?.map((gig: GigProps) => (
               <AllGigsComponent key={gig?._id} gig={gig} />

@@ -6,6 +6,7 @@ import Clockwise from "@/components/loaders/Clockwise";
 import { useAllGigs } from "@/hooks/useAllGigs";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { GigProps } from "@/types/giginterface";
+import { searchfunc } from "@/utils/index";
 import { useAuth } from "@clerk/nextjs";
 
 import React, { useState } from "react";
@@ -16,6 +17,7 @@ const GigsPage = () => {
   const { user } = useCurrentUser(userId || null);
   const [typeOfGig, setTypeOfGig] = useState<string>("");
   const [category, setCategory] = useState<string>("all");
+  let gigQuery;
 
   // const [loadingview, setLoadingView] = useState<boolean>();
   // const [loadingPostId, setLoadingPostId] = useState<object | null>(null);
@@ -25,7 +27,7 @@ const GigsPage = () => {
     user?.city ? user?.city : "all"
   );
 
-  console.log(gigs?.gigs?.map((gig: GigProps) => console.log(gig)));
+  console.log(gigQuery);
 
   return (
     <div className="h-[85%] w-[90%] mx-auto my-2 shadow-md shadow-orange-300 relative">
@@ -38,6 +40,7 @@ const GigsPage = () => {
           setCategory={setCategory}
           location={location}
           setLocation={setLocation}
+          gigQuery={gigQuery}
         />
       </div>
       {/* Scrollable Gigs List */}
@@ -48,7 +51,7 @@ const GigsPage = () => {
           </h1>
         )}
         {!loading ? (
-          gigs?.gigs
+          searchfunc(gigs?.gigs, typeOfGig, category, gigQuery, location)
             ?.filter((gig: GigProps) => gig?.isTaken === false)
             ?.map((gig: GigProps) => (
               <AllGigsComponent key={gig?._id} gig={gig} />

@@ -194,6 +194,7 @@ export const searchfunc = (data, searchquery, category, gigQuery, location) => {
   sortedData = sortedData?.filter((gig) => {
     if (searchquery) {
       gigQuery = gigme(searchquery, gig, sortedData);
+      console.log(gigQuery);
       return gigQuery;
     } else {
       if (

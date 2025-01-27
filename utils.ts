@@ -1,3 +1,4 @@
+import { GigProps } from "./types/giginterface";
 import { FetchResponse, UserProps } from "./types/userinterfaces";
 
 const randomId = Math.floor(Math.random() * 1000000000);
@@ -251,4 +252,60 @@ export const handleFollowing = async (_id: string, user: UserProps) => {
   if (res.ok) {
     console.log("following!!!", followingData);
   }
+};
+
+function gigme(query: string, data: GigProps, sorted: GigProps[]) {
+  if (data?.location?.toLowerCase().includes(query.toLowerCase())) {
+    return sorted;
+  } else if (
+    data?.time?.from?.toLowerCase().includes(query.toLowerCase()) ||
+    data?.time?.to?.toLowerCase().includes(query.toLowerCase())
+  ) {
+    return sorted;
+  } else if (data?.title?.toLowerCase().includes(query.toLowerCase())) {
+    return sorted;
+  }
+}
+export const searchfunc = (
+  data: GigProps[],
+  searchquery: string,
+  category: string,
+  gigQuery: [],
+  location: string
+) => {
+  let sortedData = data;
+
+  sortedData = sortedData?.filter((gig) => {
+    if (searchquery) {
+      gigQuery = gigme(searchquery, gig, sortedData);
+      return gigQuery;
+    } else {
+      if (
+        gig?.category &&
+        gig?.category?.toLowerCase() === category?.toLowerCase()
+      ) {
+        return sortedData;
+      } else if (gig.bussinesscat?.toLowerCase() === category?.toLowerCase()) {
+        return sortedData;
+      } else if (
+        category.toLowerCase() === "all" &&
+        gig?.location?.toLowerCase().includes(location.toLowerCase())
+      ) {
+        console.log(location);
+        return sortedData;
+      } else if (
+        category.toLowerCase() === "all" &&
+        location.toLowerCase() === "all"
+      ) {
+        return data;
+      }
+    }
+    if (location) {
+      if (gig?.location?.toLowerCase().includes(location.toLowerCase())) {
+        return sortedData;
+      }
+    }
+  });
+
+  return sortedData;
 };

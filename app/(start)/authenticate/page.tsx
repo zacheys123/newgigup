@@ -86,9 +86,9 @@ const Authenticate = () => {
                           toast.success("Successfully logged in, Welcome!");
                           setforthloader(false);
                           router.push("/");
-                        }, 5000)
+                        }, 6000)
                       );
-                    }, 5000)
+                    }, 5500)
                   );
                 }, 3500)
               );
