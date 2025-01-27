@@ -113,7 +113,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
       )}
       <section
         className=" flex flex-col rounded-md w-[95%] mx-auto shadow-md  shadow-zinc-600 bg-zinc-900 py-3
-  h-[98x] my-4  px-3"
+  h-[98x] myt-3 mb-5  px-3 "
         onClick={() => {
           if (showvideo === true) {
             setShowVideo(false);

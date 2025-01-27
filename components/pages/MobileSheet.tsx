@@ -39,7 +39,7 @@ const MobileSheet = () => {
 
       <SheetContent
         side="left"
-        className="w-[75%] sm:w-[60%] bg-zink-700  bg-opacity-25 p-6 flex flex-col gap-6 justify-start items-start rounded-br-[150px] shadow-3xl backdrop-blur-lg"
+        className="w-[75%] sm:w-[60%] bg-zink-700  bg-opacity-25 p-6 flex flex-col gap-6 justify-start items-start rounded-br-[180px] shadow-3xl backdrop-blur-lg"
       >
         <SheetTitle className="text-2xl font-semibold text-white mb-6">
           Access More Info
