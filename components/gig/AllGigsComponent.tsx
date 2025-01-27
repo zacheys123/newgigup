@@ -112,7 +112,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
         <GigDescription gig={gig} open={open} handleClose={handleClose} />
       )}
       <section
-        className=" flex flex-col rounded-md   w-[95%] mx-auto shadow-md  shadow-zinc-600 bg-zinc-700 py-3
+        className=" flex flex-col rounded-md w-[95%] mx-auto shadow-md  shadow-zinc-600 bg-zinc-900 py-3
   h-[98x] my-4  px-3"
         onClick={() => {
           if (showvideo === true) {

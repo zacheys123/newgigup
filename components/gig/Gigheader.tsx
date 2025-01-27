@@ -80,14 +80,14 @@ const Gigheader = ({
   ];
 
   const activeFilter =
-    "gigtitle h-[27px] w-[90px] text-[9px] mx-2 mb-2 bg-teal-500 text-white rounded-md shadow-md whitespace-nowrap";
+    "link h-[27px] w-[90px] text-[9px] mx-2 mb-2 bg-teal-500 text-white rounded-md shadow-md whitespace-nowrap";
 
   const inactiveFilter =
-    "gigtitle h-[27px] w-[90px] text-[11px] mx-2 mb-2 text-gray-700 rounded-md hover:bg-gray-100 transition duration-300";
+    "link h-[27px] w-[90px] text-[9x] mx-2 mb-2 text-gray-700 rounded-md hover:bg-gray-100 transition duration-300";
 
   return (
     <div className="flex flex-col gap-6 p-2 shadow-lg shadow-zinc-700 bg-gradient-to-r from-zinc-800 via-neutral-700 to-black rounded-xl">
-      <div className="flex flex-wrap items-center justify-between gap-6">
+      <div className="flex flex-wrap items-center justify-between gap-6 -mb-3">
         <motion.div
           className="flex gap-4 items-center bg-zinc-700 px-6 py-3 rounded-full shadow-xl w-full md:w-[320px] transition-all duration-300"
           variants={variant}
@@ -107,7 +107,7 @@ const Gigheader = ({
 
       <div className="overflow-x-hidden w-full flex items-center justify-between p-4 bg-neutral-800 rounded-lg">
         <select
-          className="w-[100px] h-[35px] bg-neutral-700 text-gray-300 pl-4 pr-2 rounded-md text-sm font-semibold cursor-pointer focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300"
+          className="w-[85px] h-[35px] bg-neutral-800 text-gray-300 pl-4 pr-2 rounded-md text-[11px] font-semibold cursor-pointer focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300"
           value={location || ""}
           onChange={(ev) => setLocation(ev.target.value)}
         >
