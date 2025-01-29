@@ -62,6 +62,9 @@ const FriendsComponent = () => {
             followings: [],
             allreviews: [],
             myreviews: [],
+            isClient: false,
+            isMusician: false,
+            videosProfile: [],
           });
         }
       } finally {
