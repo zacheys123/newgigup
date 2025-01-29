@@ -1,106 +1,65 @@
 "use client";
-
 import AllDirections from "@/components/loaders/AllDirections";
 import Title from "@/components/loaders/Title";
-import { useAuth, useUser } from "@clerk/nextjs";
 
+import { useAuth } from "@clerk/nextjs";
+import { CircularProgress } from "@mui/material";
 import { useRouter } from "next/navigation";
-import React, { useCallback, useEffect, useState, useRef } from "react";
-import { toast } from "sonner";
-interface UserEmail {
-  emailAddress: string;
-  verification?: {
-    status: string | null | undefined;
-  };
-}
 
-interface UserPhone {
-  phoneNumber: string;
-}
-interface UserInput {
-  firstName?: string | null | undefined;
-  lastName?: string | null | undefined;
-  imageUrl?: string;
-  username?: string;
-  emailAddresses: UserEmail[];
-  phoneNumbers: UserPhone[];
-}
+import React, { useCallback, useEffect, useState, useRef } from "react";
 
 const Authenticate = () => {
-  const router = useRouter();
-  const { user, isSignedIn } = useUser();
   const [firstloader, setfirstloader] = useState<boolean>(false);
   const [secondloader, setsecondloader] = useState<boolean>(false);
   const [thirdloader, setthirdloader] = useState<boolean>(false);
   const [fourthloader, setforthloader] = useState<boolean>(false);
+  const [mainloader, setMainloader] = useState<boolean>(false);
+  const router = useRouter();
   const { isLoaded, userId } = useAuth();
-  const registerUser = useCallback(
-    async (user: UserInput | null | undefined) => {
-      if (!user) {
-        console.error("No user data to send.");
-        return;
-      }
 
-      console.log("Sending user to backend:", user);
+  const LoadingPage = useCallback(() => {
+    setfirstloader(true);
 
-      try {
-        const res = await fetch("/api/user/register", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ user }),
-        });
+    // Store timeouts in refs
+    timeoutRefs.current.push(
+      setTimeout(() => {
+        setfirstloader(false);
+        setsecondloader(true);
 
-        if (!res.ok) {
-          console.error("Failed to register user.");
-          return;
-        }
+        timeoutRefs.current.push(
+          setTimeout(() => {
+            setsecondloader(false);
+            setthirdloader(true);
 
-        const data: { userstatus: boolean; results: object } = await res.json();
-        console.log(data);
+            timeoutRefs.current.push(
+              setTimeout(() => {
+                setthirdloader(false);
+                setforthloader(true);
 
-        window.localStorage.setItem("user", JSON.stringify(data.results));
+                timeoutRefs.current.push(
+                  setTimeout(() => {
+                    // toast.success("Successfully logged in, Welcome!");
+                    setforthloader(false);
 
-        if (data.userstatus === false) {
-          setfirstloader(true);
+                    setMainloader(true);
+                    // router.push("/");
+                    timeoutRefs.current.push(
+                      setTimeout(() => {
+                        // toast.success("Successfully logged in, Welcome!");
+                        setMainloader(false);
 
-          // Store timeouts in refs
-          timeoutRefs.current.push(
-            setTimeout(() => {
-              setfirstloader(false);
-              setsecondloader(true);
-
-              timeoutRefs.current.push(
-                setTimeout(() => {
-                  setsecondloader(false);
-                  setthirdloader(true);
-
-                  timeoutRefs.current.push(
-                    setTimeout(() => {
-                      setthirdloader(false);
-                      setforthloader(true);
-
-                      timeoutRefs.current.push(
-                        setTimeout(() => {
-                          toast.success("Successfully logged in, Welcome!");
-                          setforthloader(false);
-                          router.push("/");
-                        }, 6000)
-                      );
-                    }, 5500)
-                  );
-                }, 3500)
-              );
-            }, 2000)
-          );
-        }
-      } catch (error) {
-        console.error("Error during user registration:", error);
-      }
-    },
-    []
-  );
+                        router.push(`/roles/${userId}`);
+                      }, 5000)
+                    );
+                  }, 4000)
+                );
+              }, 4500)
+            );
+          }, 4000)
+        );
+      }, 5000)
+    );
+  }, []);
 
   const timeoutRefs = useRef<NodeJS.Timeout[]>([]); // Timeout references for clearing
 
@@ -113,20 +72,10 @@ const Authenticate = () => {
   }, []);
 
   useEffect(() => {
-    if (user && isSignedIn) {
-      const transformedUser: UserInput = {
-        firstName: user.firstName ?? undefined,
-        lastName: user.lastName ?? undefined,
-        imageUrl: user.imageUrl ?? undefined,
-        username: user.username ?? undefined,
-        emailAddresses: user.emailAddresses,
-        phoneNumbers: user.phoneNumbers,
-      };
-      registerUser(transformedUser);
-    } else {
-      console.log("User data not available or not signed in.");
-    }
-  }, [user, isSignedIn, registerUser]);
+    LoadingPage();
+
+    console.log("User data not available or not signed in.");
+  }, []);
 
   if (!isLoaded) {
     return (
@@ -147,7 +96,7 @@ const Authenticate = () => {
 
   return (
     <div className=" flex justify-center items-center h-screen w-full bg-black">
-      {/* <div className="loaderIn ">
+      <div className="loaderIn ">
         <div className="loader__bar bg-gray-400"></div>
         <div className="loader__bar bg-gray-400"></div>
         <div className="loader__bar bg-gray-400"></div>
@@ -155,7 +104,6 @@ const Authenticate = () => {
         <div className="loader__bar bg-gray-400"></div>
         <div className="loader__ball"></div>
       </div>
-       */}
       {firstloader && (
         <div className="container">
           <div className="loader_data"></div>
@@ -184,6 +132,11 @@ const Authenticate = () => {
       {fourthloader && (
         <div className="flex justify-center items-center h-screen w-full bg-black">
           <Title />
+        </div>
+      )}
+      {mainloader && (
+        <div className="flex justify-center items-center h-screen w-full bg-black opacity-40">
+          <CircularProgress size={70} color="secondary" thickness={4} />
         </div>
       )}
     </div>

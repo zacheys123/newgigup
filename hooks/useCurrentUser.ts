@@ -22,30 +22,32 @@ export function useCurrentUser(userId: string | null) {
     followings: [],
     allreviews: [],
     myreviews: [],
+    isMusician: false,
+    isClient: false,
   });
 
   // Memoize the URL to prevent unnecessary re-renders
   const url = useMemo(() => `/api/user/getuser/${userId}`, [userId]);
 
-  useEffect(() => {
-    // Safely parse user data from localStorage
-    if (typeof window !== "undefined") {
-      try {
-        const storedUser = window.localStorage.getItem("user");
-        if (storedUser) {
-          try {
-            const parsedUser = JSON.parse(storedUser);
-            setUser(parsedUser);
-            setCurrentUser(parsedUser);
-          } catch (e) {
-            console.error("Failed to parse user data from localStorage:", e);
-          }
-        }
-      } catch (e) {
-        console.error("Failed to parse user data from localStorage:", e);
-      }
-    }
-  }, []);
+  // useEffect(() => {
+  //   // Safely parse user data from localStorage
+  //   if (typeof window !== "undefined") {
+  //     try {
+  //       const storedUser = window.localStorage.getItem("user");
+  //       if (storedUser) {
+  //         try {
+  //           const parsedUser = JSON.parse(storedUser);
+  //           setUser(parsedUser);
+  //           setCurrentUser(parsedUser);
+  //         } catch (e) {
+  //           console.error("Failed to parse user data from localStorage:", e);
+  //         }
+  //       }
+  //     } catch (e) {
+  //       console.error("Failed to parse user data from localStorage:", e);
+  //     }
+  //   }
+  // }, []);
 
   useEffect(() => {
     if (!userId) {
@@ -60,6 +62,8 @@ export function useCurrentUser(userId: string | null) {
         followings: [],
         allreviews: [],
         myreviews: [],
+        isMusician: false,
+        isClient: false,
       });
       return;
     }
@@ -90,6 +94,8 @@ export function useCurrentUser(userId: string | null) {
               followings: [],
               allreviews: [],
               myreviews: [],
+              isMusician: false,
+              isClient: false,
             });
           return;
         }
@@ -114,6 +120,8 @@ export function useCurrentUser(userId: string | null) {
             followings: [],
             allreviews: [],
             myreviews: [],
+            isMusician: false,
+            isClient: false,
           });
       } finally {
         if (isMounted) setLoading(false);

@@ -1,7 +1,7 @@
 "use client";
 
-import { Box, CircularProgress } from "@mui/material";
-import React, { useEffect, useState, ChangeEvent } from "react";
+import { CircularProgress } from "@mui/material";
+import React, { useEffect, useState, ChangeEvent, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,8 @@ import useStore from "@/app/zustand/useStore";
 import { toast } from "sonner";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { experiences, instruments } from "@/data";
-import { ArrowDown, ArrowUp } from "lucide-react";
+import { ArrowDown } from "lucide-react";
+import { fileupload } from "@/hooks/fileUpload";
 
 interface UpdateResponse {
   updateStatus: boolean;
@@ -20,16 +21,11 @@ const CurrentUserProfile = () => {
   const { userId } = useAuth();
   const { user } = useCurrentUser(userId || null);
   const { setCurrentFollowers } = useStore();
-  const [
-    loadingUser,
-    // setLoadingUser
-  ] = useState<boolean>(false);
 
   // User details states
   const [firstname, setFirstname] = useState<string | null>("");
   const [lastname, setLastname] = useState<string | null>("");
   const [email, setEmail] = useState<string | null>("");
-  // const [phone, setPhone] = useState<string | null>("");
   const [username, setUsername] = useState<string | null>("");
   const [address, setAddress] = useState<string | null>("");
   const [instrument, setInstrument] = useState<string>("Piano");
@@ -38,12 +34,15 @@ const CurrentUserProfile = () => {
   const [city, setCity] = useState<string>("");
   const [month, setMonth] = useState<string | undefined>();
   const [year, setYear] = useState<string>("");
-  const [message] = useState<{ error: string; success: string }>({
-    error: "",
-    success: "",
-  });
   const [otherinfo, setOtherinfo] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [fileUrl, setFileUrl] = useState<string>("");
+  const [videoUrl, setVideoUrl] = useState<string | null>("");
+  const [isloading] = useState<boolean>(false);
+  const [videos, setVideos] = useState({
+    title: "",
+    description: "",
+  });
   const { setRefetchData } = useStore();
 
   const months = [
@@ -67,7 +66,6 @@ const CurrentUserProfile = () => {
     if (user) {
       setFirstname(user.firstname || "");
       setLastname(user.lastname || "");
-      // setPhone(user.phone || "");
       setUsername(user.username || "");
       setEmail(user.email || "");
       setCity(user.city || "");
@@ -89,6 +87,7 @@ const CurrentUserProfile = () => {
       month,
       year,
       address,
+      videoUrl,
     };
 
     if (user) {
@@ -104,7 +103,6 @@ const CurrentUserProfile = () => {
 
         if (resData.updateStatus) {
           toast.success(resData.message);
-          // window.location.reload();
           setRefetchData((prev: boolean) => !prev);
         } else {
           toast.error(resData.message);
@@ -116,6 +114,42 @@ const CurrentUserProfile = () => {
         setLoading(false);
       }
     }
+  };
+
+  const handleFileChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const dep = "video";
+      const allowedTypes = ["video/mp4", "video/webm", "video/ogg"];
+      fileupload(
+        event,
+        (file: string) => {
+          if (file) {
+            setVideoUrl(file);
+          }
+        },
+        toast,
+        allowedTypes,
+        fileUrl,
+        (file: string | undefined) => {
+          if (file) {
+            setFileUrl(file);
+          }
+        },
+        setLoading,
+        dep
+      );
+    },
+    [fileUrl]
+  );
+
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setVideos((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const followerCount =
@@ -131,7 +165,7 @@ const CurrentUserProfile = () => {
     return (
       <div className="h-screen w-screen flex justify-center items-center animate-pulse">
         <CircularProgress size="15" style={{ color: "white" }} />
-        <h6 className="text-yellow-500 text-[11px] mt-2  rounded-tl-md rounded-b-r-xl ">
+        <h6 className="text-yellow-500 text-[11px] mt-2 rounded-tl-md rounded-br-xl">
           Loading profile data...
         </h6>
       </div>
@@ -139,181 +173,151 @@ const CurrentUserProfile = () => {
   }
 
   return (
-    <>
-      <div className="container flex justify-between items-center  shadow-sm shadow-red-500 h-[100vh] overflow-y-auto">
-        {/* <Logo /> */}
-        <h3 className="text-white font-bold hidden md:block text-[12px]">
-          Add More Info
+    <div className="w-full h-full overflow-scroll flex-1">
+      <div className="flex justify-center items-center mb-6">
+        <h3 className="text-white font-bold text-lg text-center">
+          Create Your Profile
         </h3>
-        {/* <div>
-          <AvatarComponent
-            picture={user?.picture || ""}
-            posts="w-[32px] h-[32px] rounded-full object-fit"
-            firstname={user.firstname || ""}
-          />
-        </div> */}
       </div>
 
-      <Box className="block w-full lg:flex gap-3 h-full mb-5">
-        <div className="w-full py-7 h-[800px] lg:ml-[70px]">
-          {!loadingUser && (
-            <div className="text-red-300 text-[14px] font-bold font-mono my-3 ml-8 flex items-center justify-between -mt-4">
-              {user?.followers?.length === 0 ? (
-                <h6 className="text-red-300">No followers</h6>
-              ) : (
-                <h6
-                  className="text-red-600 mb-1 text-[14px] bg-gray-200 w-fit p-1 rounded-sm"
-                  onClick={() => setCurrentFollowers(true)}
-                >
-                  {followerCount}
-                </h6>
-              )}
-              {user?.followings?.length === 0 ? (
-                <h6 className="text-red-300 mr-4">No followings</h6>
-              ) : (
-                <h6 className="text-red-600 mb-1 text-[14px] bg-gray-200 w-fit p-1 rounded-sm">
-                  {followingCount}
-                </h6>
-              )}
-            </div>
+      <div className="flex flex-col lg:flex-row gap-6 max-h-[calc(100vh-50px)] overflow-y-auto">
+        <div className="text-red-300 text-[12px] font-bold my-3 flex items-center justify-between">
+          {user?.followers?.length === 0 ? (
+            <h6 className="text-red-300">No followers</h6>
+          ) : (
+            <h6
+              className="text-red-600 bg-gray-200 p-1 rounded-sm cursor-pointer"
+              onClick={() => setCurrentFollowers(true)}
+            >
+              {followerCount}
+            </h6>
           )}
-          <form className="w-full sm:w-11/12 md:w-1/2 lg:w-0 lg:hidden -mt-2">
-            {/* Personal Information */}
-            <div className="h-[165px] mt-3 w-full">
-              <div className="flex flex-col gap-2">
-                <span
-                  className="w-full text-[17px] px-2 font-bold flex items-center bg-amber-600 my-1 p-1 rounded-xl justify-between
-                 text-gray-300"
-                >
-                  Personal Info
-                </span>
-                <Input
-                  type="text"
-                  className="md:text-slate-200 text-blue-100 md:w-[80%] mx-auto font-bold text-[12px] my-3"
-                  value={firstname || ""}
-                  disabled
+          {user?.followings?.length === 0 ? (
+            <h6 className="text-red-300">No followings</h6>
+          ) : (
+            <h6 className="text-red-600 bg-gray-200 p-1 rounded-sm">
+              {followingCount}
+            </h6>
+          )}
+        </div>
+
+        <form className="space-y-4">
+          <div className="space-y-2">
+            <span className="text-md font-bold text-gray-300">
+              Personal Info
+            </span>
+            <Input
+              type="text"
+              className="w-full bg-transparent border-none  text-[12px] focus:ring-0 text-white"
+              value={firstname || ""}
+              disabled
+            />
+            <Input
+              type="text"
+              className="w-full bg-transparent border-none  text-[12px] focus:ring-0 text-white"
+              value={lastname || ""}
+              disabled
+            />
+          </div>
+
+          <div className="space-y-2">
+            <span className="text-md font-bold text-gray-300">
+              Authorization Info
+            </span>
+            <Input
+              type="text"
+              className="w-full bg-transparent border-none  text-[12px] focus:ring-0 text-white"
+              value={email || ""}
+              disabled
+            />
+            <Input
+              type="text"
+              className="w-full bg-transparent border-none  text-[12px] focus:ring-0 text-white"
+              value={username || ""}
+              disabled
+            />
+          </div>
+
+          <div className="space-y-2">
+            <span className="text-md font-bold text-gray-300">
+              Geographical Info
+            </span>
+            <Input
+              type="text"
+              className="w-full bg-transparent border-none  text-[12px] focus:ring-0 text-white"
+              placeholder="City"
+              value={city || ""}
+              onChange={(ev) => setCity(ev.target.value)}
+            />
+            <Input
+              type="text"
+              className="w-full bg-transparent border-none  text-[12px] focus:ring-0 text-white"
+              placeholder="Address"
+              value={address || ""}
+              onChange={(ev) => setAddress(ev.target.value)}
+            />
+          </div>
+
+          {!otherinfo && (
+            <div
+              className="bg-amber-900 p-2 rounded-full cursor-pointer px-3 text-[12px]"
+              onClick={() => setOtherinfo(true)}
+            >
+              <div className="flex items-center justify-between text-gray-300">
+                Instrument{" "}
+                <ArrowDown
+                  className="transform rotate-180 transition-transform duration-300"
+                  size={15}
                 />
               </div>
-              <Input
-                type="text"
-                className="md:text-slate-200 text-blue-100 md:w-[80%] mx-auto font-bold text-[12px] my-3"
-                value={lastname || ""}
-                disabled
-              />
             </div>
+          )}
 
-            {/* Authorization Info */}
-            <div className="h-[165px] mt-3 w-full">
-              <Input
-                type="text"
-                className="md:text-slate-200 text-blue-100 md:w-[80%] mx-auto font-bold text-[12px] my-3"
-                value={email || ""}
-                disabled
-              />
-              <Input
-                type="text"
-                className="md:text-slate-200 text-blue-100 md:w-[80%] mx-auto font-bold text-[12px] my-3"
-                value={username || ""}
-                disabled
-              />
-              {/* <Input
-                type="text"
-                placeholder="Phone No"
-                className="md:text-slate-200 text-blue-100 md:w-[80%] mx-auto font-bold text-[12px] my-3"
-                value={phone || ""}
-                disabled
-              /> */}
-            </div>
-
-            {/* Geographical Info */}
-            <div className="h-[170px]  w-full -mt-[79px]">
-              <Input
-                type="text"
-                className="md:text-slate-500 text-gray-400 md:w-[80%] mx-auto font-bold text-[12px] my-3"
-                placeholder="City"
-                value={city || ""}
-                onChange={(ev: ChangeEvent<HTMLInputElement>) =>
-                  setCity(ev.target.value)
-                }
-              />
-              <Input
-                type="text"
-                className="md:text-slate-200 text-gray-400 md:w-[80%] mx-auto font-bold text-[12px] my-3"
-                placeholder="Address"
-                value={address || ""}
-                onChange={(ev: ChangeEvent<HTMLInputElement>) =>
-                  setAddress(ev.target.value)
-                }
-              />
-            </div>
-            {!otherinfo && (
-              <div
-                onClick={() => setOtherinfo((prev: boolean) => !prev)}
-                className="bg-amber-900 text-[11px] font-bold font-mono text-gray-400   p-2 rounded-full mt-2"
-              >
-                <div
-                  className="w-full text-[17px] px-2 font-bold flex items-center justify-between
-                 text-gray-300 "
+          {otherinfo && (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <span className="text-[12px] font-bold text-gray-300">
+                  Instrument
+                </span>
+                <select
+                  className="w-full p-2 rounded-md bg-gray-700 text-gray-300 border-none focus:ring-0 text-[12px]"
+                  value={instrument}
+                  onChange={(ev) => setInstrument(ev.target.value)}
                 >
-                  Instrument{" "}
-                  <ArrowDown
-                    style={{
-                      transform: "rotate(180deg)",
-                      transition: "transform 0.3s ease-in-out",
-                      color: "white",
-                    }}
-                  />
-                </div>
+                  {instruments().map((ins) => (
+                    <option key={ins.id} value={ins.name}>
+                      {ins.val}
+                    </option>
+                  ))}
+                </select>
               </div>
-            )}
-            {otherinfo && (
-              <div>
-                {/* Instrument and Experience Selection */}
-                <div className="w-full flex flex-col mb-2 h-[65px] -mt-10">
-                  <span
-                    className="w-full text-[13px] px-2 font-bold flex items-center bg-amber-800 -mt-6 p-1 rounded-xl justify-between
-                 text-gray-300 my-2"
-                    onClick={() => setOtherinfo((prev: boolean) => !prev)}
-                  >
-                    Instrument <ArrowUp />
-                  </span>
+
+              <div className="space-y-2">
+                <span className="text-[12px] font-bold text-gray-300">
+                  Experience
+                </span>
+                <select
+                  className="w-full p-2 rounded-md bg-gray-700 text-gray-300 border-none focus:ring-0 text-[12px]"
+                  value={experience}
+                  onChange={(ev) => setExperience(ev.target.value)}
+                >
+                  {experiences().map((ex) => (
+                    <option key={ex.id} value={ex.name}>
+                      {ex.val}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <span className="text-[12px] font-bold text-gray-300">
+                  Date of Birth
+                </span>
+                <div className="flex gap-2">
                   <select
-                    className="my-2 text-gray-700 w-[80%] mx-auto pl-2 rounded-md text-[9px] font-mono h-[30px]"
-                    value={instrument || ""}
-                    onChange={(ev: ChangeEvent<HTMLSelectElement>) =>
-                      setInstrument(ev.target.value)
-                    }
-                  >
-                    {instruments().map((ins) => (
-                      <option key={ins.id} value={ins.name}>
-                        {ins.val}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="w-[80%] mx-auto flex flex-col  h-[65px]">
-                  <select
-                    className=" text-gray-700 w-[100%] mx-auto pl-2 rounded-md text-[9px] font-mono h-[30px] -mt-4 my-2"
-                    value={experience || ""}
-                    onChange={(ev: ChangeEvent<HTMLSelectElement>) =>
-                      setExperience(ev.target.value)
-                    }
-                  >
-                    {experiences().map((ex) => (
-                      <option key={ex.id} value={ex.name}>
-                        {ex.val}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                {/* Date Selection */}
-                <div className="w-[80%] mx-auto flex flex-col h-[65px]">
-                  <select
-                    className=" text-gray-700 w-[100%] mx-auto pl-2 rounded-md text-[9px] font-mono  h-[30px] -mt-11 my-2"
-                    value={age || ""}
-                    onChange={(ev: ChangeEvent<HTMLSelectElement>) =>
-                      setAge(ev.target.value)
-                    }
+                    className="w-1/3 p-2 rounded-md bg-gray-700 text-gray-300 border-none focus:ring-0 text-[10px]"
+                    value={age}
+                    onChange={(ev) => setAge(ev.target.value)}
                   >
                     {daysOfMonth.map((i) => (
                       <option key={i} value={i.toString()}>
@@ -321,60 +325,130 @@ const CurrentUserProfile = () => {
                       </option>
                     ))}
                   </select>
-                </div>
-                <div className="w-full   flex flex-col  mt-1">
                   <select
-                    className="text-gray-700 titler text-[10px] w-full  pl-2 element-with-overflow  h-[35px] rounded-md   font-bold  font-mono -mt-16"
-                    value={month !== undefined ? month : ""}
-                    onChange={(ev: ChangeEvent<HTMLSelectElement>) =>
-                      setMonth(ev.target.value)
-                    }
+                    className="w-1/3 p-2 rounded-md bg-gray-700 text-gray-300 border-none focus:ring-0 text-[12px]"
+                    value={month}
+                    onChange={(ev) => setMonth(ev.target.value)}
                   >
-                    {months.map((ex) => {
-                      return (
-                        <option key={ex} value={ex}>
-                          {ex}
-                        </option>
-                      );
-                    })}
+                    {months.map((m) => (
+                      <option key={m} value={m}>
+                        {m}
+                      </option>
+                    ))}
                   </select>
-                </div>
-                <div className="w-full   flex flex-col  -mt-5">
                   <Input
-                    value={year !== undefined ? year : ""}
-                    onChange={(ev: ChangeEvent<HTMLInputElement>) =>
-                      setYear(ev.target.value)
-                    }
                     type="text"
-                    className={
-                      message?.error?.split(" ").includes("year") && year === ""
-                        ? "border-2 border-red-500 rounded-xl  outline-none focus:ring-0 text-blue-600 md:text-gray-400 font-bold "
-                        : "mt-1 border-neutral-300    focus:ring-0 text-gray-200 md:text-gray-200 md:w-[80%] mx-auto font-bold "
-                    }
-                    placeholder="Year,e.g 1992=>92 or 2024 =>24"
+                    className="w-1/3 bg-transparent border-none focus:ring-0 text-white text-[14px]"
+                    placeholder="Year"
+                    value={year}
+                    onChange={(ev) => setYear(ev.target.value)}
                   />
-                </div>{" "}
+                </div>
               </div>
-            )}
-            <div className="w-full flex justify-center items-center mt-4">
-              <Button
-                variant="destructive"
-                disabled={loading}
-                title="Update"
-                className="text-[12px] h-[26px] mb-4"
-                onClick={handleUpdate}
-              >
-                {!loading ? (
-                  "Update Info"
-                ) : (
-                  <CircularProgress size="20px" sx={{ color: "white" }} />
-                )}
-              </Button>
             </div>
-          </form>
-        </div>
-      </Box>
-    </>
+          )}
+          <div className="w-full -mt-1">
+            {" "}
+            <Input
+              id="post"
+              type="text"
+              className=" mt-2 p-2 w-full text-[13px] bg-gray-300 rounded-md focus-within:ring-o outline-none"
+              placeholder="Create a Jamtitle...."
+              required
+              name="title"
+              value={videos?.title}
+              onChange={handleInputChange}
+            />
+          </div>
+
+          {/* Video Upload Section */}
+          {user?.videosProfile && user?.videosProfile?.length < 4 ? (
+            <>
+              {!videoUrl ? (
+                <div className="flex justify-between items-center w-full mx-auto mt-4">
+                  <label
+                    htmlFor="postvideo"
+                    className="bg-neutral-400 flex justify-center title py-2 px-3 mt-2 min-w-[115px] rounded-xl whitespace-nowrap"
+                  >
+                    {!loading ? (
+                      <p> Upload Video</p>
+                    ) : (
+                      <CircularProgress
+                        size="13px"
+                        sx={{ color: "white", fontBold: "500" }}
+                        className="bg-orange-700 rounded-tr-full text-[15px] font-bold"
+                      />
+                    )}
+                  </label>
+
+                  <input
+                    id="postvideo"
+                    className="hidden"
+                    type="file"
+                    accept="video/*"
+                    onChange={handleFileChange}
+                    disabled={loading}
+                  />
+                </div>
+              ) : (
+                <div className="h-[200px] md:h-[320px] bg-gray-800 mt-7">
+                  <video
+                    className="w-full h-[100%] object-cover"
+                    src={fileUrl}
+                    autoPlay
+                    loop
+                    muted
+                  />
+                </div>
+              )}
+              <h6 className="my-5 text-[15px] text-orange-700 font-mono font-bold">
+                {videos.description.length > 0 ? `#${videos.description}` : ""}
+              </h6>
+              {videoUrl && (
+                <div className="h-[30px] w-[100%] text-center">
+                  <Button
+                    disabled={isloading}
+                    variant="secondary"
+                    type="submit"
+                    className="h-full w-[80%]   text-[15px]  p-4 !bg-amber-700 font-sans text-gray-200"
+                  >
+                    {!isloading ? (
+                      "Upload Video"
+                    ) : (
+                      <CircularProgress
+                        size="13px"
+                        sx={{ color: "white", fontBold: "500" }}
+                        className="bg-orange-700 rounded-tr-full text-[15px] font-bold"
+                      />
+                    )}
+                  </Button>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="flex flex-col gap-2 my-3 p-2">
+              <span className="text-neutral-400 mb-1 text center">{`You've reached the maximum no of clips to upload, delete/remove one to upload another`}</span>
+            </div>
+          )}
+
+          {/* Update Info Button */}
+          <div className="w-full flex justify-center mt-4">
+            <Button
+              variant="destructive"
+              disabled={loading}
+              onClick={handleUpdate}
+              className="w-[80%] -p-1 h-[31px] mx-auto"
+            >
+              {!loading ? (
+                "Update Info"
+              ) : (
+                <CircularProgress size={20} sx={{ color: "white" }} />
+              )}
+            </Button>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 };
 

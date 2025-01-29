@@ -5,7 +5,12 @@ export interface VideoProps {
   description?: string;
   gigId: string;
   postedBy?: string | { _id: string; firstname: string; [key: string]: string };
-
+  createdAt?: Date;
+}
+export interface VideoProfileProps {
+  _id: string;
+  title: string;
+  url: string;
   createdAt?: Date;
 }
 
@@ -42,6 +47,9 @@ export interface UserProps {
   followings: string[]; // Array of User IDs
   allreviews: Review[];
   myreviews: Review[];
+  isMusician: boolean;
+  isClient: boolean;
+  videosProfile: VideoProfileProps[];
 }
 export interface Users {
   users: UserProps[]; // Optional}

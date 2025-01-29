@@ -2,7 +2,6 @@ import connectDb from "@/lib/connectDb";
 import User from "@/models/user";
 import { getAuth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
-
 interface UserEmail {
   emailAddress: string;
   verification?: {
@@ -27,7 +26,7 @@ export async function POST(req: NextRequest): Promise<Response> {
   try {
     const { userId } = getAuth(req); // Use getAuth for server-side authentication
     const body = await req.json(); // Parse JSON body
-    const { user } = body as { user: UserInput }; // Use defined type for the user object
+    const { transformedUser } = body as { transformedUser: UserInput }; // Use defined type for the user object
 
     if (!userId) {
       return NextResponse.json({
@@ -41,32 +40,36 @@ export async function POST(req: NextRequest): Promise<Response> {
     const existingUser = await User.findOne({
       $or: [
         { clerkId: userId },
-        { email: user.emailAddresses[0]?.emailAddress },
+        { email: transformedUser.emailAddresses[0]?.emailAddress },
       ],
     });
-
-    const updateUser = await User.findOneAndUpdate(
-      {
-        $or: [
-          { clerkId: userId },
-          { email: user.emailAddresses[0]?.emailAddress },
-        ],
-      },
-      {
-        $set: {
-          firstname: user.firstName,
-          lastname: user.lastName,
-          picture: existingUser?.picture || user.imageUrl,
-          email: user.emailAddresses[0]?.emailAddress,
-          username: user.username,
-          phone: user.phoneNumbers[0]?.phoneNumber,
-          verification: user.emailAddresses[0]?.verification?.status,
+    let updateUser;
+    if (transformedUser && userId && existingUser) {
+      updateUser = await User.findOneAndUpdate(
+        {
+          $or: [
+            { clerkId: userId },
+            { email: transformedUser.emailAddresses[0]?.emailAddress },
+          ],
         },
-      },
-      { new: true }
-    );
-
-    if (userId && existingUser) {
+        {
+          $set: {
+            firstname: transformedUser.firstName,
+            lastname: transformedUser.lastName,
+            picture: existingUser?.picture || transformedUser.imageUrl,
+            email: transformedUser.emailAddresses[0]?.emailAddress,
+            username: transformedUser.username,
+            phone: transformedUser.phoneNumbers[0]?.phoneNumber,
+            verification:
+              transformedUser.emailAddresses[0]?.verification?.status,
+            isClient: body.isClient,
+            isMusician: body.isMusician,
+          },
+        },
+        { new: true }
+      );
+    }
+    if (transformedUser && userId && existingUser) {
       return NextResponse.json({
         userstatus: false,
         message: "User already exists",
@@ -75,20 +78,26 @@ export async function POST(req: NextRequest): Promise<Response> {
     } else {
       const newUser = new User({
         clerkId: userId,
-        firstname: user.firstName,
-        lastname: user.lastName,
-        picture: existingUser?.picture || user.imageUrl,
-        email: user.emailAddresses[0]?.emailAddress,
-        username: user.username,
-        phone: user.phoneNumbers[0]?.phoneNumber,
-        verification: user.emailAddresses[0]?.verification?.status,
+        firstname: transformedUser.firstName,
+        lastname: transformedUser.lastName,
+        picture: existingUser?.picture || transformedUser.imageUrl,
+        email: transformedUser.emailAddresses[0]?.emailAddress,
+        username: transformedUser.username,
+        phone: transformedUser.phoneNumbers[0]?.phoneNumber,
+        verification: transformedUser.emailAddresses[0]?.verification?.status,
+        isClient: body.isClient,
+        isMusician: body.isMusician,
       });
 
       const mainUser = await newUser.save();
 
       return NextResponse.json({
         userstatus: true,
-        message: "Success",
+        message: body.isClient
+          ? `Welcome to gigUp ${mainUser?.firstname}`
+          : body.isMusician
+          ? `Welcome to gigUp ${mainUser?.firstname}`
+          : "",
         results: mainUser,
       });
     }

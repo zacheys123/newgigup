@@ -27,7 +27,6 @@ const userSchema = new mongoose.Schema(
     month: { type: String, lowercase: true },
     year: { type: String, lowercase: true },
     address: { type: String, lowercase: true },
-
     instrument: { type: String, lowercase: true },
     experience: { type: String, lowercase: true },
     phone: {
@@ -36,7 +35,6 @@ const userSchema = new mongoose.Schema(
     verification: {
       type: { type: String },
     },
-
     username: {
       type: String,
       require: true,
@@ -79,6 +77,24 @@ const userSchema = new mongoose.Schema(
           default: Date.now,
         },
       },
+    ],
+    isMusician: {
+      type: Boolean,
+      default: false,
+    },
+    isClient: {
+      type: Boolean,
+      default: false,
+    },
+    videosProfile: [
+      [
+        {
+          title: { type: String },
+          url: { type: String },
+          thumbnail: { type: String },
+          createdAt: { type: Date, default: Date.now },
+        },
+      ],
     ],
   },
   { timestamps: true }

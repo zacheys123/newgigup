@@ -9,7 +9,7 @@ export default function ProfileLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="bg-black h-screen w-full overflow-hidden">
+    <div className="bg-black h-full w-full overflow-scroll">
       <div className="flex items-center justify-between mt-4 mx-6  ">
         <MobileSheet />
         <UserButton />
