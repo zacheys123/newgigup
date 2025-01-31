@@ -5,8 +5,17 @@ import { NextRequest, NextResponse } from "next/server";
 export async function PUT(req: NextRequest) {
   const id = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
 
-  const { address, instrument, experience, age, month, year, city } =
-    await req.json();
+  const {
+    address,
+    instrument,
+    experience,
+    age,
+    month,
+    year,
+    city,
+    videoUrl,
+    title,
+  } = await req.json();
 
   if (!age || !month || !year) {
     return NextResponse.json({
@@ -38,6 +47,13 @@ export async function PUT(req: NextRequest) {
             year,
             city,
             address,
+          },
+          $push: {
+            videosProfile: {
+              url: videoUrl,
+              title,
+              createdAt: new Date(),
+            },
           },
         }
       );

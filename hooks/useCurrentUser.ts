@@ -24,6 +24,7 @@ export function useCurrentUser(userId: string | null) {
     myreviews: [],
     isMusician: false,
     isClient: false,
+    videosProfile: [],
   });
 
   // Memoize the URL to prevent unnecessary re-renders
@@ -64,6 +65,7 @@ export function useCurrentUser(userId: string | null) {
         myreviews: [],
         isMusician: false,
         isClient: false,
+        videosProfile: [],
       });
       return;
     }
@@ -96,6 +98,7 @@ export function useCurrentUser(userId: string | null) {
               myreviews: [],
               isMusician: false,
               isClient: false,
+              videosProfile: [],
             });
           return;
         }
@@ -122,6 +125,7 @@ export function useCurrentUser(userId: string | null) {
             myreviews: [],
             isMusician: false,
             isClient: false,
+            videosProfile: [],
           });
       } finally {
         if (isMounted) setLoading(false);

@@ -11,6 +11,7 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { experiences, instruments } from "@/data";
 import { ArrowDown } from "lucide-react";
 import { fileupload } from "@/hooks/fileUpload";
+import { VideoProfileProps } from "@/types/userinterfaces";
 
 interface UpdateResponse {
   updateStatus: boolean;
@@ -36,12 +37,16 @@ const CurrentUserProfile = () => {
   const [year, setYear] = useState<string>("");
   const [otherinfo, setOtherinfo] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [uploading, setUpLoading] = useState<boolean>(false);
+
   const [fileUrl, setFileUrl] = useState<string>("");
   const [videoUrl, setVideoUrl] = useState<string | null>("");
-  const [isloading] = useState<boolean>(false);
-  const [videos, setVideos] = useState({
+
+  const [videos, setVideos] = useState<VideoProfileProps[]>([]);
+  const [video, setVideo] = useState<VideoProfileProps>({
     title: "",
-    description: "",
+    url: "",
+    _id: "",
   });
   const { setRefetchData } = useStore();
 
@@ -58,10 +63,10 @@ const CurrentUserProfile = () => {
     "October",
     "November",
     "December",
+    0,
   ];
 
   const daysOfMonth = Array.from({ length: 31 }, (_, i) => i + 1);
-
   useEffect(() => {
     if (user) {
       setFirstname(user.firstname || "");
@@ -75,9 +80,12 @@ const CurrentUserProfile = () => {
       setMonth(user.month || "");
       setAge(user.date || "");
       setAddress(user.address || "");
+      // Ensure videoProfile is an array
+      setVideos(user.videosProfile || []);
     }
   }, [user]);
 
+  console.log(user);
   const handleUpdate = async () => {
     const datainfo = {
       city,
@@ -88,6 +96,7 @@ const CurrentUserProfile = () => {
       year,
       address,
       videoUrl,
+      title: video?.title,
     };
 
     if (user) {
@@ -135,21 +144,17 @@ const CurrentUserProfile = () => {
             setFileUrl(file);
           }
         },
-        setLoading,
+        setUpLoading,
         dep
       );
     },
     [fileUrl]
   );
-
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setVideos((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setVideo((prev) => ({ ...prev, [name]: value }));
   };
 
   const followerCount =
@@ -180,7 +185,7 @@ const CurrentUserProfile = () => {
         </h3>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-6 max-h-[calc(100vh-50px)] overflow-y-auto">
+      <div className="flex flex-col lg:flex-row gap-6 max-h-full overflow-y-scroll">
         <div className="text-red-300 text-[12px] font-bold my-3 flex items-center justify-between">
           {user?.followers?.length === 0 ? (
             <h6 className="text-red-300">No followers</h6>
@@ -356,13 +361,13 @@ const CurrentUserProfile = () => {
               placeholder="Create a Jamtitle...."
               required
               name="title"
-              value={videos?.title}
+              value={video?.title}
               onChange={handleInputChange}
             />
           </div>
 
           {/* Video Upload Section */}
-          {user?.videosProfile && user?.videosProfile?.length < 4 ? (
+          {user?.videosProfile?.length < 4 || videos?.length < 4 ? (
             <>
               {!videoUrl ? (
                 <div className="flex justify-between items-center w-full mx-auto mt-4">
@@ -370,7 +375,7 @@ const CurrentUserProfile = () => {
                     htmlFor="postvideo"
                     className="bg-neutral-400 flex justify-center title py-2 px-3 mt-2 min-w-[115px] rounded-xl whitespace-nowrap"
                   >
-                    {!loading ? (
+                    {!uploading ? (
                       <p> Upload Video</p>
                     ) : (
                       <CircularProgress
@@ -401,9 +406,7 @@ const CurrentUserProfile = () => {
                   />
                 </div>
               )}
-              <h6 className="my-5 text-[15px] text-orange-700 font-mono font-bold">
-                {videos.description.length > 0 ? `#${videos.description}` : ""}
-              </h6>
+              {/* 
               {videoUrl && (
                 <div className="h-[30px] w-[100%] text-center">
                   <Button
@@ -423,14 +426,32 @@ const CurrentUserProfile = () => {
                     )}
                   </Button>
                 </div>
-              )}
+              )} */}
             </>
           ) : (
             <div className="flex flex-col gap-2 my-3 p-2">
               <span className="text-neutral-400 mb-1 text center">{`You've reached the maximum no of clips to upload, delete/remove one to upload another`}</span>
             </div>
           )}
-
+          <div className="">
+            {videos?.map((vid: VideoProfileProps) => (
+              <div className="flex gap-2" key={vid?._id}>
+                <div className="w-[100px] h-[100px] overflow-hidden rounded-full border-2 border-gray-600">
+                  <img
+                    className="object-cover w-full h-full"
+                    src={vid?.url}
+                    alt="User Avatar"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-gray-400 text-sm">{`Clip ${
+                    videos.indexOf(video) + 1
+                  }`}</span>
+                  <span className="text-gray-500 text-sm">{video?.title}</span>
+                </div>
+              </div>
+            ))}
+          </div>
           {/* Update Info Button */}
           <div className="w-full flex justify-center mt-4">
             <Button
