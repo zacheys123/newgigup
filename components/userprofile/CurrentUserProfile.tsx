@@ -325,15 +325,13 @@ const CurrentUserProfile = () => {
 
           {/* Video Upload Section */}
           {!upload && (
-            <Button
-              variant="default"
-              className=" border border-neutral-700 mt-4"
-              onClick={() => showUpload(!upload)}
-              type="button"
+            <div
+              className=" mt-4  bg-neutral-700 w-fit p-2 rounded-xl text-gray-300 flex  gap-1 items-center"
+              onClick={() => showUpload(true)}
             >
               Upload Videos For Profile{" "}
-              <Plus onClick={() => showUpload(!upload)} />
-            </Button>
+              <Plus onClick={() => showUpload(true)} />
+            </div>
           )}
           {/* Update Info Button */}
           <div className="w-full flex justify-center mt-6">
