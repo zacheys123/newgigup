@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 
-import useStore from "@/app/zustand/useStore";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 interface AvatarProps {
@@ -10,10 +9,8 @@ interface AvatarProps {
   firstname: string;
 }
 const AvatarComponent = ({ picture, posts, firstname }: AvatarProps) => {
-  const { setLogout } = useStore();
-
   return (
-    <div className="" onClick={() => setLogout(true)}>
+    <div className="" onClick={() => console.log("logout")}>
       <Avatar>
         <AvatarImage
           src={picture}
