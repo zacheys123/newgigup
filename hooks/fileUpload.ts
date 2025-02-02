@@ -90,31 +90,37 @@ export const fileupload = async (
     if (uploadResponse.ok) {
       if (dep === "video") {
         updatefileFunc(uploadResult.secure_url);
-        alert(
-          `${dep} uploaded successfully! ,uploaded successfully!,uploading to server...`
-        );
+        alert(`${dep} uploaded successfully!!,uploading to server...`);
 
         if (user?._id && uploadResult.secure_url) {
           try {
-            const response = await fetch(`/api/user/updateVideo/${user?._id}`, {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                videoUrl: uploadResult.secure_url,
-              }),
-            });
-            const data: UpdateResponse = await response.json();
-            console.log(data);
-            if (data.updateStatus === true) {
-              toast.success(data.message || "Updated Video");
-            } else if (data.updateStatus === false) {
-              toast.error("Failed to upload video.");
+            if (!user?._id) {
+              toast.error("User ID is missing.");
+              return;
             }
-          } catch (error: unknown) {
+
+            console.log(
+              "Sending PUT request to:",
+              `/api/user/updateVideo/${user._id}`
+            );
+
+            const response = await fetch(`/api/user/updateVideo/${user._id}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ videoUrl: uploadResult.secure_url }),
+            });
+
+            const data: UpdateResponse = await response.json();
+            console.log("API Response:", data);
+
+            if (data.updateStatus) {
+              toast.success(data.message || "Video updated successfully!");
+            } else {
+              toast.error(data.message || "Failed to upload video.");
+            }
+          } catch (error) {
             console.error("Error uploading video:", error);
-            console.error(error);
+            toast.error("An error occurred while uploading.");
           }
         }
       } else {

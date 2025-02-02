@@ -48,7 +48,7 @@ const FollowButton = ({
     } catch (error) {
       // Revert optimistic update on failure
       setOptimisticFollow(false);
-      setFollow((prev: boolean) => !prev); // Update global state as well
+      setFollow(!follow); // Update global state as well
       console.error("Error following:", error);
     }
   };
@@ -77,7 +77,7 @@ const FollowButton = ({
     } catch (error) {
       // Revert optimistic update on failure
       setOptimisticFollow(true);
-      setFollow((prev: boolean) => !prev); // Update global state as well
+      setFollow(!follow); // Update global state as well
       console.error("Error unfollowing:", error);
     }
   };
