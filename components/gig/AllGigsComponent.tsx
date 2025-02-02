@@ -158,7 +158,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
               /> */}
 
                 {gig.bookedBy?._id &&
-                  gig.bookedBy._id.includes(myId) &&
+                  gig.bookedBy._id.includes(myId || "") &&
                   gig?.isPending && (
                     <div className="w-full text-right ">
                       <ButtonComponent
@@ -183,7 +183,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
 
                 {gig.postedBy?._id &&
                   gig?.isPending === false &&
-                  gig.postedBy?._id.includes(myId) &&
+                  gig.postedBy?._id.includes(myId || "") &&
                   gig?.isTaken === false && (
                     <div className="w-full text-right ">
                       <ButtonComponent
@@ -218,7 +218,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                   onClick={() => handleModal(gig)}
                 />
                 {gig.postedBy?._id &&
-                  !gig.postedBy._id.includes(myId) &&
+                  !gig.postedBy._id.includes(myId || "") &&
                   !gig?.isPending &&
                   gig?.isTaken === false && (
                     <div className="w-full text-right p-1  ">
@@ -231,7 +231,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                             // After the operation, you can handle the logic for reading the post
                             bookGig(
                               gig,
-                              myId,
+                              myId || "",
                               gigs?.gigs || [],
                               userId || "",
                               toast,
@@ -250,7 +250,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                   )}
 
                 {gig.postedBy?._id &&
-                  gig?.postedBy?._id.includes(myId) &&
+                  gig?.postedBy?._id.includes(myId || "") &&
                   gig?.isPending === true && (
                     <div className="w-full text-right">
                       <ButtonComponent
@@ -353,7 +353,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
               </>
             )}
           </div>
-          {isCreatorIsCurrentUserAndTaken(gig, myId) ? (
+          {isCreatorIsCurrentUserAndTaken(gig, myId || "") ? (
             <div
               className="flex-1 flex justify-end bg-yellow-600 px-3 py-1 rounded-tl-sm rounded-r-3xl rounded-b-2xl rounded-br-md"
               onClick={handleReviewModal}
