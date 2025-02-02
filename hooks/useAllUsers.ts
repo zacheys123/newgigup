@@ -28,6 +28,9 @@ export function useAllUsers() {
 
         allreviews: [],
         myreviews: [],
+        isClient: false,
+        isMusician: false,
+        videosProfile: [],
       },
     ],
   });
@@ -75,6 +78,9 @@ export function useAllUsers() {
 
                   allreviews: [],
                   myreviews: [],
+                  isClient: false,
+                  isMusician: false,
+                  videosProfile: [],
                 },
               ],
             });
@@ -111,6 +117,9 @@ export function useAllUsers() {
 
                 allreviews: [],
                 myreviews: [],
+                isClient: false,
+                isMusician: false,
+                videosProfile: [],
               },
             ],
           });
