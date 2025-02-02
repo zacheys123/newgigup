@@ -115,7 +115,8 @@ const Videos = ({ setShowVideo, gigId, gig }: videosProps) => {
           }
         },
         setLoading,
-        dep
+        dep,
+        user
       );
     },
     []
