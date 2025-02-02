@@ -1,10 +1,11 @@
 import { GigProps } from "@/types/giginterface";
+import { UserProps } from "@/types/userinterfaces";
 import { postedBy } from "@/utils";
 import { create } from "zustand";
 
 interface StoreState {
   search: boolean;
-  currentUser: object;
+  currentUser: UserProps;
   currentgig: GigProps;
   searchQuery: string;
   follow: boolean;
@@ -25,7 +26,7 @@ interface StoreState {
   setSelectedReview: (data: object) => void;
   setSearch: (data: boolean) => void;
   setFollow: (data: boolean) => void;
-  setCurrentUser: (data: object) => void;
+  setCurrentUser: (data: UserProps) => void;
   setCurrentGig: (data: GigProps) => void;
   setSearchQuery: (data: string) => void;
   setModalVisible: (data: boolean) => void;
@@ -41,7 +42,21 @@ const useStore = create<StoreState>((set) => ({
   mygigs: [],
   bookedgigs: [],
   search: false,
-  currentUser: {},
+  currentUser: {
+    clerkId: "",
+    firstname: "",
+    lastname: "",
+    experience: "",
+    instrument: "",
+    username: "",
+    followers: [],
+    followings: [],
+    allreviews: [],
+    myreviews: [],
+    isMusician: false,
+    isClient: false,
+    videosProfile: [],
+  },
   currentgig: {
     _id: "",
     postedBy: postedBy,
