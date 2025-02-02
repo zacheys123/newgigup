@@ -28,17 +28,22 @@ const AcceptPage = () => {
   const { loading, forgetBookings } = useForgetBookings();
   const { bookloading, bookgig } = useBookMusician();
   const [loadingreview, setLoadingreview] = useState(false);
-  // const { user } = useCurrentUser(userId || null);
+
   const [rate] = useState<number>(
-    currentgig?.bookedBy?.allreviews.reduce(
-      (acc: number, review: { rating: number }) => acc + review.rating,
-      0
-    ) / (currentgig?.postedBy?.allreviews.length || 1)
+    currentgig?.bookedBy?.allreviews?.length
+      ? currentgig.bookedBy.allreviews.reduce(
+          (acc: number, review: { rating: number }) => acc + review.rating,
+          0
+        ) / (currentgig?.postedBy?.allreviews?.length || 1)
+      : 0
   );
   const [comm] = useState<string>(
-    currentgig?.bookedBy?.allreviews
-      .filter((review: { gigId: string }) => review.gigId === currentgig?._id)
-      ?.map((review: { comment: string }) => review.comment)
+    (currentgig &&
+      currentgig?.bookedBy?.allreviews
+        .filter((review: { gigId: string }) => review.gigId === currentgig?._id)
+        ?.map((review: { comment: string }) => review.comment)
+        .join(" ")) ||
+      ""
   );
 
   const router = useRouter();
@@ -292,7 +297,7 @@ const AcceptPage = () => {
             <Rating rating={rating ? rating : rate} setRating={setRating} />
           </Box>
 
-          {currentgig.bookedBy && (
+          {currentgig?.bookedBy?.picture && (
             <Image
               width={50}
               height={50}

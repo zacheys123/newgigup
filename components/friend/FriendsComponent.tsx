@@ -157,7 +157,7 @@ const FriendsComponent = () => {
                     setFollow(true); // Update global state as well
                   } catch (error) {
                     setOptimisticFollow(false);
-                    setFollow((prev: boolean) => !prev); // Update global state as well
+                    setFollow(!follow); // Update global state as well
                     console.error("Error following:", error);
                   }
                 }
