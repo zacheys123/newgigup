@@ -2,19 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import connectDb from "@/lib/connectDb";
 import User from "@/models/user";
 
-export async function PUT(
-  req: NextRequest,
-  context: { params: { id: string } }
-) {
-  const { params } = context; // ✅ Extract params correctly
-  console.log("PUT request received for user ID:", params.id);
+export async function PUT(req: NextRequest) {
+  // const { params } = context; // ✅ Extract params correctly
+  // console.log("PUT request received for user ID:", params.id);
 
-  if (!params.id) {
-    return NextResponse.json(
-      { updateStatus: false, message: "User ID is missing" },
-      { status: 400 }
-    );
-  }
+  // if (!params.id) {
+  //   return NextResponse.json(
+  //     { updateStatus: false, message: "User ID is missing" },
+  //     { status: 400 }
+  //   );
+  // }
+  const id = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
 
   try {
     await connectDb();
@@ -28,7 +26,7 @@ export async function PUT(
       );
     }
 
-    const user = await User.findById(params.id);
+    const user = await User.findById(id);
     if (!user) {
       return NextResponse.json(
         { updateStatus: false, message: "User not found" },
@@ -43,7 +41,7 @@ export async function PUT(
       );
     }
 
-    await User.findByIdAndUpdate(params.id, {
+    await User.findByIdAndUpdate(id, {
       $push: { videosProfile: { url: videoUrl, createdAt: new Date() } },
     });
 
