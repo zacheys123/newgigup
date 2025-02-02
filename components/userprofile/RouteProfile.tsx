@@ -17,6 +17,7 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { Input } from "../ui/input";
 // import { UserProps } from "@/types/userinterfaces";
 import { fileupload } from "@/hooks/fileUpload";
+import useStore from "@/app/zustand/useStore";
 const RouteProfile = () => {
   const { userId } = useAuth();
   const [isUploading, setIsUploading] = useState<boolean>(false);
@@ -25,6 +26,7 @@ const RouteProfile = () => {
   const [fileUrl, setFileUrl] = useState<string>("");
 
   const { user } = useCurrentUser(userId || null);
+  const { setRefetchData } = useStore();
   // const {
   //   setShowFriendData,
 
@@ -65,7 +67,9 @@ const RouteProfile = () => {
           }
         },
         setIsUploading,
-        dep
+        dep,
+        user,
+        setRefetchData
       );
     },
     [fileUrl]
