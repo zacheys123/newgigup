@@ -17,7 +17,8 @@ export const fileupload = async (
   setFileUrl: (file: string | undefined) => void, // URL can be string or undefined
   setIsUploading: (isUploading: boolean) => void, // Boolean to indicate uploading state
   dep: "image" | "video", // Dependent on file type, restrict to valid options,
-  user: UserProps
+  user: UserProps,
+  setRefetchData: (refetchData: boolean) => void
 ) => {
   const file = event.target.files ? event.target.files[0] : null;
   if (fileUrl) {
@@ -86,11 +87,18 @@ export const fileupload = async (
     );
 
     const uploadResult = await uploadResponse.json();
-
+    setRefetchData(true);
     if (uploadResponse.ok) {
       if (dep === "video") {
         updatefileFunc(uploadResult.secure_url);
         alert(`${dep} uploaded successfully!!,uploading to server...`);
+
+        console.log(
+          "Sending PUT request to:",
+          `/api/user/updateVideo/${user._id}`
+        );
+
+        console.log("Sending PUT request with url:", uploadResult.secure_url);
 
         if (user?._id && uploadResult.secure_url) {
           try {
@@ -104,11 +112,26 @@ export const fileupload = async (
               `/api/user/updateVideo/${user._id}`
             );
 
-            const response = await fetch(`/api/user/updateVideo/${user._id}`, {
-              method: "PUT",
+            const url = `/api/user/videoprofile/${user?._id}`;
+            console.log("Fetching:", url);
+
+            const response = await fetch(url, {
+              method: "PUT", // Ensure it's PUT
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ videoUrl: uploadResult.secure_url }),
             });
+
+            console.log("Raw response:", response.status, response.statusText);
+
+            if (!response.ok) {
+              console.error(
+                "Response error:",
+                response.status,
+                response.statusText
+              );
+              toast.error(`Error: ${response.statusText}`);
+              return;
+            }
 
             const data: UpdateResponse = await response.json();
             console.log("API Response:", data);

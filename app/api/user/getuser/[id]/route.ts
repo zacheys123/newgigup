@@ -46,6 +46,7 @@ export async function GET(req: NextRequest) {
       followings, // Array of User IDs
       allreviews,
       myreviews,
+      videosProfile,
     } = await User.findOne(query).populate({
       path: "allreviews myreviews",
     });
@@ -74,6 +75,7 @@ export async function GET(req: NextRequest) {
 
       allreviews,
       myreviews,
+      videosProfile,
     });
   } catch (error) {
     console.error("Error fetching user:", error);

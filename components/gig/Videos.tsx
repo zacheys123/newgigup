@@ -13,6 +13,7 @@ import { CircularProgress } from "@mui/material";
 import { FetchResponse, GigProps } from "@/types/giginterface";
 import { VideoProps } from "@/types/userinterfaces";
 import { useVideos } from "@/hooks/useVideos";
+import useStore from "@/app/zustand/useStore";
 
 interface videosProps {
   setShowVideo: (showvideo: boolean) => void;
@@ -31,6 +32,7 @@ const Videos = ({ setShowVideo, gigId, gig }: videosProps) => {
     title: "",
     description: "",
   });
+  const { setRefetchData } = useStore();
   const baseUrl = `/api/gigs/addvideo/${gigId}`;
   const validGigid = typeof gigId === "string" ? gigId : ""; // Default to empty string if undefined
   const validUserId =
@@ -116,7 +118,8 @@ const Videos = ({ setShowVideo, gigId, gig }: videosProps) => {
         },
         setLoading,
         dep,
-        user
+        user,
+        setRefetchData
       );
     },
     []
