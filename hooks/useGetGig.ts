@@ -2,6 +2,7 @@
 
 import useStore from "@/app/zustand/useStore";
 import { GigProps } from "@/types/giginterface";
+import { postedBy } from "@/utils";
 import { useEffect, useMemo, useState } from "react";
 
 // Define the shape of the user object
@@ -26,7 +27,29 @@ export function useGetGigs(id: string | null) {
         });
         if (!res.ok) {
           console.error(`Failed to fetch gig: ${res.statusText}`);
-          if (isMounted) setCurrentGig({});
+          if (isMounted)
+            setCurrentGig({
+              _id: "",
+              postedBy: postedBy,
+              bookedBy: postedBy,
+              title: "",
+              secret: "",
+              description: "",
+              phone: "",
+              price: "",
+              category: "",
+              bandCategory: [],
+              bussinesscat: "",
+              location: "",
+              date: new Date(),
+              time: {},
+              isTaken: false,
+              isPending: false,
+              viewCount: [],
+              username: "",
+              updatedAt: new Date(),
+              createdAt: new Date(),
+            });
           return;
         }
         const fetchedGig: GigProps = await res.json();
@@ -35,7 +58,29 @@ export function useGetGigs(id: string | null) {
         }
       } catch (error) {
         console.error("Error fetching gig:", error);
-        if (isMounted) setCurrentGig({});
+        if (isMounted)
+          setCurrentGig({
+            _id: "",
+            postedBy: postedBy,
+            bookedBy: postedBy,
+            title: "",
+            secret: "",
+            description: "",
+            phone: "",
+            price: "",
+            category: "",
+            bandCategory: [],
+            bussinesscat: "",
+            location: "",
+            date: new Date(),
+            time: {},
+            isTaken: false,
+            isPending: false,
+            viewCount: [],
+            username: "",
+            updatedAt: new Date(),
+            createdAt: new Date(),
+          });
       } finally {
         if (isMounted) setLoading(false);
       }
