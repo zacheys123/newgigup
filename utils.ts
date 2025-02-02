@@ -23,6 +23,9 @@ export const postedBy = {
   followings: [], // Array of User IDs
   allreviews: [],
   myreviews: [],
+  isMusician: false,
+  isClient: false,
+  videosProfile: [],
 };
 
 export const instruments = [

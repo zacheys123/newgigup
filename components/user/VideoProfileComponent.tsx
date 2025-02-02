@@ -4,42 +4,40 @@ import { UserProps, VideoProfileProps } from "@/types/userinterfaces";
 import { CircularProgress } from "@mui/material";
 import React, { ChangeEvent, useCallback, useState } from "react";
 import { toast } from "sonner";
-// import { Input } from "../ui/input";
 
 interface VideoComponentProfileProps {
   user: UserProps;
   setVideoUrl: (videoUrl: string) => void;
   videos: VideoProfileProps[];
-  videoUrl: string | null;
   upload: boolean;
+  videoUrl: string | null;
   showUpload: (upload: boolean) => void;
 }
 
 const VideoProfileComponent = ({
   user,
   setVideoUrl,
-  videoUrl,
-  videos,
   upload,
   showUpload,
 }: VideoComponentProfileProps) => {
-  //   const [video, setVideo] = useState<VideoProfileProps>({
-  //     title: "",
-  //     url: "",
-  //     _id: "",
-  //   });
   const [fileUrl, setFileUrl] = useState<string>("");
-  //   const { setShowUpload, showUpload } = useStore();
-  const [uploading, setUpLoading] = useState<boolean>(false);
+  const [uploading, setUploading] = useState<boolean>(false);
+  const [addedVideos, setAddedVideos] = useState<string[]>([]);
+
+  console.log(user?.videosProfile);
   const handleFileChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
+    async (event: ChangeEvent<HTMLInputElement>) => {
       const dep = "video";
       const allowedTypes = ["video/mp4", "video/webm", "video/ogg"];
+      if (addedVideos.includes(fileUrl)) return;
       fileupload(
         event,
         (file: string) => {
           if (file) {
             setVideoUrl(file);
+            setAddedVideos((prev) =>
+              prev.length < 3 ? [...prev, file] : prev
+            );
           }
         },
         toast,
@@ -50,98 +48,119 @@ const VideoProfileComponent = ({
             setFileUrl(file);
           }
         },
-        setUpLoading,
-        dep
+        setUploading,
+        dep,
+        user
       );
     },
-    [fileUrl]
+    [fileUrl, addedVideos]
   );
-  //   const handleInputChange = (
-  //     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  //   ) => {
-  //     const { name, value } = e.target;
-  //     setVideo((prev) => ({ ...prev, [name]: value }));
-  //   };
 
   return (
-    <div className="flex justify-center items-center absolute z-50 h-[90%] w-[100%] mx-auto">
+    <>
       {upload && (
-        <span
-          onClick={() => showUpload(!upload)}
-          className="absolute right-1 -top-8 font-bold text-white z-50 text-[30px] cursor-pointer"
-        >
-          &times;
-        </span>
-      )}
-      {upload && (
-        <div className="absolute h-full w-[95%] mx-auto bg-neutral-600 p-4 overflow-auto">
-          {user?.videosProfile?.length < 4 || videos?.length < 4 ? (
-            <>
-              {!videoUrl ? (
-                <div className="flex justify-between items-center w-full mx-auto mt-4">
-                  <label
-                    htmlFor="postvideo"
-                    className="bg-neutral-400 flex justify-center title py-2 px-3 mt-2 min-w-[115px] rounded-xl whitespace-nowrap cursor-pointer"
-                  >
-                    {!uploading ? (
-                      <p>Upload Video</p>
-                    ) : (
-                      <CircularProgress
-                        size="13px"
-                        sx={{ color: "white", fontWeight: "500" }}
-                        className="bg-orange-700 rounded-tr-full text-[15px] font-bold"
+        <div className="flex justify-center items-center fixed inset-0 z-50 bg-black/40">
+          <div className="relative w-[80%] mx-auto max-w-2xl bg-neutral-700 rounded-lg p-6 shadow-lg">
+            {/* Close Button */}
+            <button
+              onClick={() => showUpload(false)}
+              className="absolute right-4 top-4 text-white text-2xl font-bold hover:text-gray-300"
+            >
+              &times;
+            </button>
+
+            <h2 className="text-center text-white text-xl font-semibold mb-4">
+              Upload Your Video
+            </h2>
+
+            {user?.videosProfile?.length < 3 || addedVideos.length < 3 ? (
+              <div className="flex flex-col items-center gap-4">
+                {addedVideos.length < 4 && (
+                  <>
+                    <label
+                      htmlFor="postvideo"
+                      className={
+                        !uploading
+                          ? "bg-blue-600 hover:bg-blue-500 text-white font-medium py-2 px-5 rounded-lg cursor-pointer transition"
+                          : "pointer-events-none"
+                      }
+                    >
+                      {!uploading ? (
+                        "Upload Video"
+                      ) : (
+                        <CircularProgress
+                          size="16px"
+                          style={{ color: "white" }}
+                        />
+                      )}
+                    </label>
+                    <input
+                      id="postvideo"
+                      className="hidden"
+                      type="file"
+                      accept="video/*"
+                      onChange={handleFileChange}
+                      disabled={uploading}
+                    />
+                  </>
+                )}
+              </div>
+            ) : (
+              <p className="text-neutral-400 text-center">
+                {`You've reached the maximum number of clips (3). Delete one to
+                upload another.`}
+              </p>
+            )}
+
+            {/* Display Added Videos */}
+            {addedVideos.length > 0 && (
+              <div className="mt-6">
+                <h3 className="text-white text-md font-semibold mb-2">
+                  Recently Added Videos
+                </h3>
+                <div className="flex gap-3 overflow-x-auto">
+                  {addedVideos.map((vid, index) => (
+                    <div
+                      key={index}
+                      className="relative group w-24 h-24 rounded-lg overflow-hidden border"
+                    >
+                      <video
+                        className="w-full h-full object-cover"
+                        src={vid}
+                        muted
                       />
-                    )}
-                  </label>
-                  <input
-                    id="postvideo"
-                    className="hidden"
-                    type="file"
-                    accept="video/*"
-                    onChange={handleFileChange}
-                    disabled={uploading}
-                  />
-                </div>
-              ) : (
-                <div className="h-[200px] md:h-[320px] bg-gray-800 mt-7">
-                  <video
-                    className="w-full h-[100%] object-cover"
-                    src={fileUrl}
-                    autoPlay
-                    loop
-                    muted
-                  />
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="flex flex-col gap-2 my-3 p-2">
-              <span className="text-neutral-400 mb-1 text-center">
-                {`You've reached the maximum number of clips to upload, delete/remove one to upload another`}
-              </span>
-            </div>
-          )}
-          <div className="">
-            {videos?.map((vid: VideoProfileProps) => (
-              <div className="flex gap-2" key={vid?._id}>
-                <div className="w-[100px] h-[100px] overflow-hidden rounded-full border-2 border-gray-600">
-                  <img
-                    className="object-cover w-full h-full"
-                    src={vid?.url}
-                    alt="User Avatar"
-                  />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <span className="text-gray-400 text-sm">{`Clip ${
-                    videos.indexOf(vid) + 1
-                  }`}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
-            ))}
+            )}
+
+            {/* Display Permanent Videos */}
+            {user?.videosProfile?.length > 0 && (
+              <div className="mt-6">
+                <h3 className="text-white text-lg font-semibold mb-2">
+                  Your Videos
+                </h3>
+                <div className="flex gap-3 overflow-x-auto">
+                  {user?.videosProfile.map((vid) => (
+                    <div
+                      key={vid._id}
+                      className="relative group w-24 h-24 rounded-lg overflow-hidden border"
+                    >
+                      <video
+                        className="w-full h-full object-cover"
+                        src={vid.url}
+                        muted
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

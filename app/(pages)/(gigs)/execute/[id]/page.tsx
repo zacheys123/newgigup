@@ -65,9 +65,9 @@ const ViewGigDetails = () => {
   }
   return (
     <>
-      {currentgig?.bookedBy?.clerkId.includes(userId) && <BookingPage />}
+      {currentgig?.bookedBy?.clerkId.includes(userId || "") && <BookingPage />}
 
-      {currentgig?.postedBy?.clerkId.includes(userId) && <AcceptPage />}
+      {currentgig?.postedBy?.clerkId.includes(userId || "") && <AcceptPage />}
     </>
   );
 };

@@ -89,7 +89,6 @@ const CurrentUserProfile = () => {
       month,
       year,
       address,
-      videoUrl,
     };
 
     if (user) {
@@ -150,9 +149,9 @@ const CurrentUserProfile = () => {
         user={user}
         setVideoUrl={setVideoUrl}
         videos={videos}
-        videoUrl={videoUrl}
         showUpload={showUpload}
         upload={upload}
+        videoUrl={videoUrl}
       />
 
       <div className="flex flex-col lg:flex-row gap-6 max-h-full overflow-y-scroll">
@@ -325,13 +324,15 @@ const CurrentUserProfile = () => {
 
           {/* Video Upload Section */}
           {!upload && (
-            <div
-              className=" mt-4  bg-neutral-700 w-fit p-2 rounded-xl text-gray-300 flex  gap-1 items-center"
+            <Button
+              variant="default"
+              className=" border border-neutral-700 mt-4"
               onClick={() => showUpload(true)}
+              type="button"
             >
               Upload Videos For Profile{" "}
               <Plus onClick={() => showUpload(true)} />
-            </div>
+            </Button>
           )}
           {/* Update Info Button */}
           <div className="w-full flex justify-center mt-6">

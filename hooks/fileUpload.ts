@@ -1,8 +1,13 @@
+import { UserProps } from "@/types/userinterfaces";
+
 type Toast = {
   success: (url: string) => void;
   error: (msg: string) => void;
 };
-
+interface UpdateResponse {
+  updateStatus: boolean;
+  message?: string | undefined;
+}
 export const fileupload = async (
   event: React.ChangeEvent<HTMLInputElement>, // Correct type for event
   updatefileFunc: (file: string) => void, // Assuming the URL is a string
@@ -11,7 +16,8 @@ export const fileupload = async (
   fileUrl: string,
   setFileUrl: (file: string | undefined) => void, // URL can be string or undefined
   setIsUploading: (isUploading: boolean) => void, // Boolean to indicate uploading state
-  dep: "image" | "video" // Dependent on file type, restrict to valid options
+  dep: "image" | "video", // Dependent on file type, restrict to valid options,
+  user: UserProps
 ) => {
   const file = event.target.files ? event.target.files[0] : null;
   if (fileUrl) {
@@ -50,6 +56,7 @@ export const fileupload = async (
   setIsUploading(true);
 
   try {
+    // console.log(user);
     // Step 1: Get the signed upload URL from your API
     const response = await fetch("/api/image/sign-upload", {
       method: "GET",
@@ -81,15 +88,39 @@ export const fileupload = async (
     const uploadResult = await uploadResponse.json();
 
     if (uploadResponse.ok) {
-      if (dep === "video") alert("Upload successful!");
-      console.log("Upload successful!");
-      console.log(uploadResult); // You can process this result further (e.g., store the URL)
-      updatefileFunc(uploadResult.secure_url);
-      if (dep === "video") toast.success(`${dep} uploaded successfully!`);
-      console.log(`${dep} uploaded successfully!`);
-    } else {
-      toast.error("Upload failed, please try again.");
-      console.error(uploadResult);
+      if (dep === "video") {
+        updatefileFunc(uploadResult.secure_url);
+        alert(
+          `${dep} uploaded successfully! ,uploaded successfully!,uploading to server...`
+        );
+
+        if (user?._id && uploadResult.secure_url) {
+          try {
+            const response = await fetch(`/api/user/updateVideo/${user?._id}`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                videoUrl: uploadResult.secure_url,
+              }),
+            });
+            const data: UpdateResponse = await response.json();
+            console.log(data);
+            if (data.updateStatus === true) {
+              toast.success(data.message || "Updated Video");
+            } else if (data.updateStatus === false) {
+              toast.error("Failed to upload video.");
+            }
+          } catch (error: unknown) {
+            console.error("Error uploading video:", error);
+            console.error(error);
+          }
+        }
+      } else {
+        toast.error("Upload failed, please try again.");
+        console.error(uploadResult);
+      }
     }
   } catch (error) {
     toast.error("An error occurred during upload.");

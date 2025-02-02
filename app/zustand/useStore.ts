@@ -1,9 +1,11 @@
+import { GigProps } from "@/types/giginterface";
+import { postedBy } from "@/utils";
 import { create } from "zustand";
 
 interface StoreState {
   search: boolean;
   currentUser: object;
-  currentgig: object;
+  currentgig: GigProps;
   searchQuery: string;
   follow: boolean;
   refetchData: boolean;
@@ -24,7 +26,7 @@ interface StoreState {
   setSearch: (data: boolean) => void;
   setFollow: (data: boolean) => void;
   setCurrentUser: (data: object) => void;
-  setCurrentGig: (data: object) => void;
+  setCurrentGig: (data: GigProps) => void;
   setSearchQuery: (data: string) => void;
   setModalVisible: (data: boolean) => void;
   setDrawerVisible: () => void;
@@ -40,7 +42,28 @@ const useStore = create<StoreState>((set) => ({
   bookedgigs: [],
   search: false,
   currentUser: {},
-  currentgig: {},
+  currentgig: {
+    _id: "",
+    postedBy: postedBy,
+    bookedBy: postedBy,
+    title: "",
+    secret: "",
+    description: "",
+    phone: "",
+    price: "",
+    category: "",
+    bandCategory: [],
+    bussinesscat: "",
+    location: "",
+    date: new Date(),
+    time: {},
+    isTaken: false,
+    isPending: false,
+    viewCount: [],
+    username: "",
+    updatedAt: new Date(),
+    createdAt: new Date(),
+  },
   searchQuery: "",
   follow: false,
   refetchData: false,

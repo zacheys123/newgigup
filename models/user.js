@@ -87,14 +87,11 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
     videosProfile: [
-      [
-        {
-          title: { type: String },
-          url: { type: String },
-          thumbnail: { type: String },
-          createdAt: { type: Date, default: Date.now },
-        },
-      ],
+      {
+        url: { type: String },
+
+        createdAt: { type: Date, default: Date.now },
+      },
     ],
   },
   { timestamps: true }
