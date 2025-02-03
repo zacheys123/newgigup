@@ -118,7 +118,7 @@ const ActionPage = () => {
     <div className="flex justify-center items-center h-screen w-full bg-black">
       <div className="text-center px-4 sm:px-6 lg:px-8">
         {/* Heading */}
-        <h1 className="text-3xl sm:text-4xl font-bold text-orange-300 mb-1 mt-1">
+        <h1 className="text-3xl sm:text-4xl font-bold text-orange-300 mb-1 -mt-[100px]">
           <span className="text-gradient mr-2">Welcome</span>
           to
           <span className="text-gradient2 ml-2">gigUp</span>
@@ -130,7 +130,7 @@ const ActionPage = () => {
         {/* Cards Container */}
         <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6">
           {/* Creator Card */}
-          <div className="bg-gray-800 p-1 sm:p-8 rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105 cursor-pointer flex-1 max-w-sm">
+          <div className="bg-gray-800 p-2 sm:p-8 rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105 cursor-pointer flex-1 max-w-sm my-2 mx-2">
             <h2 className="text-xl sm:text-2xl font-semibold text-orange-300 mb-4">
               Client
             </h2>
@@ -147,7 +147,7 @@ const ActionPage = () => {
           </div>
 
           {/* Booker Card */}
-          <div className="bg-gray-800 p-1 sm:p-8 rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105 cursor-pointer flex-1 max-w-sm">
+          <div className="bg-gray-800 p-2 sm:p-8 rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105 cursor-pointer flex-1 max-w-sm my-2 mx-2">
             <h2 className="text-xl sm:text-2xl font-semibold text-orange-300 mb-4">
               Musician
             </h2>
