@@ -123,7 +123,7 @@ const CurrentUserProfile = () => {
   console.log(upload);
 
   const active =
-    "text-md font-bold text-gray-300 bg-gradient-to-r from-neutral-500 via-rose-900  to-neutral-700 b-4 p-2 rounded-sm max-w-300px hover:bg-gradient-to-r hover:from-neutral-700 hover:to-neutral-800 transition-colors duration-200 cursor-pointer";
+    "text-md font-bold text-gray-300 bg-gradient-to-r from-red-500 via-rose-900  to-neutral-700 b-4 p-2 rounded-sm max-w-300px hover:bg-gradient-to-r hover:from-neutral-700 hover:to-neutral-800 transition-colors duration-200 cursor-pointer";
   const inactive =
     "text-md font-bold text-gray-300 bg-gradient-to-r from-neutral-700   to-neutral-700 b-4 p-2 rounded-sm max-w-300px hover:bg-gradient-to-r hover:from-neutral-700 hover:to-neutral-800 transition-colors duration-200 cursor-pointer";
 
@@ -187,8 +187,12 @@ const CurrentUserProfile = () => {
         <form className="space-y-4">
           <div className="space-y-4 my-4 h-fit py-3">
             <span
-              onClick={() => setPersonal(!personal)}
-              className={personal === true ? `${active}` : `${inactive}`}
+              onClick={() => {
+                setPersonal(!personal);
+                setGeographical(false);
+                setAuthorize(false);
+              }}
+              className={personal ? active : inactive}
             >
               Personal Info
             </span>
@@ -213,7 +217,11 @@ const CurrentUserProfile = () => {
 
           <div className="space-y-2 h-fit py-3">
             <span
-              onClick={() => setAuthorize(!authorize)}
+              onClick={() => {
+                setAuthorize(!authorize);
+                setPersonal(false);
+                setGeographical(false);
+              }}
               className={authorize ? active : inactive}
             >
               Authorization Info
@@ -238,7 +246,11 @@ const CurrentUserProfile = () => {
 
           <div className="space-y-2 h-fit py-3">
             <span
-              onClick={() => setGeographical(!geographical)}
+              onClick={() => {
+                setGeographical(!geographical);
+                setPersonal(false);
+                setAuthorize(false);
+              }}
               className={geographical ? active : inactive}
             >
               Geographical Info
