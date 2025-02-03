@@ -91,7 +91,6 @@ export const fileupload = async (
     if (uploadResponse.ok) {
       if (dep === "video") {
         updatefileFunc(uploadResult.secure_url);
-        alert(`${dep} uploaded successfully!!,uploading to server...`);
 
         console.log(
           "Sending PUT request to:",
