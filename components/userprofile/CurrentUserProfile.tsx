@@ -153,7 +153,10 @@ const CurrentUserProfile = () => {
         videoUrl={videoUrl}
       />
 
-      <div className="flex flex-col lg:flex-row gap-6 h-full overflow-y-auto">
+      {/* Scrollable Form Container */}
+      <div className="flex flex-col lg:flex-row gap-6 h-full overflow-y-auto pb-20">
+        {" "}
+        {/* Added pb-20 for bottom padding */}
         <div className="text-red-300 text-[12px] font-bold my-3 flex items-center justify-between">
           {user?.followers?.length === 0 ? (
             <h6 className="text-red-300">No followers</h6>
@@ -173,7 +176,6 @@ const CurrentUserProfile = () => {
             </h6>
           )}
         </div>
-
         <form className="space-y-4 w-full">
           <PersonalInfoSection
             firstname={firstname || ""}
@@ -312,7 +314,9 @@ const CurrentUserProfile = () => {
             </Button>
           )}
           {/* Update Info Button */}
-          <div className="w-full flex justify-center mt-6">
+          <div className="w-full flex justify-center mt-6 mb-10">
+            {" "}
+            {/* Added mb-10 for bottom margin */}
             <Button
               variant="destructive"
               disabled={loading}

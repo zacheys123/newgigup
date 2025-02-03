@@ -201,7 +201,6 @@ const VideoProfileComponent = ({
                 </div>
               </div>
             )}
-
             {/* Display Permanent Videos */}
             {user?.videosProfile && user?.videosProfile?.length > 0 && (
               <div className="mt-6">
@@ -235,9 +234,20 @@ const VideoProfileComponent = ({
               initial={{
                 opacity: 0,
                 transform: "scale(0)",
+                x: -150,
               }}
-              animate={{ opacity: 1, x: 50, transform: "scale(1)" }}
-              transition={{ duration: 0.8, ease: "easeInOut" }}
+              animate={{
+                opacity: currentvideo?._id && videopreview === true ? 1 : 0,
+                x: 50,
+                transform: "scale(1)",
+              }}
+              transition={{ duration: 1, ease: "easeInOut" }}
+              exit={{
+                opacity: !currentvideo?._id && videopreview ? 0 : 1,
+                x: 50,
+                transform: "scale(0)",
+                transition: { duration: 1, ease: "easeInOut" },
+              }}
             >
               <div className="relative flex justify-center items-center    rounded-full cursor-pointer ">
                 <span
