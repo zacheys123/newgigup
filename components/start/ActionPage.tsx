@@ -118,7 +118,7 @@ const ActionPage = () => {
     <div className="flex justify-center items-center h-screen w-full bg-black">
       <div className="text-center px-4 sm:px-6 lg:px-8">
         {/* Heading */}
-        <h1 className="text-3xl sm:text-4xl font-bold text-orange-300 mb-1 -mt-[120px]">
+        <h1 className="text-3xl sm:text-4xl font-bold text-orange-300 mb-1 -mt-[80px]">
           <span className="text-gradient mr-2">Welcome</span>
           to
           <span className="text-gradient2 ml-2">gigUp</span>
