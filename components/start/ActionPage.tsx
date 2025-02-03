@@ -119,9 +119,9 @@ const ActionPage = () => {
       <div className="text-center px-4 sm:px-6 lg:px-8">
         {/* Heading */}
         <h1 className="text-3xl sm:text-4xl font-bold text-orange-300 mb-1 -mt-[70px]">
-          <span className="text-gradient mr-2">Welcome</span>
+          <span className=" mr-2">Welcome</span>
           to
-          <span className="text-gradient2 ml-2">gigUp</span>
+          <span className="text-gradient ml-2">gigUp</span>
         </h1>
         <p className="text-gray-300 mb-8 text-sm sm:text-base">
           2 more step to connect in gigup
@@ -134,7 +134,7 @@ const ActionPage = () => {
             onClick={connectAsClient}
             className="bg-gray-800 p-2 sm:p-8 rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105 cursor-pointer flex-1 max-w-sm my-2 mx-2"
           >
-            <h2 className="text-xl sm:text-2xl font-semibold text-orange-300 mb-4">
+            <h2 className="text-xl sm:text-2xl font-semibold text-orange-500 mb-4">
               Client
             </h2>
             <p className="text-gray-300 mb-6 text-sm sm:text-base">
@@ -151,7 +151,7 @@ const ActionPage = () => {
             onClick={connectAsMusician}
             className="bg-gray-800 p-2 sm:p-8 rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105 cursor-pointer flex-1 max-w-sm my-2 mx-2"
           >
-            <h2 className="text-xl sm:text-2xl font-semibold text-orange-300 mb-4">
+            <h2 className="text-xl sm:text-2xl font-semibold text-blue-300 mb-4">
               Musician
             </h2>
             <p className="text-gray-300 mb-6 text-sm sm:text-base">
