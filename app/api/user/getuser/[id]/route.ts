@@ -47,6 +47,8 @@ export async function GET(req: NextRequest) {
       allreviews,
       myreviews,
       videosProfile,
+      isMusician,
+      isClient,
     } = await User.findOne(query).populate({
       path: "allreviews myreviews",
     });
@@ -71,11 +73,12 @@ export async function GET(req: NextRequest) {
       verification,
       username, // Required, unique, and lowercase
       followers, // Array of User IDs
-      followings, // Array of User IDs
-
+      followings, // Array of User ID
       allreviews,
       myreviews,
       videosProfile,
+      isMusician,
+      isClient,
     });
   } catch (error) {
     console.error("Error fetching user:", error);

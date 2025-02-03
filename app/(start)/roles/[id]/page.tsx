@@ -16,9 +16,9 @@ const Actions = () => {
 
       // Ensure that the user object has the necessary properties
       if (user.isMusician !== undefined && user.isClient !== undefined) {
-        if (user.isMusician && !user.isClient) {
+        if (user.isMusician === true && user.isClient === false) {
           router.push(`/gigs/${userId}`);
-        } else if (user.isClient && !user.isMusician) {
+        } else if (user.isClient === true && user.isMusician === false) {
           router.push(`/create/${userId}`);
         }
       }

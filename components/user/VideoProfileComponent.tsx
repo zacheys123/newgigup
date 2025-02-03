@@ -142,7 +142,7 @@ const VideoProfileComponent = ({
             )}
             {user?.videosProfile?.length < 3 && addedVideos.length < 3 ? (
               <div className="flex flex-col items-center gap-4">
-                {addedVideos.length < 4 && (
+                {addedVideos.length < 3 && (
                   <>
                     <label
                       htmlFor="postvideo"
@@ -231,7 +231,7 @@ const VideoProfileComponent = ({
           </div>
           {currentvideo?._id && videopreview === true && (
             <motion.div
-              className="absolute h-[70%] w-[85%] m-auto z-50 bg-gray-700 backdrop-blur-3xl"
+              className="absolute h-[87%] w-[85%] m-auto z-50 bg-gray-700 backdrop-blur-3xl"
               initial={{
                 opacity: 0,
                 transform: "scale(0)",
