@@ -58,6 +58,7 @@ const ActionPage = () => {
         });
         const data = await res.json();
         window.localStorage.setItem("user", JSON.stringify(data.results));
+        router.push("/profile");
         console.log(data);
         if (data.userstatus) {
           // Userstatusful connection as musician
