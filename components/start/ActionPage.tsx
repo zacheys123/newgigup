@@ -130,7 +130,10 @@ const ActionPage = () => {
         {/* Cards Container */}
         <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6">
           {/* Creator Card */}
-          <div className="bg-gray-800 p-2 sm:p-8 rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105 cursor-pointer flex-1 max-w-sm my-2 mx-2">
+          <div
+            onClick={connectAsClient}
+            className="bg-gray-800 p-2 sm:p-8 rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105 cursor-pointer flex-1 max-w-sm my-2 mx-2"
+          >
             <h2 className="text-xl sm:text-2xl font-semibold text-orange-300 mb-4">
               Client
             </h2>
@@ -138,16 +141,16 @@ const ActionPage = () => {
               Join as a client to create gigs for musicians and choose the best
               talent to deliver quality music for you.
             </p>
-            <Button
-              className="!bg-orange-700 !text-white px-4 sm:px-6 py-2 rounded-full hover:bg-orange-600 transition-colors duration-300 text-sm sm:text-base"
-              onClick={connectAsClient}
-            >
+            <Button className="!bg-orange-700 !text-white px-4 sm:px-6 py-2 rounded-full hover:bg-orange-600 transition-colors duration-300 text-sm sm:text-base">
               Join as Client
             </Button>
           </div>
 
           {/* Booker Card */}
-          <div className="bg-gray-800 p-2 sm:p-8 rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105 cursor-pointer flex-1 max-w-sm my-2 mx-2">
+          <div
+            onClick={connectAsMusician}
+            className="bg-gray-800 p-2 sm:p-8 rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105 cursor-pointer flex-1 max-w-sm my-2 mx-2"
+          >
             <h2 className="text-xl sm:text-2xl font-semibold text-orange-300 mb-4">
               Musician
             </h2>
@@ -155,17 +158,14 @@ const ActionPage = () => {
               Join as a musician to discover and book gigs while connecting with
               fellow musicians and clients.
             </p>
-            <Button
-              className="!bg-orange-700 !text-white px-4 sm:px-6 py-2 rounded-full hover:bg-orange-600 transition-colors duration-300 text-sm sm:text-base"
-              onClick={connectAsMusician}
-            >
+            <Button className="!bg-blue-800 !text-white px-4 sm:px-6 py-2 rounded-full hover:bg-orange-600 transition-colors duration-300 text-sm sm:text-base">
               Join as Musician
             </Button>
           </div>
 
           {/* Both Card */}
-          <div className="bg-gray-800 p-1 sm:p-8 rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105 cursor-pointer flex-1 max-w-sm opacity-60 pointer-events-none">
-            <h2 className="text-xl sm:text-2xl font-semibold text-orange-300 mb-4">
+          <div className="bg-red-800 p-1 sm:p-8 rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105 cursor-pointer flex-1 max-w-sm opacity-70 ">
+            <h2 className="text-xl sm:text-2xl font-semibold text-gray-100 mb-4">
               Both
             </h2>
             <p className="text-gray-300 mb-6 text-sm sm:text-base">
