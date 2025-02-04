@@ -1,9 +1,11 @@
 "use client";
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
-import { useUser } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import BallLoader from "../loaders/BallLoader";
+
 interface UserEmail {
   emailAddress: string;
   verification?: {
@@ -29,7 +31,11 @@ interface UserInput {
 // }
 const ActionPage = () => {
   const { user, isSignedIn } = useUser();
+  const { userId } = useAuth();
   const router = useRouter();
+  const [musicianload, setMusicianLoad] = useState<boolean>(false);
+  const [clientload, setClientLoad] = useState<boolean>(false);
+
   const connectAsMusician = useCallback(async () => {
     if (!user) {
       console.error("No user data to send.");
@@ -47,7 +53,7 @@ const ActionPage = () => {
         emailAddresses: user.emailAddresses,
         phoneNumbers: user.phoneNumbers,
       };
-
+      setMusicianLoad(true);
       try {
         const res = await fetch(`/api/user/register `, {
           method: "POST",
@@ -72,6 +78,8 @@ const ActionPage = () => {
         }
       } catch (error) {
         console.error(error);
+      } finally {
+        setMusicianLoad(false);
       }
     }
   }, [isSignedIn, user, router]);
@@ -92,25 +100,28 @@ const ActionPage = () => {
         emailAddresses: user.emailAddresses,
         phoneNumbers: user.phoneNumbers,
       };
-
+      setClientLoad(true);
       try {
         const res = await fetch(`/api/user/register `, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ transformedUser, isMusician: true }),
+          body: JSON.stringify({ transformedUser, isClient: true }),
         });
         const data = await res.json();
         window.localStorage.setItem("user", JSON.stringify(data.results));
         console.log(data);
-        if (data.userstatus) {
-          // Userstatusful connection as musician
-        } else {
-          console.error("Failed to connect as musician.");
-        }
+
+        // Userstatusful connection as client
+        setTimeout(() => {
+          router.push(`/client/profile/${userId}`);
+        }, 3000);
+        toast.success("Welcome to Gigup!!!");
       } catch (error) {
         console.error(error);
+      } finally {
+        setClientLoad(false);
       }
     }
   }, [isSignedIn, user]);
@@ -143,7 +154,7 @@ const ActionPage = () => {
               talent to deliver quality music for you.
             </p>
             <Button className="!bg-orange-700 !text-white px-4 sm:px-6 py-2 rounded-full hover:bg-orange-600 transition-colors duration-300 text-sm sm:text-base">
-              Join as Client
+              {clientload ? <BallLoader /> : "Join as Client"}
             </Button>
           </div>
 
@@ -160,7 +171,7 @@ const ActionPage = () => {
               fellow musicians and clients.
             </p>
             <Button className="!bg-blue-800 !text-white px-4 sm:px-6 py-2 rounded-full hover:bg-orange-600 transition-colors duration-300 text-sm sm:text-base">
-              Join as Musician
+              {musicianload ? <BallLoader /> : "Join as Musician"}
             </Button>
           </div>
 
