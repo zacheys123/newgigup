@@ -20,7 +20,7 @@ export default function ProfileLayout({
           duration: 3000,
         }}
       />
-      {children} <UserNav />
+      {children}
     </div>
   );
 }
