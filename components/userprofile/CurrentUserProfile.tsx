@@ -61,28 +61,27 @@ const CurrentUserProfile = () => {
     "October",
     "November",
     "December",
-    0,
   ];
 
   const daysOfMonth = Array.from({ length: 31 }, (_, i) => i + 1);
   useEffect(() => {
     if (user) {
-      setFirstname(user.firstname || "");
-      setLastname(user.lastname || "");
-      setUsername(user.username || "");
-      setEmail(user.email || "");
-      setCity(user.city || "");
-      setExperience(user.experience || "");
-      setInstrument(user.instrument || "");
-      setYear(user.year || "");
-      setMonth(user.month || "");
-      setAge(user.date || "");
-      setAddress(user.address || "");
+      setFirstname(user?.firstname || "");
+      setLastname(user?.lastname || "");
+      setUsername(user?.username || "");
+      setEmail(user?.email || "");
+      setCity(user?.city || "");
+      setExperience(user?.experience || "");
+      setInstrument(user?.instrument || "");
+      setYear(user?.year || "");
+      setMonth(user?.month || "");
+      setAge(user?.date || "");
+      setAddress(user?.address || "");
       // Ensure videoProfile is an array
-      setVideos(user.videosProfile || []);
+      setVideos(user?.videosProfile || []);
     }
   }, [user]);
-  console.log(user);
+
   const handleUpdate = async () => {
     const datainfo = {
       city,
@@ -120,7 +119,7 @@ const CurrentUserProfile = () => {
     }
   };
   const [upload, showUpload] = useState<boolean>(false);
-  console.log(upload);
+  console.log(month);
 
   const active =
     "text-md font-bold text-gray-300 bg-gradient-to-r from-red-500 via-rose-900  to-neutral-700 b-4 p-2 rounded-sm max-w-300px hover:bg-gradient-to-r hover:from-neutral-700 hover:to-neutral-800 transition-colors duration-200 cursor-pointer";
@@ -348,7 +347,7 @@ const CurrentUserProfile = () => {
                     onChange={(ev) => setMonth(ev.target.value)}
                   >
                     {months.map((m) => (
-                      <option key={m} value={m}>
+                      <option key={m} value={m.toLowerCase()}>
                         {m}
                       </option>
                     ))}

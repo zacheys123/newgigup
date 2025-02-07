@@ -16,7 +16,7 @@ export async function PUT(req: NextRequest) {
     videoUrl,
     title,
   } = await req.json();
-
+  console.log(month);
   if (!age || !month || !year) {
     return NextResponse.json({
       updateStatus: false,

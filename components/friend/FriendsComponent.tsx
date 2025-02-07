@@ -6,7 +6,7 @@ import Logo from "../Logo";
 import { useAuth, UserButton } from "@clerk/nextjs";
 import { IoCheckmarkDone } from "react-icons/io5";
 import { Button } from "../ui/button";
-import { MdAdd } from "react-icons/md";
+import { MdAdd, MdPerson } from "react-icons/md";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { Box } from "@mui/material";
 import { BsChatDots } from "react-icons/bs";
@@ -273,6 +273,14 @@ const FriendsComponent = () => {
               {friend?.experience ? friend?.experience : "-null"}
             </span>
           </div>
+        </div>
+        <div className="flex justify-center items-center">
+          <Button
+            className="min-w-[50px] h-[30px] text-white  text-[11px] bg-blue-600 hover:bg-blue-700"
+            onClick={() => router.push(`/myvideos/${friend?._id}`)}
+          >
+            View Video Profile <MdPerson />
+          </Button>
         </div>
       </Box>
       <Box className="h-fit bg-neutral-800 w-[100%] px-2 py-3">

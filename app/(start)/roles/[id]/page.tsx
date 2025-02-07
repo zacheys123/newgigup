@@ -1,4 +1,5 @@
 "use client";
+import BallLoader from "@/components/loaders/BallLoader";
 import ActionPage from "@/components/start/ActionPage";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAuth } from "@clerk/nextjs";
@@ -26,7 +27,14 @@ const Actions = () => {
   }, [user, userId, router]);
 
   if (!user) {
-    return <div>Loading...</div>; // Or some loading spinner
+    return (
+      <div className="h-full w-full bg-black">
+        <span className="flex flex-col items-center">
+          <BallLoader />
+          Loading...
+        </span>
+      </div>
+    ); // Or some loading spinner
   }
 
   // If the user object doesn't have the necessary properties, stay on the current page

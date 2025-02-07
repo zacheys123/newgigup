@@ -164,7 +164,7 @@ const CreateGig = () => {
   };
   console.log(bussinesscat);
   return (
-    <div className="w-[85%]  mx-auto">
+    <div className="w-[85%]  mx-auto py-5">
       <form onSubmit={onSubmit} className="  mt-[20px] py-3 ">
         <h6 className=" text-gray-300 font-sans text-center underline mb-3 -my-4">
           Enter info to create a gig
@@ -173,7 +173,7 @@ const CreateGig = () => {
           onChange={handleBussinessChange}
           name="durationfrom"
           value={bussinesscat ? bussinesscat : ""}
-          className="mb-2 w-[130px]  bg-neutral-300 h-[30px] rounded-md text-[12px] flex justify-center items-center p-2 font-mono"
+          className="mb-5 w-[130px]  bg-neutral-300 h-[30px] rounded-md text-[12px] flex justify-center items-center p-2 font-mono"
         >
           <option value="full">Full Band</option>
           <option value="personal">Individual</option>
@@ -187,7 +187,7 @@ const CreateGig = () => {
                 : `flex flex-col gap-1 h-[70px] `
             }
           >
-            <div className="flex items-center gap-2">
+            <div className="flex my-5items-center gap-2">
               <input
                 autoComplete="off"
                 onChange={handleInputChange}
@@ -195,7 +195,7 @@ const CreateGig = () => {
                 value={gigInputs?.secret}
                 type={!secretpass ? "password" : "text"}
                 placeholder="Enter secret,  NB://(valid only once)"
-                className="font-mono  h-[35px] text-[12px]  bg-zinc-700 border-2 border-neutral-400 mb-2 focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-300"
+                className="font-mono  h-[35px] text-[12px]  bg-zinc-700 border-2 border-neutral-400 mb-7 focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-300"
               />{" "}
               {secretpass ? (
                 <EyeOff
@@ -220,21 +220,21 @@ const CreateGig = () => {
             value={gigInputs?.title}
             type="text"
             placeholder="Enter any title"
-            className="font-mono  h-[35px] text-[12px]  bg-zinc-700 border-2 border-neutral-400 mb-2  focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-300"
+            className="font-mono  h-[35px] text-[12px]  bg-zinc-700 border-2 border-neutral-400 mb-5  focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-300"
           />{" "}
           <Textarea
             onChange={handleInputChange}
             name="description"
             value={gigInputs?.description}
             style={{ resize: "none", height: "fit-content" }}
-            className="min-h-[70px] py-2 mb-2 font-mono  bg-zinc-700 border-2 border-neutral-400 text-neutral-300 px-3 "
+            className="min-h-[70px] py-2 mb-5 font-mono  bg-zinc-700 border-2 border-neutral-400 text-neutral-300 px-3 "
             placeholder=" Enter description e.g what songs or the vybe expected in the event/show"
           />
           <input
             autoComplete="off"
             type="text"
             placeholder="Enter phone no: "
-            className="font-mono  h-[35px] text-[12px]  bg-zinc-700 border-2 border-neutral-400 mb-2  focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-300"
+            className="font-mono  h-[35px] text-[12px]  bg-zinc-700 border-2 border-neutral-400 mb-5  focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-300"
             onChange={handleInputChange}
             name="phoneNo"
             value={gigInputs?.phoneNo}
@@ -243,7 +243,7 @@ const CreateGig = () => {
             autoComplete="off"
             type="text"
             placeholder="Enter price range expected  "
-            className="font-mono  h-[35px] text-[12px]  bg-zinc-700 border-2 border-neutral-400 mb-2  focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-300"
+            className="font-mono  h-[35px] text-[12px]  bg-zinc-700 border-2 border-neutral-400 mb-5  focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-300"
             onChange={handleInputChange}
             name="price"
             value={gigInputs?.price}
@@ -252,7 +252,7 @@ const CreateGig = () => {
             autoComplete="off"
             type="text"
             placeholder="Enter location  "
-            className="font-mono  h-[35px] text-[12px]  bg-zinc-700 border-2 border-neutral-400 mb-2  focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-300 w-full"
+            className="font-mono  h-[35px] text-[12px]  bg-zinc-700 border-2 border-neutral-400 mb-5  focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-300 w-full"
             onChange={handleInputChange}
             name="location"
             value={gigInputs?.location}
@@ -383,7 +383,7 @@ const CreateGig = () => {
             )}
           </>
           {showduration ? (
-            <div className="flex items-center flex-col gap-2 mt-5 bg-gray-800 pt-2 rounded-md relative ">
+            <div className="flex my-5items-center flex-col gap-2 mt-5 bg-gray-800 pt-2 rounded-md relative ">
               {" "}
               <div
                 className="text-white absolute right-2 -top-1 text-[23px]"
@@ -392,7 +392,7 @@ const CreateGig = () => {
                 &times;
               </div>
               <Box className="flex items-center flex-col  mt-4">
-                <div className="flex items-center gap-3">
+                <div className="flex my-5items-center gap-3">
                   {" "}
                   <h6 className="mb-2 w-[50px] text-white font-mono flex justify-center text-[11px]">
                     from:
@@ -416,7 +416,7 @@ const CreateGig = () => {
                     <option value="am">AM</option>
                   </select>{" "}
                 </div>
-                <div className="flex items-center gap-3 ">
+                <div className="flex my-5items-center gap-3 ">
                   <h6 className="mb-2 w-[50px] text-white font-mono flex justify-center text-[11px]">
                     to:
                   </h6>
@@ -448,7 +448,7 @@ const CreateGig = () => {
               minDate={minDate}
               maxDate={maxDate}
               title="Set Event Date"
-              className="font-mono  h-[35px] text-[12px]  bg-zinc-800 border-2 border-neutral-400 mb-2  focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-300 w-[300px]"
+              className="font-mono  h-[35px] text-[12px]  bg-zinc-800 border-2 border-neutral-400 mb-5  focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-300 w-[300px]"
             /> */}
             </div>
           ) : (
