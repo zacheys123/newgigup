@@ -38,7 +38,15 @@ const MainUser = ({
       <div className="flex gap-4 items-center">
         <div
           className="flex-1 flex items-center gap-2"
-          onClick={() => router.push(`/search/${username}`)}
+          onClick={() => {
+            if (isMusician) {
+              router.push(`/search/${username}`);
+            } else if (isClient) {
+              router.push(`/client/search/${username}`);
+            } else {
+              return;
+            }
+          }}
         >
           <AvatarComponent
             picture={picture || ""}

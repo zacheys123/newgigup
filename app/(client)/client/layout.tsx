@@ -1,5 +1,4 @@
 import MobileSheet from "@/components/pages/MobileSheet";
-import UserNav from "@/components/user/UsersNav";
 import { UserButton } from "@clerk/nextjs";
 import { Toaster } from "sonner";
 
