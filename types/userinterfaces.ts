@@ -58,6 +58,7 @@ export interface UserProps {
   organization: string;
   bio: string;
   handles: string;
+  genre: string;
 }
 export interface Users {
   users: UserProps[]; // Optional}

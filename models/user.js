@@ -102,7 +102,7 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
     },
     handles: { type: String, lowercase: true },
-    genres: [""],
+    genres: { type: String, lowercase: true },
   },
   { timestamps: true }
 );

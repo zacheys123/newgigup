@@ -34,6 +34,7 @@ export function useAllUsers() {
         organization: "",
         bio: "",
         handles: "",
+        genre: "",
       },
     ],
   });
@@ -87,6 +88,7 @@ export function useAllUsers() {
                   organization: "",
                   bio: "",
                   handles: "",
+                  genre: "",
                 },
               ],
             });
@@ -129,6 +131,7 @@ export function useAllUsers() {
                 organization: "",
                 bio: "",
                 handles: "",
+                genre: "",
               },
             ],
           });
