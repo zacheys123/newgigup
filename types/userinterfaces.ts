@@ -13,6 +13,11 @@ export interface VideoProfileProps {
   url: string;
   createdAt?: Date;
 }
+export interface handleProfileprops {
+  _id: string;
+  name: string;
+  handle: string;
+}
 
 export interface Review {
   _id: string;
@@ -50,6 +55,9 @@ export interface UserProps {
   isMusician: boolean;
   isClient: boolean;
   videosProfile: VideoProfileProps[];
+  organization: string;
+  bio: string;
+  handles: string;
 }
 export interface Users {
   users: UserProps[]; // Optional}

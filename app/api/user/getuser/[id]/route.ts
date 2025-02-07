@@ -49,6 +49,10 @@ export async function GET(req: NextRequest) {
       videosProfile,
       isMusician,
       isClient,
+      organization,
+      bio,
+      handles,
+      genre,
     } = await User.findOne(query).populate({
       path: "allreviews myreviews",
     });
@@ -79,6 +83,10 @@ export async function GET(req: NextRequest) {
       videosProfile,
       isMusician,
       isClient,
+      organization,
+      bio,
+      handles,
+      genre,
     });
   } catch (error) {
     console.error("Error fetching user:", error);

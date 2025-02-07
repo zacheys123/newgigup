@@ -93,6 +93,16 @@ const userSchema = new mongoose.Schema(
         createdAt: { type: Date, default: Date.now },
       },
     ],
+    organization: {
+      type: String,
+      lowercase: true,
+    },
+    bio: {
+      type: String,
+      lowercase: true,
+    },
+    handles: { type: String, lowercase: true },
+    genres: [""],
   },
   { timestamps: true }
 );

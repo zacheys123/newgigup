@@ -31,6 +31,9 @@ export function useAllUsers() {
         isClient: false,
         isMusician: false,
         videosProfile: [],
+        organization: "",
+        bio: "",
+        handles: "",
       },
     ],
   });
@@ -81,6 +84,9 @@ export function useAllUsers() {
                   isClient: false,
                   isMusician: false,
                   videosProfile: [],
+                  organization: "",
+                  bio: "",
+                  handles: "",
                 },
               ],
             });
@@ -120,6 +126,9 @@ export function useAllUsers() {
                 isClient: false,
                 isMusician: false,
                 videosProfile: [],
+                organization: "",
+                bio: "",
+                handles: "",
               },
             ],
           });

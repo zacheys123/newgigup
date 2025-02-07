@@ -25,6 +25,9 @@ export function useCurrentUser(userId: string | null) {
     isMusician: false,
     isClient: false,
     videosProfile: [],
+    organization: "",
+    bio: "",
+    handles: "",
   });
 
   // Memoize the URL to prevent unnecessary re-renders
@@ -66,6 +69,9 @@ export function useCurrentUser(userId: string | null) {
         isMusician: false,
         isClient: false,
         videosProfile: [],
+        organization: "",
+        bio: "",
+        handles: "",
       });
       return;
     }
@@ -99,6 +105,9 @@ export function useCurrentUser(userId: string | null) {
               isMusician: false,
               isClient: false,
               videosProfile: [],
+              organization: "",
+              bio: "",
+              handles: "",
             });
           return;
         }
@@ -126,6 +135,9 @@ export function useCurrentUser(userId: string | null) {
             isMusician: false,
             isClient: false,
             videosProfile: [],
+            organization: "",
+            bio: "",
+            handles: "",
           });
       } finally {
         if (isMounted) setLoading(false);

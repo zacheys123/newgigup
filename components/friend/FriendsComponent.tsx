@@ -65,6 +65,7 @@ const FriendsComponent = () => {
             isClient: false,
             isMusician: false,
             videosProfile: [],
+            organization: "",
           });
         }
       } finally {
@@ -138,6 +139,8 @@ const FriendsComponent = () => {
                     setFollow(true); // Update global state as well
                     console.error("Error following:", error);
                   }
+                } else {
+                  console.log("No friend Id");
                 }
               }}
             >

@@ -26,6 +26,9 @@ export const postedBy = {
   isMusician: false,
   isClient: false,
   videosProfile: [],
+  organization: "",
+  handles: "",
+  bio: "",
 };
 
 export const instruments = [

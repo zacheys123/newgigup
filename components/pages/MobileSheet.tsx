@@ -82,10 +82,10 @@ const MobileSheet = () => {
         <Link
           href={
             user?.isClient
-              ? `/profile`
-              : user?.isMusician
               ? `/client/profile/${userId}`
-              : ""
+              : user?.isMusician
+              ? `/profile`
+              : "/404Page"
           }
           className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 hover:text-white rounded-md transition-all"
         >
