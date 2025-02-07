@@ -217,13 +217,13 @@ const ClientSearchComponent = () => {
           </span>
         </div>
       </Box>
-      <Box className="h-fit bg-neutral-800 w-[100%] px-2 py-3">
+      <Box className="h-fit bg-neutral-800 w-[100%] px-2 py-5">
         <h4 className="text-[16px] font-bold text-gray-400 mt-3 mb-1 ">
           General Info
         </h4>
         <div className="flex flex-col h-fit py-2">
-          <span className="text-[12px] font-bold text-gray-500">
-            <span className="text-[15px] font-bold text-neutral-200 font-mono">
+          <span className="text-[12px] font-bold text-gray-500 flex flex-col">
+            <span className="text-[15px] font-bold text-neutral-400 font-mono">
               City:{" "}
             </span>
             {friend?.city ? friend?.city : "-null"}
@@ -244,9 +244,9 @@ const ClientSearchComponent = () => {
             </span>
           </div>
           <div className="flex flex-col gap-2">
-            <span className="text-[12px] font-bold text-gray-500">
-              <span className="text-[15px] font-bold text-neutral-200 font-mono">
-                Organization:
+            <span className="text-[12px] font-bold text-gray-500 flex flex-col">
+              <span className="text-[15px] font-bold text-neutral-400 font-mono">
+                Organization/Company/Hotel:
               </span>
               {friend?.organization ? friend?.organization : "-null"}
             </span>
