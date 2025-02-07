@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
 import { useAuth, useUser } from "@clerk/nextjs";
@@ -35,6 +35,7 @@ const ActionPage = () => {
   const router = useRouter();
   const [musicianload, setMusicianLoad] = useState<boolean>(false);
   const [clientload, setClientLoad] = useState<boolean>(false);
+  const [userload, setUserload] = useState<boolean>(false);
 
   const connectAsMusician = useCallback(async () => {
     if (!user) {
@@ -126,6 +127,12 @@ const ActionPage = () => {
     }
   }, [isSignedIn, user]);
 
+  useEffect(() => {
+    setUserload(false);
+    setTimeout(() => {
+      setUserload(true);
+    }, 5000);
+  }, []);
   return (
     <div className="flex justify-center items-center h-screen w-full bg-black">
       <div className="text-center px-4 sm:px-6 lg:px-8">
@@ -153,9 +160,11 @@ const ActionPage = () => {
               Join as a client to create gigs for musicians and choose the best
               talent to deliver quality music for you.
             </p>
-            <Button className="!bg-orange-700 !text-white px-4 sm:px-6 py-2 rounded-full hover:bg-orange-600 transition-colors duration-300 text-sm sm:text-base">
-              {clientload ? <BallLoader /> : "Join as Client"}
-            </Button>
+            {userload === true && (
+              <Button className="!bg-orange-700 !text-white px-4 sm:px-6 py-2 rounded-full hover:bg-orange-600 transition-colors duration-300 text-sm sm:text-base">
+                {clientload ? <BallLoader /> : "Join as Client"}
+              </Button>
+            )}
           </div>
 
           {/* Booker Card */}
@@ -170,9 +179,11 @@ const ActionPage = () => {
               Join as a musician to discover and book gigs while connecting with
               fellow musicians and clients.
             </p>
-            <Button className="!bg-blue-800 !text-white px-4 sm:px-6 py-2 rounded-full hover:bg-orange-600 transition-colors duration-300 text-sm sm:text-base">
-              {musicianload ? <BallLoader /> : "Join as Musician"}
-            </Button>
+            {userload === true && (
+              <Button className="!bg-blue-800 !text-white px-4 sm:px-6 py-2 rounded-full hover:bg-orange-600 transition-colors duration-300 text-sm sm:text-base">
+                {musicianload ? <BallLoader /> : "Join as Musician"}
+              </Button>
+            )}
           </div>
 
           {/* Both Card */}
