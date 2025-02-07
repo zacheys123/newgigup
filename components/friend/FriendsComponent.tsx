@@ -66,6 +66,9 @@ const FriendsComponent = () => {
             isMusician: false,
             videosProfile: [],
             organization: "",
+            handles: "",
+            bio: "",
+            genre: "",
           });
         }
       } finally {
