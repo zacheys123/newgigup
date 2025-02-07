@@ -10,7 +10,7 @@ export default function ProfileLayout({
 }>) {
   return (
     <div className="bg-black h-full w-full overflow-scroll">
-      <div className="flex items-center justify-between mt-4 mx-6  ">
+      <div className="flex items-center justify-between mt-4 mx-6  mb-3 ">
         <MobileSheet />
         <UserButton />
       </div>
