@@ -56,6 +56,10 @@ const useStore = create<StoreState>((set) => ({
     isMusician: false,
     isClient: false,
     videosProfile: [],
+    handles: "",
+    bio: "",
+    genre: "",
+    organization: "",
   },
   currentgig: {
     _id: "",
