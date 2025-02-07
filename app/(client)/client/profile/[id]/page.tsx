@@ -1,7 +1,7 @@
 "use client";
 import BallLoader from "@/components/loaders/BallLoader";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import Image from "next/image";
 // import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -19,38 +19,41 @@ interface UpdateResponse {
 }
 const ClientProfile = () => {
   const { userId } = useAuth();
-  const { user } = useCurrentUser(userId || "");
+  const { user } = useUser();
+  const { user: myuser } = useCurrentUser(userId || "");
   const { setRefetchData } = useStore();
   const [loading, setLoading] = useState<boolean>(false);
   // State for form inputs
   const [formData, setFormData] = useState({
     fullName:
-      user?.firstname && user?.lastname
-        ? `${user.firstname} ${user.lastname}`
+      myuser?.firstname && myuser?.lastname
+        ? `${myuser?.firstname} ${myuser?.lastname}`
         : "",
-    username: user?.username || "",
-    location: user?.city || "",
-    bio: user?.bio || "",
+    username: myuser?.username || "",
+    location: myuser?.city || "",
+    bio: myuser?.bio || "",
     handles: "",
     organization: "",
+    picture: user?.imageUrl,
   });
 
   useEffect(() => {
-    if (user) {
+    if (myuser) {
       setFormData({
         fullName:
-          user.firstname && user.lastname
-            ? `${user.firstname} ${user.lastname}`
+          myuser?.firstname && myuser?.lastname
+            ? `${myuser?.firstname} ${myuser?.lastname}`
             : "",
-        username: user.username || "",
-        location: user.city || "",
-        bio: user.bio || "",
+        username: myuser?.username || "",
+        location: myuser?.city || "",
+        bio: myuser?.bio || "",
         handles: "",
         organization: "",
+        picture: user?.imageUrl,
       });
     }
-  }, [user]);
-
+  }, [myuser]);
+  console.log(user);
   // Handle input changes
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -86,7 +89,7 @@ const ClientProfile = () => {
     setLoading(true);
     try {
       const { data }: UpdateResponse = await axios.put(
-        `/api/user/client/${user?._id}`,
+        `/api/user/client/${myuser?._id}`,
         formData
       );
       console.log(data);
@@ -116,9 +119,9 @@ const ClientProfile = () => {
       >
         {/* Profile Header */}
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 border-b border-neutral-700 pb-4">
-          {user && user?.picture && (
+          {user && myuser?.picture && (
             <Image
-              src={user.picture || "/default-avatar.png"}
+              src={myuser.picture || "/default-avatar.png"}
               alt="Profile"
               className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-2 border-neutral-500"
               width={128}

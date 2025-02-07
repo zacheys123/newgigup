@@ -14,6 +14,7 @@ export async function PUT(req: NextRequest) {
       { _id: id },
       {
         $set: {
+          picture: formData?.picture,
           city: formData.location,
           bio: formData?.bio,
           handles: formData?.handles,
