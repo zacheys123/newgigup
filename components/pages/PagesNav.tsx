@@ -60,6 +60,32 @@ const PagesNav = () => {
       extraStyle: "",
     });
   }
+  if (!user?.isClient && !user?.isMusician) {
+    links.push({
+      href: `/create/${userId}`,
+      Icon: IoIosAddCircle,
+      size: 33,
+      extraStyle: "text-purple-500",
+    });
+    links.push({
+      href: `/my_gig/${userId}`,
+      Icon: MdOutlinePersonalInjury,
+      size: 24,
+      extraStyle: "",
+    });
+    links.push({
+      href: `/av_gigs/${userId}`,
+      Icon: MdComment,
+      size: 24,
+      extraStyle: "",
+    });
+    links.push({
+      href: `/bookedgigs/${userId}`,
+      Icon: MdEmojiEvents,
+      size: 33,
+      extraStyle: "",
+    });
+  }
 
   return (
     <div className="fixed bottom-0 w-full z-50 bg-gradient-to-t from-zinc-900 via-blue-900 to-yellow-750 shadow-xl shadow-teal-600 py-2">
@@ -68,6 +94,8 @@ const PagesNav = () => {
           user?.isClient
             ? "flex justify-center items-center w-full h-[60px] px-1 mx-auto gap-[90px]"
             : user?.isMusician
+            ? "flex justify-center items-center w-full h-[60px] px-1 mx-auto gap-[90px]"
+            : !user?.isClient && !user?.isMusician
             ? "flex justify-center items-center w-full h-[60px] px-1 mx-auto gap-[90px]"
             : ""
         }

@@ -15,6 +15,7 @@ const nextConfig: NextConfig = {
       // "cdn.discordapp.com",
       // "cdn.discordcdn.com",
       // "i.stack.imgur.com",
+      "res.cloudinary.com",
       // "i.imgur.com",
       "lh3.googleusercontent.com",
     ],

@@ -18,6 +18,10 @@ type Info = {
   postedBy: string;
   bussinesscat: string;
   secret: string;
+  font: string;
+  fontColor: string;
+  backgroundColor: string;
+  logo: string;
 };
 
 export async function POST(req: NextRequest) {
@@ -35,7 +39,16 @@ export async function POST(req: NextRequest) {
     postedBy,
     bussinesscat,
     secret,
+    font,
+    fontColor,
+    backgroundColor,
+    logo,
   }: Info = await req.json();
+
+  console.log(font);
+  console.log(fontColor);
+  console.log(backgroundColor);
+  console.log(logo);
 
   if (
     !title ||
@@ -99,6 +112,10 @@ export async function POST(req: NextRequest) {
       postedBy,
       bussinesscat,
       bandCategory: category && category.length > 0 ? "" : bandCategory,
+      font,
+      fontColor,
+      backgroundColor,
+      logo,
     });
 
     return NextResponse.json({

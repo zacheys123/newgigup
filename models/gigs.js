@@ -40,6 +40,24 @@ const gigSchema = new mongoose.Schema(
     isPending: { type: Boolean, default: false },
 
     viewCount: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+
+    bookCount: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    font: {
+      type: String,
+      lowerCase: true,
+    },
+    fontColor: {
+      type: String,
+      lowerCase: true,
+    },
+    backgroundColor: {
+      type: String,
+      lowerCase: true,
+    },
+    logo: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true }
 );

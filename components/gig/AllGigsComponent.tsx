@@ -112,8 +112,14 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
         <GigDescription gig={gig} open={open} handleClose={handleClose} />
       )}
       <section
-        className=" flex flex-col rounded-md w-[95%] mx-auto shadow-md  shadow-zinc-600 bg-zinc-900 py-3
-  h-[98x] myt-3 mb-5  px-3 "
+        className={
+          !gig?.backgroundColor
+            ? "flex flex-col rounded-md w-[95%] mx-auto shadow-md shadow-zinc-600 bg-zinc-900 py-3 h-[98px] mt-3 mb-5 px-3"
+            : `flex flex-col rounded-md w-[95%] mx-auto shadow-md shadow-zinc-600
+             bg-[${
+               gig.backgroundColor || "zinc-900"
+             } ] py-3 h-[98px] mt-3 mb-5 px-3`
+        }
         onClick={() => {
           if (showvideo === true) {
             setShowVideo(false);
@@ -217,9 +223,9 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                   }}
                   onClick={() => handleModal(gig)}
                 />
-                {gig.postedBy?._id &&
-                  !gig.postedBy._id.includes(myId || "") &&
-                  !gig?.isPending &&
+                {gig?.postedBy?._id &&
+                  gig?.postedBy?._id !== myId &&
+                  !gig?.bookCount?.includes(myId || "") &&
                   gig?.isTaken === false && (
                     <div className="w-full text-right p-1  ">
                       <ButtonComponent

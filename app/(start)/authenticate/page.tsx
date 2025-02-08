@@ -5,7 +5,7 @@ import Title from "@/components/loaders/Title";
 import { useAuth } from "@clerk/nextjs";
 import { CircularProgress } from "@mui/material";
 import { useRouter } from "next/navigation";
-
+import "@/components/loaders/word.css";
 import React, { useCallback, useEffect, useState, useRef } from "react";
 
 const Authenticate = () => {

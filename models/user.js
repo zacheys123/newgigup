@@ -103,6 +103,7 @@ const userSchema = new mongoose.Schema(
     },
     handles: { type: String, lowercase: true },
     genres: { type: String, lowercase: true },
+    usersbookgig: [{ type: mongoose.Schema.Types.ObjectId, ref: "Gigs" }],
   },
   { timestamps: true }
 );

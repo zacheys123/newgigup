@@ -1,3 +1,5 @@
+import { GigProps } from "./giginterface";
+
 export interface VideoProps {
   _id: string;
   title: string;
@@ -59,6 +61,7 @@ export interface UserProps {
   bio: string;
   handles: string;
   genre: string;
+  usersbookgig: GigProps[];
 }
 export interface Users {
   users: UserProps[]; // Optional}

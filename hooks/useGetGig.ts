@@ -49,6 +49,11 @@ export function useGetGigs(id: string | null) {
               username: "",
               updatedAt: new Date(),
               createdAt: new Date(),
+              bookCount: [],
+              font: "",
+              fontColor: "",
+              backgroundColor: "",
+              logo: "",
             });
           return;
         }
@@ -80,6 +85,11 @@ export function useGetGigs(id: string | null) {
             username: "",
             updatedAt: new Date(),
             createdAt: new Date(),
+            bookCount: [],
+            font: "",
+            fontColor: "",
+            backgroundColor: "",
+            logo: "",
           });
       } finally {
         if (isMounted) setLoading(false);

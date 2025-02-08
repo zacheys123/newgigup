@@ -1,15 +1,18 @@
 "use client";
 import { Textarea } from "flowbite-react";
-import React, { useState, ChangeEvent, FormEvent } from "react";
+import React, { useState, ChangeEvent, FormEvent, useCallback } from "react";
 import { Button } from "../ui/button";
 // import DatePicker from "react-datepicker";
 // import "react-datepicker/dist/react-datepicker.css";
 import { Box, CircularProgress } from "@mui/material";
-import { ArrowDown, EyeIcon, EyeOff } from "lucide-react";
+import { ArrowDown01Icon, EyeIcon, EyeOff } from "lucide-react";
 
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAuth } from "@clerk/nextjs";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
+import GigCustomization from "./GigCustomization";
+import { fileupload } from "@/hooks/fileUpload";
+import useStore from "@/app/zustand/useStore";
 // import useStore from "@/app/zustand/useStore";
 // import { useAuth } from "@clerk/nextjs";
 
@@ -27,6 +30,11 @@ interface GigInputs {
   durationfrom: string;
   bussinesscat: string;
 }
+interface CustomProps {
+  fontColor: string;
+  font: string;
+  backgroundColor: string;
+}
 
 interface UserInfo {
   prefferences: string[];
@@ -34,9 +42,24 @@ interface UserInfo {
 type bussinesscat = string | null;
 
 const CreateGig = () => {
+  const { userId } = useAuth();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [secretpass, setSecretPass] = useState<boolean>(false);
+  const [showcustomization, setShowCustomization] = useState<boolean>(false);
   const [selectedDate] = useState<Date | null>(null);
+
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [imageUrl, setUrl] = useState<string>("");
+  const [fileUrl, setFileUrl] = useState<string>("");
+  const { setRefetchData } = useStore();
+  const { user } = useCurrentUser(userId || null);
+
+  const [gigcustom, setGigCustom] = useState<CustomProps>({
+    fontColor: "",
+
+    font: "",
+    backgroundColor: "",
+  });
   const [secretreturn] = useState<string>("");
   const [gigInputs, setGigs] = useState<GigInputs>({
     title: "",
@@ -59,7 +82,7 @@ const CreateGig = () => {
   // const [errors, setErrors] = useState<string[]>([]);
   // const [success, setSuccess] = useState<boolean>(false);
   const [showduration, setshowduration] = useState<boolean>(false);
-  const { userId } = useAuth();
+
   const {
     user: { _id },
   } = useCurrentUser(userId || null);
@@ -69,6 +92,48 @@ const CreateGig = () => {
   // const handleDate = (date: Date | null) => {
   //   setSelectedDate(date);
   // };
+
+  // handle the image upload to cloudinary
+
+  const handleFileChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const dep = "image";
+      // Check if the file is a video
+      const allowedTypes = [
+        "image/png",
+        "image/jpeg",
+        "image/gif",
+        "image/webp",
+      ];
+
+      fileupload(
+        event,
+        (file: string) => {
+          // Ensure the file is a valid string before updating state
+          if (file) {
+            setUrl(file); // setUrl expects a string, ensure it's not undefined
+          }
+        },
+        toast,
+        allowedTypes,
+        fileUrl,
+        (file: string | undefined) => {
+          // Handle fileUrl, only set if it's a valid string (not undefined)
+          if (file) {
+            setFileUrl(file); // setFileUrl expects a string, ensure it's not undefined
+          }
+        },
+        setIsUploading,
+        dep,
+        user,
+        setRefetchData
+      );
+      console.log(imageUrl);
+    },
+    [fileUrl]
+  );
+
+  //
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -83,6 +148,7 @@ const CreateGig = () => {
     setBussinessCategory(e.target.value);
   };
 
+  // only used when you choose other
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = e.target;
     setUserInfo((prev) => ({
@@ -91,7 +157,9 @@ const CreateGig = () => {
         : prev.prefferences.filter((item) => item !== value),
     }));
   };
+  //
 
+  // submit your gig
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -116,6 +184,10 @@ const CreateGig = () => {
           from: `${gigInputs.start}${gigInputs.durationfrom}`,
           postedBy: _id,
           bussinesscat: bussinesscat,
+          font: gigcustom.font,
+          fontColor: gigcustom.fontColor,
+          backgroundColor: gigcustom.backgroundColor,
+          logo: imageUrl,
         }),
       });
       const data = await res.json();
@@ -123,11 +195,6 @@ const CreateGig = () => {
       if (data.gigstatus === "true") {
         toast.success(data?.message, {
           position: "top-center",
-          autoClose: 5000, // 5 seconds
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
         });
         setGigs({
           title: "",
@@ -149,11 +216,11 @@ const CreateGig = () => {
       if (data.gigstatus === "false") {
         toast.error(data?.message, {
           position: "top-center",
-          autoClose: 3000, // 5 seconds
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
+          // autoClose: 3000, // 5 seconds
+          // hideProgressBar: false,
+          // closeOnClick: true,
+          // pauseOnHover: true,
+          // draggable: true,
         });
       }
     } catch (error) {
@@ -162,23 +229,33 @@ const CreateGig = () => {
       setIsLoading(false);
     }
   };
-  console.log(bussinesscat);
+  console.log(imageUrl);
   return (
-    <div className="w-[85%]  mx-auto py-5">
-      <form onSubmit={onSubmit} className="  mt-[20px] py-3 ">
-        <h6 className=" text-gray-300 font-sans text-center underline mb-3 -my-4">
+    <>
+      <form
+        onSubmit={onSubmit}
+        className="h-[100vh]  mt-[20px] py-3 overflow-y-hidden -mt-7"
+      >
+        <h6 className=" text-gray-300 font-sans text-center underline mb-3 ">
           Enter info to create a gig
-        </h6>
-        <select
-          onChange={handleBussinessChange}
-          name="durationfrom"
-          value={bussinesscat ? bussinesscat : ""}
-          className="mb-5 w-[130px]  bg-neutral-300 h-[30px] rounded-md text-[12px] flex justify-center items-center p-2 font-mono"
-        >
-          <option value="full">Full Band</option>
-          <option value="personal">Individual</option>
-          <option value="other">other...</option>
-        </select>{" "}
+        </h6>{" "}
+        <div className="flex w-full justify-between">
+          <select
+            onChange={handleBussinessChange}
+            name="durationfrom"
+            value={bussinesscat ? bussinesscat : ""}
+            className="mb-5 w-[130px]  bg-neutral-300 h-[30px] rounded-md text-[12px] flex justify-center items-center p-2 font-mono"
+          >
+            <option value="full">Full Band</option>
+            <option value="personal">Individual</option>
+            <option value="other">other...</option>
+          </select>{" "}
+          <div onClick={() => setShowCustomization(true)}>
+            <h1 className="text-sm text-gray-300 bg-gradient-to-tr from-orange-300 via-green-800 to-yellow-900  py-1 px-2 rounded-md cursor-pointer">
+              Customize your Gig Card
+            </h1>
+          </div>
+        </div>
         <div className="w-full  gap-4">
           <div
             className={
@@ -259,7 +336,9 @@ const CreateGig = () => {
           />{" "}
           <>
             {bussinesscat === "other" ? (
-              <h6 className="choice mb-2">Choose the setUp of the show</h6>
+              <h6 className="choice mb-2 text-gray-400">
+                Choose the setUp of the show
+              </h6>
             ) : (
               ""
             )}
@@ -283,7 +362,7 @@ const CreateGig = () => {
               </select>
             )}
             {bussinesscat === "other" && (
-              <div className="h-[80px] rounded-lg shadow-xl gap-5  bg-zinc-800  p-2 choice flex flex-wrap">
+              <div className="h-[80px] rounded-lg shadow-xl gap-5  bg-zinc-700  p-2 choice flex flex-wrap">
                 <div>
                   <input
                     onChange={handleChange}
@@ -454,15 +533,15 @@ const CreateGig = () => {
           ) : (
             <Box
               onClick={() => setshowduration(true)}
-              className="flex justify-center items-center w-[70%] my-3  mx-auto bg-gray-500 py-3 rounded-md"
+              className="flex justify-between items-center w-[70%] mt-3   mx-auto bg-gray-500 py-1 px-4 rounded-md"
             >
-              <h6 className="text-[14px] text-gray-400 font-sans">
+              <h6 className="text-[14px] text-gray-200 font-sans">
                 Enter Duration
               </h6>
-              <ArrowDown
+              <ArrowDown01Icon
                 size="22"
                 style={{
-                  color: "gray",
+                  color: "lightgray",
                 }}
               />
             </Box>
@@ -483,7 +562,19 @@ const CreateGig = () => {
           </div>
         </div>{" "}
       </form>
-    </div>
+      <div className="h-full w-full relative">
+        {showcustomization && (
+          <GigCustomization
+            customization={gigcustom}
+            setCustomization={setGigCustom}
+            closeModal={() => setShowCustomization(false)}
+            logo={imageUrl}
+            handleFileChange={handleFileChange}
+            isUploading={isUploading}
+          />
+        )}
+      </div>
+    </>
   );
 };
 

@@ -1,6 +1,7 @@
 import connectDb from "@/lib/connectDb";
 
 import Gigs from "@/models/gigs";
+import User from "@/models/user";
 import { getAuth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -20,14 +21,18 @@ export async function PUT(req: NextRequest) {
   try {
     await connectDb();
     // Find the event and ensure it's not already booked
-    const newGig = await Gigs.findById(id);
+    const newGig = await Gigs.findById(id).populate({
+      path: "postedBy",
+      model: User,
+    });
 
-    if (newGig?.isPending === true || newGig?.postedBy?.equals(userid)) {
+    if (newGig?.bookCount > 10 || newGig?.postedBy?.equals(userid)) {
       return NextResponse.json({
         gigstatus: "false",
         message: "Cannot Book this Gig,already booked? ",
       });
     }
+    // update viewCount
     if (!newGig?.viewCount.includes(userid)) {
       await newGig.updateOne(
         {
@@ -38,15 +43,51 @@ export async function PUT(req: NextRequest) {
         { new: true }
       );
     }
+    // update the bookCount by adding ur id to the array of users that clicked on book gig
+    if (!newGig?.bookCount.includes(userid)) {
+      await newGig.updateOne(
+        {
+          $push: {
+            bookCount: userid,
+          },
+        },
+        { new: true }
+      );
+    }
+    // updating a users bookedby field in gig collection data
     await newGig.updateOne(
       {
         $set: {
-          isPending: true,
+          // isPending: true,
           bookedBy: userid,
         },
       },
       { new: true }
     );
+    // get the details of the person tha posted the gig
+    const postedByid = newGig?.postedBy?._id;
+    const updateUsersBookedByfield = await User.findByIdAndUpdate(postedByid, {
+      $push: {
+        usersbookgig: newGig?._id,
+      },
+    });
+
+    return NextResponse.json({
+      gigstatus: true,
+      message:
+        "Booked the gig successfully, wait for confirmationfrom client...",
+      data: updateUsersBookedByfield,
+    });
+
+    // await newGig.updateOne(
+    //   {
+    //     $set: {
+    //       isPending: true,
+    //       bookedBy: userid,
+    //     },
+    //   },
+    //   { new: true }
+    // );
 
     // Notify Socket.io server directly
     // socket.emit("book-gig", {
@@ -72,10 +113,6 @@ export async function PUT(req: NextRequest) {
     //   "Your gig was booked!",
     //   `Gig "${currentgig.title}" has been booked.`
     // );
-    return NextResponse.json({
-      gigstatus: true,
-      message: "Booked the gig successfully",
-    });
   } catch (error) {
     console.log(error);
   }

@@ -4,6 +4,7 @@ import connectDb from "@/lib/connectDb";
 import { NextRequest } from "next/server";
 import { getAuth } from "@clerk/nextjs/server";
 import mongoose from "mongoose";
+import Gig from "@/models/gigs";
 
 export async function GET(req: NextRequest) {
   const searchUrl = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
@@ -53,8 +54,10 @@ export async function GET(req: NextRequest) {
       bio,
       handles,
       genre,
+      usersbookgig,
     } = await User.findOne(query).populate({
-      path: "allreviews myreviews",
+      path: "allreviews myreviews usersbookgig",
+      model: Gig,
     });
 
     console.log(firstname);
@@ -87,6 +90,7 @@ export async function GET(req: NextRequest) {
       bio,
       handles,
       genre,
+      usersbookgig,
     });
   } catch (error) {
     console.error("Error fetching user:", error);

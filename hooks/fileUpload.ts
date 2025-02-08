@@ -145,9 +145,13 @@ export const fileupload = async (
             toast.error("An error occurred while uploading.");
           }
         }
+      } else if (dep === "image") {
+        toast.success("Image Upload successful.");
+        console.log(uploadResult?.secure_url);
+        updatefileFunc(uploadResult.secure_url);
       } else {
         toast.error("Upload failed, please try again.");
-        console.error(uploadResult);
+        console.log(uploadResult);
       }
     }
   } catch (error) {

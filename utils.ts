@@ -30,6 +30,7 @@ export const postedBy = {
   handles: "",
   bio: "",
   genre: "",
+  usersbookgig: [],
 };
 
 export const instruments = [
@@ -315,3 +316,61 @@ export const handleFollowing = async (_id: string, user: UserProps) => {
 
 //   return sortedData;
 // };
+
+// Font Choices
+export const fonts = [
+  "Poppins",
+  "Inter",
+  "Roboto",
+  "Lora",
+  "Montserrat",
+  "Merriweather",
+  "Playfair Display",
+  "Oswald",
+  "Raleway",
+  "Source Sans Pro",
+  "Nunito",
+  "Open Sans",
+  "Work Sans",
+  "Quicksand",
+  "DM Sans",
+  "Manrope",
+  "Josefin Sans",
+  "Cabin",
+  "Bebas Neue",
+  "Fira Sans",
+  "Cairo",
+  "Ubuntu",
+  "Noto Sans",
+  "Sofia",
+  "Arial",
+  "Georgia",
+  "Verdana",
+  "Courier New",
+  "Times New Roman",
+  "Trebuchet MS",
+];
+
+// Professional Color Palette (Mini Circles)
+export const colors = [
+  "#fff",
+  "#1E1E1E",
+  "#3B3B3B",
+  "#FF5733",
+  "#FF8C42",
+  "#FFC857",
+  "#6A0572",
+  "#AB83A1",
+  "#0D3B66",
+  "#F4D35E",
+  "#EE964B",
+  "#006D77",
+  "#83C5BE",
+  "#E29578",
+  "#FFB4A2",
+  "#B5838D",
+  "#3D348B",
+  "#7678ED",
+  "#F6AE2D",
+  "#F26419",
+];
