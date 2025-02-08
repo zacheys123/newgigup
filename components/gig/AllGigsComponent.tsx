@@ -113,13 +113,9 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
       )}
       <section
         className={
-          !gig?.backgroundColor
-            ? "flex flex-col rounded-md w-[95%] mx-auto shadow-md shadow-zinc-600 bg-zinc-900 py-3 h-[98px] mt-3 mb-5 px-3"
-            : `flex flex-col rounded-md w-[95%] mx-auto shadow-md shadow-zinc-600
-             bg-[${
-               gig.backgroundColor || "zinc-900"
-             } ] py-3 h-[98px] mt-3 mb-5 px-3`
+          "flex flex-col rounded-md w-[95%] mx-auto shadow-md shadow-zinc-600 bg-zinc-900 py-5 h-[118px] mt-3 mb-5 px-3"
         }
+        style={{ background: gig?.backgroundColor }} // Applying fontColor dynamically
         onClick={() => {
           if (showvideo === true) {
             setShowVideo(false);
@@ -139,16 +135,38 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
         >
           <Box>
             <div className="flex gap-2">
-              <span className="gigtitle text-orange-300"> gigtitle:</span>
-              <span className="gigtitle text-gray-300"> {gig?.title}</span>
+              <span className="gigtitle text-orange-300">gigtitle:</span>
+              <span
+                className={`gigtitle ${
+                  gig?.font ? `font-${gig.font}` : "text-gray-300"
+                }`}
+                style={{ color: gig?.fontColor }} // Applying fontColor dynamically
+              >
+                {gig?.title}
+              </span>
             </div>
             <div className="flex gap-2">
-              <span className="gigtitle text-orange-300"> location:</span>
-              <span className="gigtitle text-gray-300"> {gig?.location}</span>
-            </div>{" "}
+              <span className="gigtitle text-orange-300">location:</span>
+              <span
+                className={`gigtitle ${
+                  gig?.font ? `font-${gig.font}` : "text-gray-300"
+                } line-clamp-1`}
+                style={{ color: gig?.fontColor }} // Applying fontColor dynamically
+              >
+                {gig?.location}
+              </span>
+            </div>
             <div className="flex gap-2">
               <span className="gigtitle text-orange-300"> price:</span>
-              <span className="gigtitle text-gray-300"> {gig?.price}</span>
+              <span
+                className={`gigtitle ${
+                  gig?.font ? `font-${gig.font}` : "text-gray-300"
+                }`}
+                style={{ color: gig?.fontColor }} // Applying fontColor dynamically
+              >
+                {" "}
+                {gig?.price}
+              </span>
             </div>{" "}
           </Box>
           {gig && (
@@ -375,7 +393,16 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
           ) : (
             <div>
               <span className="titler text-red-700 font-bold line-clamp-1 ">
-                {gig?.postedBy?.picture && (
+                {gig?.logo && (
+                  <Image
+                    src={gig?.logo}
+                    alt="p"
+                    width={25}
+                    height={25}
+                    className="w-[25px] h-[25px] rounded-full"
+                  />
+                )}
+                {gig?.postedBy?.picture && !gig?.logo && (
                   <Image
                     src={gig?.postedBy?.picture}
                     alt="p"

@@ -51,6 +51,7 @@ const VideoProfile = () => {
             handles: "",
             bio: "",
             genre: "",
+            usersbookgig: [],
           });
         }
       } finally {
