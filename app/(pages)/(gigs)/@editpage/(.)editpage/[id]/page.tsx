@@ -1,7 +1,13 @@
 "use client";
 import { Textarea } from "flowbite-react";
-import React, { useState, ChangeEvent, FormEvent, useCallback } from "react";
-import { Button } from "../ui/button";
+import React, {
+  useState,
+  ChangeEvent,
+  FormEvent,
+  useCallback,
+  useEffect,
+} from "react";
+
 // import DatePicker from "react-datepicker";
 // import "react-datepicker/dist/react-datepicker.css";
 import { Box, CircularProgress } from "@mui/material";
@@ -10,16 +16,20 @@ import { ArrowDown01Icon, EyeIcon, EyeOff } from "lucide-react";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAuth } from "@clerk/nextjs";
 import { toast } from "sonner";
-import GigCustomization from "./GigCustomization";
 import { fileupload } from "@/hooks/fileUpload";
 import useStore from "@/app/zustand/useStore";
+import { Button } from "@/components/ui/button";
+import GigCustomization from "@/components/gig/GigCustomization";
+import { useParams, useRouter } from "next/navigation";
+import { useGetGigs } from "@/hooks/useGetGig";
+import { Dialog } from "@/components/ui/dialog";
 // import useStore from "@/app/zustand/useStore";
 // import { useAuth } from "@clerk/nextjs";
 
 interface GigInputs {
   title: string;
   description: string;
-  phoneNo: string;
+  phone: string;
   price: string;
   category: string;
   location: string;
@@ -41,7 +51,8 @@ interface UserInfo {
 }
 type bussinesscat = string | null;
 
-const CreateGig = () => {
+const EditPage = () => {
+  const { id } = useParams();
   const { userId } = useAuth();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [secretpass, setSecretPass] = useState<boolean>(false);
@@ -51,12 +62,12 @@ const CreateGig = () => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [imageUrl, setUrl] = useState<string>("");
   const [fileUrl, setFileUrl] = useState<string>("");
-  const { setRefetchData } = useStore();
+  const { setRefetchData, currentgig } = useStore();
   const { user } = useCurrentUser(userId || null);
+  const {} = useGetGigs(id as string | null);
 
   const [gigcustom, setGigCustom] = useState<CustomProps>({
     fontColor: "",
-
     font: "",
     backgroundColor: "",
   });
@@ -64,7 +75,7 @@ const CreateGig = () => {
   const [gigInputs, setGigs] = useState<GigInputs>({
     title: "",
     description: "",
-    phoneNo: "",
+    phone: "",
     price: "",
     category: "",
     location: "",
@@ -75,6 +86,14 @@ const CreateGig = () => {
     durationfrom: "am",
     bussinesscat: "personal",
   });
+  useEffect(() => {
+    if (currentgig) {
+      setGigs((prev) => ({
+        ...prev,
+        ...currentgig,
+      }));
+    }
+  }, [currentgig]);
   const [userinfo, setUserInfo] = useState<UserInfo>({
     prefferences: [],
   });
@@ -162,15 +181,15 @@ const CreateGig = () => {
 
     try {
       setIsLoading(true);
-      const res = await fetch(`/api/gigs/create`, {
-        method: "POST",
+      const res = await fetch(`/api/gigs/editgig/${currentgig?._id}`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           title: gigInputs.title,
           description: gigInputs.description,
-          phoneNo: gigInputs.phoneNo,
+          phoneNo: gigInputs.phone,
           price: gigInputs.price,
           category: gigInputs.category,
           bandCategory: userinfo.prefferences,
@@ -196,7 +215,7 @@ const CreateGig = () => {
         setGigs({
           title: "",
           description: "",
-          phoneNo: "",
+          phone: "",
           price: "",
           category: "",
           location: "",
@@ -226,15 +245,21 @@ const CreateGig = () => {
       setIsLoading(false);
     }
   };
-  console.log(imageUrl);
+
+  const [open, setOpen] = useState<boolean>(true);
+  const router = useRouter();
+  const handleClose = () => {
+    router.back();
+    setOpen(false);
+  };
   return (
-    <>
+    <Dialog open={open} onOpenChange={handleClose}>
       <form
         onSubmit={onSubmit}
-        className="h-[100vh]  mt-[20px] py-3 overflow-y-hidden -mt-7"
+        className="h-[100vh]  mt-[20px] py-3 overflow-y-hidden  bg-gray-900 w-[90%] mx-auto px-2"
       >
         <h6 className=" text-gray-300 font-sans text-center underline mb-3 ">
-          Enter info to create a gig
+          Enter info to update a gig
         </h6>{" "}
         <div className="flex w-full justify-between">
           <select
@@ -311,7 +336,7 @@ const CreateGig = () => {
             className="font-mono  h-[35px] text-[12px]  bg-zinc-700 border-2 border-neutral-400 mb-5  focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-300"
             onChange={handleInputChange}
             name="phoneNo"
-            value={gigInputs?.phoneNo}
+            value={gigInputs?.phone}
           />{" "}
           <input
             autoComplete="off"
@@ -545,13 +570,13 @@ const CreateGig = () => {
           )}
           <div className="w-full flex justify-center">
             <Button
-              variant="destructive"
+              variant="update"
               type="submit"
               className="mt-4 w-[60%] h-[30px] text-[12px]"
               disabled={isLoading}
             >
               {!isLoading ? (
-                "Create Gig"
+                "Update Gig"
               ) : (
                 <CircularProgress size="14px" sx={{ color: "white" }} />
               )}
@@ -571,8 +596,8 @@ const CreateGig = () => {
           />
         )}
       </div>
-    </>
+    </Dialog>
   );
 };
 
-export default CreateGig;
+export default EditPage;

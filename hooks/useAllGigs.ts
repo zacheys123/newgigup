@@ -1,11 +1,13 @@
 "use client";
 
+import useStore from "@/app/zustand/useStore";
 import { GigProps, Gigs } from "@/types/giginterface";
 import { postedBy } from "@/utils";
 import { useEffect, useMemo, useState } from "react";
 
 export function useAllGigs() {
   const [loading, setLoading] = useState<boolean>(false);
+  const { refetchgig } = useStore();
   const [gigs, setGigs] = useState<{ gigs: GigProps[] } | null>({
     gigs: [
       {
@@ -139,7 +141,7 @@ export function useAllGigs() {
     return () => {
       isMounted = false;
     };
-  }, [url]);
+  }, [url, refetchgig]);
 
   return { loading, gigs };
 }

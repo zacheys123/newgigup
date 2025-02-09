@@ -2,9 +2,7 @@ import { GigProps } from "./types/giginterface";
 // import { VideoProps } from "./types/userinterfaces";
 
 export const isCreatorIsCurrentUserAndTaken = (gig: GigProps, myId: string) => {
-  return (
-    gig?.isTaken && gig?.bookedBy?._id !== myId && gig?.postedBy?._id === myId
-  );
+  return gig?.isTaken === true && gig?.postedBy?._id === myId;
 };
 
 export const isCreatorIsCurrentUserAndPendingIsFalse = (

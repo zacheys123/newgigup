@@ -19,9 +19,9 @@ export async function GET(req: NextRequest) {
     const vids = await Video.find().populate({ path: "postedBy", model: User });
     console.log("all my gigs", vids);
 
-    const videos = vids.filter((video) => {
+    const videos = vids?.filter((video) => {
       console.log("video objects", video);
-      return video.postedBy._id.toString() === id;
+      return video?.postedBy?._id.toString() === id;
     });
     return NextResponse.json({
       videos,

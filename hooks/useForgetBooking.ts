@@ -7,32 +7,27 @@ export function useForgetBookings() {
   const [loading, setLoading] = useState<boolean>(false);
   const route = useRouter();
 
-  const forgetBookings = async (userId: string, myGig: GigProps) => {
+  const forgetBookings = async (id: string, myGig: GigProps) => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/gigs/cancelgig/${myGig?._id}`, {
+      const response = await fetch(`/api/gigs/remove-musician/${myGig?._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          userId,
-        }),
+        body: JSON.stringify({ musicianId: id }),
       });
       if (!response.ok) {
         throw new Error("Failed to cancel the gig");
       }
-      const data: FetchResponse = await response.json();
+      console.log("Musician removed from book count.");
+      const data: { message: string } = await response.json();
+      console.log(data);
 
-      if (data.gigstatus === true) {
-        toast.success(data.message);
-        console.log(data);
-        route.back();
-        setLoading(false);
-      } else {
-        toast.error(data.message);
-        setLoading(false);
-      }
+      console.log(data);
+      route.back();
+      setLoading(false);
+      toast.success(data.message);
     } catch (error: unknown) {
       setLoading(false);
       console.error("Error canceling the gig:try again later", error);
@@ -51,7 +46,8 @@ export function useBookMusician() {
       refresh: () => void;
     },
     myGig: GigProps,
-    userId: string
+    userId: string,
+    userid: string
   ) => {
     try {
       setLoading(true);
@@ -60,6 +56,9 @@ export function useBookMusician() {
         headers: {
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          musicianId: userid,
+        }),
       });
       if (!response.ok) {
         throw new Error("Failed to choose musician");

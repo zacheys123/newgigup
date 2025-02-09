@@ -35,7 +35,6 @@ export function useAllUsers() {
         bio: "",
         handles: "",
         genre: "",
-        usersbookgig: [],
       },
     ],
   });
@@ -90,7 +89,6 @@ export function useAllUsers() {
                   bio: "",
                   handles: "",
                   genre: "",
-                  usersbookgig: [],
                 },
               ],
             });
@@ -134,7 +132,6 @@ export function useAllUsers() {
                 bio: "",
                 handles: "",
                 genre: "",
-                usersbookgig: [],
               },
             ],
           });

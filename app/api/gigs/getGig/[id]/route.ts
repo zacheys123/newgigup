@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const GET = async (req: NextRequest) => {
   const id = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
-
+  console.log(" gig ID", id);
   if (!id) {
     console.log("Invalid gig ID");
     return NextResponse.json({ error: "Invalid gig ID" }, { status: 400 });
@@ -15,9 +15,10 @@ export const GET = async (req: NextRequest) => {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
   try {
-    const gig = await Gig.findOne({ _id: id })
-      .populate({ path: "postedBy", model: User })
-      .populate({ path: "bookedBy", model: User });
+    const gig = await Gig.findById({ _id: id }).populate({
+      path: "postedBy bookCount bookedBy",
+      model: User,
+    });
 
     if (!gig) {
       console.log("Gig not found");

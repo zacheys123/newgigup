@@ -6,7 +6,7 @@ export const bookGig = async (
   gigs: Array<GigProps> | null,
   userId: string | null,
   toast: { error: (msg: string) => void; success: (msg: string) => void },
-
+  setRefetchGig: (refetchgig: boolean) => void,
   router: {
     push: (url: string) => void;
     replace: (url: string) => void;
@@ -41,7 +41,8 @@ export const bookGig = async (
     if (data.gigstatus === true) {
       toast.success(data.message || "Booked successfully");
       // socket.emit("book-gig", data);
-      router.push(`/execute/${gig?._id}`);
+      // router.push(`/execute/${gig?._id}`);
+      setRefetchGig(true);
     } else {
       toast.error(data.message || "Error Occured");
       router.push(`/gigs/${userId}`);

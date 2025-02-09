@@ -1,70 +1,70 @@
-import useStore from "@/app/zustand/useStore";
+"use client";
 import { Box, CircularProgress, Divider } from "@mui/material";
 import { motion } from "framer-motion";
 // import { EyeIcon, MessageCircle, X } from "lucide-react";
 import Image from "next/image";
 import React, { FormEvent, useEffect, useState } from "react";
 // import { MdAdd } from "react-icons/md";
-import { RiCornerDownRightLine } from "react-icons/ri";
 import { Button } from "../ui/button";
 import Rating from "./Rating";
-import { ArrowDown, ArrowUp, MessageCircle, X } from "lucide-react";
+import { ArrowDown, ArrowUp, MessageCircle } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
-import { useBookMusician, useForgetBookings } from "@/hooks/useForgetBooking";
+
 import { Textarea } from "flowbite-react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { MdAdd } from "react-icons/md";
-import { FetchResponse } from "@/types/giginterface";
+import { FetchResponse, GigProps } from "@/types/giginterface";
 
 // import { useCurrentUser } from "@/hooks/useCurrentUser";
 
-const AcceptPage = () => {
+const AcceptPage = ({
+  _id,
+  bookedBy,
+  postedBy,
+  viewCount,
+  isTaken,
+  isPending,
+}: GigProps) => {
   const { userId } = useAuth();
 
-  const { currentgig } = useStore();
   const [comment, setComment] = useState<string>("");
   const [rating, setRating] = useState<number>(0);
-  const { loading, forgetBookings } = useForgetBookings();
-  const { bookloading, bookgig } = useBookMusician();
   const [loadingreview, setLoadingreview] = useState(false);
 
   const [rate] = useState<number>(
-    currentgig?.bookedBy?.allreviews?.length
-      ? currentgig.bookedBy.allreviews.reduce(
+    bookedBy?.allreviews?.length
+      ? bookedBy.allreviews.reduce(
           (acc: number, review: { rating: number }) => acc + review.rating,
           0
-        ) / (currentgig?.postedBy?.allreviews?.length || 1)
+        ) / (postedBy?.allreviews?.length || 1)
       : 0
   );
   const [comm] = useState<string>(
-    (currentgig &&
-      currentgig?.bookedBy?.allreviews
-        .filter((review: { gigId: string }) => review.gigId === currentgig?._id)
-        ?.map((review: { comment: string }) => review.comment)
-        .join(" ")) ||
-      ""
+    bookedBy?.allreviews
+      .filter((review: { gigId: string }) => review.gigId === _id)
+      ?.map((review: { comment: string }) => review.comment)
+      .join(" ") || ""
   );
 
   const router = useRouter();
-  const book = () => bookgig(router, currentgig, userId || "");
-  const forget = () => forgetBookings(userId || "", currentgig);
+
   const variant = {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0, transition: { duration: 0.5 } },
   };
 
   useEffect(() => {
-    if (currentgig?.isPending === true && currentgig?.isTaken === false) {
+    if (isPending === true && isTaken === false) {
       return;
     }
-    if (currentgig?.isPending === false && currentgig?.isTaken === true) {
+    if (isPending === false && isTaken === true) {
       return;
     }
-    if (currentgig?.isPending === false && currentgig?.isTaken === false) {
+    if (isPending === false && isTaken === false) {
       router.push(`/gigs/${userId}/`);
     }
-  }, [currentgig?.isTaken, currentgig?.isPending, userId]);
+  }, [isTaken, isPending, userId]);
   const handleRatingChange = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -80,7 +80,7 @@ const AcceptPage = () => {
         return;
       }
 
-      const res = await fetch(`/api/gigs/reviewgig/${currentgig._id}`, {
+      const res = await fetch(`/api/gigs/reviewgig/${_id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -88,8 +88,8 @@ const AcceptPage = () => {
         body: JSON.stringify({
           rating,
           comment,
-          postedBy: currentgig?.postedBy?._id,
-          postedTo: currentgig?.bookedBy?._id,
+          postedBy: postedBy?._id,
+          postedTo: bookedBy?._id,
         }),
       });
 
@@ -120,7 +120,7 @@ const AcceptPage = () => {
   const [pers, setPers] = useState<boolean>(false);
   return (
     <div className="h-[83%] w-full overflow-y-auto relative">
-      {!currentgig?.isTaken && (
+      {/* {!isTaken && (
         <div className="absolute w-[40px] h-[90px] flex flex-col gap-[10px] bg-gray-700 right-5 top-[460px] opacity-85 rounded-xl pt-4 animate-pulse ">
           {" "}
           {!loading ? (
@@ -147,7 +147,7 @@ const AcceptPage = () => {
               }}
             />
           )}
-          {bookloading ? (
+          {/* {bookloading ? (
             <CircularProgress
               size="20px"
               color="primary"
@@ -167,20 +167,20 @@ const AcceptPage = () => {
                 color: "lightgray",
               }}
               className="shadow shadow-slate-200"
-              onClick={book}
+         
             />
-          )}
-        </div>
-      )}
+          )} */}
+      {/* </div>
+      )} */}
 
       <div className="h-[130px] w-[90%] mx-auto p-4 bg-zinc-600  shadow-md shadow-zinc-700 my-4 flex flex-col gap-3 rounded-xl">
         <h4 className="text-gray-400 text-[13px] font-serif underline underline-offset-2">
           Personal
         </h4>
         <div className="w-full h-[30px] flex justify-end  items-center gap-[90px] ">
-          {currentgig?.bookedBy?.picture && (
+          {bookedBy?.picture && (
             <Image
-              src={currentgig?.bookedBy?.picture}
+              src={bookedBy?.picture}
               alt="Prof pic "
               width={30}
               height={30}
@@ -192,8 +192,7 @@ const AcceptPage = () => {
           <div className="flex gap-4 items-center">
             <div className="flex items-center ">
               <h4 className="text-gray-300 text-[14px] font-mono font-bold flex items-center gap-1">
-                {currentgig?.viewCount?.length}{" "}
-                <span className="text-gray-400">views</span>
+                {viewCount?.length} <span className="text-gray-400">views</span>
               </h4>
             </div>
             <div className="flex  items-center">
@@ -219,10 +218,10 @@ const AcceptPage = () => {
         </div>
         <div className="w-full  h-full flex justify-around">
           <h4 className="text-gray-300 text-[13px] font-bold">
-            {currentgig?.postedBy?.firstname}
+            {postedBy?.firstname}
           </h4>{" "}
           <h4 className="text-gray-300 text-[13px] font-bold">
-            {currentgig?.postedBy?.lastname}
+            {postedBy?.lastname}
           </h4>
         </div>
       </div>
@@ -249,25 +248,21 @@ const AcceptPage = () => {
             <div className="text-sm text-neutral-300 space-y-3">
               <div>
                 <span className="font-bold text-neutral-400">Username:</span>{" "}
-                {currentgig?.bookedBy?.username}
+                {bookedBy?.username}
               </div>
               <div>
                 <span className="font-bold text-neutral-400">
                   Email Address:
                 </span>{" "}
-                {currentgig?.bookedBy?.email}
+                {bookedBy?.email}
               </div>
               <div>
                 <span className="font-bold text-neutral-400">Instrumment:</span>{" "}
-                {currentgig?.bookedBy?.instrument
-                  ? currentgig?.bookedBy?.instrument
-                  : "-"}
+                {bookedBy?.instrument ? bookedBy?.instrument : "-"}
               </div>
               <div>
                 <span className="font-bold text-neutral-400">Experience:</span>{" "}
-                {currentgig?.bookedBy?.experience
-                  ? currentgig?.bookedBy?.experience
-                  : "-"}
+                {bookedBy?.experience ? bookedBy?.experience : "-"}
               </div>
             </div>
           </motion.div>
@@ -278,38 +273,38 @@ const AcceptPage = () => {
         <motion.div className="text-center" whileHover={{ scale: 1.1 }}>
           <span className="text-purple-400 font-medium title">Followers</span>
           <p className="text-sm font-bold text-red-500 mt-1 choice">
-            {currentgig.bookedBy?.followers?.length || 0}
+            {bookedBy?.followers?.length || 0}
           </p>
         </motion.div>
         <motion.div className="text-center" whileHover={{ scale: 1.1 }}>
           <span className="text-purple-400 font-medium title">Following</span>
           <p className="text-sm font-bold text-red-500 mt-1 font-mono ">
-            {currentgig.bookedBy?.followings?.length || 0}
+            {bookedBy?.followings?.length || 0}
           </p>
         </motion.div>
       </div>
       <Divider className="my-6 border-neutral-700" />
       <Divider sx={{ backgroundColor: "gray", width: "82%", margin: "auto" }} />
-      {currentgig?.isTaken && (
+      {isTaken && (
         <div className="w-full flex justify-between gap-4 my-8 p-3 rounded-lg shadow-md shadow-amber-600">
           <Box className="flex flex-col gap-3">
             <h6 className="text-neutral-400 font-semibold ">Rate Musician</h6>
             <Rating rating={rating ? rating : rate} setRating={setRating} />
           </Box>
 
-          {currentgig?.bookedBy?.picture && (
+          {bookedBy?.picture && (
             <Image
               width={50}
               height={50}
               className="w-12 h-12 rounded-full shadow-sm"
-              src={currentgig.bookedBy?.picture}
+              src={bookedBy?.picture}
               alt="Booker profile"
             />
           )}
         </div>
       )}
       <div className="flex justify-center mt-8 space-x-6">
-        {currentgig?.isTaken && (
+        {isTaken && (
           <form
             className="flex flex-col gap-2 w-full"
             onSubmit={handleRatingChange}

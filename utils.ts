@@ -30,7 +30,6 @@ export const postedBy = {
   handles: "",
   bio: "",
   genre: "",
-  usersbookgig: [],
 };
 
 export const instruments = [

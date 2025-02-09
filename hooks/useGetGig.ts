@@ -10,6 +10,7 @@ import { useEffect, useMemo, useState } from "react";
 export function useGetGigs(id: string | null) {
   const { setCurrentGig } = useStore();
   const [loading, setLoading] = useState<boolean>(false);
+  const { refetchgig } = useStore();
   // Memoize the URL to prevent unnecessary re-renders
   const url = useMemo(() => `/api/gigs/getGig/${id}`, [id]);
 
@@ -102,7 +103,7 @@ export function useGetGigs(id: string | null) {
     return () => {
       isMounted = false;
     };
-  }, [url]);
+  }, [url, refetchgig]);
 
   return { loading };
 }

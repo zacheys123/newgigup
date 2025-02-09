@@ -13,16 +13,13 @@ export async function GET(req: NextRequest) {
     await connectDb();
     const gigs = await Gigs.find()
       .populate({
-        path: "postedBy",
+        path: "postedBy bookCount bookedBy",
         model: User,
       })
-      .populate({
-        path: "bookedBy",
-        model: User,
-      })
+
       .collation({ locale: "en", strength: 2 })
       .exec();
-
+    console.log(gigs);
     return NextResponse.json({ gigs });
   } catch (error) {
     console.log(error);

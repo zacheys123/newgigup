@@ -18,6 +18,7 @@ interface StoreState {
   followersModal: boolean;
   followingsModal: boolean;
   currentFollowers: boolean;
+  refetchgig: boolean;
 
   setShowUpload: () => void;
   setRefetchData: (data: boolean) => void;
@@ -33,6 +34,7 @@ interface StoreState {
   setDrawerVisible: () => void;
   setFollowersModal: (data: boolean) => void;
   setFollowingsModal: (data: boolean) => void;
+  setRefetchGig: (data: boolean) => void;
 }
 
 const useStore = create<StoreState>((set) => ({
@@ -42,6 +44,7 @@ const useStore = create<StoreState>((set) => ({
   mygigs: [],
   bookedgigs: [],
   search: false,
+  refetchgig: false,
   currentUser: {
     clerkId: "",
     firstname: "",
@@ -116,6 +119,7 @@ const useStore = create<StoreState>((set) => ({
     set((state) => ({ drawerVisible: !state.drawerVisible })),
   setFollowersModal: (data) => set(() => ({ followersModal: data })),
   setFollowingsModal: (data) => set(() => ({ followingsModal: data })),
+  setRefetchGig: (data) => set(() => ({ refetchgig: data })),
 }));
 
 export default useStore;

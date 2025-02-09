@@ -26,7 +26,7 @@ export interface GigProps {
   username: string; // Required, unique, and lowercase
   updatedAt: Date;
   createdAt: Date;
-  bookCount: string[];
+  bookCount: UserProps[];
   font: string;
   fontColor: string;
   backgroundColor: string;

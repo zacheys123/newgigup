@@ -3,6 +3,7 @@ import useStore from "@/app/zustand/useStore";
 import AcceptPage from "@/components/gig/AcceptPage";
 import BookingPage from "@/components/gig/BookingPage";
 import { Button } from "@/components/ui/button";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useGetGigs } from "@/hooks/useGetGig";
 import { useAuth } from "@clerk/nextjs";
 import { useParams, useRouter } from "next/navigation";
@@ -12,6 +13,7 @@ const ViewGigDetails = () => {
   const { id } = useParams();
   console.log(id);
   const { loading } = useGetGigs(id as string | null);
+  const { user } = useCurrentUser(userId || null);
   const router = useRouter();
   const { currentgig } = useStore();
 
@@ -44,7 +46,7 @@ const ViewGigDetails = () => {
       </div>
     );
   }
-  if (currentgig?.bookedBy == null || currentgig?.postedBy == null) {
+  if (currentgig?.bookCount == null || currentgig?.postedBy == null) {
     return (
       <div className="h-[84%] w-full flex p-2  flex-col justify-center items-center">
         <h4 className="text-gray-400 mb-2">No Gig Info found, try later </h4>
@@ -65,9 +67,13 @@ const ViewGigDetails = () => {
   }
   return (
     <>
-      {currentgig?.bookedBy?.clerkId.includes(userId || "") && <BookingPage />}
+      {currentgig?.bookCount?.some((myuser) => myuser._id === user?._id) && (
+        <BookingPage />
+      )}
 
-      {currentgig?.postedBy?.clerkId.includes(userId || "") && <AcceptPage />}
+      {currentgig?.postedBy?.clerkId.includes(userId || "") && (
+        <AcceptPage {...currentgig} />
+      )}
     </>
   );
 };

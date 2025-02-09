@@ -42,7 +42,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
     setOpen(false);
     console.log("close", gigdesc);
   };
-  const { currentUser, showModal, setShowModal } = useStore();
+  const { currentUser, showModal, setShowModal, setRefetchGig } = useStore();
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
   const myId = currentUser?._id;
   const router = useRouter();
@@ -70,7 +70,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
     router.push(`/execute/${id}`);
   };
   const handleEdit = async (id: string) => {
-    router.push(`/editpage/edit/${id}`);
+    router.push(`/editpage/${id}`);
   };
 
   const handleReviewModal = () => {
@@ -92,7 +92,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
     typeof gig?.bookedBy?._id === "string" ? gig?.bookedBy?._id : ""; // Default to empty string if undefined
 
   const { friendvideos } = useVideos(validGigid, validUserId);
-  const testfilteredvids = friendvideos?.videos.filter(
+  const testfilteredvids = friendvideos?.videos?.filter(
     (video) => video.gigId === gig._id
   );
   const [currentId, setCurrentId] = useState<string | null>();
@@ -105,7 +105,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
     testfilteredvids?.length < 4;
   // user?.videos.length < 4;
 
-  console.log();
+  console.log(gigs);
   return (
     <>
       {gigdesc && (
@@ -181,32 +181,32 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                 loadingtitle="Edit gig"
               /> */}
 
-                {gig.bookedBy?._id &&
-                  gig.bookedBy._id.includes(myId || "") &&
-                  gig?.isPending && (
-                    <div className="w-full text-right ">
-                      <ButtonComponent
-                        variant="secondary"
-                        classname="!bg-purple-600 h-[20px] text-[8px]   font-bold whitespace-nowrap text-red-200  mt-5"
-                        onclick={() => {
-                          setLoadingPostId(gig?._id || "");
+                {gig?.bookCount?.some((user) => user._id === myId) && (
+                  <div className="w-full text-right ">
+                    <ButtonComponent
+                      variant="secondary"
+                      classname="!bg-purple-600 h-[20px] text-[8px]   font-bold whitespace-nowrap text-red-200  mt-9"
+                      onclick={() => {
+                        setLoadingPostId(gig?._id || "");
 
-                          setTimeout(() => {
-                            handleEditBooked(gig?._id || "");
-                            setLoadingPostId("");
-                          }, 2000);
-                        }}
-                        title={
-                          loadingPostId === gig._id
-                            ? "viewing....!!"
-                            : "View Booked Gig!!!"
-                        }
-                      />
-                    </div>
-                  )}
+                        setTimeout(() => {
+                          handleEditBooked(gig?._id || "");
+                          setLoadingPostId("");
+                        }, 2000);
+                      }}
+                      title={
+                        loadingPostId === gig._id
+                          ? "viewing....!!"
+                          : "View Booked Gig!!!"
+                      }
+                    />
+                  </div>
+                )}
 
                 {gig.postedBy?._id &&
-                  gig?.isPending === false &&
+                  !gig?.bookCount?.some((user) => user._id === myId) &&
+                  gig?.bookCount?.length === 0 &&
+                  gig.bookCount.length < 4 &&
                   gig.postedBy?._id.includes(myId || "") &&
                   gig?.isTaken === false && (
                     <div className="w-full text-right ">
@@ -232,18 +232,22 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
               </div>
 
               <Box className="flex flex-col gap-3 ">
-                <PiDotsThreeVerticalBold
-                  style={{
-                    color: "lightgray",
-                    position: "absolute",
-                    right: 10,
-                    top: -6,
-                  }}
-                  onClick={() => handleModal(gig)}
-                />
+                {!gig?.isTaken && (
+                  <PiDotsThreeVerticalBold
+                    style={{
+                      color: "lightgray",
+                      position: "absolute",
+                      right: 10,
+                      top: -6,
+                    }}
+                    onClick={() => handleModal(gig)}
+                  />
+                )}
                 {gig?.postedBy?._id &&
                   gig?.postedBy?._id !== myId &&
-                  !gig?.bookCount?.includes(myId || "") &&
+                  !gig?.bookCount?.some((user) => user._id === myId) &&
+                  gig?.bookCount.length < 4 &&
+                  currentUser?.isClient === false &&
                   gig?.isTaken === false && (
                     <div className="w-full text-right p-1  ">
                       <ButtonComponent
@@ -259,6 +263,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                               gigs?.gigs || [],
                               userId || "",
                               toast,
+                              setRefetchGig,
                               router
                             );
 
@@ -275,7 +280,10 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
 
                 {gig.postedBy?._id &&
                   gig?.postedBy?._id.includes(myId || "") &&
-                  gig?.isPending === true && (
+                  gig?.bookCount.length !== 0 &&
+                  gig?.bookCount?.length >= 3 &&
+                  gig?.bookCount?.length <= 4 &&
+                  !gig?.isTaken && (
                     <div className="w-full text-right">
                       <ButtonComponent
                         variant="secondary"
@@ -284,7 +292,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                           setLoadingPostId(gig?._id || "");
 
                           setTimeout(() => {
-                            router.push(`/execute/${gig?._id}`);
+                            router.push(`/pre_execute/${gig?._id}`);
                             setLoadingPostId("");
                           }, 2000);
                         }}

@@ -26,58 +26,51 @@ export async function PUT(req: NextRequest) {
       model: User,
     });
 
-    if (newGig?.bookCount > 10 || newGig?.postedBy?.equals(userid)) {
+    if (newGig?.bookCount.length > 3 || newGig?.postedBy?.equals(userid)) {
       return NextResponse.json({
         gigstatus: "false",
         message: "Cannot Book this Gig,already booked? ",
       });
-    }
-    // update viewCount
-    if (!newGig?.viewCount.includes(userid)) {
-      await newGig.updateOne(
-        {
-          $push: {
-            viewCount: userid,
+    } else {
+      // update viewCount
+      if (!newGig?.viewCount.includes(userid)) {
+        await newGig.updateOne(
+          {
+            $push: {
+              viewCount: userid,
+            },
           },
-        },
-        { new: true }
-      );
-    }
-    // update the bookCount by adding ur id to the array of users that clicked on book gig
-    if (!newGig?.bookCount.includes(userid)) {
-      await newGig.updateOne(
-        {
-          $push: {
-            bookCount: userid,
+          { new: true }
+        );
+      }
+      // update the bookCount by adding ur id to the array of users that clicked on book gig
+      if (!newGig?.bookCount.includes(userid)) {
+        await newGig.updateOne(
+          {
+            $push: {
+              bookCount: userid,
+              // bookedBy: userid,
+            },
           },
-        },
-        { new: true }
-      );
-    }
-    // updating a users bookedby field in gig collection data
-    await newGig.updateOne(
-      {
-        $set: {
-          // isPending: true,
-          bookedBy: userid,
-        },
-      },
-      { new: true }
-    );
-    // get the details of the person tha posted the gig
-    const postedByid = newGig?.postedBy?._id;
-    const updateUsersBookedByfield = await User.findByIdAndUpdate(postedByid, {
-      $push: {
-        usersbookgig: newGig?._id,
-      },
-    });
+          { new: true }
+        );
+      }
 
-    return NextResponse.json({
-      gigstatus: true,
-      message:
-        "Booked the gig successfully, wait for confirmationfrom client...",
-      data: updateUsersBookedByfield,
-    });
+      // get the details of the person tha posted the gig
+      // const postedByid = newGig?.postedBy?._id;
+      // const updateUsersBookedByfield = await User.findByIdAndUpdate(postedByid, {
+      //   $push: {
+      //     usersbookgig: newGig?.bookedBy?._id,
+      //   },
+      // });
+
+      return NextResponse.json({
+        gigstatus: true,
+        message:
+          "Booked the gig successfully, wait for confirmationfrom client...",
+        // data: updateUsersBookedByfield,
+      });
+    }
 
     // await newGig.updateOne(
     //   {

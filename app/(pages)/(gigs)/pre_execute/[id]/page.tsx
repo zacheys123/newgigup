@@ -1,7 +1,8 @@
+import PrePendingComponent from "@/components/gig/PrePendingComponent";
 import React from "react";
 
 const PreExecutePage = () => {
-  return <div>Pre-excecute</div>;
+  return <PrePendingComponent />;
 };
 
 export default PreExecutePage;
