@@ -5,10 +5,8 @@ import { Toaster } from "sonner";
 
 export default function GigLayout({
   children,
-  editpage,
 }: Readonly<{
   children: React.ReactNode;
-  editpage: React.ReactNode; // Add Chat type here
 }>) {
   return (
     <div className="bg-black h-screen w-full overflow-hidden">
@@ -22,7 +20,6 @@ export default function GigLayout({
           duration: 3000,
         }}
       />
-      {editpage}
       {children} <PagesNav />
     </div>
   );

@@ -231,9 +231,9 @@ const CreateGig = () => {
     <>
       <form
         onSubmit={onSubmit}
-        className="h-[100vh]  mt-[20px] py-3 overflow-y-hidden -mt-7"
+        className="h-[100vh]   py-3 overflow-y-hidden -mt-1"
       >
-        <h6 className=" text-gray-300 font-sans text-center underline mb-3 ">
+        <h6 className=" text-gray-300 font-sans text-center underline mb-1 -mt-4 ">
           Enter info to create a gig
         </h6>{" "}
         <div className="flex w-full justify-between">

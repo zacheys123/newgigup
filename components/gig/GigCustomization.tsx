@@ -30,11 +30,11 @@ const GigCustomization: React.FC<GigCustomizationProps> = ({
 }) => {
   console.log("mylogo", logo);
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black  h-[90%] bg-opacity-70 backdrop-blur-md animate-fadeIn mt-[90px] w-[90%] mx-auto">
-      <div className="bg-white/20 backdrop-blur-0 p-6 rounded-2xl shadow-xl w-[420px]  h-[90%] border border-white/30 transition-all animate-slideUp overflow-hidden">
+    <div className="fixed inset-0 flex items-center z-50 justify-center bg-black  h-[900px] bg-opacity-70 backdrop-blur-md animate-fadeIn mt-[25px] w-[90%] mx-auto">
+      <div className="bg-white/20 backdrop-blur-0 p-6 rounded-2xl shadow-xl w-[420px]  h-[900px] border border-white/30 transition-all animate-slideUp overflow-hidden">
         {/* Scrollable Content */}
-        <div className="overflow-y-auto max-h-[500px] pr-2 mt-[50px]">
-          <h2 className="text-xl font-semibold text-white mb-4 text-center">
+        <div className="overflow-y-auto max-h-[800px] pr-2 mt-[50px]">
+          <h2 className="text-xl font-semibold text-white -mt-4 text-center">
             Customize Your Gig
           </h2>
 

@@ -70,7 +70,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
     router.push(`/execute/${id}`);
   };
   const handleEdit = async (id: string) => {
-    router.push(`/editpage/${id}`);
+    return router.push(`/editpage/${id}`);
   };
 
   const handleReviewModal = () => {
