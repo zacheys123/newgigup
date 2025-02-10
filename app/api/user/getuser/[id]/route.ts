@@ -54,7 +54,6 @@ export async function GET(req: NextRequest) {
       bio,
       handles,
       genre,
-      usersbookgig,
     } = await User.findOne(query).populate({
       path: "allreviews myreviews usersbookgig",
       model: Gig,
@@ -90,7 +89,6 @@ export async function GET(req: NextRequest) {
       bio,
       handles,
       genre,
-      usersbookgig,
     });
   } catch (error) {
     console.error("Error fetching user:", error);

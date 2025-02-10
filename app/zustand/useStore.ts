@@ -63,7 +63,6 @@ const useStore = create<StoreState>((set) => ({
     bio: "",
     genre: "",
     organization: "",
-    usersbookgig: [],
   },
   currentgig: {
     _id: "",

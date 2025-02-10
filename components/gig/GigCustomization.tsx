@@ -28,7 +28,6 @@ const GigCustomization: React.FC<GigCustomizationProps> = ({
   handleFileChange,
   isUploading,
 }) => {
-  console.log("mylogo", logo);
   return (
     <div className="fixed inset-0 flex items-center z-50 justify-center bg-black  h-[900px] bg-opacity-70 backdrop-blur-md animate-fadeIn mt-[25px] w-[90%] mx-auto">
       <div className="bg-white/20 backdrop-blur-0 p-6 rounded-2xl shadow-xl w-[420px]  h-[900px] border border-white/30 transition-all animate-slideUp overflow-hidden">
