@@ -18,6 +18,8 @@ export async function GET(req: NextRequest) {
       })
 
       .collation({ locale: "en", strength: 2 })
+      .sort({ createdAt: -1 }) // Sort by createdAt in descending order
+
       .exec();
     console.log(gigs);
     return NextResponse.json({ gigs });

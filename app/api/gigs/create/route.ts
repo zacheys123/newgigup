@@ -66,6 +66,13 @@ export async function POST(req: NextRequest) {
       message: "All fields should be filled.",
     });
   }
+
+  if (!logo) {
+    return NextResponse.json({
+      gigstatus: "false",
+      message: "logo is required",
+    });
+  }
   const { userId } = getAuth(req);
   if (!userId) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });

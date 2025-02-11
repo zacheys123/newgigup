@@ -1,7 +1,11 @@
 import { GigProps } from "@/types/giginterface";
-import { UserProps } from "@/types/userinterfaces";
+import { Review, UserProps } from "@/types/userinterfaces";
+import io from "socket.io-client";
+import { ChatProps, MessageProps } from "@/types/chatinterfaces";
 import { postedBy } from "@/utils";
 import { create } from "zustand";
+
+const socket = io("http://localhost:3000", { path: "/socket.io" });
 
 interface StoreState {
   search: boolean;
@@ -11,40 +15,45 @@ interface StoreState {
   follow: boolean;
   refetchData: boolean;
   showModal: boolean;
-  selectedReview: object;
+  selectedReview: Record<string, Review>;
   showUpload: boolean;
   modalVisible: boolean;
   drawerVisible: boolean;
   followersModal: boolean;
   followingsModal: boolean;
   currentFollowers: boolean;
-  refetchgig: boolean;
+  refetchGig: boolean;
+  messages: MessageProps[];
+  chats: Record<string, ChatProps>;
 
   setShowUpload: () => void;
   setRefetchData: (data: boolean) => void;
   setShowModal: (data: boolean) => void;
   setCurrentFollowers: (data: boolean) => void;
-  setSelectedReview: (data: object) => void;
+  setSelectedReview: (data: Record<string, Review>) => void;
   setSearch: (data: boolean) => void;
   setFollow: (data: boolean) => void;
-  setCurrentUser: (data: UserProps) => void;
-  setCurrentGig: (data: GigProps) => void;
+  setCurrentUser: (data: Partial<UserProps>) => void;
+  setCurrentGig: (data: Partial<GigProps>) => void;
   setSearchQuery: (data: string) => void;
   setModalVisible: (data: boolean) => void;
   setDrawerVisible: () => void;
   setFollowersModal: (data: boolean) => void;
   setFollowingsModal: (data: boolean) => void;
   setRefetchGig: (data: boolean) => void;
+  setMessages: (data: MessageProps[]) => void;
+  addChat: (chat: ChatProps) => void;
+  addMessage: (message: MessageProps) => void;
+  fetchMessages: (chatId: string) => Promise<void>;
+  sendMessage: (message: MessageProps) => Promise<void>;
+  listenForMessages: () => void;
 }
 
 const useStore = create<StoreState>((set) => ({
   messages: [],
-  allgigs: [],
-  publishedgigs: [],
-  mygigs: [],
-  bookedgigs: [],
+  chats: {}, // Efficient dictionary for chat lookups
   search: false,
-  refetchgig: false,
+  refetchGig: false,
   currentUser: {
     clerkId: "",
     firstname: "",
@@ -105,20 +114,95 @@ const useStore = create<StoreState>((set) => ({
 
   setShowUpload: () => set((state) => ({ showUpload: !state.showUpload })),
   setRefetchData: (data) => set(() => ({ refetchData: data })),
-  setCurrentFollowers: (data) => set(() => ({ refetchData: data })),
+  setCurrentFollowers: (data) => set(() => ({ currentFollowers: data })),
   setShowModal: (data) => set(() => ({ showModal: data })),
   setSelectedReview: (data) => set(() => ({ selectedReview: data })),
   setSearch: (data) => set(() => ({ search: data })),
   setFollow: (data) => set(() => ({ follow: data })),
-  setCurrentUser: (data) => set(() => ({ currentUser: data })),
-  setCurrentGig: (data) => set(() => ({ currentgig: data })),
+  setCurrentUser: (data) =>
+    set((state) => ({ currentUser: { ...state.currentUser, ...data } })),
+  setCurrentGig: (data) =>
+    set((state) => ({ currentgig: { ...state.currentgig, ...data } })),
   setSearchQuery: (data) => set(() => ({ searchQuery: data })),
   setModalVisible: (data) => set(() => ({ modalVisible: data })),
   setDrawerVisible: () =>
     set((state) => ({ drawerVisible: !state.drawerVisible })),
   setFollowersModal: (data) => set(() => ({ followersModal: data })),
   setFollowingsModal: (data) => set(() => ({ followingsModal: data })),
-  setRefetchGig: (data) => set(() => ({ refetchgig: data })),
+  setRefetchGig: (data) => set(() => ({ refetchGig: data })),
+  setMessages: (data) => set(() => ({ messages: data })),
+  // Efficiently add new chats
+  addChat: (chat) =>
+    set((state) => ({
+      chats: { ...state.chats, [chat.chatId]: chat },
+    })),
+
+  // Efficiently add new messages to the correct chat
+  addMessage: (message) =>
+    set((state) => {
+      if (state.messages.find((msg: MessageProps) => msg._id === message._id))
+        return state;
+      return {
+        messages: [...state.messages, message],
+        chats: {
+          ...state.chats,
+          [message.chatId]: {
+            ...state.chats[message.chatId],
+            messages: [
+              ...(state.chats[message.chatId]?.messages || []),
+              message,
+            ],
+          },
+        },
+      };
+    }),
+
+  // Fetch messages and update chat state
+  fetchMessages: async (chatId: string) => {
+    try {
+      const res = await fetch(`/api/chat/getmessages?chatId=${chatId}`);
+      if (!res.ok) throw new Error("Failed to fetch messages");
+
+      const { messages } = await res.json();
+      set((state) => ({
+        messages,
+        chats: {
+          ...state.chats,
+          [chatId]: {
+            ...state.chats[chatId],
+            messages,
+          },
+        },
+      }));
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+    }
+  },
+
+  listenForMessages: () => {
+    socket.off("receive_message"); // Ensure we don’t create multiple listeners
+    socket.on("receive_message", (message) => {
+      set((state) => ({
+        messages: [...state.messages, message],
+      }));
+    });
+  },
+  sendMessage: async (newMessage: MessageProps) => {
+    try {
+      const res = await fetch("/api/messages/sendmessages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newMessage),
+      });
+
+      if (!res.ok) throw new Error("Failed to send message");
+
+      const savedMessage = await res.json();
+      socket.emit("send_message", savedMessage);
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+  },
 }));
 
 export default useStore;

@@ -33,10 +33,6 @@ const GigCustomization: React.FC<GigCustomizationProps> = ({
       <div className="bg-white/20 backdrop-blur-0 p-6 rounded-2xl shadow-xl w-[420px]  h-[900px] border border-white/30 transition-all animate-slideUp overflow-hidden">
         {/* Scrollable Content */}
         <div className="overflow-y-auto max-h-[800px] pr-2 mt-[50px]">
-          <h2 className="text-xl font-semibold text-white -mt-4 text-center">
-            Customize Your Gig
-          </h2>
-
           {/* Font Selection */}
           <div className="mb-4">
             <label className="block text-sm text-white mb-1">Font:</label>

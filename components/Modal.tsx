@@ -1,6 +1,6 @@
 import { UserProps, VideoProfileProps } from "@/types/userinterfaces";
 import { motion } from "framer-motion";
-import ChatPage from "./chat/ChatPage";
+import Chat from "./chat/Chat";
 
 interface ModalProps {
   onClose: () => void;
@@ -8,39 +8,19 @@ interface ModalProps {
     type: string;
     user: UserProps;
   };
-  messages: { senderId: string; text: string }[];
   user: UserProps;
-  newMessage: string;
-  setNewMessage: (message: string) => void;
-  sendMessage: (e: React.FormEvent) => void;
 }
 
-const Modal: React.FC<ModalProps> = ({
-  onClose,
-  modal,
-  messages,
-  user,
-  newMessage,
-  setNewMessage,
-  sendMessage,
-}) => (
+const Modal: React.FC<ModalProps> = ({ onClose, modal, user }) => (
   <motion.div
     initial={{ scale: 0.8, opacity: 0 }}
     animate={{ scale: 1, opacity: 1 }}
     transition={{ duration: 0.3 }}
-    className="bg-gray-800 rounded-lg p-6 shadow-lg max-w-md w-full text-white relative"
+    className="bg-gray-800 rounded-lg p-6 shadow-lg max-w-md w-full text-white relative h-[80%]"
   >
     <h2 className="text-xl font-bold mb-4">
       {modal.type === "chat" ? (
-        <ChatPage
-          onClose={onClose}
-          modal={modal}
-          messages={messages}
-          user={user}
-          newMessage={newMessage}
-          setNewMessage={setNewMessage}
-          sendMessage={sendMessage}
-        />
+        <Chat onClose={onClose} modal={modal} myuser={user} />
       ) : (
         <section className="h-[500px] w-full">
           {modal?.user?.videosProfile?.length > 0 && (

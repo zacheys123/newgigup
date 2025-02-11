@@ -5,10 +5,12 @@ import Logo from "./Logo";
 import { Music, User, MessageCircleQuestion } from "lucide-react";
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 const Nav = () => {
   const { userId } = useAuth();
   const router = useRouter();
+  const { user } = useCurrentUser(userId || null);
 
   return (
     <nav className="sticky top-0 w-full bg-neutral-900 text-white shadow-md py-4 px-6 flex items-center justify-between  shadow-slate-700 ">
@@ -30,7 +32,13 @@ const Nav = () => {
             </Link>
 
             <Link
-              href={`/profile`}
+              href={
+                user?.isClient
+                  ? `/client/profile/${userId}`
+                  : user?.isMusician
+                  ? `/profile`
+                  : "/profile"
+              }
               className="flex items-center gap-2 p-3 rounded-full transition-all hover:bg-neutral-700 hover:scale-105"
             >
               <User size="21" />

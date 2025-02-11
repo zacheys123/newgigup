@@ -134,7 +134,7 @@ export const fileupload = async (
 
             const data: UpdateResponse = await response.json();
             console.log("API Response:", data);
-
+            setRefetchData(true);
             if (data.updateStatus) {
               toast.success(data.message || "Video updated successfully!");
             } else {

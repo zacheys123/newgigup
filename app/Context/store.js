@@ -2,6 +2,7 @@
 import React from "react";
 import { authReducer } from "../../reducers/authReducers";
 import { createContext, useContext, useMemo, useReducer } from "react";
+import { SocketProvider } from "./SocketContext"; // Import the SocketProvider
 
 export const initialState = {
   toggle: false,
@@ -22,7 +23,9 @@ export const GlobalProvider = ({ children }) => {
   }, [userState]);
 
   return (
-    <GlobalContext.Provider value={value}>{children}</GlobalContext.Provider>
+    <SocketProvider>
+      <GlobalContext.Provider value={value}>{children}</GlobalContext.Provider>
+    </SocketProvider>
   );
 };
 export const useGlobalContext = () => useContext(GlobalContext);

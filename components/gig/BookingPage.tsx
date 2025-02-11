@@ -6,8 +6,10 @@ import { CircularProgress } from "@mui/material";
 import { MessageCircle, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { MdAdd } from "react-icons/md";
+import Modal from "../Modal";
+import { UserProps } from "@/types/userinterfaces";
 
 const BookingPage = () => {
   const { currentgig } = useStore();
@@ -28,6 +30,12 @@ const BookingPage = () => {
       router.push(`/execute/${currentgig?._id}`);
     }
   }, [currentgig?.isTaken, currentgig?.isPending]);
+  const postedByUser = currentgig?.postedBy;
+
+  const [modal, setModal] = useState<{
+    type: "chat" | "video";
+    user: UserProps;
+  } | null>(null);
   return (
     <div className="h-[83%] w-full overflow-y-auto relative">
       <div className="absolute w-[40px] h-[40px] flex  justify-center items-center right-5 top-[460px] opacity-85 rounded-md  animate-pulse  shadow shadow-slate-400   bg-gray-800">
@@ -97,6 +105,7 @@ const BookingPage = () => {
                 cursor: "pointer",
                 color: "white",
               }}
+              onClick={() => setModal({ type: "chat", user: postedByUser })}
             />
           </div>
         </div>
@@ -185,6 +194,12 @@ const BookingPage = () => {
           </h4>{" "}
         </div>
       </div>
+      {/* Modal */}
+      {modal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm w-[100%] mx-auto h-full">
+          <Modal onClose={() => setModal(null)} modal={modal} user={user} />
+        </div>
+      )}
     </div>
   );
 };

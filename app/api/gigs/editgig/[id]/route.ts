@@ -62,6 +62,12 @@ export async function PUT(req: NextRequest) {
         { status: 400 }
       );
     }
+    if (!logo) {
+      return NextResponse.json(
+        { gigstatus: "false", message: "Logo is required" },
+        { status: 400 }
+      );
+    }
 
     const { userId } = getAuth(req);
     if (!userId) {

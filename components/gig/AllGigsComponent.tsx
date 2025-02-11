@@ -281,10 +281,8 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                 {gig.postedBy?._id &&
                   gig?.postedBy?._id.includes(myId || "") &&
                   gig?.bookCount.length !== 0 &&
-                  gig?.bookCount?.length >= 3 &&
-                  gig?.bookCount?.length <= 4 &&
                   !gig?.isTaken && (
-                    <div className="w-full text-right">
+                    <div className="w-full text-right relative">
                       <ButtonComponent
                         variant="secondary"
                         classname=" h-[20px] text-[8px] mt-5 font-bold   rounded-b-md rounded-br-xl"
@@ -302,6 +300,11 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                             : "View Gig Details!!"
                         }
                       />
+                      {gig?.bookCount.length > 0 && (
+                        <span className="absolute right-[1px] top-[12px] bg-gray-200 w-4 h-4 text-red-500 text-[10px] font-bold  rounded-full  flex justify-center items-center">
+                          {gig?.bookCount.length}
+                        </span>
+                      )}
                     </div>
                   )}
               </Box>

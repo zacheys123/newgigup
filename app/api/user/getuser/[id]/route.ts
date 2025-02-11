@@ -55,7 +55,7 @@ export async function GET(req: NextRequest) {
       handles,
       genre,
     } = await User.findOne(query).populate({
-      path: "allreviews myreviews usersbookgig",
+      path: "allreviews myreviews",
       model: Gig,
     });
 

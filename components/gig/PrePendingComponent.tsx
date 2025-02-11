@@ -32,8 +32,6 @@ const PrePendingComponent = () => {
     type: "chat" | "video";
     user: UserProps;
   } | null>(null);
-  const [messages] = useState<{ senderId: string; text: string }[]>([]);
-  const [newMessage, setNewMessage] = useState("");
 
   //   const forget = () => forgetBookings(userId || "", currentgig);
   const handleBookUser = (userId: string) => {
@@ -58,14 +56,7 @@ const PrePendingComponent = () => {
       console.error(error);
     }
   };
-  const sendMessage = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newMessage.trim()) return;
 
-    // const newMsg = { senderId: user._id, text: newMessage };
-    // setMessages([...messages, newMsg]);
-    setNewMessage("");
-  };
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen btext-gray-300 backdrop-blur-xl bg-black bg-opacity-50 ">
@@ -88,7 +79,9 @@ const PrePendingComponent = () => {
         <h1 className="text-3xl font-extrabold text-gray-100">
           {currentgig?.title}
         </h1>
-        <p className="text-gray-400 text-md mt-2">{currentgig?.description}</p>
+        <p className="text-gray-400 text-md mt-2 capitalize">
+          {currentgig?.description}
+        </p>
         <p
           className={`mt-3 text-sm font-semibold tracking-wide uppercase ${
             currentgig?.isTaken ? "text-red-400" : "text-green-400"
@@ -196,16 +189,8 @@ const PrePendingComponent = () => {
 
       {/* Modal */}
       {modal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm w-[100%] mx-auto ">
-          <Modal
-            onClose={() => setModal(null)}
-            modal={modal}
-            messages={messages}
-            user={user}
-            newMessage={newMessage}
-            setNewMessage={setNewMessage}
-            sendMessage={sendMessage}
-          />
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm w-[100%] mx-auto h-full">
+          <Modal onClose={() => setModal(null)} modal={modal} user={user} />
         </div>
       )}
     </div>
