@@ -1,11 +1,8 @@
 import { GigProps } from "@/types/giginterface";
 import { Review, UserProps } from "@/types/userinterfaces";
-import io from "socket.io-client";
 import { ChatProps, MessageProps } from "@/types/chatinterfaces";
 import { postedBy } from "@/utils";
 import { create } from "zustand";
-
-const socket = io("http://localhost:3000", { path: "/socket.io" });
 
 interface StoreState {
   search: boolean;
@@ -25,6 +22,7 @@ interface StoreState {
   refetchGig: boolean;
   messages: MessageProps[];
   chats: Record<string, ChatProps>;
+  onlineUsers: [];
 
   setShowUpload: () => void;
   setRefetchData: (data: boolean) => void;
@@ -46,7 +44,9 @@ interface StoreState {
   addMessage: (message: MessageProps) => void;
   fetchMessages: (chatId: string) => Promise<void>;
   sendMessage: (message: MessageProps) => Promise<void>;
-  listenForMessages: () => void;
+  // listenForMessages: () => void;
+  setOnlineUsers: (onlineuser: []) => void;
+  updateMessageReaction: (messageId: string, emoji: string) => void;
 }
 
 const useStore = create<StoreState>((set) => ({
@@ -111,7 +111,9 @@ const useStore = create<StoreState>((set) => ({
   followersModal: false,
   followingsModal: false,
   currentFollowers: false,
+  onlineUsers: [],
 
+  setOnlineUsers: (data) => set(() => ({ onlineUsers: data })),
   setShowUpload: () => set((state) => ({ showUpload: !state.showUpload })),
   setRefetchData: (data) => set(() => ({ refetchData: data })),
   setCurrentFollowers: (data) => set(() => ({ currentFollowers: data })),
@@ -137,17 +139,15 @@ const useStore = create<StoreState>((set) => ({
       chats: { ...state.chats, [chat.chatId]: chat },
     })),
 
-  // Efficiently add new messages to the correct chat
   addMessage: (message) =>
     set((state) => {
-      if (state.messages.find((msg: MessageProps) => msg._id === message._id))
-        return state;
+      if (state.messages.find((msg) => msg._id === message._id)) return state;
       return {
         messages: [...state.messages, message],
         chats: {
           ...state.chats,
           [message.chatId]: {
-            ...state.chats[message.chatId],
+            ...(state.chats[message.chatId] || {}), // Ensure chat exists
             messages: [
               ...(state.chats[message.chatId]?.messages || []),
               message,
@@ -179,14 +179,14 @@ const useStore = create<StoreState>((set) => ({
     }
   },
 
-  listenForMessages: () => {
-    socket.off("receive_message"); // Ensure we don’t create multiple listeners
-    socket.on("receive_message", (message) => {
-      set((state) => ({
-        messages: [...state.messages, message],
-      }));
-    });
-  },
+  // listenForMessages: () => {
+  //   socket.off("receive_message"); // Ensure we don’t create multiple listeners
+  //   socket.on("receive_message", (message) => {
+  //     set((state) => ({
+  //       messages: [...state.messages, message],
+  //     }));
+  //   });
+  // },
   sendMessage: async (newMessage: MessageProps) => {
     try {
       const res = await fetch("/api/messages/sendmessages", {
@@ -198,7 +198,35 @@ const useStore = create<StoreState>((set) => ({
       if (!res.ok) throw new Error("Failed to send message");
 
       const savedMessage = await res.json();
-      socket.emit("send_message", savedMessage);
+      console.log(savedMessage);
+      set((state) => ({
+        messages: [...state.messages, savedMessage], // Update state
+        chats: {
+          ...state.chats,
+          [savedMessage.chatId]: {
+            ...(state.chats[savedMessage.chatId] || {}),
+            messages: [
+              ...(state.chats[savedMessage.chatId]?.messages || []),
+              savedMessage,
+            ],
+          },
+        },
+      }));
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+  },
+  updateMessageReaction: async (messageId: string, emoji: string) => {
+    // put request to update message model reactions prroperty
+    console.log("updateMessageReaction ", messageId, emoji);
+    try {
+      const res = await fetch(`/api/messages?messageId=${messageId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(emoji),
+      });
+
+      if (!res.ok) throw new Error("Failed to send message");
     } catch (error) {
       console.error("Error sending message:", error);
     }

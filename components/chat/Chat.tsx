@@ -7,7 +7,9 @@ import ChatInput from "./ChatInput";
 import useStore from "@/app/zustand/useStore";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAuth } from "@clerk/nextjs";
-import { useSocket } from "@/app/Context/SocketContext";
+
+// import { useSocket } from "@/app/Context/SocketContext";
+// import { MessageProps } from "@/types/chatinterfaces";
 
 interface ChatProps {
   myuser: UserProps;
@@ -21,11 +23,26 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose }) => {
   const { userId } = useAuth();
   const [loading, setLoading] = useState(true);
   const [newMessage, setNewMessage] = useState("");
-  const { sendMessage, listenForMessages, addMessage } = useStore();
+  const { sendMessage, addMessage } = useStore();
   const { user: myuserd } = useCurrentUser(userId || null);
-  const { socket } = useSocket();
+  // const { socket } = useSocket();
+
+  // useEffect(() => {
+  //   if (!socket) return;
+
+  //   const handleMessage = (message: MessageProps) => {
+  //     addMessage(message); // ✅ Optimized: Add message directly to Zustand store
+  //   };
+
+  //   socket.on("receive_message", handleMessage);
+
+  //   return () => {
+  //     socket.off("receive_message", handleMessage); // ✅ Cleanup listener
+  //   };
+  // }, [socket, addMessage]);
+
   useEffect(() => {
-    listenForMessages(); // ✅ Start listening for real-time messages
+    // listenForMessages(); // ✅ Start listening for real-time messages
 
     const fetchChat = async () => {
       if (!myuserd?._id || !modal.user?._id) return;
@@ -61,17 +78,19 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose }) => {
     };
 
     fetchChat();
-  }, [myuserd._id, modal.user, listenForMessages]);
+  }, [myuserd._id, modal.user, chatId]);
 
   const send = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !chatId || !socket) return;
+    if (!newMessage.trim() || !chatId) return;
 
     const newMsg = {
       sender: myuser,
       receiver: modal?.user?._id, // ✅ Corrected spelling
       text: newMessage,
       chatId,
+      createdAt: new Date(),
+      reactions: "",
     };
 
     sendMessage(newMsg); // ✅ Real-time WebSocket message sending
@@ -96,6 +115,7 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose }) => {
   return (
     <section className="w-full max-w-lg sm:max-w-xl h-[700px] flex flex-col border border-gray-300 dark:border-gray-700 rounded-2xl shadow-2xl bg-white -mt-[70px] dark:bg-gray-900">
       <ChatHeader onClose={onClose} modal={modal} user={myuserd} />
+
       <div className="flex-1">
         <ChatPage chatId={chatId} />
       </div>
