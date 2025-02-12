@@ -68,73 +68,78 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
       <div className="flex-1 overflow-y-auto space-y-4 p-2">
         {messages
           .filter((msg) => msg.chatId === chatId)
-          .map((msg: MessageProps) => (
-            <div
-              key={msg._id}
-              className={`flex items-end relative  ${
-                msg.sender?._id === user?._id ? "justify-end" : "justify-start"
-              }`}
-            >
-              {showReaction?.success === true &&
-                messageReactions[msg._id || ""] && (
-                  <div className="absolute top-[12px] z-50 right-0 px-3 py-1 bg-gray-800 text-white text-xs rounded-md shadow-md animate-fadeIn">
-                    {showReaction?.message
-                      ? `'${showReaction?.message}'`
-                      : `Reacted with ${reactionOptions[0]}`}
-                  </div>
-                )}
+          .map((msg: MessageProps) => {
+            console.log(msg);
+            return (
               <div
-                className={`relative max-w-xs md:max-w-sm px-4 py-3 text-sm md:text-base rounded-2xl shadow-xl transition-all duration-300 transform my-3 ${
+                key={msg._id}
+                className={`flex items-end relative  ${
                   msg.sender?._id === user?._id
-                    ? "bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-br-md self-end"
-                    : "bg-gradient-to-r from-amber-500 to-amber-700 text-white rounded-bl-md self-start"
+                    ? "justify-end"
+                    : "justify-start"
                 }`}
               >
-                <span className="block">{msg.text}</span>
+                {showReaction?.success === true &&
+                  messageReactions[msg._id || ""] && (
+                    <div className="absolute top-[12px] z-50 right-0 px-3 py-1 bg-gray-800 text-white text-xs rounded-md shadow-md animate-fadeIn">
+                      {showReaction?.message
+                        ? `'${showReaction?.message}'`
+                        : `Reacted with ${reactionOptions[0]}`}
+                    </div>
+                  )}
+                <div
+                  className={`relative max-w-xs md:max-w-sm px-4 py-3 text-sm md:text-base rounded-2xl shadow-xl transition-all duration-300 transform my-3 ${
+                    msg.sender?._id === user?._id
+                      ? "bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-br-md self-end"
+                      : "bg-gradient-to-r from-amber-500 to-amber-700 text-white rounded-bl-md self-start"
+                  }`}
+                >
+                  <span className="block">{msg.text}</span>
 
-                {/* Timestamp */}
-                <span className="text-[11px] text-gray-300 dark:text-gray-400 mt-1 block text-right">
-                  {moment(msg?.createdAt || new Date()).calendar(null, {
-                    sameDay: "[Today at] h:mm A",
-                    lastDay: "[Yesterday at] h:mm A",
-                    lastWeek: "dddd [at] h:mm A",
-                    sameElse: "MMMM D [at] h:mm A",
-                  })}
-                </span>
-                <div className="absolute -bottom-4 right-1">
-                  <button
-                    className="text-lg hover:scale-110 transition"
-                    onClick={() =>
-                      setReactionPopup(
-                        reactionPopup === msg._id ? "" : msg?._id || ""
-                      )
-                    }
-                  >
-                    {msg?.reactions
-                      ? msg?.reactions
-                      : messageReactions[msg._id || ""] ||
-                        (msg.reactions ?? [])[0] ||
-                        "💗"}
-                  </button>
-                </div>
-
-                {/* Reaction Popup */}
-                {reactionPopup === msg._id && (
-                  <div className="absolute bottom-[37px] right-2 bg-white dark:bg-gray-800 shadow-md p-2 rounded-lg flex  w-full space-x-2 z-50 overflow-x-auto">
-                    {reactionOptions.map((emoji) => (
-                      <button
-                        key={emoji}
-                        onClick={() => handleReaction(msg._id || "", emoji)}
-                        className="text-lg hover:scale-125 transition"
-                      >
-                        {emoji}
-                      </button>
-                    ))}
+                  {/* Timestamp */}
+                  <span className="text-[11px] text-gray-300 dark:text-gray-400 mt-1 block text-right">
+                    {moment(msg?.createdAt || new Date()).calendar(null, {
+                      sameDay: "[Today at] h:mm A",
+                      lastDay: "[Yesterday at] h:mm A",
+                      lastWeek: "dddd [at] h:mm A",
+                      sameElse: "MMMM D [at] h:mm A",
+                    })}
+                  </span>
+                  <div className="absolute -bottom-4 right-1">
+                    <button
+                      className="text-lg hover:scale-110 transition"
+                      onClick={() =>
+                        setReactionPopup(
+                          reactionPopup === msg._id ? "" : msg?._id || ""
+                        )
+                      }
+                    >
+                      {msg?.reactions && msg?.sender?._id !== user?._id
+                        ? msg?.reactions
+                        : messageReactions[msg._id || ""] ||
+                          (msg.reactions ?? [])[0] ||
+                          "💗"}
+                    </button>
                   </div>
-                )}
+
+                  {/* Reaction Popup */}
+                  {reactionPopup === msg._id && (
+                    <div className="absolute bottom-[37px] right-2 bg-white dark:bg-gray-800 shadow-md p-2 rounded-lg flex  w-full space-x-2 z-50 overflow-x-auto">
+                      {reactionOptions.map((emoji) => (
+                        <button
+                          key={emoji}
+                          onClick={() => handleReaction(msg._id || "", emoji)}
+                          className="text-lg hover:scale-125 transition"
+                        >
+                          {emoji}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
 
         {/* Typing Indicator */}
         {isTyping && (
