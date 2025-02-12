@@ -46,7 +46,11 @@ interface StoreState {
   sendMessage: (message: MessageProps) => Promise<void>;
   // listenForMessages: () => void;
   setOnlineUsers: (onlineuser: []) => void;
-  updateMessageReaction: (messageId: string, emoji: string) => void;
+  updateMessageReaction: (
+    messageId: string,
+    emoji: string,
+    setShowReaction: (response: { success: boolean; message: string }) => void
+  ) => void;
 }
 
 const useStore = create<StoreState>((set) => ({
@@ -216,19 +220,44 @@ const useStore = create<StoreState>((set) => ({
       console.error("Error sending message:", error);
     }
   },
-  updateMessageReaction: async (messageId: string, emoji: string) => {
-    // put request to update message model reactions prroperty
+  updateMessageReaction: async (
+    messageId: string,
+    emoji: string,
+    setShowReaction: (response: { success: boolean; message: string }) => void
+  ) => {
     console.log("updateMessageReaction ", messageId, emoji);
+
     try {
       const res = await fetch(`/api/messages?messageId=${messageId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(emoji),
+        body: JSON.stringify({ emoji }),
       });
 
-      if (!res.ok) throw new Error("Failed to send message");
+      if (!res.ok) throw new Error("Failed to update message reaction");
+
+      const data = await res.json();
+      console.log(data);
+
+      setTimeout(() => {
+        setShowReaction({
+          success: false,
+          message: "",
+        });
+      }, 3000);
+      // Call the callback function with success status
+      setShowReaction({
+        success: true,
+        message: data.message,
+      });
     } catch (error) {
-      console.error("Error sending message:", error);
+      console.error("Error updating message reaction:", error);
+
+      // Handle failure case
+      setShowReaction({
+        success: false,
+        message: "Failed to update reaction",
+      });
     }
   },
 }));

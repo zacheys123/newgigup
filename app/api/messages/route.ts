@@ -10,9 +10,9 @@ type Info = {
 export async function PUT(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const messageId = searchParams.get("messageId");
+  const { emoji }: Info = await req.json();
+  console.log(emoji);
   try {
-    const { emoji }: Info = await req.json();
-
     if (!emoji) {
       return NextResponse.json(
         { gigstatus: "false", message: "No reactions recieved." },

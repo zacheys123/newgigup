@@ -9,6 +9,10 @@ import { useEffect, useState } from "react";
 interface ChatPageProps {
   chatId: string;
 }
+interface ReactionsProps {
+  success: boolean;
+  message: string;
+}
 
 const reactionOptions = ["👍", "😀", "😂", "🔥", "😢", "🎉", "😨", "😡"];
 
@@ -28,6 +32,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
     [key: string]: string;
   }>({});
 
+  const [showReaction, setShowReaction] = useState<ReactionsProps>();
   useEffect(() => {
     const loadMessages = async () => {
       if (chatId) {
@@ -40,13 +45,13 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
   }, [chatId, addMessage]);
 
   // Handle sending reaction
-  const handleReaction = async (messageId: string, emoji: string) => {
+  const handleReaction = (messageId: string, emoji: string) => {
     setMessageReactions((prev) => ({
       ...prev,
       [messageId]: emoji, // Update only this specific message
     }));
 
-    await updateMessageReaction(messageId, emoji); // Send reaction to backend
+    updateMessageReaction(messageId, emoji, setShowReaction); // Send reaction to backend
     setReactionPopup(""); // Close popup after selection
   };
   console.log(reactionPopup);
@@ -66,10 +71,18 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
           .map((msg: MessageProps) => (
             <div
               key={msg._id}
-              className={`flex items-end  ${
+              className={`flex items-end relative  ${
                 msg.sender?._id === user?._id ? "justify-end" : "justify-start"
               }`}
             >
+              {showReaction?.success === true &&
+                messageReactions[msg._id || ""] && (
+                  <div className="absolute top-[12px] z-50 right-0 px-3 py-1 bg-gray-800 text-white text-xs rounded-md shadow-md animate-fadeIn">
+                    {showReaction?.message
+                      ? `'${showReaction?.message}'`
+                      : `Reacted with ${reactionOptions[0]}`}
+                  </div>
+                )}
               <div
                 className={`relative max-w-xs md:max-w-sm px-4 py-3 text-sm md:text-base rounded-2xl shadow-xl transition-all duration-300 transform my-3 ${
                   msg.sender?._id === user?._id
