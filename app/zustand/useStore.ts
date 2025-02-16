@@ -202,24 +202,33 @@ const useStore = create<StoreState>((set) => ({
       if (!res.ok) throw new Error("Failed to send message");
 
       const savedMessage = await res.json();
-      console.log(savedMessage);
-      set((state) => ({
-        messages: [...state.messages, savedMessage], // Update state
-        chats: {
-          ...state.chats,
-          [savedMessage.chatId]: {
-            ...(state.chats[savedMessage.chatId] || {}),
-            messages: [
-              ...(state.chats[savedMessage.chatId]?.messages || []),
-              savedMessage,
-            ],
+
+      set((state) => {
+        console.log("Before update:", state.messages.length);
+        // Ensure the message is not already in the state
+        if (state.messages.some((msg) => msg._id === savedMessage._id)) {
+          return state;
+        }
+        console.log("After update:", state.messages.length);
+        return {
+          messages: [...state.messages, savedMessage], // Add only if not present
+          chats: {
+            ...state.chats,
+            [savedMessage.chatId]: {
+              ...(state.chats[savedMessage.chatId] || {}),
+              messages: [
+                ...(state.chats[savedMessage.chatId]?.messages || []),
+                savedMessage,
+              ],
+            },
           },
-        },
-      }));
+        };
+      });
     } catch (error) {
       console.error("Error sending message:", error);
     }
   },
+
   updateMessageReaction: async (
     messageId: string,
     emoji: string,

@@ -11,7 +11,7 @@ export interface MessageProps {
   _id?: string;
   chatId: string; // Reference to the chat
   sender: UserProps; // Changed senderId to full UserProps for flexibility
-  text: string;
+  content: string;
   createdAt: Date; //
   reactions: string;
 }

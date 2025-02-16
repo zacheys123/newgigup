@@ -5,24 +5,34 @@ import Chat from "@/models/chat";
 // import { getIO } from "@/lib/socket"; // Import Socket.io instance
 
 export async function POST(req: NextRequest) {
-  const { sender, receiver, text, chatId } = await req.json();
-  if (!sender || !receiver || !text || !chatId) {
+  const { sender, receiver, content, chatId, reactions } = await req.json();
+  if (!sender || !receiver || !content || !chatId) {
     return NextResponse.json(
       { error: "Missing required fields" },
       { status: 400 }
     );
   }
-  console.log(sender);
-  console.log("Received", text, chatId, receiver);
+  console.log("message", content);
+  console.log("chatId", chatId);
+  console.log("Receiver", receiver);
   console.log("sender", sender);
+  console.log("reactions", reactions);
+  if (!content || !chatId || !reactions || !sender || !receiver) {
+    console.log("Missing required fields");
+    return NextResponse.json(
+      { error: "Missing required fields" },
+      { status: 400 }
+    );
+  }
   try {
     await connectDb();
 
     const newMessage = new Message({
       sender: typeof sender === "object" ? sender?._id : sender,
       receiver,
-      text,
+      content,
       chatId,
+      reactions,
     });
 
     await newMessage.save();
