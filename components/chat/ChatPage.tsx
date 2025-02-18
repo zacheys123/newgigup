@@ -95,7 +95,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
       >
         {(messages ?? [])
           .filter((msg: MessageProps) => msg.chatId === chatId)
-          .map((msg: MessageProps, index: number, arr: []) => {
+          .map((msg: MessageProps, index, arr) => {
             const isLastMessage = index === arr.length - 1;
 
             return (

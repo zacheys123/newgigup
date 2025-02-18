@@ -26,7 +26,7 @@ const Actions = () => {
     }
   }, [user, userId, router]);
 
-  if (!user) {
+  if (!user?.isClient || !user.isMusician) {
     return (
       <div className="h-full w-full bg-black">
         <span className="flex flex-col items-center">
@@ -46,8 +46,8 @@ const Actions = () => {
     );
   }
 
-  // If the user is neither a musician nor a client, stay on the current page
-  if (user.isMusician === false && user.isClient === false) {
+  // If the user is neither a musician nor a client, render the ActionPage
+  if (!user.isMusician && !user.isClient) {
     return (
       <div>
         <ActionPage />
