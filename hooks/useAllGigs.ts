@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 
 export function useAllGigs() {
   const [loading, setLoading] = useState<boolean>(false);
-  const { refetchgig } = useStore();
+  const { refetchGig } = useStore();
   const [gigs, setGigs] = useState<{ gigs: GigProps[] } | null>({
     gigs: [
       {
@@ -141,7 +141,7 @@ export function useAllGigs() {
     return () => {
       isMounted = false;
     };
-  }, [url, refetchgig]);
+  }, [url, refetchGig]);
 
   return { loading, gigs };
 }
