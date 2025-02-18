@@ -94,15 +94,15 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
         className="h-[400px]  overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700"
       >
         {(messages ?? [])
-          .filter((msg) => msg.chatId === chatId)
-          .map((msg: MessageProps, index, arr) => {
+          .filter((msg: MessageProps) => msg.chatId === chatId)
+          .map((msg: MessageProps, index: number, arr: []) => {
             const isLastMessage = index === arr.length - 1;
 
             return (
               <div
                 key={msg._id || Math.random().toString(36).substr(2, 9)}
                 className={`flex items-end relative ${
-                  msg.sender?._id === user?._id
+                  msg?.tempId || msg.sender?._id === user?._id
                     ? "justify-end"
                     : "justify-start"
                 }`}

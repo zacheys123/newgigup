@@ -14,6 +14,7 @@ export interface MessageProps {
   content: string;
   createdAt: Date; //
   reactions: string;
+  tempId?: string;
 }
 
 export interface Messages {

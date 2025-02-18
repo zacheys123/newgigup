@@ -6,9 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "ws": "ts-node socketServer.ts",
-    "dev:all": "concurrently \"npm run ws\" \"npm run dev\""
+    "lint": "next lint"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.9.6",
@@ -45,10 +43,11 @@
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
     "sonner": "^1.7.1",
+    "styled-jsx": "*",
     "tailwind-merge": "^2.6.0",
     "tailwind-scrollbar-hide": "^2.0.0",
     "tailwindcss-animate": "^1.0.7",
-    "zustand": "^5.0.2"
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

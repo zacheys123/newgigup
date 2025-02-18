@@ -1,9 +1,20 @@
+import { ChatProps, MessageProps } from "@/types/chatinterfaces";
 import { GigProps } from "@/types/giginterface";
 import { Review, UserProps } from "@/types/userinterfaces";
-import { ChatProps, MessageProps } from "@/types/chatinterfaces";
 import { postedBy } from "@/utils";
-import { create } from "zustand";
+import { create } from "zustand"; // Import SetState
 
+// ... (your existing interfaces and types)
+interface Message {
+  _id?: string;
+  sender: UserProps;
+  content: string;
+  createdAt: Date;
+  reactions: string;
+  tempId?: string;
+  chatId: string;
+  receiver?: string;
+}
 interface StoreState {
   search: boolean;
   currentUser: UserProps;
@@ -52,7 +63,6 @@ interface StoreState {
     setShowReaction: (response: { success: boolean; message: string }) => void
   ) => void;
 }
-
 const useStore = create<StoreState>((set) => ({
   messages: [],
   chats: {}, // Efficient dictionary for chat lookups
@@ -117,58 +127,59 @@ const useStore = create<StoreState>((set) => ({
   currentFollowers: false,
   onlineUsers: [],
 
-  setOnlineUsers: (data) => set(() => ({ onlineUsers: data })),
-  setShowUpload: () => set((state) => ({ showUpload: !state.showUpload })),
-  setRefetchData: (data) => set(() => ({ refetchData: data })),
-  setCurrentFollowers: (data) => set(() => ({ currentFollowers: data })),
-  setShowModal: (data) => set(() => ({ showModal: data })),
-  setSelectedReview: (data) => set(() => ({ selectedReview: data })),
-  setSearch: (data) => set(() => ({ search: data })),
-  setFollow: (data) => set(() => ({ follow: data })),
-  setCurrentUser: (data) =>
-    set((state) => ({ currentUser: { ...state.currentUser, ...data } })),
-  setCurrentGig: (data) =>
-    set((state) => ({ currentgig: { ...state.currentgig, ...data } })),
-  setSearchQuery: (data) => set(() => ({ searchQuery: data })),
-  setModalVisible: (data) => set(() => ({ modalVisible: data })),
+  setOnlineUsers: (data: []) => set(() => ({ onlineUsers: data })),
+  setShowUpload: () =>
+    set((state: StoreState) => ({ showUpload: !state.showUpload })),
+  setRefetchData: (data: boolean) => set(() => ({ refetchData: data })),
+  setCurrentFollowers: (data: boolean) =>
+    set(() => ({ currentFollowers: data })),
+  setShowModal: (data: boolean) => set(() => ({ showModal: data })),
+  setSelectedReview: (data: Record<string, Review>) =>
+    set(() => ({ selectedReview: data })),
+  setSearch: (data: boolean) => set(() => ({ search: data })),
+  setFollow: (data: boolean) => set(() => ({ follow: data })),
+  setCurrentUser: (data: Partial<UserProps>) =>
+    set((state: StoreState) => ({
+      currentUser: { ...state.currentUser, ...data },
+    })),
+  setCurrentGig: (data: Partial<GigProps>) =>
+    set((state: StoreState) => ({
+      currentgig: { ...state.currentgig, ...data },
+    })),
+  setSearchQuery: (data: string) => set(() => ({ searchQuery: data })),
+  setModalVisible: (data: boolean) => set(() => ({ modalVisible: data })),
   setDrawerVisible: () =>
-    set((state) => ({ drawerVisible: !state.drawerVisible })),
-  setFollowersModal: (data) => set(() => ({ followersModal: data })),
-  setFollowingsModal: (data) => set(() => ({ followingsModal: data })),
-  setRefetchGig: (data) => set(() => ({ refetchGig: data })),
-  setMessages: (data) => set(() => ({ messages: data })),
-  // Efficiently add new chats
-  addChat: (chat) =>
-    set((state) => ({
+    set((state: StoreState) => ({ drawerVisible: !state.drawerVisible })),
+  setFollowersModal: (data: boolean) => set(() => ({ followersModal: data })),
+  setFollowingsModal: (data: boolean) => set(() => ({ followingsModal: data })),
+  setRefetchGig: (data: boolean) => set(() => ({ refetchGig: data })),
+  setMessages: (data: MessageProps[]) => set(() => ({ messages: data })),
+  addChat: (chat: ChatProps) =>
+    set((state: StoreState) => ({
       chats: { ...state.chats, [chat.chatId]: chat },
     })),
 
-  addMessage: (message) =>
-    set((state) => {
-      if (state.messages.find((msg) => msg._id === message._id)) return state;
-      return {
-        messages: [...state.messages, message],
-        chats: {
-          ...state.chats,
-          [message.chatId]: {
-            ...(state.chats[message.chatId] || {}), // Ensure chat exists
-            messages: [
-              ...(state.chats[message.chatId]?.messages || []),
-              message,
-            ],
-          },
-        },
-      };
-    }),
+  addMessage: (newMessage: Message) => {
+    set((state: StoreState) => {
+      // Check if message already exists
+      const existingMessage = state.messages.find(
+        (msg: MessageProps) =>
+          msg._id === newMessage._id || msg.tempId === newMessage.tempId
+      );
 
-  // Fetch messages and update chat state
+      if (existingMessage) return state; // Prevent duplicate message
+
+      return { messages: [...state.messages, newMessage] };
+    });
+  },
+
   fetchMessages: async (chatId: string) => {
     try {
       const res = await fetch(`/api/chat/getmessages?chatId=${chatId}`);
       if (!res.ok) throw new Error("Failed to fetch messages");
 
       const { messages } = await res.json();
-      set((state) => ({
+      set((state: StoreState) => ({
         messages,
         chats: {
           ...state.chats,
@@ -183,14 +194,6 @@ const useStore = create<StoreState>((set) => ({
     }
   },
 
-  // listenForMessages: () => {
-  //   socket.off("receive_message"); // Ensure we don’t create multiple listeners
-  //   socket.on("receive_message", (message) => {
-  //     set((state) => ({
-  //       messages: [...state.messages, message],
-  //     }));
-  //   });
-  // },
   sendMessage: async (newMessage: MessageProps) => {
     try {
       const res = await fetch("/api/messages/sendmessages", {
@@ -203,7 +206,7 @@ const useStore = create<StoreState>((set) => ({
 
       const savedMessage = await res.json();
 
-      set((state) => {
+      set((state: StoreState) => {
         console.log("Before update:", state.messages.length);
         // Ensure the message is not already in the state
         if (state.messages.some((msg) => msg._id === savedMessage._id)) {
