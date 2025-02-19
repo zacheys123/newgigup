@@ -15,7 +15,7 @@ const ChatInput = ({
   return (
     <form
       onSubmit={sendMessage}
-      className="p-3 border-t border-gray-200 dark:border-gray-700 flex items-center gap-3 bg-gray-100 dark:bg-gray-800 rounded-b-2xl"
+      className="p-3  border-gray-300 dark:border-gray-700 flex items-center gap-3 bg-gray-100 dark:bg-gray-800 rounded-b-2xl"
     >
       <div className=" bg-neutral-100 rounded-full -px-2 w-full   flex items-center gap-1">
         <span className="hover:cursor-pointer w-[26px]">🙂</span>

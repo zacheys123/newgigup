@@ -1,13 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useStore from "@/app/zustand/useStore";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { MessageProps } from "@/types/chatinterfaces";
 import { useAuth } from "@clerk/nextjs";
 import { CircularProgress } from "@mui/material";
-import { io } from "socket.io-client";
 import moment from "moment";
 import useSocket from "@/hooks/useSocket";
-import { UserProps } from "@/types/userinterfaces";
 
 interface ChatPageProps {
   chatId: string;
@@ -20,7 +18,7 @@ interface ReactionsProps {
 
 const reactionOptions = ["👍", "😀", "😂", "🔥", "😢", "🎉", "😨", "😡"];
 
-const ChatPage: React.FC<ChatPageProps> = ({ chatId, modal }) => {
+const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
   const { messages, fetchMessages, addMessage, updateMessageReaction } =
     useStore();
   const { userId } = useAuth();
@@ -45,33 +43,6 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId, modal }) => {
 
     loadMessages();
   }, [chatId, addMessage]);
-  const messagesRef = useRef(messages);
-
-  const [renderKey, setRenderKey] = useState(0);
-
-  useEffect(() => {
-    messagesRef.current = messages;
-  }, [messages]);
-  useEffect(() => {
-    if (!socket) return;
-
-    const handleIncomingMessage = (message: MessageProps) => {
-      console.log("🟢 New message received:", message);
-
-      if (!messages.some((msg) => msg._id === message._id)) {
-        console.log("✅ Adding message to state.");
-        addMessage(message); // ✅ Update Zustand state
-      } else {
-        console.warn("⚠️ Duplicate message, skipping.");
-      }
-    };
-
-    socket.on("getMessage", handleIncomingMessage);
-
-    return () => {
-      socket.off("getMessage", handleIncomingMessage);
-    };
-  }, [socket, messages, addMessage]); // ✅ Ensure dependencies update correctly
 
   const handleReaction = (messageId: string, emoji: string) => {
     if (!socket) return;
@@ -133,7 +104,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId, modal }) => {
 
   if (loading)
     return (
-      <div className="text-center text-gray-500 flex justify-center items-center">
+      <div className="h-full w-full text-gray-500 flex justify-center items-center">
         <CircularProgress size="24px" className="animate-spin text-gray-500" />
       </div>
     );

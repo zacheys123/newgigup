@@ -2,8 +2,6 @@ import { ChatProps, MessageProps } from "@/types/chatinterfaces";
 import { GigProps } from "@/types/giginterface";
 import { initialState, StoreState } from "@/types/storeinterface";
 import { Review, UserProps } from "@/types/userinterfaces";
-import { postedBy } from "@/utils";
-import { io, Socket } from "socket.io-client";
 import { create } from "zustand"; // Import SetState
 
 const isDuplicateMessage = (

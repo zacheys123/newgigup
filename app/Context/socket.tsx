@@ -1,10 +1,11 @@
 "use client";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAuth } from "@clerk/nextjs";
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { io, Socket } from "socket.io-client";
+import React, { createContext, useContext, useEffect } from "react";
+
 import useStore from "../zustand/useStore";
 import useSocket from "@/hooks/useSocket";
+import { MessageProps } from "@/types/chatinterfaces";
 
 const SOCKET_URL = "http://localhost:8080";
 
@@ -18,32 +19,10 @@ const SocketContext = createContext({});
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  //   const [socket, setSocket] = useState<Socket | null>(null);
-  //   const [isConnected, setIsConnected] = useState(false);
-
-  //   useEffect(() => {
-  //     const newSocket = io(SOCKET_URL, { withCredentials: true });
-
-  //     newSocket.on("connect", () => {
-  //       console.log("Connected to socket server");
-  //       setIsConnected(true);
-  //     });
-
-  //     newSocket.on("disconnect", () => {
-  //       console.log("Disconnected from socket server");
-  //       setIsConnected(false);
-  //     });
-
-  //     setSocket(newSocket);
-
-  //     return () => {
-  //       newSocket.disconnect();
-  //     };
-  //   }, []);
   const { userId } = useAuth();
 
   const { user } = useCurrentUser(userId || null);
-  const { setOnlineUsers } = useStore();
+  const { setOnlineUsers, messages, addMessage } = useStore();
 
   const { socket } = useSocket();
 
@@ -54,12 +33,44 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
         setOnlineUsers(res);
         console.log(res);
       });
+      const handleIncomingMessage = (message: MessageProps) => {
+        console.log("🟢 New message received:", message);
+
+        if (!messages.some((msg) => msg._id === message._id)) {
+          console.log("✅ Adding message to state.");
+          addMessage(message); // ✅ Update Zustand state
+        } else {
+          console.warn("⚠️ Duplicate message, skipping.");
+        }
+      };
+      socket.on("getMessage", handleIncomingMessage);
 
       return () => {
+        socket?.off("getMessage", handleIncomingMessage); // Cleanup on unmount
         socket?.off("getOnlineUsers");
       };
     }
   }, [socket, setOnlineUsers, user]);
+  useEffect(() => {
+    if (socket?.connected === true) {
+      const handleIncomingMessage = (message: MessageProps) => {
+        console.log("🟢 New message received:", message);
+
+        if (!messages.some((msg) => msg._id === message._id)) {
+          console.log("✅ Adding message to state.");
+          addMessage(message); // ✅ Update Zustand state
+        } else {
+          console.warn("⚠️ Duplicate message, skipping.");
+        }
+      };
+      socket.on("getMessage", handleIncomingMessage);
+
+      return () => {
+        socket?.off("getMessage", handleIncomingMessage); // Cleanup on unmount
+        socket?.off("getOnlineUsers");
+      };
+    }
+  }, [socket, messages, addMessage]);
 
   return (
     <SocketContext.Provider value={{ socket }}>
