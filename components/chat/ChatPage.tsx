@@ -1,13 +1,17 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import useStore from "@/app/zustand/useStore";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { MessageProps } from "@/types/chatinterfaces";
 import { useAuth } from "@clerk/nextjs";
 import { CircularProgress } from "@mui/material";
+import { io } from "socket.io-client";
 import moment from "moment";
+import useSocket from "@/hooks/useSocket";
+import { UserProps } from "@/types/userinterfaces";
 
 interface ChatPageProps {
   chatId: string;
+  modal: string;
 }
 interface ReactionsProps {
   success: boolean;
@@ -16,26 +20,21 @@ interface ReactionsProps {
 
 const reactionOptions = ["👍", "😀", "😂", "🔥", "😢", "🎉", "😨", "😡"];
 
-const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
-  const {
-    messages = [],
-    fetchMessages,
-    addMessage,
-    updateMessageReaction,
-  } = useStore();
+const ChatPage: React.FC<ChatPageProps> = ({ chatId, modal }) => {
+  const { messages, fetchMessages, addMessage, updateMessageReaction } =
+    useStore();
   const { userId } = useAuth();
   const { user } = useCurrentUser(userId || null);
   const [loading, setLoading] = useState<boolean>(true);
   const [reactionPopup, setReactionPopup] = useState<string>("");
-  const [isTyping] = useState<boolean>(false);
+  const [isTyping, setIsTyping] = useState<boolean>(false);
   const [messageReactions, setMessageReactions] = useState<{
     [key: string]: string;
   }>({});
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
   const lastMessageRef = useRef<HTMLDivElement | null>(null);
-
   const [showReaction, setShowReaction] = useState<ReactionsProps>();
-
+  const { socket } = useSocket();
   useEffect(() => {
     const loadMessages = async () => {
       if (chatId) {
@@ -46,16 +45,59 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
 
     loadMessages();
   }, [chatId, addMessage]);
+  const messagesRef = useRef(messages);
+
+  const [renderKey, setRenderKey] = useState(0);
+
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleIncomingMessage = (message: MessageProps) => {
+      console.log("🟢 New message received:", message);
+
+      if (!messages.some((msg) => msg._id === message._id)) {
+        console.log("✅ Adding message to state.");
+        addMessage(message); // ✅ Update Zustand state
+      } else {
+        console.warn("⚠️ Duplicate message, skipping.");
+      }
+    };
+
+    socket.on("getMessage", handleIncomingMessage);
+
+    return () => {
+      socket.off("getMessage", handleIncomingMessage);
+    };
+  }, [socket, messages, addMessage]); // ✅ Ensure dependencies update correctly
 
   const handleReaction = (messageId: string, emoji: string) => {
+    if (!socket) return;
     setMessageReactions((prev) => ({
       ...prev,
       [messageId]: emoji,
     }));
     updateMessageReaction(messageId, emoji, setShowReaction);
+    socket.emit("messageReaction", { messageId, emoji });
+
     setReactionPopup("");
   };
+  // Listen for real-time reaction updates
+  useEffect(() => {
+    if (!socket) return;
+    socket.on("updateMessageReaction", ({ messageId, emoji }) => {
+      setMessageReactions((prev) => ({
+        ...prev,
+        [messageId]: emoji,
+      }));
+    });
 
+    return () => {
+      socket.off("updateMessageReaction");
+    };
+  }, []);
   // Smooth Auto-Scrolling
   useEffect(() => {
     const scrollToBottom = () => {
@@ -72,6 +114,23 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
     scrollToBottom();
   }, [messages]);
 
+  // Handle typing status updates
+  useEffect(() => {
+    if (!socket) return;
+    socket.on("userTyping", ({ senderId: modal }) => {
+      setIsTyping(true);
+    });
+
+    socket.on("userStoppedTyping", ({ senderId: modal }) => {
+      setIsTyping(false);
+    });
+
+    return () => {
+      socket.off("userTyping");
+      socket.off("userStoppedTyping");
+    };
+  }, []);
+
   if (loading)
     return (
       <div className="text-center text-gray-500 flex justify-center items-center">
@@ -80,9 +139,9 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
     );
 
   return (
-    <div className="flex-1 flex flex-col p-4 bg-gray-100 dark:bg-gray-900 rounded-lg shadow-md">
+    <div className="flex-1 flex flex-col p-4 bg-gray-100 dark:bg-gray-900 rounded-sm shadow-md">
       {messages?.length === 0 && (
-        <div className="flex p-2 h-[400px] justify-center items-center">
+        <div className="flex p-2 h-[140px] justify-center items-center">
           <p className="text-md font-semibold text-neutral-500">
             Send a message to start a chat.
           </p>
@@ -91,7 +150,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
 
       <div
         ref={messagesContainerRef}
-        className="h-[400px]  overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700"
+        className="h-[500px]  overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700"
       >
         {(messages ?? [])
           .filter((msg: MessageProps) => msg.chatId === chatId)
@@ -102,7 +161,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
               <div
                 key={msg._id || Math.random().toString(36).substr(2, 9)}
                 className={`flex items-end relative ${
-                  msg?.tempId || msg.sender?._id === user?._id
+                  msg.sender?._id === user?._id || msg.tempId === user?._id // Ensure compatibility with different message structures
                     ? "justify-end"
                     : "justify-start"
                 }`}

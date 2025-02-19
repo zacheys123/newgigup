@@ -1,12 +1,14 @@
 "use client";
 import { UserProps } from "@/types/userinterfaces";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ChangeEvent, useRef } from "react";
 import ChatPage from "./ChatPage";
 import ChatHeader from "./ChatHeader";
 import ChatInput from "./ChatInput";
 import useStore from "@/app/zustand/useStore";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAuth } from "@clerk/nextjs";
+import useSocket from "@/hooks/useSocket";
+import { MessageProps } from "@/types/chatinterfaces";
 
 // import { useSocket } from "@/app/Context/SocketContext";
 // import { MessageProps } from "@/types/chatinterfaces";
@@ -22,23 +24,11 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose }) => {
   const { userId } = useAuth();
   const [loading, setLoading] = useState(true);
   const [newMessage, setNewMessage] = useState("");
-  const { sendMessage, addMessage } = useStore();
+  const { sendMessage, addMessage, onlineUsers, messages } = useStore();
   const { user: myuserd } = useCurrentUser(userId || null);
-  // const { socket } = useSocket();
+  const { socket } = useSocket();
 
-  // useEffect(() => {
-  //   if (!socket) return;
-
-  //   const handleMessage = (message: MessageProps) => {
-  //     addMessage(message); // ✅ Optimized: Add message directly to Zustand store
-  //   };
-
-  //   socket.on("receive_message", handleMessage);
-
-  //   return () => {
-  //     socket.off("receive_message", handleMessage); // ✅ Cleanup listener
-  //   };
-  // }, [socket, addMessage]);
+  const messagesRef = useRef(messages);
 
   useEffect(() => {
     // listenForMessages(); // ✅ Start listening for real-time messages
@@ -80,6 +70,7 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose }) => {
   }, [myuserd._id, modal.user, chatId]);
 
   const send = async (e: React.FormEvent) => {
+    if (!socket) return;
     e.preventDefault();
     if (!newMessage.trim() || !chatId) return;
 
@@ -92,10 +83,16 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose }) => {
       reactions: "😁",
     };
 
-    sendMessage(newMsg); // ✅ Real-time WebSocket message sending
-    // socket.emit("send_message", newMsg);
-    addMessage(newMsg); // Optimistically update UI
-    setNewMessage("");
+    try {
+      sendMessage(newMsg);
+      addMessage(newMsg); // Optimistically update UI
+      socket.emit("sendMessage", newMsg, onlineUsers);
+
+      setNewMessage("");
+    } catch (error) {
+      console.error("Message sending failed", error);
+      // Remove the message from the store or show a "retry" option
+    }
 
     // try {
     //   await fetch("/api/chat/sendmessage", {
@@ -107,6 +104,19 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose }) => {
     //   console.error("Error sending message:", error);
     // }
   };
+  let typingTimeout: NodeJS.Timeout;
+
+  const handleTyping = (e: ChangeEvent<HTMLInputElement>) => {
+    if (!socket) return;
+
+    socket.emit("typing", { senderId: myuserd._id, receiverId: chatId });
+
+    if (typingTimeout) clearTimeout(typingTimeout);
+
+    typingTimeout = setTimeout(() => {
+      socket.emit("stopTyping", { senderId: myuserd._id, receiverId: chatId });
+    }, 3000);
+  };
 
   if (loading) return <p>Loading chat...</p>;
   if (!chatId) return <p>Chat could not be created</p>;
@@ -116,12 +126,13 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose }) => {
       <ChatHeader onClose={onClose} modal={modal} user={myuserd} />
 
       <div className="flex-1">
-        <ChatPage chatId={chatId} />
+        <ChatPage chatId={chatId} modal={modal?.user?._id || ""} />
       </div>
       <ChatInput
         newMessage={newMessage}
         setNewMessage={setNewMessage}
         sendMessage={send}
+        handleTyping={handleTyping}
       />
       <small className="text-center text-muted-foreground text-[11px]">
         Powered By: gigMeUp

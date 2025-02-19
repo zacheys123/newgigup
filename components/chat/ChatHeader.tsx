@@ -1,4 +1,6 @@
+import useStore from "@/app/zustand/useStore";
 import { UserProps } from "@/types/userinterfaces";
+import moment from "moment";
 import Image from "next/image";
 import React from "react";
 
@@ -13,7 +15,13 @@ interface ChatPageProps {
   // sendMessage: (e: React.FormEvent) => void;
 }
 const ChatHeader = ({ onClose, modal }: ChatPageProps) => {
-  const isOnline = true;
+  // Accessing onlineUsers state from Zustand store
+  const { onlineUsers } = useStore();
+
+  console.log(onlineUsers);
+  // Checking if the user is online based on their userId
+  const isOnline = onlineUsers.some((user) => user.userId === modal.user._id);
+  console.log(isOnline);
   const online = "text-green-500 link";
   const offline = "text-red-500 link";
   return (
@@ -37,7 +45,13 @@ const ChatHeader = ({ onClose, modal }: ChatPageProps) => {
           <span className="text-neutral-500 dark:text-gray-200">{`Chat with ${modal.user.firstname}`}</span>
         </div>
         <span className={isOnline ? online : offline}>
-          {isOnline ? "Online" : "Offline"}
+          {isOnline ? (
+            "Online"
+          ) : (
+            <span className="ml-5">
+              last seen {moment(Date.now()).calendar()}
+            </span>
+          )}
         </span>
       </div>
       <button

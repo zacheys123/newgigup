@@ -7,6 +7,7 @@ import "react-toastify/dist/ReactToastify.css"; // Import styles for Toastify
 import { ClerkLoaded } from "@clerk/nextjs";
 import { GlobalProvider } from "./Context/store";
 import { Providers } from "./providers";
+import { SocketProvider } from "./Context/socket";
 
 // import "@/lib/cron";
 
@@ -23,13 +24,15 @@ export default function RootLayout({
   return (
     <Providers>
       <GlobalProvider>
-        <html lang="en">
-          <body className="min-h-screen bg-gray-200 w-screen overflow-x-hidden ">
-            {" "}
-            <ToastContainer />
-            <ClerkLoaded>{children} </ClerkLoaded>
-          </body>
-        </html>
+        <SocketProvider>
+          <html lang="en">
+            <body className="min-h-screen bg-gray-200 w-screen overflow-x-hidden ">
+              {" "}
+              <ToastContainer />
+              <ClerkLoaded>{children} </ClerkLoaded>
+            </body>
+          </html>
+        </SocketProvider>
       </GlobalProvider>
     </Providers>
   );

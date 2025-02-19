@@ -1,14 +1,16 @@
-import React from "react";
+import React, { ChangeEvent } from "react";
 
 interface ChatInputProps {
   newMessage: string;
   setNewMessage: (message: string) => void;
   sendMessage: (e: React.FormEvent) => void;
+  handleTyping: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 const ChatInput = ({
   newMessage,
   setNewMessage,
   sendMessage,
+  handleTyping,
 }: ChatInputProps) => {
   return (
     <form
@@ -22,7 +24,10 @@ const ChatInput = ({
           placeholder="Type a message..."
           className="flex-1 px-4 py-2 text-sm md:text-base rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white dark:bg-gray-900 text-gray-600 transition-all"
           value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
+          onChange={(e) => {
+            handleTyping(e);
+            setNewMessage(e.target.value);
+          }}
         />
         <button
           type="submit"

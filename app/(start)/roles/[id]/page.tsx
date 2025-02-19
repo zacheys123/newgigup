@@ -26,7 +26,7 @@ const Actions = () => {
     }
   }, [user, userId, router]);
 
-  if (!user?.isClient || !user.isMusician) {
+  if (!user) {
     return (
       <div className="h-full w-full bg-black">
         <span className="flex flex-col items-center">
@@ -47,15 +47,19 @@ const Actions = () => {
   }
 
   // If the user is neither a musician nor a client, render the ActionPage
-  if (!user.isMusician && !user.isClient) {
-    return (
-      <div>
-        <ActionPage />
-      </div>
-    );
-  }
+  // if (!user.isMusician && !user.isClient) {
+  //   return (
+  //     <div>
+  //       <ActionPage />
+  //     </div>
+  //   );
+  // }
 
-  return null; // Default return statement
+  return (
+    <div>
+      <ActionPage />
+    </div>
+  );
 };
 
 export default Actions;

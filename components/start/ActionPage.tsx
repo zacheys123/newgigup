@@ -65,15 +65,16 @@ const ActionPage = () => {
         });
         const data = await res.json();
         window.localStorage.setItem("user", JSON.stringify(data.results));
+        window.location.reload();
         router.push("/profile");
         console.log(data);
         if (data.userstatus) {
           // Userstatusful connection as musician
           setTimeout(() => {
-            toast.success(data.message);
-          }, 3000);
-
-          router.push("/profile");
+            window.location.reload();
+            router.push("/profile");
+          }, 1000);
+          toast.success(data.message);
         } else {
           console.log("Failed to connect as musician.");
         }
