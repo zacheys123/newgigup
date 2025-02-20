@@ -1,16 +1,19 @@
 "use client";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAuth } from "@clerk/nextjs";
-import React, { createContext, useContext, useEffect } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 import useStore from "../zustand/useStore";
-import useSocket from "@/hooks/useSocket";
+
 import { MessageProps } from "@/types/chatinterfaces";
+
+import { io, Socket } from "socket.io-client";
 
 // interface SocketContextType {
 //   socket: Socket | null;
 
 // }
+const SOCKET_URL = "http://localhost:8080"; // Update if needed
 
 const SocketContext = createContext({});
 
@@ -22,8 +25,29 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
   const { user } = useCurrentUser(userId || null);
   const { setOnlineUsers, addMessage } = useStore();
 
-  const { socket } = useSocket();
-  console.log(socket);
+  const [socket, setSocket] = useState<Socket | null>(null);
+
+  useEffect(() => {
+    console.log("⏳ Initializing socket...");
+    const newSocket = io(SOCKET_URL, {
+      transports: ["websocket"],
+      reconnectionAttempts: 5, // 🔄 Auto-reconnect
+      timeout: 5000,
+    });
+
+    newSocket.on("connect", () => {
+      console.log("✅ Socket connected!");
+      setSocket(newSocket);
+    });
+
+    newSocket.on("disconnect", () => {
+      console.warn("❌ Socket disconnected!");
+    });
+
+    return () => {
+      newSocket.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     if (socket?.connected === true && user) {
@@ -45,9 +69,12 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
   //   messagesRef.current = messages;
   // }, []);
   // import { useStore } from "@/store"; // Ensure correct Zustand import
+  console.log(socket);
   useEffect(() => {
+    console.log("🔍 Checking socket instance:", socket); // Debugging line
+
     if (!socket) {
-      console.error("❌ No socket instance found.");
+      console.log("❌ No socket instance found.");
       return;
     }
 
@@ -69,7 +96,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
       console.log("🛑 Cleaning up socket listeners...");
       socket.off("getMessage", handleIncomingMessage);
     };
-  }, [socket, addMessage]); // ✅ Re-run when `socket` updates
+  }, [socket, addMessage]);
 
   useEffect(() => {
     if (!socket?.connected) {
@@ -80,6 +107,8 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
     console.log("✅ Listening for incoming messages...");
 
     const handleIncomingMessage = (message: MessageProps) => {
+      // ✅ Force UI re-render before adding to Zustand
+      setTimeout(() => addMessage(message), 0);
       console.log("🟢 Received a message from the server:", message);
     };
 

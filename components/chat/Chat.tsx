@@ -1,6 +1,6 @@
 "use client";
 import { UserProps } from "@/types/userinterfaces";
-import React, { useState, useEffect, ChangeEvent, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import ChatPage from "./ChatPage";
 import ChatHeader from "./ChatHeader";
 import ChatInput from "./ChatInput";
@@ -8,7 +8,6 @@ import useStore from "@/app/zustand/useStore";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAuth } from "@clerk/nextjs";
 import useSocket from "@/hooks/useSocket";
-import { MessageProps } from "@/types/chatinterfaces";
 
 // import { useSocket } from "@/app/Context/SocketContext";
 // import { MessageProps } from "@/types/chatinterfaces";
@@ -24,7 +23,7 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose }) => {
   const { userId } = useAuth();
   const [loading, setLoading] = useState(true);
   const [newMessage, setNewMessage] = useState("");
-  const { sendMessage, addMessage, onlineUsers, messages } = useStore();
+  const { sendMessage, addMessage, onlineUsers } = useStore();
   const { user: myuserd } = useCurrentUser(userId || null);
   const { socket } = useSocket();
 
@@ -104,7 +103,7 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose }) => {
   };
   let typingTimeout: NodeJS.Timeout;
 
-  const handleTyping = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleTyping = () => {
     if (!socket) return;
 
     socket.emit("typing", { senderId: myuserd._id, receiverId: chatId });

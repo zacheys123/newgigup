@@ -89,11 +89,11 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
   // Handle typing status updates
   useEffect(() => {
     if (!socket) return;
-    socket.on("userTyping", ({ senderId }) => {
+    socket.on("userTyping", ({}) => {
       setIsTyping(true);
     });
 
-    socket.on("userStoppedTyping", ({ senderId }) => {
+    socket.on("userStoppedTyping", ({}) => {
       setIsTyping(false);
     });
 
