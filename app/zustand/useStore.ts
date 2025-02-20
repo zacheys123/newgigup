@@ -83,17 +83,11 @@ const useStore = create<StoreState>((set, get) => ({
   },
 
   addMessage: (newMessage) => {
-    set((state: StoreState) => {
+    set((state) => {
       if (isDuplicateMessage(state.messages, newMessage)) return state;
 
       return {
-        messages: [
-          ...state.messages,
-          {
-            ...newMessage,
-            temPid: newMessage.sender?._id || newMessage.sender, // Ensure sender is stored consistently
-          },
-        ],
+        messages: [...state.messages, newMessage],
       };
     });
   },

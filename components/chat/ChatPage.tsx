@@ -6,7 +6,7 @@ import { useAuth } from "@clerk/nextjs";
 import { CircularProgress } from "@mui/material";
 import moment from "moment";
 import useSocket from "@/hooks/useSocket";
-
+import { unstable_batchedUpdates } from "react-dom";
 interface ChatPageProps {
   chatId: string;
   modal: string;
@@ -19,8 +19,7 @@ interface ReactionsProps {
 const reactionOptions = ["👍", "😀", "😂", "🔥", "😢", "🎉", "😨", "😡"];
 
 const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
-  const { messages, fetchMessages, addMessage, updateMessageReaction } =
-    useStore();
+  const { messages, fetchMessages, updateMessageReaction } = useStore();
   const { userId } = useAuth();
   const { user } = useCurrentUser(userId || null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -42,7 +41,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
     };
 
     loadMessages();
-  }, [chatId, addMessage]);
+  }, [chatId]);
 
   const handleReaction = (messageId: string, emoji: string) => {
     if (!socket) return;
@@ -59,16 +58,18 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
   useEffect(() => {
     if (!socket) return;
     socket.on("updateMessageReaction", ({ messageId, emoji }) => {
-      setMessageReactions((prev) => ({
-        ...prev,
-        [messageId]: emoji,
-      }));
+      unstable_batchedUpdates(() => {
+        setMessageReactions((prev) => ({
+          ...prev,
+          [messageId]: emoji,
+        }));
+      });
     });
 
     return () => {
       socket.off("updateMessageReaction");
     };
-  }, []);
+  }, [socket]);
   // Smooth Auto-Scrolling
   useEffect(() => {
     const scrollToBottom = () => {
@@ -88,11 +89,11 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
   // Handle typing status updates
   useEffect(() => {
     if (!socket) return;
-    socket.on("userTyping", ({ senderId: modal }) => {
+    socket.on("userTyping", ({ senderId }) => {
       setIsTyping(true);
     });
 
-    socket.on("userStoppedTyping", ({ senderId: modal }) => {
+    socket.on("userStoppedTyping", ({ senderId }) => {
       setIsTyping(false);
     });
 
@@ -101,6 +102,10 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
       socket.off("userStoppedTyping");
     };
   }, []);
+  console.log("Component re-rendered");
+  useEffect(() => {
+    console.log("Updated messages state:", messages);
+  }, [messages]);
 
   if (loading)
     return (
@@ -130,7 +135,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
 
             return (
               <div
-                key={msg._id || Math.random().toString(36).substr(2, 9)}
+                key={msg._id || msg.tempId}
                 className={`flex items-end relative ${
                   msg.sender?._id === user?._id || msg.tempId === user?._id // Ensure compatibility with different message structures
                     ? "justify-end"

@@ -2,10 +2,6 @@
 // import useStore from "@/app/zustand/useStore";
 // import { useEffect } from "react";
 // import { io, Socket } from "socket.io-client";
-import useStore from "@/app/zustand/useStore";
-import { useEffect, useState } from "react";
-import { Socket } from "socket.io-client";
-import { io } from "socket.io-client";
 
 const SOCKET_URL = "http://localhost:8080"; // Update if needed
 
@@ -41,11 +37,19 @@ const SOCKET_URL = "http://localhost:8080"; // Update if needed
 //   return null; // No need to render anything
 // };
 
+import { useEffect, useState } from "react";
+import { io, Socket } from "socket.io-client";
+
 const useSocket = () => {
-  const [socket, setSocket] = useState<Socket>();
+  const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
-    const newSocket: Socket = io(SOCKET_URL); // Ensure you're using the correct URL
+    const newSocket = io(SOCKET_URL, {
+      transports: ["websocket"],
+      reconnectionAttempts: 3,
+      timeout: 5000,
+    });
+
     setSocket(newSocket);
 
     return () => {

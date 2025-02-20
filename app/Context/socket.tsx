@@ -7,8 +7,6 @@ import useStore from "../zustand/useStore";
 import useSocket from "@/hooks/useSocket";
 import { MessageProps } from "@/types/chatinterfaces";
 
-const SOCKET_URL = "http://localhost:8080";
-
 // interface SocketContextType {
 //   socket: Socket | null;
 
@@ -22,9 +20,10 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
   const { userId } = useAuth();
 
   const { user } = useCurrentUser(userId || null);
-  const { setOnlineUsers, messages, addMessage } = useStore();
+  const { setOnlineUsers, addMessage } = useStore();
 
   const { socket } = useSocket();
+  console.log(socket);
 
   useEffect(() => {
     if (socket?.connected === true && user) {
@@ -33,44 +32,63 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
         setOnlineUsers(res);
         console.log(res);
       });
-      const handleIncomingMessage = (message: MessageProps) => {
-        console.log("🟢 New message received:", message);
-
-        if (!messages.some((msg) => msg._id === message._id)) {
-          console.log("✅ Adding message to state.");
-          addMessage(message); // ✅ Update Zustand state
-        } else {
-          console.warn("⚠️ Duplicate message, skipping.");
-        }
-      };
-      socket.on("getMessage", handleIncomingMessage);
 
       return () => {
-        socket?.off("getMessage", handleIncomingMessage); // Cleanup on unmount
         socket?.off("getOnlineUsers");
       };
     }
   }, [socket, setOnlineUsers, user]);
+
+  // const messagesRef = useRef(messages);
+
+  // useEffect(() => {
+  //   messagesRef.current = messages;
+  // }, []);
+  // import { useStore } from "@/store"; // Ensure correct Zustand import
   useEffect(() => {
-    if (socket?.connected === true) {
-      const handleIncomingMessage = (message: MessageProps) => {
-        console.log("🟢 New message received:", message);
-
-        if (!messages.some((msg) => msg._id === message._id)) {
-          console.log("✅ Adding message to state.");
-          addMessage(message); // ✅ Update Zustand state
-        } else {
-          console.warn("⚠️ Duplicate message, skipping.");
-        }
-      };
-      socket.on("getMessage", handleIncomingMessage);
-
-      return () => {
-        socket?.off("getMessage", handleIncomingMessage); // Cleanup on unmount
-        socket?.off("getOnlineUsers");
-      };
+    if (!socket) {
+      console.error("❌ No socket instance found.");
+      return;
     }
-  }, [socket, messages, addMessage]);
+
+    if (!socket.connected) {
+      console.warn("⚠️ Socket is NOT connected.");
+      return;
+    }
+
+    console.log("✅ Socket is connected.");
+
+    const handleIncomingMessage = (message: MessageProps) => {
+      console.log("🟢 Received a message from the server:", message);
+      addMessage(message); // ✅ Update Zustand state
+    };
+
+    socket.on("getMessage", handleIncomingMessage);
+
+    return () => {
+      console.log("🛑 Cleaning up socket listeners...");
+      socket.off("getMessage", handleIncomingMessage);
+    };
+  }, [socket, addMessage]); // ✅ Re-run when `socket` updates
+
+  useEffect(() => {
+    if (!socket?.connected) {
+      console.warn("⚠️ Socket is NOT connected.");
+      return;
+    }
+
+    console.log("✅ Listening for incoming messages...");
+
+    const handleIncomingMessage = (message: MessageProps) => {
+      console.log("🟢 Received a message from the server:", message);
+    };
+
+    socket.on("getMessage", handleIncomingMessage);
+
+    return () => {
+      socket.off("getMessage", handleIncomingMessage);
+    };
+  }, [socket]); // ✅ Keep dependencies minimal
 
   return (
     <SocketContext.Provider value={{ socket }}>
