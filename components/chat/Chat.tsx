@@ -16,7 +16,7 @@ interface ChatProps {
   myuser: UserProps;
   modal: { user: UserProps };
   onClose: () => void;
-  onOpenX: (showx: boolean) => void;
+  onOpenX: () => void;
 }
 
 const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose, onOpenX }) => {

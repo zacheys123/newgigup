@@ -61,7 +61,10 @@ const BookingPage = () => {
     forget();
     setShowConfirmation(false);
   };
-
+  // Define the onOpenX function
+  const handleOpenX = () => {
+    setShowX(false); // Reset the showX state
+  };
   return (
     <div className="h-[83%] w-full overflow-y-auto relative bg-gradient-to-b from-gray-900 to-gray-800 p-6">
       {!showX && (
@@ -84,8 +87,8 @@ const BookingPage = () => {
       )}
       {/* Confirmation Modal */}
       {showConfirmation && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
-          <div className="bg-gray-700 p-6 rounded-lg shadow-lg">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm z-50">
+          <div className="bg-gray-700 p-6 rounded-lg shadow-lg ">
             <h4 className="text-gray-200 text-lg font-bold mb-4">
               Are you sure?
             </h4>
@@ -235,7 +238,7 @@ const BookingPage = () => {
             onClose={() => setModal(null)}
             modal={modal}
             user={user}
-            onOpenX={setShowX}
+            onOpenX={handleOpenX}
           />
         </div>
       )}

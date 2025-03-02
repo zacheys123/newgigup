@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import Chat from "./chat/Chat";
 
 interface ModalProps {
-  onOpenX: (showX: boolean) => void;
+  onOpenX: () => void;
   onClose: () => void;
   modal: {
     type: string;

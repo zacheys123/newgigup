@@ -5,7 +5,7 @@ import Image from "next/image";
 import React from "react";
 
 interface ChatPageProps {
-  onOpenX: (showX: boolean) => void;
+  onOpenX: () => void;
   onClose: () => void;
   modal: {
     user: UserProps;
@@ -57,7 +57,7 @@ const ChatHeader = ({ onClose, modal, onOpenX }: ChatPageProps) => {
       </div>
       <button
         onClick={() => {
-          onOpenX(false);
+          onOpenX();
           onClose();
         }}
         className="text-gray-500 dark:text-gray-400 hover:text-red-500 transition-colors"
