@@ -5,6 +5,7 @@ import Image from "next/image";
 import React from "react";
 
 interface ChatPageProps {
+  onOpenX: (showX: boolean) => void;
   onClose: () => void;
   modal: {
     user: UserProps;
@@ -14,7 +15,7 @@ interface ChatPageProps {
   // setNewMessage: (message: string) => void;
   // sendMessage: (e: React.FormEvent) => void;
 }
-const ChatHeader = ({ onClose, modal }: ChatPageProps) => {
+const ChatHeader = ({ onClose, modal, onOpenX }: ChatPageProps) => {
   // Accessing onlineUsers state from Zustand store
   const { onlineUsers } = useStore();
 
@@ -55,7 +56,10 @@ const ChatHeader = ({ onClose, modal }: ChatPageProps) => {
         </span>
       </div>
       <button
-        onClick={onClose}
+        onClick={() => {
+          onOpenX(false);
+          onClose();
+        }}
         className="text-gray-500 dark:text-gray-400 hover:text-red-500 transition-colors"
       >
         ✖

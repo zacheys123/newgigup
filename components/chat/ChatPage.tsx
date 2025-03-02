@@ -7,6 +7,8 @@ import { CircularProgress } from "@mui/material";
 import moment from "moment";
 import useSocket from "@/hooks/useSocket";
 import { unstable_batchedUpdates } from "react-dom";
+import { v4 as uuidv4 } from "uuid"; // Install uuid: npm install uuid
+
 interface ChatPageProps {
   chatId: string;
   modal: string;
@@ -24,7 +26,10 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
   const { user } = useCurrentUser(userId || null);
   const [loading, setLoading] = useState<boolean>(true);
   const [reactionPopup, setReactionPopup] = useState<string>("");
-  const [isTyping, setIsTyping] = useState<boolean>(false);
+  const [
+    isTyping,
+    //  setIsTyping
+  ] = useState<boolean>(false);
   const [messageReactions, setMessageReactions] = useState<{
     [key: string]: string;
   }>({});
@@ -86,27 +91,39 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
     scrollToBottom();
   }, [messages]);
 
-  // Handle typing status updates
+  // // Handle typing status updates
+  // useEffect(() => {
+  //   if (!socket) return;
+  //   socket.on("userTyping", ({}) => {
+  //     setIsTyping(true);
+  //   });
+
+  //   socket.on("userStoppedTyping", ({}) => {
+  //     setIsTyping(false);
+  //   });
+
+  //   return () => {
+  //     socket.off("userTyping");
+  //     socket.off("userStoppedTyping");
+  //   };
+  // }, []);
+  // console.log("Component re-rendered");
+
+  // const [, forceUpdate] = useState(0);
+
+  // useEffect(() => {
+  //   forceUpdate((prev) => prev + 1);
+  // }, [messages]); // ✅ Forces re-render on message update
+  // useEffect(() => {
+  //   console.log("Messages updated:", messages);
+  // }, [messages]);
+
   useEffect(() => {
-    if (!socket) return;
-    socket.on("userTyping", ({}) => {
-      setIsTyping(true);
-    });
+    fetchMessages(chatId); // Fetch messages when chatId changes
+  }, [chatId]);
 
-    socket.on("userStoppedTyping", ({}) => {
-      setIsTyping(false);
-    });
-
-    return () => {
-      socket.off("userTyping");
-      socket.off("userStoppedTyping");
-    };
-  }, []);
-  console.log("Component re-rendered");
-  useEffect(() => {
-    console.log("Updated messages state:", messages);
-  }, [messages]);
-
+  // Filter messages for the current chat
+  const chatMessages = (messages ?? []).filter((msg) => msg.chatId === chatId);
   if (loading)
     return (
       <div className="h-full w-full text-gray-500 flex justify-center items-center">
@@ -115,9 +132,9 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
     );
 
   return (
-    <div className="flex-1 flex flex-col p-4 bg-gray-100 dark:bg-gray-900 rounded-sm shadow-md">
+    <div className="flex-1 flex flex-col p-4 bg-gray-100 z-50  rounded-sm shadow-md">
       {messages?.length === 0 && (
-        <div className="flex p-2 h-[140px] justify-center items-center">
+        <div className="flex p-2 h-full justify-center items-center bg-inherit">
           <p className="text-md font-semibold text-neutral-500">
             Send a message to start a chat.
           </p>
@@ -126,16 +143,17 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
 
       <div
         ref={messagesContainerRef}
-        className="h-[500px]  overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700"
+        className="h-[400px]  overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700"
       >
-        {(messages ?? [])
+        {chatMessages
           .filter((msg: MessageProps) => msg.chatId === chatId)
           .map((msg: MessageProps, index, arr) => {
             const isLastMessage = index === arr.length - 1;
-
+            // const key = msg._id || msg.tempId || uuidv4();
+            // console.log("Rendering message with key:", key); // Log the key
             return (
               <div
-                key={msg._id || msg.tempId}
+                key={msg._id || msg.tempId || uuidv4()}
                 className={`flex items-end relative ${
                   msg.sender?._id === user?._id || msg.tempId === user?._id // Ensure compatibility with different message structures
                     ? "justify-end"

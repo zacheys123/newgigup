@@ -32,12 +32,12 @@ const PrePendingComponent = () => {
     type: "chat" | "video";
     user: UserProps;
   } | null>(null);
-
+  console.log(modal);
   //   const forget = () => forgetBookings(userId || "", currentgig);
-  const handleBookUser = (userId: string) => {
-    setSelectedUser(userId);
+  const handleBookUser = (bookingId: string) => {
+    setSelectedUser(bookingId);
     console.log(`User ${userId} booked. Others disqualified.`);
-    bookgig(router, currentgig, userId || "", user._id || "");
+    bookgig(router, currentgig, userId || "", bookingId as string);
   };
 
   const removeMusicianfrombookCount = async (id: string) => {
@@ -59,7 +59,7 @@ const PrePendingComponent = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen btext-gray-300 backdrop-blur-xl bg-black bg-opacity-50 ">
+      <div className="flex justify-center items-center min-h-screen text-gray-300 backdrop-blur-xl bg-black bg-opacity-50 ">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
@@ -70,6 +70,16 @@ const PrePendingComponent = () => {
   }
   return (
     <div className="p-6 bg-gradient-to-b from-gray-900 to-black text-white min-h-screen">
+      {bookloading && (
+        <div className="h-[800px] absolute w-[90%] mx-auto  z-50 backdrop-blur-xl bg-black bg-opacity-50 flex justify-center items-center">
+          <CircularProgress
+            className="mx-auto mb-6"
+            size={30}
+            thickness={5}
+            style={{ color: "yellow" }}
+          />
+        </div>
+      )}{" "}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -94,99 +104,95 @@ const PrePendingComponent = () => {
           Interested Musicians
         </h2>
         <div className="mt-4 max-h-[370px] sm:max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800 space-y-4">
-          {currentgig?.bookCount?.map((user: UserProps) => (
-            <motion.div
-              key={user._id}
-              className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 bg-gray-700 rounded-lg transition-all shadow-md relative"
-              whileHover={{
-                scale: 1.02,
-                boxShadow: "0px 5px 15px rgba(255, 255, 255, 0.1)",
-              }}
-            >
-              <div className="min-w-0 flex-1">
-                <p className="text-lg font-semibold text-gray-100">
-                  {user.firstname} {user.lastname}
-                  <span
-                    className="absolute right-4 top-1 font-bold"
-                    onClick={() => removeMusicianfrombookCount(user?._id || "")}
-                  >
-                    x
-                  </span>
-                </p>
-                <p className="text-sm text-gray-400">{user.email}</p>
-                {user.instrument === "piano" && (
-                  <p className="text-sm text-gray-300 italic">
-                    🎹 {user.instrument}
+          {currentgig?.bookCount?.map((myuser: UserProps) => {
+            return (
+              <motion.div
+                key={myuser._id}
+                className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 bg-gray-700 rounded-lg transition-all shadow-md relative"
+                whileHover={{
+                  scale: 1.02,
+                  boxShadow: "0px 5px 15px rgba(255, 255, 255, 0.1)",
+                }}
+              >
+                <div className="min-w-0 flex-1">
+                  <p className="text-lg font-semibold text-gray-100">
+                    {myuser.firstname} {myuser.lastname}
+                    <span
+                      className="absolute right-4 top-1 font-bold"
+                      onClick={() =>
+                        removeMusicianfrombookCount(myuser?._id || "")
+                      }
+                    >
+                      x
+                    </span>
                   </p>
-                )}
-                {user.instrument === "guitar" && (
-                  <p className="text-sm text-gray-300 italic">
-                    🎸 {user.instrument}
-                  </p>
-                )}
-                {user.instrument === "bass" && (
-                  <p className="text-sm text-gray-300 italic">
-                    🎸 {user.instrument}
-                  </p>
-                )}{" "}
-                {user.instrument === "drums" && (
-                  <p className="text-sm text-gray-300 italic">
-                    <Drum /> {user.instrument}
-                  </p>
-                )}{" "}
-                {user.instrument === "saxophone" && (
-                  <p className="text-sm text-gray-300 italic">
-                    🎷 {user.instrument}
-                  </p>
-                )}{" "}
-                {user.instrument === "trumpet" && (
-                  <p className="text-sm text-gray-300 italic">
-                    🎺 {user.instrument}
-                  </p>
-                )}
-                {user.instrument === "violin" && (
-                  <p className="text-sm text-gray-300 italic">
-                    🎻 {user.instrument}
-                  </p>
-                )}
-              </div>
-              <div className="flex items-center space-x-3 sm:space-x-4 mt-3 sm:mt-0">
-                <button
-                  onClick={() => handleBookUser(user._id || "")}
-                  className={`px-4 py-2 text-xs sm:text-sm rounded-lg font-semibold transition-all ${
-                    selectedUser === user._id
-                      ? "bg-orange-300 text-gray-300 cursor-not-allowed"
-                      : "bg-amber-600 hover:bg-blue-500 text-white"
-                  }`}
-                  disabled={selectedUser !== null}
-                >
-                  {selectedUser === user._id && bookloading ? (
-                    <CircularProgress
-                      size="16px"
-                      className="animate-spin text-white"
-                    />
-                  ) : (
-                    "Book"
+                  <p className="text-sm text-gray-400">{myuser.email}</p>
+                  {myuser.instrument === "piano" && (
+                    <p className="text-sm text-gray-300 italic">
+                      🎹 {myuser.instrument}
+                    </p>
                   )}
-                </button>
-                <ChatBubbleOvalLeftIcon
-                  className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-300 cursor-pointer hover:text-yellow-400 transition-transform transform hover:scale-110"
-                  onClick={() => setModal({ type: "chat", user })}
-                />
-                <UserIcon
-                  className="w-5 h-5 sm:w-6 sm:h-6 text-green-300 cursor-pointer hover:text-green-400 transition-transform transform hover:scale-110"
-                  onClick={() => router.push(`/profile/${user._id}`)}
-                />
-                <VideoCameraIcon
-                  className="w-5 h-5 sm:w-6 sm:h-6 text-red-400 cursor-pointer hover:text-red-500 transition-transform transform hover:scale-110"
-                  onClick={() => setModal({ type: "video", user })}
-                />
-              </div>
-            </motion.div>
-          ))}
+                  {myuser.instrument === "guitar" && (
+                    <p className="text-sm text-gray-300 italic">
+                      🎸 {myuser.instrument}
+                    </p>
+                  )}
+                  {myuser.instrument === "bass" && (
+                    <p className="text-sm text-gray-300 italic">
+                      🎸 {myuser.instrument}
+                    </p>
+                  )}{" "}
+                  {myuser.instrument === "drums" && (
+                    <p className="text-sm text-gray-300 italic">
+                      <Drum /> {myuser.instrument}
+                    </p>
+                  )}{" "}
+                  {myuser.instrument === "saxophone" && (
+                    <p className="text-sm text-gray-300 italic">
+                      🎷 {myuser.instrument}
+                    </p>
+                  )}{" "}
+                  {myuser.instrument === "trumpet" && (
+                    <p className="text-sm text-gray-300 italic">
+                      🎺 {myuser.instrument}
+                    </p>
+                  )}
+                  {myuser.instrument === "violin" && (
+                    <p className="text-sm text-gray-300 italic">
+                      🎻 {myuser.instrument}
+                    </p>
+                  )}
+                </div>
+                <div className="flex items-center space-x-3 sm:space-x-4 mt-3 sm:mt-0">
+                  <button
+                    onClick={() => handleBookUser(myuser._id || "")}
+                    className={`px-4 py-2 text-xs sm:text-sm rounded-lg font-semibold transition-all ${
+                      selectedUser === user._id
+                        ? "bg-orange-300 text-gray-300 cursor-not-allowed"
+                        : "bg-amber-600 hover:bg-blue-500 text-white"
+                    }`}
+                    disabled={selectedUser !== null}
+                  >
+                    Book
+                  </button>
+                  <ChatBubbleOvalLeftIcon
+                    className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-300 cursor-pointer hover:text-yellow-400 transition-transform transform hover:scale-110"
+                    onClick={() => setModal({ type: "chat", user: myuser })}
+                  />
+                  <UserIcon
+                    className="w-5 h-5 sm:w-6 sm:h-6 text-green-300 cursor-pointer hover:text-green-400 transition-transform transform hover:scale-110"
+                    onClick={() => router.push(`/profile`)}
+                  />
+                  <VideoCameraIcon
+                    className="w-5 h-5 sm:w-6 sm:h-6 text-red-400 cursor-pointer hover:text-red-500 transition-transform transform hover:scale-110"
+                    onClick={() => setModal({ type: "video", user: myuser })}
+                  />
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
       </motion.div>
-
       {/* Modal */}
       {modal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm w-[100%] mx-auto h-full">

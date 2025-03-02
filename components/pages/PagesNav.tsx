@@ -27,11 +27,15 @@ const PagesNav = () => {
     tap: { scale: 1, opacity: 0.9 },
   };
 
-  const links = [
-    { href: `/gigs/${userId}`, Icon: FaHome, size: 29, extraStyle: "" },
-  ];
+  const links = [];
 
   if (user?.isMusician) {
+    links.push({
+      href: `/gigs/${userId}`,
+      Icon: FaHome,
+      size: 29,
+      extraStyle: "",
+    });
     links.push({
       href: `/av_gigs/${userId}`,
       Icon: MdComment,
@@ -48,10 +52,16 @@ const PagesNav = () => {
 
   if (user?.isClient) {
     links.push({
+      href: `/gigs/${userId}`,
+      Icon: FaHome,
+      size: 29,
+      extraStyle: "",
+    });
+    links.push({
       href: `/create/${userId}`,
       Icon: IoIosAddCircle,
-      size: 33,
-      extraStyle: "text-purple-500",
+      size: 36,
+      extraStyle: "text-purple-500 ",
     });
     links.push({
       href: `/my_gig/${userId}`,
@@ -60,32 +70,32 @@ const PagesNav = () => {
       extraStyle: "",
     });
   }
-  if (!user?.isClient && !user?.isMusician) {
-    links.push({
-      href: `/create/${userId}`,
-      Icon: IoIosAddCircle,
-      size: 33,
-      extraStyle: "text-purple-500",
-    });
-    links.push({
-      href: `/my_gig/${userId}`,
-      Icon: MdOutlinePersonalInjury,
-      size: 24,
-      extraStyle: "",
-    });
-    links.push({
-      href: `/av_gigs/${userId}`,
-      Icon: MdComment,
-      size: 24,
-      extraStyle: "",
-    });
-    links.push({
-      href: `/bookedgigs/${userId}`,
-      Icon: MdEmojiEvents,
-      size: 33,
-      extraStyle: "",
-    });
-  }
+  // if (!user?.isClient && !user?.isMusician) {
+  //   links.push({
+  //     href: `/create/${userId}`,
+  //     Icon: IoIosAddCircle,
+  //     size: 33,
+  //     extraStyle: "text-purple-500",
+  //   });
+  //   links.push({
+  //     href: `/my_gig/${userId}`,
+  //     Icon: MdOutlinePersonalInjury,
+  //     size: 24,
+  //     extraStyle: "",
+  //   });
+  //   links.push({
+  //     href: `/av_gigs/${userId}`,
+  //     Icon: MdComment,
+  //     size: 24,
+  //     extraStyle: "",
+  //   });
+  //   links.push({
+  //     href: `/bookedgigs/${userId}`,
+  //     Icon: MdEmojiEvents,
+  //     size: 33,
+  //     extraStyle: "",
+  //   });
+  // }
 
   return (
     <div className="fixed bottom-0 w-full z-50 bg-gradient-to-t from-zinc-900 via-blue-900 to-yellow-750 shadow-xl shadow-teal-600 py-2">

@@ -21,9 +21,9 @@ const BookedGigs = () => {
 
   let gigQuery;
   return (
-    <div className="h-[85%] w-[90%] mx-auto my-2 shadow-md shadow-orange-300 relative">
+    <div className="h-[85vh] w-[90%] mx-auto my-2 shadow-md shadow-orange-300 relative">
       {/* Fixed Gigheader */}
-      <div className="sticky top-0 z-10 shadow-md">
+      <div className="sticky top-0 z-10 shadow-md bg-gray-900">
         <Gigheader
           typeOfGig={typeOfGig}
           setTypeOfGig={setTypeOfGig}
@@ -33,8 +33,9 @@ const BookedGigs = () => {
           setLocation={setLocation}
         />
       </div>
+
       {/* Scrollable Gigs List */}
-      <div className="h-[83%] overflow-y-scroll bg-gray-900">
+      <div className="h-[calc(100%-80px)] overflow-y-auto bg-gray-900">
         {" "}
         {gigs && gigs?.gigs?.length === 0 && (
           <h1 className="text-white text-center font-bold py-5">

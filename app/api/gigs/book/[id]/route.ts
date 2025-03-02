@@ -23,6 +23,7 @@ export async function PUT(req: NextRequest) {
           isTaken: true,
           isPending: false,
           bookedBy: musicianId,
+          bookCount: [],
         },
         // $pull:{
         //   bookCount: nonBookedMusicians,

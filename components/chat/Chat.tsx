@@ -16,9 +16,10 @@ interface ChatProps {
   myuser: UserProps;
   modal: { user: UserProps };
   onClose: () => void;
+  onOpenX: (showx: boolean) => void;
 }
 
-const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose }) => {
+const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose, onOpenX }) => {
   const [chatId, setChatId] = useState<string | null>(null);
   const { userId } = useAuth();
   const [loading, setLoading] = useState(true);
@@ -119,10 +120,15 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose }) => {
   if (!chatId) return <p>Chat could not be created</p>;
 
   return (
-    <section className="w-full max-w-lg sm:max-w-xl h-[600px] flex flex-col border border-gray-300 dark:border-gray-700 rounded-2xl shadow-2xl bg-white -mt-[70px] dark:bg-gray-900">
-      <ChatHeader onClose={onClose} modal={modal} user={myuserd} />
+    <section className="w-full max-w-lg sm:max-w-xl h-[600px]   flex flex-col border border-gray-300 dark:border-gray-700 rounded-2xl shadow-2xl bg-white -mt-[70px] dark:bg-gray-900">
+      <ChatHeader
+        onClose={onClose}
+        modal={modal}
+        user={myuserd}
+        onOpenX={onOpenX}
+      />
 
-      <div className="flex-1">
+      <div className="flex-1 z-50 ">
         <ChatPage chatId={chatId} modal={modal?.user?._id || ""} />
       </div>
       <ChatInput

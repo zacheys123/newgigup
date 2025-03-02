@@ -23,7 +23,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
   const { userId } = useAuth();
 
   const { user } = useCurrentUser(userId || null);
-  const { setOnlineUsers, addMessage } = useStore();
+  const { setOnlineUsers, addMessage, messages } = useStore();
 
   const [socket, setSocket] = useState<Socket | null>(null);
 
@@ -69,35 +69,45 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
   //   messagesRef.current = messages;
   // }, []);
   // import { useStore } from "@/store"; // Ensure correct Zustand import
-  console.log(socket);
+  // console.log(socket);
+  // console.log("updated messages", localMessages);
+  // useEffect(() => {
+  //   console.log("🔍 Checking socket instance:", socket); // Debugging line
+
+  //   if (!socket) {
+  //     console.log("❌ No socket instance found.");
+  //     return;
+  //   }
+
+  //   if (!socket.connected) {
+  //     console.warn("⚠️ Socket is NOT connected.");
+  //     return;
+  //   }
+
+  //   console.log("✅ Socket is connected.");
+
+  //   const handleIncomingMessage = (message: MessageProps) => {
+  //     console.log("🔵 Incoming message:", message);
+  //     addMessage(message); // ✅ Update Zustand state
+  //   };
+
+  //   socket.on("getMessage", handleIncomingMessage);
+
+  //   return () => {
+  //     console.log("🛑 Cleaning up socket listeners...");
+  //     socket.off("getMessage", handleIncomingMessage);
+  //   };
+  // }, [socket, addMessage]);
+
+  const [, forceUpdate] = useState(0);
+
   useEffect(() => {
-    console.log("🔍 Checking socket instance:", socket); // Debugging line
+    forceUpdate((prev) => prev + 1);
+  }, [messages]); // ✅ Forces re-render on message update
 
-    if (!socket) {
-      console.log("❌ No socket instance found.");
-      return;
-    }
-
-    if (!socket.connected) {
-      console.warn("⚠️ Socket is NOT connected.");
-      return;
-    }
-
-    console.log("✅ Socket is connected.");
-
-    const handleIncomingMessage = (message: MessageProps) => {
-      console.log("🟢 Received a message from the server:", message);
-      addMessage(message); // ✅ Update Zustand state
-    };
-
-    socket.on("getMessage", handleIncomingMessage);
-
-    return () => {
-      console.log("🛑 Cleaning up socket listeners...");
-      socket.off("getMessage", handleIncomingMessage);
-    };
-  }, [socket, addMessage]);
-
+  // In your SocketProvider (socket.tsx)
+  // In your SocketProvider (socket.tsx)
+  // In your SocketProvider (socket.tsx)
   useEffect(() => {
     if (!socket?.connected) {
       console.warn("⚠️ Socket is NOT connected.");
@@ -107,9 +117,22 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
     console.log("✅ Listening for incoming messages...");
 
     const handleIncomingMessage = (message: MessageProps) => {
-      // ✅ Force UI re-render before adding to Zustand
-      setTimeout(() => addMessage(message), 0);
       console.log("🟢 Received a message from the server:", message);
+
+      // Check if the message already exists in the Zustand store
+      const { messages } = useStore.getState();
+      const isDuplicate = messages.some(
+        (msg) =>
+          (msg._id && message._id && msg._id === message._id) || // Check for _id match
+          (msg.tempId && message.tempId && msg.tempId === message.tempId) // Check for tempId match
+      );
+
+      if (!isDuplicate) {
+        console.log("🟢 Adding new message to Zustand store.");
+        addMessage(message);
+      } else {
+        console.log("🟡 Duplicate message detected, skipping update.");
+      }
     };
 
     socket.on("getMessage", handleIncomingMessage);
@@ -117,8 +140,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
     return () => {
       socket.off("getMessage", handleIncomingMessage);
     };
-  }, [socket]); // ✅ Keep dependencies minimal
-
+  }, [socket, addMessage]);
   return (
     <SocketContext.Provider value={{ socket }}>
       {children}

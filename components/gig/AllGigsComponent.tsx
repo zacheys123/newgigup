@@ -113,7 +113,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
       )}
       <section
         className={
-          "flex flex-col rounded-md w-[95%] mx-auto shadow-md shadow-zinc-600 bg-zinc-900 py-5 h-[118px] mt-3 mb-5 px-3"
+          "flex flex-col rounded-md w-[95%] mx-auto shadow-md shadow-zinc-600 bg-zinc-900 py-5 h-[118px] mt-2 mb-3 px-3 first:mt-1"
         }
         style={{ background: gig?.backgroundColor }} // Applying fontColor dynamically
         onClick={() => {
@@ -401,30 +401,45 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                   : "Review Musician"}
               </h4>
             </div>
-          ) : (
+          ) : !gig?.bookedBy ? (
             <div>
-              <span className="titler text-red-700 font-bold line-clamp-1 ">
-                {gig?.logo && (
+              <span className="titler text-red-700 font-bold line-clamp-1">
+                {gig?.logo ? (
                   <Image
-                    src={gig?.logo}
-                    alt="p"
+                    src={gig.logo}
+                    alt="gig-logo"
                     width={25}
                     height={25}
                     className="w-[25px] h-[25px] rounded-full"
                   />
-                )}
-                {gig?.postedBy?.picture && !gig?.logo && (
+                ) : gig?.postedBy?.picture ? (
                   <Image
-                    src={gig?.postedBy?.picture}
-                    alt="p"
+                    src={gig.postedBy.picture}
+                    alt="user-picture"
                     width={25}
                     height={25}
                     className="w-[25px] h-[25px] rounded-full"
                   />
-                )}
+                ) : null}
               </span>
             </div>
-          )}{" "}
+          ) : gig?.bookedBy?._id === myId ? (
+            <div className="w-full flex justify-end">
+              {canShowAddGigVideos && (
+                <div
+                  className=" flex bg-yellow-600 px-3 py-1 rounded-r-3xl rounded-b-[10px] rounded-br-md min-w-[120px]"
+                  onClick={() => {
+                    setCurrentId(gig._id);
+                    setShowVideo(true);
+                  }}
+                >
+                  <h4 className="text-[10px] !text-orange-100 font-bold flex items-center gap-2">
+                    Add Gig Videos <Video />
+                  </h4>
+                </div>
+              )}
+            </div>
+          ) : null}
           {showModal &&
             selectedReview &&
             selectedReview?.postedTo === gig?.bookedBy?._id && (
@@ -435,23 +450,6 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
               />
             )}
         </div>{" "}
-        {gig && gig?.bookedBy?._id == myId && (
-          <div className=" w-full flex justify-end">
-            {canShowAddGigVideos && (
-              <div
-                className=" my-3 flex  bg-yellow-600 px-3 py-1 rounded-r-3xl rounded-b-[10px] rounded-br-md min-w-[120px] "
-                onClick={() => {
-                  setCurrentId(gig._id);
-                  setShowVideo(true);
-                }}
-              >
-                <h4 className="text-[10px] !text-orange-100 font-bold flex  items-center gap-2">
-                  Add Gig Videos <Video />
-                </h4>
-              </div>
-            )}
-          </div>
-        )}
         {showvideo && currentId === gig?._id && (
           <motion.div
             initial={{

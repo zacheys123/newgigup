@@ -15,16 +15,9 @@ const PublishedGigs = () => {
   const { user } = useCurrentUser(userId || null);
   const [typeOfGig, setTypeOfGig] = useState<string>("");
   const [category, setCategory] = useState<string>("all");
-  // let gigQuery;
-  // const [loadingview, setLoadingView] = useState<boolean>();
-  // const [loadingPostId, setLoadingPostId] = useState<object | null>(null);
-  // const [loadingId, setLoadingId] = useState<boolean>();
-
   const [location, setLocation] = useState<string>(() =>
     user?.city ? user?.city : "all"
   );
-  let gigQuery;
-  // console.log(gigs?.gigs?.map((gig: GigProps) => console.log(gig)));
 
   return (
     <div className="h-[85%] w-[90%] mx-auto my-2 shadow-md shadow-orange-300 relative">
@@ -40,15 +33,14 @@ const PublishedGigs = () => {
         />
       </div>
       {/* Scrollable Gigs List */}
-      <div className="h-[83%] overflow-y-scroll bg-gray-900">
-        {" "}
+      <div className="h-[calc(100%-60px)] overflow-y-auto bg-gray-900">
         {gigs?.gigs?.length === 0 && (
           <h1 className="text-white text-center font-bold py-5">
             No gigs found
           </h1>
         )}
         {!loading ? (
-          searchfunc(gigs?.gigs, typeOfGig, category, gigQuery, location)
+          searchfunc(gigs?.gigs, typeOfGig, category, null, location)
             ?.filter(
               (gig: GigProps) =>
                 gig?.postedBy?._id !== user?._id && gig?.isTaken === false

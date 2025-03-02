@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import Chat from "./chat/Chat";
 
 interface ModalProps {
+  onOpenX: (showX: boolean) => void;
   onClose: () => void;
   modal: {
     type: string;
@@ -11,7 +12,7 @@ interface ModalProps {
   user: UserProps;
 }
 
-const Modal: React.FC<ModalProps> = ({ onClose, modal, user }) => (
+const Modal: React.FC<ModalProps> = ({ onClose, modal, user, onOpenX }) => (
   <motion.div
     initial={{ scale: 0.8, opacity: 0 }}
     animate={{ scale: 1, opacity: 1 }}
@@ -20,7 +21,7 @@ const Modal: React.FC<ModalProps> = ({ onClose, modal, user }) => (
   >
     <h2 className="text-xl font-bold mb-4">
       {modal.type === "chat" ? (
-        <Chat onClose={onClose} modal={modal} myuser={user} />
+        <Chat onClose={onClose} modal={modal} myuser={user} onOpenX={onOpenX} />
       ) : (
         <section className="h-[500px] w-full">
           {modal?.user?.videosProfile?.length > 0 && (

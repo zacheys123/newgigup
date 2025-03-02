@@ -162,7 +162,7 @@ const CurrentUserProfile = () => {
         videoUrl={videoUrl}
       />
 
-      <div className="flex flex-col lg:flex-row gap-6 max-h-full overflow-y-scroll py-5">
+      <div className="flex flex-col lg:flex-row gap-2 max-h-full overflow-y-scroll py-5">
         <div className="text-red-300 text-[12px] font-bold my-3 flex items-center justify-between">
           {user?.followers?.length === 0 ? (
             <h6 className="text-red-300">No followers</h6>

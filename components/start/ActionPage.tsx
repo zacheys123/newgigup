@@ -61,7 +61,7 @@ const ActionPage = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ transformedUser, isMusician: true }),
+          body: JSON.stringify({ transformedUser, isMusician: true,isClient:false }),
         });
         const data = await res.json();
         window.localStorage.setItem("user", JSON.stringify(data.results));
@@ -109,7 +109,7 @@ const ActionPage = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ transformedUser, isClient: true }),
+          body: JSON.stringify({ transformedUser, isClient: true ,isMusician:false}),
         });
         const data = await res.json();
         window.localStorage.setItem("user", JSON.stringify(data.results));

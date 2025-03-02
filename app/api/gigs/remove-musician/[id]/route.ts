@@ -8,6 +8,7 @@ export async function DELETE(req: NextRequest) {
   const { userId } = getAuth(req);
   const { musicianId } = await req.json();
 
+  console.log(musicianId);
   if (!userId) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }

@@ -3,16 +3,17 @@ import { GigProps } from "@/types/giginterface";
 import { initialState, StoreState } from "@/types/storeinterface";
 import { Review, UserProps } from "@/types/userinterfaces";
 import { create } from "zustand"; // Import SetState
+// import { unstable_batchedUpdates } from "react-dom";
 
-const isDuplicateMessage = (
-  messages: MessageProps[],
-  newMessage: MessageProps
-) => {
-  return messages.some(
-    (msg) => msg._id === newMessage._id || msg.tempId === newMessage.tempId
-  );
-};
-const useStore = create<StoreState>((set, get) => ({
+// const isDuplicateMessage = (
+//   messages: MessageProps[],
+//   newMessage: MessageProps
+// ) => {
+//   return messages.some(
+//     (msg) => msg._id === newMessage._id || msg.tempId === newMessage.tempId
+//   );
+// };
+const useStore = create<StoreState>((set) => ({
   ...initialState,
   setShowUpload: () =>
     set((state: StoreState) => ({ showUpload: !state.showUpload })),
@@ -82,46 +83,69 @@ const useStore = create<StoreState>((set, get) => ({
     }
   },
 
+  // In your Zustand store (useStore.ts)
   addMessage: (newMessage) => {
-    set((state) => {
-      if (isDuplicateMessage(state.messages, newMessage)) return state;
+    console.log("🟠 Adding new message to Zustand store:", newMessage);
+    console.log("New Message ID:", newMessage._id);
+    console.log("New Message Temp ID:", newMessage.tempId);
 
+    set((state) => {
+      const isDuplicate = state.messages.some(
+        (msg) =>
+          (msg._id && newMessage._id && msg._id === newMessage._id) || // Check for _id match
+          (msg.tempId && newMessage.tempId && msg.tempId === newMessage.tempId) // Check for tempId match
+      );
+
+      if (isDuplicate) {
+        console.log("🟡 Duplicate message detected, skipping update.");
+        return state;
+      }
+
+      console.log("🟢 Adding new message to Zustand store.");
+      const chatId = newMessage.chatId as string;
       return {
         messages: [...state.messages, newMessage],
-      };
-    });
-  },
-
-  sendMessage: async (newMessage: MessageProps) => {
-    console.log("Debug newMessage:", newMessage);
-    if (!newMessage.chatId || typeof newMessage.chatId !== "string") {
-      console.error("Error: newMessage.chatId is invalid", newMessage.chatId);
-      return;
-    }
-
-    const { currentUser } = get(); // Get current user from Zustand store
-    const chatId = newMessage.chatId as string;
-    const tempId = `temp-${Math.random().toString(36).substr(2, 9)}`;
-    const optimisticMessage = { ...newMessage, tempId: currentUser?._id };
-
-    // Optimistically update UI
-    set((state: StoreState) => {
-      const existingChat = state.chats?.[chatId] ?? {
-        messages: [],
-      };
-
-      return {
-        messages: [...state.messages, optimisticMessage],
         chats: {
           ...state.chats,
           [chatId]: {
-            ...existingChat,
-            messages: [...(existingChat.messages ?? []), optimisticMessage],
+            ...state.chats[chatId],
+            messages: [...(state.chats[chatId]?.messages || []), newMessage],
           },
         },
       };
     });
+  },
 
+  // In your Zustand store (useStore.ts)
+  // In your Zustand store (useStore.ts)
+  // In your Zustand store (useStore.ts)
+  // In your Zustand store (useStore.ts)
+  // In your Zustand store (useStore.ts)
+  sendMessage: async (newMessage: MessageProps) => {
+    // const tempId = `temp-${Math.random().toString(36).substr(2, 9)}`; // Unique tempId
+    // const optimisticMessage = { ...newMessage, tempId }; // Add tempId to the optimistic message
+
+    // console.log("🟠 Adding optimistic message with tempId:", tempId);
+
+    // // Optimistically update UI (only for the sender)
+    // set((state: StoreState) => {
+    //   const existingChat = state.chats?.[newMessage.chatId as string] ?? {
+    //     messages: [],
+    //   };
+
+    //   return {
+    //     messages: [...state.messages, optimisticMessage],
+    //     chats: {
+    //       ...state.chats,
+    //       [newMessage.chatId as string]: {
+    //         ...existingChat,
+    //         messages: [...(existingChat.messages ?? []), optimisticMessage],
+    //       },
+    //     },
+    //   };
+    // });
+
+    // Send the message to the server
     try {
       const res = await fetch("/api/messages/sendmessages", {
         method: "POST",
@@ -132,29 +156,30 @@ const useStore = create<StoreState>((set, get) => ({
       if (!res.ok) throw new Error("Failed to send message");
 
       const savedMessage = await res.json();
+      console.log("🟢 Message sent successfully:", savedMessage);
 
       // Replace optimistic message with real one
-      set((state: StoreState) => ({
-        messages: state.messages.map((msg) =>
-          msg.tempId === tempId ? savedMessage : msg
-        ),
-        chats: {
-          ...state.chats,
-          [savedMessage.chatId]: {
-            ...state.chats?.[savedMessage.chatId],
-            messages: state.chats?.[savedMessage.chatId]?.messages?.map((msg) =>
-              msg.tempId === tempId ? savedMessage : msg
-            ) ?? [savedMessage],
-          },
-        },
-      }));
+      // set((state: StoreState) => ({
+      //   messages: state.messages.map((msg) =>
+      //     msg.tempId === tempId ? savedMessage : msg
+      //   ),
+      //   chats: {
+      //     ...state.chats,
+      //     [savedMessage.chatId]: {
+      //       ...state.chats?.[savedMessage.chatId],
+      //       messages: state.chats?.[savedMessage.chatId]?.messages?.map((msg) =>
+      //         msg.tempId === tempId ? savedMessage : msg
+      //       ) ?? [savedMessage],
+      //     },
+      //   },
+      // }));
     } catch (error) {
       console.error("Error sending message:", error);
 
-      // Remove optimistic message if request fails
-      set((state: StoreState) => ({
-        messages: state.messages.filter((msg) => msg.tempId !== tempId),
-      }));
+      // // Remove optimistic message if request fails
+      // set((state: StoreState) => ({
+      //   messages: state.messages.filter((msg) => msg.tempId !== tempId),
+      // }));
     }
   },
 

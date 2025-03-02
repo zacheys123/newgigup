@@ -10,13 +10,14 @@ export function useForgetBookings() {
   const forgetBookings = async (id: string, myGig: GigProps) => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/gigs/remove-musician/${myGig?._id}`, {
+      const response = await fetch(`/api/gigs/cancelgig/${myGig?._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ musicianId: id }),
       });
+      console.log(response);
       if (!response.ok) {
         throw new Error("Failed to cancel the gig");
       }
