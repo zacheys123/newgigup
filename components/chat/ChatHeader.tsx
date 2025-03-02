@@ -15,7 +15,7 @@ interface ChatPageProps {
   // setNewMessage: (message: string) => void;
   // sendMessage: (e: React.FormEvent) => void;
 }
-const ChatHeader = ({ onClose, modal, onOpenX }: ChatPageProps) => {
+const ChatHeader = ({ onOpenX, onClose, modal }: ChatPageProps) => {
   // Accessing onlineUsers state from Zustand store
   const { onlineUsers } = useStore();
 

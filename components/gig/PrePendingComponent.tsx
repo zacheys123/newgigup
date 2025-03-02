@@ -33,12 +33,19 @@ const PrePendingComponent = () => {
     user: UserProps;
   } | null>(null);
   console.log(modal);
+  const [showX, setShowX] = useState(false);
   //   const forget = () => forgetBookings(userId || "", currentgig);
   const handleBookUser = (bookingId: string) => {
     setSelectedUser(bookingId);
     console.log(`User ${userId} booked. Others disqualified.`);
     bookgig(router, currentgig, userId || "", bookingId as string);
   };
+
+  // Define the onOpenX function
+  const handleOpenX = () => {
+    setShowX(false); // Reset the showX state
+  };
+  console.log(showX);
 
   const removeMusicianfrombookCount = async (id: string) => {
     try {
@@ -196,7 +203,12 @@ const PrePendingComponent = () => {
       {/* Modal */}
       {modal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm w-[100%] mx-auto h-full">
-          <Modal onClose={() => setModal(null)} modal={modal} user={user} />
+          <Modal
+            onClose={() => setModal(null)}
+            modal={modal}
+            user={user}
+            onOpenX={handleOpenX}
+          />
         </div>
       )}
     </div>
