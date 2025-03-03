@@ -31,7 +31,7 @@ const ClientSearchComponent = () => {
 
   useEffect(() => {
     if (!username) {
-      // Guard: Do not run the effect if `id` is undefined or null
+      // Guard: Do not run the effect if `usernamme` is undefined or null
       return;
     }
     let isMounted = true;

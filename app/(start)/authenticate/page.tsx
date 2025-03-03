@@ -16,7 +16,6 @@ const Authenticate = () => {
   const [mainloader, setMainloader] = useState<boolean>(false);
   const router = useRouter();
   const { isLoaded, userId } = useAuth();
-
   const LoadingPage = useCallback(() => {
     setfirstloader(true);
 
