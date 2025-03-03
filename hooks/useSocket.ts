@@ -7,7 +7,7 @@ const useSocket = () => {
   const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
-    const newSocket = io(process.env.NEXT_PUBLIC_SOCKET_URL); // Ensure you're using the correct URL
+    const newSocket = io(process.env.NEXT_PUBLIC_SOCKET_URL);
     setSocket(newSocket);
 
     return () => {

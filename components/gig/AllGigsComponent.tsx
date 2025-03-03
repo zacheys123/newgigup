@@ -7,7 +7,6 @@ import { PiDotsThreeVerticalBold } from "react-icons/pi";
 import GigDescription from "./GigDescription";
 import useStore from "@/app/zustand/useStore";
 import { useRouter } from "next/navigation";
-import { bookGig } from "@/hooks/bookGig";
 import { useAllGigs } from "@/hooks/useAllGigs";
 import { toast } from "react-toastify";
 import { useAuth } from "@clerk/nextjs";
@@ -20,7 +19,9 @@ import AlreadyReviewModal from "../modals/AlreadyReviewModall";
 import { motion } from "framer-motion";
 import { Review } from "@/types/userinterfaces";
 import { isCreatorIsCurrentUserAndTaken } from "@/constants";
-import useSocket from "@/hooks/useSocket";
+import { useSocketContext } from "@/app/Context/socket";
+import { useBookGig } from "@/hooks/useBookGig";
+
 // import { useCurrentUser } from "@/hooks/useCurrentUser";
 interface FetchResponse {
   success: boolean;
@@ -36,7 +37,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
   const [loadingPostId, setLoadingPostId] = useState<string>("");
   const [gigdesc, setGigdesc] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
-  const { socket } = useSocket();
+  const { socket } = useSocketContext();
   const { gigs } = useAllGigs() || { gigs: [] }; // Default to empty array if null or undefined
   const [showvideo, setShowVideo] = useState<boolean>(false);
   const handleClose = () => {
@@ -45,6 +46,8 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
   };
   const { currentUser, showModal, setShowModal, setRefetchGig } = useStore();
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
+  const [bookCount, setBookCount] = useState(gig.bookCount.length || 0);
+  const { bookGig } = useBookGig();
   const myId = currentUser?._id;
   const router = useRouter();
   // conditionsl styling
@@ -106,24 +109,37 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
     testfilteredvids?.length < 4;
   // user?.videos.length < 4;
 
-  const [bookCount, setBookCount] = useState(gig.bookCount.length);
+  const hasBookedGig = gig?.bookCount?.some((user) => user._id === myId);
+
+  const isGigCreator = gig?.postedBy?._id === myId;
+  const canEditGig =
+    gig?.postedBy?._id &&
+    isGigCreator &&
+    bookCount === 0 &&
+    gig?.isTaken === false &&
+    gig?.postedBy?._id.includes(myId || "");
 
   useEffect(() => {
-    if (!socket) {
-      return;
-    }
-    // Listen for the updateBookCount event
-    socket.on("updateBookCount", ({ gigId, bookCount: newBookCount }) => {
+    if (!socket) return;
+
+    const handleUpdateBookCount = ({
+      gigId,
+      bookCount: newBookCount,
+    }: {
+      gigId: string;
+      bookCount: number;
+    }) => {
       if (gigId === gig._id) {
         setBookCount(newBookCount);
       }
-    });
-
-    // Cleanup the socket connection on component unmount
-    return () => {
-      socket.disconnect();
     };
-  }, [gig._id]);
+
+    socket.on("updateBookCount", handleUpdateBookCount);
+
+    return () => {
+      socket.off("updateBookCount", handleUpdateBookCount);
+    };
+  }, [gig._id, socket]);
   return (
     <>
       {gigdesc && (
@@ -199,7 +215,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                 loadingtitle="Edit gig"
               /> */}
 
-                {gig?.bookCount?.some((user) => user._id === myId) && (
+                {hasBookedGig && (
                   <div className="w-full text-right ">
                     <ButtonComponent
                       variant="secondary"
@@ -221,12 +237,10 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                   </div>
                 )}
 
-                {gig.postedBy?._id &&
-                  !gig?.bookCount?.some((user) => user._id === myId) &&
-                  gig?.bookCount?.length === 0 &&
+                {!hasBookedGig &&
                   gig.bookCount.length < 4 &&
-                  gig.postedBy?._id.includes(myId || "") &&
-                  gig?.isTaken === false && (
+                  isGigCreator &&
+                  canEditGig && (
                     <div className="w-full text-right ">
                       <ButtonComponent
                         variant="secondary"
@@ -263,7 +277,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                 )}
                 {gig?.postedBy?._id &&
                   gig?.postedBy?._id !== myId &&
-                  !gig?.bookCount?.some((user) => user._id === myId) &&
+                  !hasBookedGig &&
                   gig?.bookCount.length < 4 &&
                   currentUser?.isClient === false &&
                   gig?.isTaken === false && (
@@ -275,16 +289,16 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                           setLoadingPostId(gig?._id || "");
                           setTimeout(() => {
                             // After the operation, you can handle the logic for reading the post
+
                             bookGig(
                               gig,
-                              myId || "",
+                              myId as string,
                               gigs?.gigs || [],
-                              userId || "",
+                              userId as string,
                               toast,
                               setRefetchGig,
                               router
                             );
-
                             // Reset the loading state after reading
                             setLoadingPostId("");
                           }, 2000);
@@ -319,7 +333,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                         }
                       />
                       {gig?.bookCount.length > 0 && (
-                        <span className="absolute right-[1px] top-[12px] bg-gray-200 w-4 h-4 text-red-500 text-[10px] font-bold  rounded-full  flex justify-center items-center">
+                        <span className="absolute right-[1px] top-[12px] bg-blue-600 w-4 h-4 text-gray-100 text-[10px] font-bold  rounded-full  flex justify-center items-center">
                           {bookCount}
                         </span>
                       )}

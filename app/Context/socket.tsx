@@ -10,6 +10,8 @@ interface SocketContextType {
   socket: Socket | null;
 }
 
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL;
+
 const SocketContext = createContext<SocketContextType>({ socket: null });
 
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -21,9 +23,8 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
   const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
-    console.log("WebSocket URL:", process.env.NEXT_PUBLIC_SOCKET_URL);
     console.log("⏳ Initializing socket...");
-    const newSocket = io(process.env.NEXT_PUBLIC_SOCKET_URL, {
+    const newSocket = io(SOCKET_URL, {
       transports: ["websocket"],
       reconnectionAttempts: 5,
       timeout: 5000,
@@ -36,14 +37,17 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
 
     newSocket.on("disconnect", () => {
       console.warn("❌ Socket disconnected!");
+      setSocket(null); // Ensure socket is set to null on disconnect
     });
 
     newSocket.on("connect_error", (err) => {
       console.error("❌ Socket connection error:", err);
+      setSocket(null); // Ensure socket is set to null on error
     });
 
     return () => {
       newSocket.disconnect();
+      setSocket(null); // Cleanup on unmount
     };
   }, []);
 

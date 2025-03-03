@@ -1,5 +1,5 @@
 import { FetchResponse, GigProps } from "@/types/giginterface";
-import { io } from "socket.io-client";
+import { Socket } from "socket.io";
 
 export const bookGig = async (
   gig: GigProps,
@@ -12,50 +12,60 @@ export const bookGig = async (
     push: (url: string) => void;
     replace: (url: string) => void;
     refresh: () => void;
-  }
+  },
+  socket: Socket // Ensure it can be null
 ): Promise<void> => {
-  const countUserPosts = gigs
-    ? gigs.filter((gig) => gig?.bookedBy?._id === myId && gig?.isTaken === true)
-        .length
-    : 0; // Default to 0 if gigs is null or undefined
+  if (!gig) {
+    toast.error("Invalid gig data.");
+    return;
+  }
 
-  console.log(gig);
-  //... your logic here
+  const countUserPosts = gigs
+    ? gigs.filter((g) => g?.bookedBy?._id === myId && g?.isTaken === true)
+        .length
+    : 0;
 
   if (countUserPosts > 2) {
     toast.error("You have reached your maximum booking limit");
     return;
   }
+
   try {
     const res = await fetch(`/api/gigs/bookgig/${gig?._id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        userid: myId,
-      }),
+      body: JSON.stringify({ userid: myId }),
     });
+
     const data: FetchResponse = await res.json();
     console.log(data);
+
     if (data.gigstatus === true) {
       toast.success(data.message || "Booked successfully");
-      // socket.emit("book-gig", data);
-      // router.push(`/execute/${gig?._id}`);
-      // Emit a Socket.IO event to notify all clients about the booking
-      const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL); // Replace with your server URL
-      socket.emit("gigBooked", {
-        gigId: gig?._id,
-        bookCount: gig?.bookCount?.length + 1, // Increment the bookCount
-      });
+
+      // Emit Socket.IO event before updating state
+      if (socket) {
+        socket.emit("gigBooked", {
+          gigId: gig?._id,
+          bookCount: (gig?.bookCount?.length || 0) + 1, // Avoid undefined length
+        });
+      } else {
+        console.warn("Socket connection unavailable");
+      }
+
       setRefetchGig(true);
+
+      // Navigate the user if necessary
+      router.replace(`/execute/${gig?._id}`);
     } else {
-      toast.error(data.message || "Error Occured");
-      router.push(`/gigs/${userId}`);
+      toast.error(data.message || "Error occurred");
+      router.replace(`/gigs/${userId}`);
       router.refresh();
     }
   } catch (error) {
-    console.log(error);
+    console.error("Booking Error:", error);
     toast.error("Failed to book the gig. Please try again.");
   }
 };
