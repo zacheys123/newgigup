@@ -1,7 +1,7 @@
 // components/gig/AllGigsComponent.ts
 import { GigProps } from "@/types/giginterface";
 import { Box, Divider } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ButtonComponent from "../ButtonComponent";
 import { PiDotsThreeVerticalBold } from "react-icons/pi";
 import GigDescription from "./GigDescription";
@@ -20,6 +20,7 @@ import AlreadyReviewModal from "../modals/AlreadyReviewModall";
 import { motion } from "framer-motion";
 import { Review } from "@/types/userinterfaces";
 import { isCreatorIsCurrentUserAndTaken } from "@/constants";
+import useSocket from "@/hooks/useSocket";
 // import { useCurrentUser } from "@/hooks/useCurrentUser";
 interface FetchResponse {
   success: boolean;
@@ -35,7 +36,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
   const [loadingPostId, setLoadingPostId] = useState<string>("");
   const [gigdesc, setGigdesc] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
-  // const { user } = useCurrentUser(userId || null);
+  const { socket } = useSocket();
   const { gigs } = useAllGigs() || { gigs: [] }; // Default to empty array if null or undefined
   const [showvideo, setShowVideo] = useState<boolean>(false);
   const handleClose = () => {
@@ -105,7 +106,24 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
     testfilteredvids?.length < 4;
   // user?.videos.length < 4;
 
-  console.log(gigs);
+  const [bookCount, setBookCount] = useState(gig.bookCount.length);
+
+  useEffect(() => {
+    if (!socket) {
+      return;
+    }
+    // Listen for the updateBookCount event
+    socket.on("updateBookCount", ({ gigId, bookCount: newBookCount }) => {
+      if (gigId === gig._id) {
+        setBookCount(newBookCount);
+      }
+    });
+
+    // Cleanup the socket connection on component unmount
+    return () => {
+      socket.disconnect();
+    };
+  }, [gig._id]);
   return (
     <>
       {gigdesc && (
@@ -302,7 +320,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                       />
                       {gig?.bookCount.length > 0 && (
                         <span className="absolute right-[1px] top-[12px] bg-gray-200 w-4 h-4 text-red-500 text-[10px] font-bold  rounded-full  flex justify-center items-center">
-                          {gig?.bookCount.length}
+                          {bookCount}
                         </span>
                       )}
                     </div>
@@ -311,41 +329,6 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
             </div>
           )}
         </div>
-        {/* {gig?.isTaken === false ? (
-          <Box className="bg-zinc-700 shadow-sm shadow-zinc-400 flex items-center justify-around h-[30px] py-4 mt-2">
-            <div className="flex gap-2">
-              <span className="gigtitle text-orange-300"> status:</span>
-              <span className="gigtitle text-red-300">
-                {" "}
-                {gig?.isPending ? "Pending" : "Available"}
-              </span>
-            </div>{" "}
-            <div className="flex gap-2">
-              {gig?.postedBy?.picture && (
-                <Avatar
-                  src={gig?.postedBy?.picture}
-                  className="!w-[24px] !h-[24px]"
-                />
-              )}
-            </div>
-          </Box>
-        ) : (
-          <Box className="bg-green-700 shadow-sm shadow-zinc-400 flex items-center justify-around h-[30px] py-4 mt-2">
-            {" "}
-            <div className="flex gap-2 items-center ">
-              <span className="gigtitle text-orange-300"> status:</span>
-              <span className="gigtitle text-red-300">
-                {" "}
-                {gig?.isTaken && "Taken"}
-              </span>
-            </div>{" "}
-            <div className="flex gap-2">
-              <span className="gigtittle text-gray-300">By:</span>
-              <span className="flex gigtittle">{gig?.bookedBy?.firstname}</span>
-              <ArrowRight />
-            </div>
-          </Box> */}
-        {/* )} */}
         <Divider />{" "}
         <div className="flex justify-between items-center mt-2">
           <div className={gig?.isPending ? " flex " : "flex w-[60%]"}>
