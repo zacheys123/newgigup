@@ -17,7 +17,7 @@ const Modal: React.FC<ModalProps> = ({ onClose, modal, user, onOpenX }) => (
     initial={{ scale: 0.8, opacity: 0 }}
     animate={{ scale: 1, opacity: 1 }}
     transition={{ duration: 0.3 }}
-    className="bg-gray-800 rounded-lg p-6 shadow-lg max-w-md w-full text-white relative h-[80%]"
+    className=" rounded-lg p-6 shadow-lg max-w-md w-full text-white relative h-[100%]"
   >
     <h2 className="text-xl font-bold mb-4">
       {modal.type === "chat" ? (
