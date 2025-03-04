@@ -53,7 +53,7 @@ const MobileSheet = () => {
             className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 hover:text-white rounded-md transition-all"
           >
             <Home size="20" className="text-white" />
-            <SheetDescription className="text-lg font-medium title text-neutral-300 ">
+            <SheetDescription className="text-lg font-medium title text-neutral-400 ">
               Home
             </SheetDescription>
           </Link>
@@ -64,7 +64,7 @@ const MobileSheet = () => {
           className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 hover:text-white rounded-md transition-all"
         >
           <MdDashboard size="20" className="text-white" />
-          <SheetDescription className="text-lg font-medium title text-neutral-300 ">
+          <SheetDescription className="text-lg font-medium title text-neutral-400 ">
             Reviews
           </SheetDescription>
         </Link>
@@ -74,7 +74,7 @@ const MobileSheet = () => {
           className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 hover:text-white rounded-md transition-all"
         >
           <Search size="20" className="text-white" />
-          <SheetDescription className="text-lg font-medium title text-neutral-300 ">
+          <SheetDescription className="text-lg font-medium title text-neutral-400 ">
             Search
           </SheetDescription>
         </Link>
@@ -90,7 +90,7 @@ const MobileSheet = () => {
           className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 hover:text-white rounded-md transition-all"
         >
           <User size="20" className="text-white" />
-          <SheetDescription className="text-lg font-medium title text-neutral-300 ">
+          <SheetDescription className="text-lg font-medium title text-neutral-400 ">
             Profile
           </SheetDescription>
         </Link>
@@ -100,7 +100,7 @@ const MobileSheet = () => {
           className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 hover:text-white rounded-md transition-all"
         >
           <BookCopy size="20" className="text-white" />
-          <SheetDescription className="text-lg font-medium title text-neutral-300 ">
+          <SheetDescription className="text-lg font-medium title text-neutral-400 ">
             Personal Reviews
           </SheetDescription>
         </Link>
@@ -110,26 +110,27 @@ const MobileSheet = () => {
           className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 hover:text-white rounded-md transition-all"
         >
           <MessageCircle size="20" className="text-white" />
-          <SheetDescription className="text-lg font-medium title text-neutral-300 ">
+          <SheetDescription className="text-lg font-medium title text-neutral-400 ">
             My Chats
           </SheetDescription>
         </Link>
-
-        <Link
-          href={`/search/allvideos/${user?._id}/*${user?.firstname}${user?.lastname}`}
-          className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 hover:text-white rounded-md transition-all"
-        >
-          <VideoIcon size="20" className="text-white" />
-          <SheetDescription className="text-lg font-medium title text-neutral-300 ">
-            My Videos
-          </SheetDescription>
-        </Link>
+        {user?.isMusician && !user?.isClient && (
+          <Link
+            href={`/search/allvideos/${user?._id}/*${user?.firstname}${user?.lastname}`}
+            className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 hover:text-white rounded-md transition-all"
+          >
+            <VideoIcon size="20" className="text-white" />
+            <SheetDescription className="text-lg font-medium title text-neutral-400 ">
+              My Videos
+            </SheetDescription>
+          </Link>
+        )}
         <Link
           href={`/gigs/${userId}`}
           className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 hover:text-white rounded-md transition-all"
         >
           <Music size="20" className="text-white" />
-          <SheetDescription className="text-lg font-medium title text-neutral-300 ">
+          <SheetDescription className="text-lg font-medium title text-neutral-400 ">
             Gigs
           </SheetDescription>
         </Link>
@@ -138,7 +139,7 @@ const MobileSheet = () => {
           className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 hover:text-white rounded-md transition-all"
         >
           <Settings size="20" className="text-white" />
-          <SheetDescription className="text-lg font-medium title text-neutral-300 ">
+          <SheetDescription className="text-lg font-medium title text-neutral-400 ">
             Settings
           </SheetDescription>
         </Link>

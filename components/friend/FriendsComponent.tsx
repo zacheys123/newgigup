@@ -174,37 +174,41 @@ const FriendsComponent = () => {
           )}
         </div>
       </div>
-      <div className="h-[70px] flex gap-2 justify-around items-center">
-        <ArrowLeftIcon
-          size="19"
-          style={{ color: "lightgrey" }}
-          onClick={() => router.back()}
-        />
-        <BsChatDots size="19" style={{ color: "lightgrey" }} />
-        <Music
-          size="19"
-          style={{ color: "lightgrey" }}
-          onClick={() => router.push(`/gigs/${userId}`)}
-        />
-        <Video
-          size="19"
-          style={{ color: "lightgrey" }}
-          onClick={() =>
-            router.push(
-              `/search/allvideos/${friend?._id}/*${user?.firstname}${user?.lastname}`
-            )
-          }
-        />
-        <MdRateReview
-          size={22}
-          style={{ color: "lightgrey" }}
-          onClick={() =>
-            router.push(
-              `/search/reviews/${friend?._id}/*${user?.firstname}${user?.lastname}`
-            )
-          }
-        />
-      </div>
+      {user && (
+        <div className="h-[80px] flex gap-2 justify-around items-center">
+          <ArrowLeftIcon
+            size={22}
+            style={{ color: "lightgrey" }}
+            onClick={() => router.back()}
+          />
+          <BsChatDots size="19" style={{ color: "lightgrey" }} />
+          <Music
+            size={22}
+            style={{ color: "lightgrey" }}
+            onClick={() => router.push(`/gigs/${userId}`)}
+          />
+          <Video
+            size={22}
+            style={{ color: "lightgrey" }}
+            onClick={() =>
+              router.push(
+                `/search/allvideos/${friend?._id}/*${user?.firstname}${user?.lastname}`
+              )
+            }
+          />
+          {!user?.isMusician && user?.isClient && (
+            <MdRateReview
+              size={22}
+              style={{ color: "lightgrey" }}
+              onClick={() =>
+                router.push(
+                  `/search/reviews/${friend?._id}/*${user?.firstname}${user?.lastname}`
+                )
+              }
+            />
+          )}
+        </div>
+      )}
       <Box className="h-fit bg-neutral-800 w-[100%] px-2 py-3">
         <h4 className="text-[16px] font-bold text-gray-400 mt-3 mb-1 ">
           Fullname
