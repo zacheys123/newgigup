@@ -106,7 +106,7 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose, onOpenX }) => {
       <div className="flex h-[550px] justify-center items-center">
         <p className="text-1xl font-mono animate-bounce text-amber-600">
           {" "}
-          Loading chat...
+          Loading chat Data...
         </p>
       </div>
     );
