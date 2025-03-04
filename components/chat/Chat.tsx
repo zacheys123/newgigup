@@ -101,11 +101,16 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose, onOpenX }) => {
     }, 3000);
   };
 
-  if (loading) return <p>Loading chat...</p>;
+  if (loading)
+    return (
+      <div className="flex h-full justify-center items-center">
+        Loading chat...
+      </div>
+    );
   if (!chatId) return <p>Chat could not be created</p>;
 
   return (
-    <section className="w-full max-w-lg sm:max-w-xl h-[500px] mt-3  flex flex-col border border-gray-600/50  rounded-2xl shadow-2xl bg-neutral-800/50  overflow-hidden">
+    <section className="w-full max-w-lg sm:max-w-xl h-[550px] mt-10  flex flex-col border border-gray-600/50  rounded-2xl shadow-2xl bg-neutral-800/50  overflow-hidden">
       {/* Chat Header */}
       <ChatHeader
         onClose={onClose}
