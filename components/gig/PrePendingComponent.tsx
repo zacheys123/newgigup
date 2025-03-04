@@ -260,7 +260,7 @@ const PrePendingComponent = () => {
       </motion.div>
       {/* Modal */}
       {modal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm w-[100%] mx-auto h-full">
+        <div className="fixed inset-0 flex items-center justify-center  bg-opacity-50 backdrop-blur-sm w-[100%] mx-auto h-full -py-6">
           <Modal
             onClose={() => setModal(null)}
             modal={modal}
