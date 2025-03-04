@@ -133,7 +133,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
 
   return (
     <div className="flex-1 flex flex-col p-4   rounded-sm">
-      {messages?.length === 0 && (
+      {messages && messages?.length === 0 && (
         <div className="flex p-2 h-full justify-center items-center bg-inherit">
           <p className="text-md font-semibold text-neutral-500">
             Send a message to start a chat.
@@ -143,7 +143,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
 
       <div
         ref={messagesContainerRef}
-        className="h-[400px]  overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700"
+        className="h-[430px]  overflow-y-auto scrollbar-thin scrollbar-thumb-gray-900 px-3"
       >
         {chatMessages
           .filter((msg: MessageProps) => msg.chatId === chatId)
@@ -172,8 +172,8 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
                 <div
                   className={`relative max-w-xs md:max-w-sm px-4 py-3 text-sm md:text-base rounded-2xl shadow-xl transition-all duration-300 transform my-3 ${
                     msg.sender?._id === user?._id
-                      ? "bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-br-md self-end"
-                      : "bg-gradient-to-r from-amber-500 to-amber-700 text-white rounded-bl-md self-start"
+                      ? "bg-gradient-to-bl from-green-900 via-gray-600 to-blue-700 text-white rounded-br-md self-end"
+                      : "bg-gradient-to-r from-amber-900 via-zinc-600  to-amber-400 text-white rounded-bl-md self-start"
                   }`}
                 >
                   <span className="block">{msg.content}</span>
