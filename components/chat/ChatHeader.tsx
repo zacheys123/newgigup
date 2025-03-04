@@ -26,11 +26,11 @@ const ChatHeader = ({ onOpenX, onClose, modal }: ChatPageProps) => {
   const online = "text-green-500 link";
   const offline = "text-red-500 link";
   return (
-    <header className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-lg font-bold flex justify-between items-center rounded-t-2xl shadow-xl shadow-amber-500">
+    <header className="p-4 border-b border-gray-200 dark:border-gray-700 bg-neutral-700/50 dark:bg-gray-800 text-lg font-bold flex justify-between items-center rounded-t-2xl shadow-sm shadow-amber-500">
       <div className="flex flex-col gap-0 justify-center">
         {" "}
-        <div className="flex items-center gap-1">
-          <div className="relative h-30 w-30 p-[5px] bg-neutral-400  rounded-full">
+        <div className="flex items-center gap-2">
+          <div className="relative h-30 w-30 p-[3px] bg-neutral-400  rounded-full">
             <Image
               src={modal.user.picture ? modal.user.picture : ""}
               alt="Profile Pic"
@@ -43,7 +43,7 @@ const ChatHeader = ({ onOpenX, onClose, modal }: ChatPageProps) => {
               <span className="absolute left-2 bottom-1 bg-green-300 animate-pulse w-2 h-2 z-55 rounded-full"></span>
             )}
           </div>
-          <span className="text-neutral-500 dark:text-gray-200">{`Chat with ${modal.user.firstname}`}</span>
+          <span className="text-neutral-300 dark:text-gray-200">{`Chat with ${modal.user.firstname}`}</span>
         </div>
         <span className={isOnline ? online : offline}>
           {isOnline ? (

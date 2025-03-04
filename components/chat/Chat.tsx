@@ -105,7 +105,7 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose, onOpenX }) => {
   if (!chatId) return <p>Chat could not be created</p>;
 
   return (
-    <section className="w-full max-w-lg sm:max-w-xl h-[600px] -mt-10 flex flex-col border border-gray-300  rounded-2xl shadow-2xl bg-white  overflow-hidden">
+    <section className="w-full max-w-lg sm:max-w-xl h-[600px] -mt-10 flex flex-col border border-gray-600/50  rounded-2xl shadow-2xl bg-neutral-800/50  overflow-hidden">
       {/* Chat Header */}
       <ChatHeader
         onClose={onClose}
@@ -115,24 +115,26 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose, onOpenX }) => {
       />
 
       {/* Chat Messages */}
-      <div className="flex-1 p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700 scrollbar-track-transparent">
-        <ChatPage chatId={chatId} modal={modal?.user?._id || ""} />
+      <div className="flex-1 p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-900 dark:scrollbar-thumb-gray-900 scrollbar-track-transparent">
+        <ChatPage chatId={chatId} modal={modal?.user?._id as string} />
       </div>
 
       {/* Chat Input */}
-      <div className="w-full p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+      <div className="w-full p-4  bg-gray-700/30 ">
         <ChatInput
           newMessage={newMessage}
           setNewMessage={setNewMessage}
           sendMessage={send}
           handleTyping={handleTyping}
-        />
+        />{" "}
+        <div className="flex justify-center w-full mt-2">
+          <small className="text-center text-muted-foreground text-xs py-2 text-neutral-500">
+            Powered By: gigMeUp
+          </small>
+        </div>
       </div>
 
       {/* Footer */}
-      <small className="text-center text-muted-foreground text-xs py-2 bg-gray-50 dark:bg-gray-800">
-        Powered By: gigMeUp
-      </small>
     </section>
   );
 };

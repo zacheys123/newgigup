@@ -1,3 +1,4 @@
+import { Feather } from "lucide-react";
 import React, { ChangeEvent } from "react";
 
 interface ChatInputProps {
@@ -16,13 +17,13 @@ const ChatInput = ({
   return (
     <form
       onSubmit={sendMessage}
-      className="w-full flex items-center gap-2 bg-white dark:bg-gray-800 rounded-lg "
+      className="w-full flex items-center gap-2 bg-inherit rounded-lg "
     >
-      <div className="flex-1 flex items-center gap-2 bg-gray-100 dark:bg-gray-700 rounded-full p-1">
+      <div className="flex-1 flex items-center gap-2  rounded-full  p-1">
         <input
           type="text"
           placeholder="Type a message..."
-          className="flex-1 px-4 py-2 text-sm md:text-base rounded-full border-none focus:outline-none focus:ring-2 focus:ring-blue-400 bg-transparent text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 transition-all"
+          className="flex-1 px-4 py-2 text-sm md:text-base rounded-full border-none focus:outline-none focus:ring-2 focus:ring-blue-400 bg-transparent text-gray-200 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 transition-all shadow-sm shadow-slate-600"
           value={newMessage}
           onChange={(e) => {
             handleTyping(e);
@@ -31,9 +32,9 @@ const ChatInput = ({
         />
         <button
           type="submit"
-          className="px-4 py-2 text-sm md:text-base font-semibold bg-blue-500 text-white rounded-full hover:bg-blue-600 active:bg-blue-700 transition-all transform hover:scale-105 active:scale-95 shadow-md "
+          className="px-4 py-2 text-sm md:text-base font-semibold  text-white rounded-full transition-all transform hover:scale-105 active:scale-95 shadow-md "
         >
-          Send
+          <Feather />
         </button>
       </div>
     </form>
