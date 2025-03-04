@@ -103,14 +103,17 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose, onOpenX }) => {
 
   if (loading)
     return (
-      <div className="flex h-full justify-center items-center">
-        Loading chat...
+      <div className="flex h-[550px] justify-center items-center">
+        <p className="text-1xl font-mono animate-bounce text-amber-600">
+          {" "}
+          Loading chat...
+        </p>
       </div>
     );
   if (!chatId) return <p>Chat could not be created</p>;
 
   return (
-    <section className="w-full max-w-lg sm:max-w-xl h-[550px] mt-10  flex flex-col border border-gray-600/50  rounded-2xl shadow-2xl bg-neutral-800/50  overflow-hidden">
+    <section className="w-full max-w-lg sm:max-w-xl h-[550px] mt-10  flex flex-col border border-gray-600/50  rounded-2xl shadow-2xl bg-neutral-900/50  overflow-hidden">
       {/* Chat Header */}
       <ChatHeader
         onClose={onClose}
