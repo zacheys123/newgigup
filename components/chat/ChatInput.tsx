@@ -6,6 +6,7 @@ interface ChatInputProps {
   sendMessage: (e: React.FormEvent) => void;
   handleTyping: (e: ChangeEvent<HTMLInputElement>) => void;
 }
+
 const ChatInput = ({
   newMessage,
   setNewMessage,
@@ -15,14 +16,13 @@ const ChatInput = ({
   return (
     <form
       onSubmit={sendMessage}
-      className="p-3  border-gray-300 dark:border-gray-700 flex items-center gap-3 bg-gray-100 dark:bg-gray-800 rounded-b-2xl"
+      className="w-full flex items-center gap-2 bg-white dark:bg-gray-800 rounded-lg "
     >
-      <div className=" bg-neutral-100 rounded-full -px-2 w-full   flex items-center gap-1">
-        <span className="hover:cursor-pointer w-[26px]">🙂</span>
+      <div className="flex-1 flex items-center gap-2 bg-gray-100 dark:bg-gray-700 rounded-full p-1">
         <input
           type="text"
           placeholder="Type a message..."
-          className="flex-1 px-4 py-2 text-sm md:text-base rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white dark:bg-gray-900 text-gray-600 transition-all"
+          className="flex-1 px-4 py-2 text-sm md:text-base rounded-full border-none focus:outline-none focus:ring-2 focus:ring-blue-400 bg-transparent text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 transition-all"
           value={newMessage}
           onChange={(e) => {
             handleTyping(e);
@@ -31,7 +31,7 @@ const ChatInput = ({
         />
         <button
           type="submit"
-          className="px-4 py-2 text-sm md:text-base font-semibold bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all"
+          className="px-4 py-2 text-sm md:text-base font-semibold bg-blue-500 text-white rounded-full hover:bg-blue-600 active:bg-blue-700 transition-all transform hover:scale-105 active:scale-95 shadow-md "
         >
           Send
         </button>

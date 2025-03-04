@@ -56,6 +56,7 @@ export const initialState = {
     backgroundColor: "",
     logo: "",
   },
+
   searchQuery: "",
   follow: false,
   refetchData: false,

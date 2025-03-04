@@ -11,6 +11,8 @@ import { MdAdd } from "react-icons/md";
 import Modal from "../Modal";
 import { UserProps } from "@/types/userinterfaces";
 import { ChatBubbleOvalLeftIcon } from "@heroicons/react/24/solid";
+import useSocket from "@/hooks/useSocket";
+import { toast } from "sonner";
 
 const BookingPage = () => {
   const { currentgig } = useStore();
@@ -18,8 +20,9 @@ const BookingPage = () => {
   const { loading, forgetBookings } = useForgetBookings();
   const { user } = useCurrentUser(userId || null);
   const router = useRouter();
-
-  const forget = () => forgetBookings(user?._id as string, currentgig);
+  const { socket } = useSocket();
+  const forget = () =>
+    forgetBookings(user?._id as string, currentgig, userId as string);
   useEffect(() => {
     if (currentgig?.isTaken === true) {
       router.push(`/gigs/${userId}`);
@@ -65,6 +68,36 @@ const BookingPage = () => {
   const handleOpenX = () => {
     setShowX(false); // Reset the showX state
   };
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("musicianBooked", ({ gigId, message }) => {
+        // Show a notification to the musician
+        if (currentgig?._id === gigId) {
+          toast.success(message);
+
+          // Refresh the page or redirect if needed
+          if (currentgig?.isTaken && currentgig?.bookedBy !== user?._id) {
+            router.push(`/gigs/${userId}`);
+          }
+        }
+      });
+
+      socket.on("updateGigStatus", ({ gigId, isTaken }) => {
+        // Refresh the page if the gig is taken
+        if (isTaken && currentgig?._id === gigId) {
+          router.refresh(); // Refresh the page to reflect the updated gig status
+        }
+      });
+
+      // Cleanup listeners on unmount
+      return () => {
+        socket.off("musicianBooked");
+        socket.off("updateGigStatus");
+      };
+    }
+  }, [socket, currentgig, userId, router]);
+
   return (
     <div className="h-[83%] w-full overflow-y-auto relative bg-gradient-to-b from-gray-900 to-gray-800 p-6">
       {!showX && (

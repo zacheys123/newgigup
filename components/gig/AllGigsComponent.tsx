@@ -237,30 +237,27 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                   </div>
                 )}
 
-                {!hasBookedGig &&
-                  gig.bookCount.length < 4 &&
-                  isGigCreator &&
-                  canEditGig && (
-                    <div className="w-full text-right ">
-                      <ButtonComponent
-                        variant="secondary"
-                        classname="!bg-gray-200 h-[20px] text-[8px]  font-bold w-[60px] text-gray-700 mt-5  rounded-b-md rounded-br-xl"
-                        onclick={() => {
-                          setLoadingPostId(gig?._id || "");
+                {gig.bookCount.length < 4 && canEditGig && (
+                  <div className="w-full text-right ">
+                    <ButtonComponent
+                      variant="secondary"
+                      classname="!bg-gray-200 h-[20px] text-[8px]  font-bold w-[60px] text-gray-700 mt-5  rounded-b-md rounded-br-xl"
+                      onclick={() => {
+                        setLoadingPostId(gig?._id || "");
 
-                          setTimeout(() => {
-                            handleEdit(gig?._id || "");
-                            setLoadingPostId("");
-                          }, 2000);
-                        }}
-                        title={
-                          loadingPostId === gig._id
-                            ? "editing gig..."
-                            : "Edit Gig!!!!!!"
-                        }
-                      />
-                    </div>
-                  )}
+                        setTimeout(() => {
+                          handleEdit(gig?._id || "");
+                          setLoadingPostId("");
+                        }, 2000);
+                      }}
+                      title={
+                        loadingPostId === gig._id
+                          ? "editing gig..."
+                          : "Edit Gig!!!!!!"
+                      }
+                    />
+                  </div>
+                )}
               </div>
 
               <Box className="flex flex-col gap-3 ">
@@ -310,35 +307,32 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                     </div>
                   )}
 
-                {gig.postedBy?._id &&
-                  gig?.postedBy?._id.includes(myId || "") &&
-                  gig?.bookCount.length !== 0 &&
-                  !gig?.isTaken && (
-                    <div className="w-full text-right relative">
-                      <ButtonComponent
-                        variant="secondary"
-                        classname=" h-[20px] text-[8px] mt-5 font-bold   rounded-b-md rounded-br-xl"
-                        onclick={() => {
-                          setLoadingPostId(gig?._id || "");
+                {isGigCreator && bookCount > 0 && !gig?.isTaken && (
+                  <div className="w-full text-right relative">
+                    <ButtonComponent
+                      variant="secondary"
+                      classname=" h-[20px] text-[8px] mt-5 font-bold   rounded-b-md rounded-br-xl"
+                      onclick={() => {
+                        setLoadingPostId(gig?._id || "");
 
-                          setTimeout(() => {
-                            router.push(`/pre_execute/${gig?._id}`);
-                            setLoadingPostId("");
-                          }, 2000);
-                        }}
-                        title={
-                          loadingPostId === gig._id
-                            ? "viewing..."
-                            : "View Gig Details!!"
-                        }
-                      />
-                      {gig?.bookCount.length > 0 && (
-                        <span className="absolute right-[1px] top-[12px] bg-blue-600 w-4 h-4 text-gray-100 text-[10px] font-bold  rounded-full  flex justify-center items-center">
-                          {bookCount}
-                        </span>
-                      )}
-                    </div>
-                  )}
+                        setTimeout(() => {
+                          router.push(`/pre_execute/${gig?._id}`);
+                          setLoadingPostId("");
+                        }, 2000);
+                      }}
+                      title={
+                        loadingPostId === gig._id
+                          ? "viewing..."
+                          : "View Gig Details!!"
+                      }
+                    />
+                    {bookCount > 0 && (
+                      <span className="absolute right-[1px] top-[12px] bg-blue-600 w-4 h-4 text-gray-100 text-[10px] font-bold  rounded-full  flex justify-center items-center">
+                        {bookCount}
+                      </span>
+                    )}
+                  </div>
+                )}
               </Box>
             </div>
           )}

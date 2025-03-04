@@ -18,6 +18,7 @@ import { useBookMusician } from "@/hooks/useForgetBooking";
 import { CircularProgress } from "@mui/material";
 import { toast } from "sonner";
 import { Drum } from "lucide-react";
+import useSocket from "@/hooks/useSocket";
 
 const PrePendingComponent = () => {
   const { userId } = useAuth();
@@ -28,18 +29,19 @@ const PrePendingComponent = () => {
   const router = useRouter();
   const { bookloading, bookgig } = useBookMusician();
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
+  const { socket } = useSocket();
   const [modal, setModal] = useState<{
     type: "chat" | "video";
     user: UserProps;
   } | null>(null);
   console.log(modal);
   const [showX, setShowX] = useState(false);
-  //   const forget = () => forgetBookings(userId || "", currentgig);
-  const handleBookUser = (bookingId: string) => {
-    setSelectedUser(bookingId);
-    console.log(`User ${userId} booked. Others disqualified.`);
-    bookgig(router, currentgig, userId || "", bookingId as string);
-  };
+  // //   const forget = () => forgetBookings(userId || "", currentgig);
+  // const handleBookUser = (bookingId: string) => {
+  //   setSelectedUser(bookingId);
+  //   console.log(`User ${userId} booked. Others disqualified.`);
+  //   bookgig(router, currentgig, userId || "", bookingId as string);
+  // };
 
   // Define the onOpenX function
   const handleOpenX = () => {
@@ -63,6 +65,36 @@ const PrePendingComponent = () => {
       console.error(error);
     }
   };
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(
+    null
+  );
+
+  const handleBookUser = (bookingId: string) => {
+    setSelectedUser(bookingId);
+    setSelectedBookingId(bookingId);
+    setShowConfirmation(true);
+  };
+
+  const confirmCancel = () => {
+    if (selectedBookingId) {
+      // playSound();
+      bookgig(router, currentgig, userId || "", selectedBookingId);
+      if (socket) {
+        socket.emit("gigBookinMusician", {
+          gigId: currentgig?._id,
+          musicianId: selectedBookingId,
+          isTaken: true,
+          title: currentgig?.title,
+          // bookCount: currentgig?.bookCount,
+        });
+      }
+      setShowConfirmation(false);
+      toast.success("Musician booked successfully!");
+    } else {
+      toast.error("No booking ID selected.");
+    }
+  };
 
   if (loading) {
     return (
@@ -77,6 +109,32 @@ const PrePendingComponent = () => {
   }
   return (
     <div className="p-6 bg-gradient-to-b from-gray-900 to-black text-white min-h-screen">
+      {showConfirmation && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm z-50">
+          <div className="bg-gray-700 p-6 rounded-lg shadow-lg ">
+            <h4 className="text-gray-200 text-lg font-bold mb-4">
+              Are you sure?
+            </h4>
+            <p className="text-gray-400 text-sm mb-4">
+              This action cannot be undone.
+            </p>
+            <div className="flex gap-4">
+              <button
+                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition-colors"
+                onClick={confirmCancel}
+              >
+                Confirm
+              </button>
+              <button
+                className="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-md transition-colors"
+                onClick={() => setShowConfirmation(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {bookloading && (
         <div className="h-[800px] absolute w-[90%] mx-auto  z-50 backdrop-blur-xl bg-black bg-opacity-50 flex justify-center items-center">
           <CircularProgress

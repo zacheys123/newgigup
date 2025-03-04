@@ -9,9 +9,6 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAuth } from "@clerk/nextjs";
 import useSocket from "@/hooks/useSocket";
 
-// import { useSocket } from "@/app/Context/SocketContext";
-// import { MessageProps } from "@/types/chatinterfaces";
-
 interface ChatProps {
   myuser: UserProps;
   modal: { user: UserProps };
@@ -29,8 +26,6 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose, onOpenX }) => {
   const { socket } = useSocket();
 
   useEffect(() => {
-    // listenForMessages(); // ✅ Start listening for real-time messages
-
     const fetchChat = async () => {
       if (!myuserd?._id || !modal.user?._id) return;
 
@@ -74,7 +69,7 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose, onOpenX }) => {
 
     const newMsg = {
       sender: myuser,
-      receiver: modal?.user?._id, // ✅ Corrected spelling
+      receiver: modal?.user?._id,
       content: newMessage,
       chatId,
       createdAt: new Date(),
@@ -89,19 +84,9 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose, onOpenX }) => {
       setNewMessage("");
     } catch (error) {
       console.error("Message sending failed", error);
-      // Remove the message from the store or show a "retry" option
     }
-
-    // try {
-    //   await fetch("/api/chat/sendmessage", {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify(newMsg),
-    //   });
-    // } catch (error) {
-    //   console.error("Error sending message:", error);
-    // }
   };
+
   let typingTimeout: NodeJS.Timeout;
 
   const handleTyping = () => {
@@ -120,7 +105,8 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose, onOpenX }) => {
   if (!chatId) return <p>Chat could not be created</p>;
 
   return (
-    <section className="w-full max-w-lg sm:max-w-xl h-[600px]   flex flex-col border border-gray-300 dark:border-gray-700 rounded-2xl shadow-2xl bg-white -mt-[70px] dark:bg-gray-900">
+    <section className="w-full max-w-lg sm:max-w-xl h-[600px] flex flex-col border border-gray-300 dark:border-gray-700 rounded-2xl shadow-2xl bg-white dark:bg-gray-900 overflow-hidden">
+      {/* Chat Header */}
       <ChatHeader
         onClose={onClose}
         modal={modal}
@@ -128,16 +114,23 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose, onOpenX }) => {
         onOpenX={onOpenX}
       />
 
-      <div className="flex-1 z-50 ">
+      {/* Chat Messages */}
+      <div className="flex-1 p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700 scrollbar-track-transparent">
         <ChatPage chatId={chatId} modal={modal?.user?._id || ""} />
       </div>
-      <ChatInput
-        newMessage={newMessage}
-        setNewMessage={setNewMessage}
-        sendMessage={send}
-        handleTyping={handleTyping}
-      />
-      <small className="text-center text-muted-foreground text-[11px]">
+
+      {/* Chat Input */}
+      <div className="w-full p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+        <ChatInput
+          newMessage={newMessage}
+          setNewMessage={setNewMessage}
+          sendMessage={send}
+          handleTyping={handleTyping}
+        />
+      </div>
+
+      {/* Footer */}
+      <small className="text-center text-muted-foreground text-xs py-2 bg-gray-50 dark:bg-gray-800">
         Powered By: gigMeUp
       </small>
     </section>

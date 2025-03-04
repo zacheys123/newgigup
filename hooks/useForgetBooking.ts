@@ -2,12 +2,17 @@ import { FetchResponse, GigProps } from "@/types/giginterface";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import useSocket from "./useSocket";
 
 export function useForgetBookings() {
   const [loading, setLoading] = useState<boolean>(false);
   const route = useRouter();
-
-  const forgetBookings = async (id: string, myGig: GigProps) => {
+  const { socket } = useSocket();
+  const forgetBookings = async (
+    id: string,
+    myGig: GigProps,
+    userId: string
+  ) => {
     try {
       setLoading(true);
       const response = await fetch(`/api/gigs/cancelgig/${myGig?._id}`, {
@@ -23,10 +28,13 @@ export function useForgetBookings() {
       }
       console.log("Musician removed from book count.");
       const data: { message: string } = await response.json();
-      console.log(data);
-
-      console.log(data);
-      route.back();
+      if (socket) {
+        socket.emit("cancelBooking", {
+          gigId: myGig._id,
+          bookCount: (myGig?.bookCount?.length || 0) - 1, // Avoid undefined length
+        });
+      }
+      route.push(`/gigs/${userId}`);
       setLoading(false);
       toast.success(data.message);
     } catch (error: unknown) {
@@ -39,6 +47,7 @@ export function useForgetBookings() {
 
 export function useBookMusician() {
   const [bookloading, setLoading] = useState<boolean>();
+
   // logic for useBookGig hook goes here
   const bookgig = async (
     router: {
@@ -68,7 +77,8 @@ export function useBookMusician() {
       if (data.gigstatus === true) {
         console.log(data);
         toast.success(data.message);
-        router.push(`/gigs/${userId}`);
+
+        router.refresh();
         setLoading(false);
       } else {
         toast.error(data.message);

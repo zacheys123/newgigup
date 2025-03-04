@@ -15,6 +15,7 @@ import { create } from "zustand"; // Import SetState
 // };
 const useStore = create<StoreState>((set) => ({
   ...initialState,
+
   setShowUpload: () =>
     set((state: StoreState) => ({ showUpload: !state.showUpload })),
   setRefetchData: (data: boolean) => set(() => ({ refetchData: data })),

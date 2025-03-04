@@ -132,7 +132,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
     );
 
   return (
-    <div className="flex-1 flex flex-col p-4 bg-gray-100 z-50  rounded-sm shadow-md">
+    <div className="flex-1 flex flex-col p-4   rounded-sm">
       {messages?.length === 0 && (
         <div className="flex p-2 h-full justify-center items-center bg-inherit">
           <p className="text-md font-semibold text-neutral-500">
