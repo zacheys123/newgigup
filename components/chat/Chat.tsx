@@ -105,7 +105,7 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose, onOpenX }) => {
   if (!chatId) return <p>Chat could not be created</p>;
 
   return (
-    <section className="w-full max-w-lg sm:max-w-xl h-[700px]  flex flex-col border border-gray-600/50  rounded-2xl shadow-2xl bg-neutral-800/50  overflow-hidden">
+    <section className="w-full max-w-lg sm:max-w-xl h-[600px] mt-3  flex flex-col border border-gray-600/50  rounded-2xl shadow-2xl bg-neutral-800/50  overflow-hidden">
       {/* Chat Header */}
       <ChatHeader
         onClose={onClose}
@@ -120,7 +120,7 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose, onOpenX }) => {
       </div>
 
       {/* Chat Input */}
-      <div className="w-full p-4  bg-gray-700/30 ">
+      <div className="w-full p-4   ">
         <ChatInput
           newMessage={newMessage}
           setNewMessage={setNewMessage}
