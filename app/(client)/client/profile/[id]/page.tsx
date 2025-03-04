@@ -10,6 +10,7 @@ import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import useStore from "@/app/zustand/useStore";
+import { motion } from "framer-motion";
 
 interface UpdateResponse {
   data: {
@@ -102,11 +103,19 @@ const ClientProfile = () => {
     }
   };
 
-  if (!user) {
+  if (!myuser?.firstname || !myuser?.lastname || !myuser?.username) {
     return (
-      <div className="flex justify-center items-center h-full flex-col bg-neutral-800">
-        <BallLoader />
-        <h4 className="title text-neutral-400 animate-pulse">loading...</h4>
+      <div className="flex justify-center items-center min-h-screen text-gray-300 backdrop-blur-sm bg-neutral-700/50 flex-col gap-4 ">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full"
+        >
+          <BallLoader />
+        </motion.div>
+        <h6 className="animate-pulse font-mono text-1xl  text-amber-500">
+          {`Loading User's Data`}
+        </h6>
       </div>
     );
   }

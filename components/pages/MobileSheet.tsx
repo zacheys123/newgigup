@@ -80,13 +80,7 @@ const MobileSheet = () => {
         </Link>
 
         <Link
-          href={
-            user?.isClient
-              ? `/client/profile/${userId}`
-              : user?.isMusician
-              ? `/profile`
-              : "/profile"
-          }
+          href={user?.isClient ? `/client/profile/${userId}` : `/profile`}
           className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 hover:text-white rounded-md transition-all"
         >
           <User size="20" className="text-white" />
@@ -106,7 +100,7 @@ const MobileSheet = () => {
         </Link>
 
         <Link
-          href="gigs/chats"
+          href="/chats"
           className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 hover:text-white rounded-md transition-all"
         >
           <MessageCircle size="20" className="text-white" />
@@ -116,7 +110,7 @@ const MobileSheet = () => {
         </Link>
         {user?.isMusician && !user?.isClient && (
           <Link
-            href={`/search/allvideos/${user?._id}/*${user?.firstname}${user?.lastname}`}
+            href={`/search/allvideos/${user?._id}/*${user?.firstname}/${user?.lastname}`}
             className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 hover:text-white rounded-md transition-all"
           >
             <VideoIcon size="20" className="text-white" />

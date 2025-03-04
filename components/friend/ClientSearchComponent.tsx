@@ -8,7 +8,7 @@ import { Button } from "../ui/button";
 import { MdAdd } from "react-icons/md";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { Box } from "@mui/material";
-import { BsInstagram, BsTwitter } from "react-icons/bs";
+import { BsFacebook, BsInstagram, BsTwitter } from "react-icons/bs";
 
 import { ArrowLeftIcon, Music, Video } from "lucide-react";
 import useStore from "@/app/zustand/useStore";
@@ -312,7 +312,7 @@ const ClientSearchComponent = () => {
                         />
                       )}
                       {handle.includes("facebook") && (
-                        <BsTwitter
+                        <BsFacebook
                           onClick={() =>
                             window.open(
                               handle.startsWith("http")

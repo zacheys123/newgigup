@@ -19,6 +19,7 @@ import {
   handleUnfollow,
   handleUnFollowingCurrent,
 } from "@/utils";
+import { motion } from "framer-motion";
 const FriendsComponent = () => {
   const { userId } = useAuth();
   const { username } = useParams();
@@ -90,7 +91,20 @@ const FriendsComponent = () => {
 
   console.log(friend?.picture);
   const isFollowing = friend?.followers.includes(user?._id || "");
-  if (loading) return <div>loading....</div>;
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen text-gray-300 backdrop-blur-sm bg-neutral-700/50 flex-col gap-4 ">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          className="w-8 h-8 border-4 border-lime-400 border-t-transparent rounded-full"
+        />
+        <h6 className="animate-pulse font-mono text-1xl  text-amber-500">
+          {`Loading User's Data`}
+        </h6>
+      </div>
+    );
+  }
   return (
     <div className="overflow-y-auto h-[95%] w-[90%] mx-auto  shadow-md shadow-orange-300 flex flex-col gap-2">
       {/* Fixed Gigheader */}
@@ -174,41 +188,42 @@ const FriendsComponent = () => {
           )}
         </div>
       </div>
-      {user && (
-        <div className="h-[80px] flex gap-2 justify-around items-center">
-          <ArrowLeftIcon
-            size={22}
-            style={{ color: "lightgrey" }}
-            onClick={() => router.back()}
-          />
-          <BsChatDots size="19" style={{ color: "lightgrey" }} />
-          <Music
-            size={22}
-            style={{ color: "lightgrey" }}
-            onClick={() => router.push(`/gigs/${userId}`)}
-          />
-          <Video
-            size={22}
-            style={{ color: "lightgrey" }}
-            onClick={() =>
-              router.push(
-                `/search/allvideos/${friend?._id}/*${user?.firstname}${user?.lastname}`
-              )
-            }
-          />
-          {!user?.isMusician && user?.isClient && (
-            <MdRateReview
+      {user?.isMusician ||
+        (user?.isClient && (
+          <div className="h-[80px] flex gap-2 justify-around items-center">
+            <ArrowLeftIcon
+              size={22}
+              style={{ color: "lightgrey" }}
+              onClick={() => router.back()}
+            />
+            <BsChatDots size="19" style={{ color: "lightgrey" }} />
+            <Music
+              size={22}
+              style={{ color: "lightgrey" }}
+              onClick={() => router.push(`/gigs/${userId}`)}
+            />
+            <Video
               size={22}
               style={{ color: "lightgrey" }}
               onClick={() =>
                 router.push(
-                  `/search/reviews/${friend?._id}/*${user?.firstname}${user?.lastname}`
+                  `/search/allvideos/${friend?._id}/*${friend?.firstname}/${friend?.lastname}`
                 )
               }
             />
-          )}
-        </div>
-      )}
+            {!user?.isMusician && user?.isClient && (
+              <MdRateReview
+                size={22}
+                style={{ color: "lightgrey" }}
+                onClick={() =>
+                  router.push(
+                    `/search/reviews/${friend?._id}/*${friend?.firstname}${friend?.lastname}`
+                  )
+                }
+              />
+            )}
+          </div>
+        ))}
       <Box className="h-fit bg-neutral-800 w-[100%] px-2 py-3">
         <h4 className="text-[16px] font-bold text-gray-400 mt-3 mb-1 ">
           Fullname

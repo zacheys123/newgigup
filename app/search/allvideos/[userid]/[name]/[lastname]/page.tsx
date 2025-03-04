@@ -15,7 +15,7 @@ interface UpdateResponse {
   message?: string;
 }
 const AllVideosPage = () => {
-  const { userid } = useParams();
+  const { userid, name } = useParams();
   const { userId } = useAuth();
   //   const { userId } = useAuth();
   const [friendvideos, setFriendVideos] = useState<VideoProps[]>();
@@ -125,7 +125,9 @@ const AllVideosPage = () => {
           size={28}
           onClick={() => router.back()}
         />
-        <h1 className="text-white text-2xl font-extrabold">All My Videos</h1>
+        <h1 className="text-white text-2xl font-extrabold">
+          {user?._id === userid ? "All My Videos" : `${name?.slice(1)} Videos`}
+        </h1>
       </div>
       {!friendvideos && (
         <div className="flex flex-col gap-4 bg-zinc-800 rounded-lg shadow-md shadow-slate-500 py-8 px-6 text-center">
@@ -301,10 +303,9 @@ const AllVideosPage = () => {
             >
               Your browser does not support the video tag.
             </video>
-            <p className="text-amber-500">{video.description}</p>
+            <p className="text-amber-500">@{video.description}</p>
             <h5 className="title text-neutral-400 text-sm">
-              Posted on{" "}
-              {moment(video.createdAt).format("MMMM Do YYYY, h:mm:ss a")}
+              Posted on {moment(video.createdAt).format("MMMM Do YYYY, h:mm a")}
             </h5>
           </div>
         ))}
