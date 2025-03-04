@@ -144,24 +144,24 @@ const Videos = ({ setShowVideo, gigId, gig }: videosProps) => {
           >
             &times;
           </span>
-          <ul className="custom-list ml-4 py-4">
+          <ul className="custom-list ml-4 py-1">
             <h6 className="text-neutral-400 ">
-              -)-By Adding videos to your profile -)-:you:
+              By Adding videos to your profile :
             </h6>
-            <li className="text-neutral-500 my-7 ">
+            <li className="text-neutral-500 my-[20px] ">
               You create a portfolio for future jobs
             </li>
-            <li className="text-neutral-500 my-7">
+            <li className="text-neutral-500 my-[20px]">
               Depending on reviews this can make people see if reviews are true
               or not
             </li>
-            <li className="text-neutral-500 my-7 ">
+            <li className="text-neutral-500 my-[20px] ">
               you create a following of clients that like your work
             </li>
-            <li className="text-neutral-500 my-7 ">
+            <li className="text-neutral-500 my-[20px] ">
               You also allow clients to judge you by your work
             </li>
-            <li className="text-neutral-500 my-7 ">
+            <li className="text-neutral-500 my-[20px] ">
               It adds alot to your online presence
             </li>
           </ul>
