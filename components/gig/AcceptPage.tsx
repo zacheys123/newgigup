@@ -25,6 +25,7 @@ const AcceptPage = ({
   viewCount,
   isTaken,
   isPending,
+  bookCount,
 }: GigProps) => {
   const { userId } = useAuth();
 
@@ -55,14 +56,14 @@ const AcceptPage = ({
   };
 
   useEffect(() => {
-    if (isPending === true && isTaken === false) {
+    if (bookCount?.length < 1 && isTaken === false) {
       return;
     }
-    if (isPending === false && isTaken === true) {
+    if (bookCount?.length === 0 && isTaken === true) {
       return;
     }
-    if (isPending === false && isTaken === false) {
-      router.push(`/gigs/${userId}/`);
+    if (isTaken === false) {
+      router.push(`/gigs/${userId}`);
     }
   }, [isTaken, isPending, userId, router]);
   const handleRatingChange = async (event: FormEvent<HTMLFormElement>) => {

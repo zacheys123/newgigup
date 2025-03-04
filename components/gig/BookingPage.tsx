@@ -73,22 +73,19 @@ const BookingPage = () => {
     if (socket) {
       socket.on("musicianBooked", ({ gigId, message }) => {
         // Show a notification to the musician
-        if (currentgig?._id === gigId) {
-          toast.success(message);
+        console.log(gigId);
+        console.log(message);
+        toast.success(message);
 
-          // Refresh the page or redirect if needed
-          if (currentgig?.isTaken && currentgig?.bookedBy !== user?._id) {
-            router.push(`/gigs/${userId}`);
-          }
-        }
+        // Refresh the page or redirect if needed
       });
 
-      socket.on("updateGigStatus", ({ gigId, isTaken }) => {
-        // Refresh the page if the gig is taken
-        if (isTaken && currentgig?._id === gigId) {
-          router.refresh(); // Refresh the page to reflect the updated gig status
-        }
-      });
+      // socket.on("updateGigStatus", ({ gigId, isTaken }) => {
+      //   // Refresh the page if the gig is taken
+      //   if (isTaken && gigId === gigId && currentgig?.bookedBy !== user?._id) {
+      //     router.push(`/gigs/${userId}`);
+      //   }
+      // });
 
       // Cleanup listeners on unmount
       return () => {

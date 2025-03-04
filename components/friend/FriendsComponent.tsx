@@ -196,7 +196,7 @@ const FriendsComponent = () => {
           }
         />
         <MdRateReview
-          size="19"
+          size={22}
           style={{ color: "lightgrey" }}
           onClick={() =>
             router.push(

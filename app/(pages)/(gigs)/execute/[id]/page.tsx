@@ -17,19 +17,6 @@ const ViewGigDetails = () => {
   const router = useRouter();
   const { currentgig } = useStore();
 
-  // fetch data from server
-  // render data in UI
-  // return JSX with fetched data
-
-  // return null if no data
-  // handle error
-  // handle pagination
-  // handle sorting
-  // handle filtering
-  // handle user authentication and authorization
-  // handle data validation
-  // handle error handling
-
   console.log(currentgig);
   if (loading) {
     return (
@@ -71,7 +58,7 @@ const ViewGigDetails = () => {
         <BookingPage />
       )}
 
-      {currentgig?.postedBy?.clerkId.includes(userId || "") && (
+      {currentgig?.postedBy?.clerkId.includes(userId as string) && (
         <AcceptPage {...currentgig} />
       )}
     </>
