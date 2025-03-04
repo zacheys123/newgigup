@@ -166,7 +166,9 @@ const PrePendingComponent = () => {
         </p>
 
         <h2 className="text-2xl font-semibold mt-6 text-gray-200">
-          Interested Musicians
+          {currentgig?.bookCount?.length > 0
+            ? "Interested Musicians"
+            : "No Musiians"}
         </h2>
         <div className="mt-4 max-h-[370px] sm:max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800 space-y-4">
           {currentgig?.bookCount?.map((myuser: UserProps) => {
