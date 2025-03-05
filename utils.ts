@@ -141,13 +141,13 @@ export const searchFunc = (users: UserProps[], searchQuery: string) => {
   if (searchQuery) {
     sortedData = sortedData?.filter((user: UserProps) => {
       if (
-        user?.firstname?.toLowerCase().includes(searchQuery) ||
-        user?.lastname?.toLowerCase().includes(searchQuery) ||
+        user?.firstname?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user?.lastname?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         // user?.username?.toLowerCase().includes(searchQuery) ||
-        user?.email?.toLowerCase().includes(searchQuery) ||
-        user?.instrument?.toLowerCase().includes(searchQuery)
+        user?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user?.instrument?.toLowerCase().includes(searchQuery.toLowerCase())
       ) {
-        return sortedData;
+        return true;
       }
     });
   }

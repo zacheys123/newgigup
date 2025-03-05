@@ -2,6 +2,7 @@
 import useStore from "@/app/zustand/useStore";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import useSocket from "@/hooks/useSocket";
+import { MessageProps } from "@/types/chatinterfaces";
 import { UserProps } from "@/types/userinterfaces";
 import { useAuth } from "@clerk/nextjs";
 import moment from "moment";
@@ -240,7 +241,7 @@ const ChatPage = () => {
       )}
       {/* Chat messages container with ref for auto-scrolling */}
       <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-4">
-        {searchMessage().map((message) => (
+        {searchMessage().map((message: MessageProps) => (
           <div
             key={message._id || message.tempId || uuidv4()}
             className={`mb-4 ${
@@ -248,13 +249,13 @@ const ChatPage = () => {
             }`}
           >
             <div
-              className={`inline-block p-3 rounded-lg ${
+              className={`inline-block p-6 rounded-lg  ${
                 message.sender?._id === otherUserId
                   ? "bg-blue-50"
                   : "bg-green-50"
               }`}
             >
-              <p className="text-sm">{message.content}</p>
+              <p className="text-lg">{message.content}</p>
               <p className="text-xs text-gray-500 mt-1">
                 {moment(message?.createdAt || new Date()).calendar(null, {
                   sameDay: "[Today at] h:mm A",

@@ -129,20 +129,20 @@ const AllChats = () => {
     }
   };
   const LoadingSkeleton = () => (
-    <div className="animate-pulse flex items-center p-3 space-x-4">
+    <div className="animate-pulse flex items-center p-3 space-x-4 mt-9">
       <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
-      <div className="flex-1 space-y-2">
-        <div className="h-8 bg-gray-300 rounded w-3/4"></div>
-        <div className="h-8 bg-gray-300 rounded w-1/2"></div>
+      <div className="flex-1 space-y-5">
+        <div className="h-6 bg-gray-300  rounded-full"></div>
+        <div className="h-6 bg-gray-300  w-1/2 rounded-full"></div>
       </div>
     </div>
   );
 
   // Use it in your component
-  if (!chats) {
+  if (chats) {
     return (
       <div className="flex-1 overflow-y-auto p-2 sm:p-4">
-        {[...Array(15)].map((_, index) => (
+        {[...Array(7)].map((_, index) => (
           <LoadingSkeleton key={index} />
         ))}
       </div>
