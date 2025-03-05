@@ -32,6 +32,7 @@ export const postedBy = {
   handles: "",
   bio: "",
   genre: "",
+  refferences: [],
 };
 
 export const instruments = [

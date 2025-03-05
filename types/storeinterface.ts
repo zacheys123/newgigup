@@ -28,6 +28,7 @@ export const initialState = {
     bio: "",
     genre: "",
     organization: "",
+    refferences: [],
   },
   currentgig: {
     _id: "",

@@ -29,6 +29,7 @@ export function useCurrentUser(userId: string | null) {
     bio: "",
     handles: "",
     genre: "",
+    refferences: [],
   });
 
   // Memoize the URL to prevent unnecessary re-renders
@@ -74,6 +75,7 @@ export function useCurrentUser(userId: string | null) {
         bio: "",
         handles: "",
         genre: "",
+        refferences: [],
       });
       return;
     }
@@ -111,6 +113,7 @@ export function useCurrentUser(userId: string | null) {
               bio: "",
               handles: "",
               genre: "",
+              refferences: [],
             });
           return;
         }
@@ -142,6 +145,7 @@ export function useCurrentUser(userId: string | null) {
             bio: "",
             handles: "",
             genre: "",
+            refferences: [],
           });
       } finally {
         if (isMounted) setLoading(false);

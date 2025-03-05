@@ -1,10 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import connectDb from "@/lib/connectDb";
 import Chat from "@/models/chat";
 import Message from "@/models/messages";
 // Make sure this is imported
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
     await connectDb(); // Ensure DB is connected before querying
 

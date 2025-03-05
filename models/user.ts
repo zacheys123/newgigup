@@ -103,6 +103,7 @@ const userSchema = new mongoose.Schema(
     },
     handles: { type: String, lowercase: true },
     genres: { type: String, lowercase: true },
+    refferences: [{ type: Schema.Types.ObjectId, ref: "User" }],
   },
   { timestamps: true }
 );

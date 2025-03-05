@@ -70,6 +70,7 @@ const FriendsComponent = () => {
             handles: "",
             bio: "",
             genre: "",
+            refferences: [],
           });
         }
       } finally {

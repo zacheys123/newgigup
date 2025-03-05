@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import BallLoader from "../loaders/BallLoader";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 interface UserEmail {
   emailAddress: string;
@@ -36,7 +37,7 @@ const ActionPage = () => {
   const [musicianload, setMusicianLoad] = useState<boolean>(false);
   const [clientload, setClientLoad] = useState<boolean>(false);
   const [userload, setUserload] = useState<boolean>(false);
-
+  const { user: myuser } = useCurrentUser(userId || null);
   const connectAsMusician = useCallback(async () => {
     if (!user) {
       console.error("No user data to send.");
@@ -61,7 +62,11 @@ const ActionPage = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ transformedUser, isMusician: true,isClient:false }),
+          body: JSON.stringify({
+            transformedUser,
+            isMusician: true,
+            isClient: false,
+          }),
         });
         const data = await res.json();
         window.localStorage.setItem("user", JSON.stringify(data.results));
@@ -109,7 +114,11 @@ const ActionPage = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ transformedUser, isClient: true ,isMusician:false}),
+          body: JSON.stringify({
+            transformedUser,
+            isClient: true,
+            isMusician: false,
+          }),
         });
         const data = await res.json();
         window.localStorage.setItem("user", JSON.stringify(data.results));
@@ -161,11 +170,12 @@ const ActionPage = () => {
               Join as a client to create gigs for musicians and choose the best
               talent to deliver quality music for you.
             </p>
-            {userload === true && (
-              <Button className="!bg-orange-700 !text-white px-4 sm:px-6 py-2 rounded-full hover:bg-orange-600 transition-colors duration-300 text-sm sm:text-base">
-                {clientload ? <BallLoader /> : "Join as Client"}
-              </Button>
-            )}
+            {(userload === true && myuser?.isMusician === true) ||
+              (myuser?.isClient === true && (
+                <Button className="!bg-orange-700 !text-white px-4 sm:px-6 py-2 rounded-full hover:bg-orange-600 transition-colors duration-300 text-sm sm:text-base">
+                  {clientload ? <BallLoader /> : "Join as Client"}
+                </Button>
+              ))}
           </div>
 
           {/* Booker Card */}
@@ -180,11 +190,12 @@ const ActionPage = () => {
               Join as a musician to discover and book gigs while connecting with
               fellow musicians and clients.
             </p>
-            {userload === true && (
-              <Button className="!bg-blue-800 !text-white px-4 sm:px-6 py-2 rounded-full hover:bg-orange-600 transition-colors duration-300 text-sm sm:text-base">
-                {musicianload ? <BallLoader /> : "Join as Musician"}
-              </Button>
-            )}
+            {(userload === true && myuser?.isMusician === true) ||
+              (myuser?.isClient === true && (
+                <Button className="!bg-blue-800 !text-white px-4 sm:px-6 py-2 rounded-full hover:bg-orange-600 transition-colors duration-300 text-sm sm:text-base">
+                  {musicianload ? <BallLoader /> : "Join as Musician"}
+                </Button>
+              ))}
           </div>
 
           {/* Both Card */}

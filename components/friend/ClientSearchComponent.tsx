@@ -69,6 +69,7 @@ const ClientSearchComponent = () => {
             handles: "",
             bio: "",
             genre: "",
+            refferences: [],
           });
         }
       } finally {

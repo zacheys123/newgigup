@@ -1,3 +1,4 @@
+import ChatNavigation from "@/components/chat/mainchats/ChatNavigation";
 import { Toaster } from "sonner";
 
 export default function NoHeadersLayout({
@@ -7,10 +8,11 @@ export default function NoHeadersLayout({
 }>) {
   return (
     <div className="bg-black h-screen w-full overflow-hidden relative">
-      <div className="absolute left-2 top-5 z-50 text-white ">
+      <div className="h-full absolute  z-50 ">
         {/* <MobileSheet />
         <UserButton /> */}
-        some hanging header
+
+        <ChatNavigation />
       </div>
       <Toaster
         position="top-right"
