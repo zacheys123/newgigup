@@ -1,6 +1,7 @@
 "use client";
+import useStore from "@/app/zustand/useStore";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { MessageProps } from "@/types/chatinterfaces";
+import useSocket from "@/hooks/useSocket";
 import { UserProps } from "@/types/userinterfaces";
 import { useAuth } from "@clerk/nextjs";
 import moment from "moment";
@@ -16,7 +17,6 @@ const ChatPage = () => {
   const router = useRouter();
   const chatId = params.chatId as string;
   const otherUserId = searchParams.get("userId");
-  const [messages, setMessages] = useState<MessageProps[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,27 +26,24 @@ const ChatPage = () => {
   const [isTyping, setIsTyping] = useState(false); // For typing indicator
   const { user } = useCurrentUser(userId || null);
   const [searchquery, setSearch] = useState<string>("");
-
+  const { messages, fetchMessages, addMessage, sendMessage, onlineUsers } =
+    useStore();
+  const { socket } = useSocket();
   // Ref for the chat container to enable auto-scrolling
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
   // Fetch messages and other user's details on component mount
   useEffect(() => {
-    const fetchMessagesAndUser = async () => {
+    const fetchUser = async () => {
       try {
-        const [messagesResponse, userResponse] = await Promise.all([
-          fetch(`/api/chat/getmessages?chatId=${chatId}`),
-          fetch(`/api/user/getuser/${otherUserId}`),
-        ]);
+        const response = await fetch(`/api/user/getuser/${otherUserId}`);
 
-        if (!messagesResponse.ok || !userResponse.ok) {
+        if (!response.ok) {
           throw new Error("Failed to fetch data");
         }
 
-        const { messages } = await messagesResponse.json();
-        const userData = await userResponse.json();
+        const userData = await response.json();
         console.log(userData);
-        setMessages(messages);
         setOtherUser(userData);
       } catch (error) {
         setError(error instanceof Error ? error.message : "An error occurred");
@@ -55,7 +52,8 @@ const ChatPage = () => {
       }
     };
 
-    fetchMessagesAndUser();
+    fetchUser();
+    fetchMessages(chatId);
   }, [chatId, otherUserId]);
 
   // Auto-scroll to the bottom whenever messages change
@@ -67,34 +65,27 @@ const ChatPage = () => {
   }, [messages]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault(); // Prevent form submission from reloading the page
+    if (!socket) return;
+    e.preventDefault();
+    if (!newMessage.trim() || !chatId) return;
 
-    if (!newMessage.trim()) return;
+    const newMsg = {
+      sender: user,
+      receiver: otherUserId,
+      content: newMessage,
+      chatId,
+      createdAt: new Date(),
+      reactions: "😁",
+    };
 
     try {
-      const response = await fetch("/api/messages/sendmessages", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          chatId,
-          content: newMessage,
-          sender: user, // Replace with actual logged-in user ID
-          reciever: otherUserId, // Replace with the other user's ID
-        }),
-      });
+      sendMessage(newMsg);
+      addMessage(newMsg); // Optimistically update UI
+      socket.emit("sendMessage", newMsg, onlineUsers);
 
-      if (!response.ok) {
-        throw new Error("Failed to send message");
-      }
-
-      // Refresh messages after sending
-      const updatedMessages = await response.json();
-      setMessages(updatedMessages);
       setNewMessage("");
     } catch (error) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      console.error("Message sending failed", error);
     }
   };
 
@@ -154,14 +145,14 @@ const ChatPage = () => {
 
   return (
     <div
-      className="h-screen flex flex-col bg-[#f0f2f5] pt-[55px] "
+      className="h-screen flex flex-col bg-[#f0f2f5] pt-[65px] "
       onClick={() => {
         setIsMenuOpen(false);
       }}
     >
       {/* Header with back icon, avatar, and other user's name */}
-      <div className="w-full bg-neutral-300/60 h-[55px] absolute top-0 px-5 py-2 flex items-center">
-        <button onClick={() => router.back()} className="mr-4">
+      <div className="w-full bg-[#776f7c]/90 h-[65px] absolute top-0 px-5 py-2 flex items-center">
+        <button onClick={() => router.back()} className="mr-4 text-gray-300">
           <IoArrowBack className="text-2xl" />
         </button>
         {otherUser?.picture && (
@@ -174,7 +165,9 @@ const ChatPage = () => {
               height={30}
             />
             <div>
-              <span className="font-semibold">{otherUser?.firstname}</span>
+              <span className="font-semibold text-gray-200">
+                {otherUser?.firstname}
+              </span>
               {isTyping && <p className="text-xs text-gray-500">Typing...</p>}
             </div>
           </div>
@@ -182,17 +175,14 @@ const ChatPage = () => {
         {/* Search Icon */}
         <button
           onClick={(ev) => toggleSearch(ev)}
-          className="ml-auto p-2 hover:bg-gray-200 rounded-full"
+          className="ml-auto p-2 bg-gray-200 hover:bg-gray-200 rounded-full"
         >
           <IoSearch className="text-gray-600" />
         </button>
         {/* Menu Icon and Dropdown */}
         <div className="relative">
-          <button
-            onClick={(ev) => toggleMenu(ev)}
-            className="p-2 hover:bg-gray-200 rounded-full"
-          >
-            <IoEllipsisVertical className="text-gray-600" />
+          <button onClick={(ev) => toggleMenu(ev)} className="p-2 ">
+            <IoEllipsisVertical className="text-gray-300 ml-2" size="20" />
           </button>
           {isMenuOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg">

@@ -11,6 +11,7 @@ import { FaSearch, FaArrowLeft, FaUserPlus } from "react-icons/fa"; // Import ic
 import { useAllUsers } from "@/hooks/useAllUsers";
 import BallLoader from "@/components/loaders/BallLoader";
 import { colors, fonts } from "@/utils";
+import useStore from "@/app/zustand/useStore";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -28,7 +29,7 @@ const AllChats = () => {
       setTimeout(() => revalidate({ retryCount }), 5000); // Retry after 5 seconds
     },
   });
-
+  const { setIsOpen } = useStore();
   const [searchQuery, setSearchQuery] = useState(""); // State for search query
   const [searchAddChat, setSearchAddChat] = useState(""); // State for search query
   const [isSearchVisible, setIsSearchVisible] = useState(false); // State to toggle search input
@@ -40,15 +41,27 @@ const AllChats = () => {
   };
 
   // Filter chats based on the search query
-  const filteredChats = chats?.filter(
+  const uniqueChatsMap = new Map<
+    string,
+    { users: UserProps[]; _id: string; messages: MessageProps[] }
+  >();
+
+  chats?.forEach(
     (chat: { users: UserProps[]; _id: string; messages: MessageProps[] }) => {
       const otherUser = chat.users.find((user) => user._id !== loggedInUserId);
-      return (
-        otherUser?.firstname &&
-        otherUser?.firstname.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      if (otherUser && !uniqueChatsMap.has(otherUser._id as string)) {
+        uniqueChatsMap.set(otherUser._id as string, chat);
+      }
     }
   );
+
+  const filteredChats = Array.from(uniqueChatsMap.values()).filter((chat) => {
+    const otherUser = chat.users.find((user) => user._id !== loggedInUserId);
+    return (
+      otherUser?.firstname &&
+      otherUser?.firstname.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  });
 
   // Filter users for the "Add Chat" modal
   const filteredUsers = users?.users?.filter((user: UserProps) => {
@@ -98,10 +111,14 @@ const AllChats = () => {
         },
         body: JSON.stringify({ users: [loggedInUserId, otherUserId] }),
       });
-
+      const { chatId } = await response.json();
+      console.log(chatId);
       if (response.ok) {
-        const newChat = await response.json();
-        router.push(`/chats/${newChat._id}?userId=${otherUserId}`);
+        if (chatId) {
+          router.push(`/chats/${chatId}?userId=${otherUserId}`);
+        } else {
+          console.log(chatId);
+        }
       } else {
         console.error("Failed to create chat");
       }
@@ -134,7 +151,12 @@ const AllChats = () => {
   //   );
   // }
   return (
-    <div className="h-screen bg-[#f0f2f5] flex flex-col">
+    <div
+      className="h-screen bg-[#f0f2f5] flex flex-col"
+      onClick={() => {
+        setIsOpen(false);
+      }}
+    >
       {isAddingChat && (
         <div className="fixed inset-0 flex items-center justify-center bg-black  bg-opacity-50 backdrop-blur-[4px] w-[100%] mx-auto h-full -py-6 z-50">
           <div className="w-[90%] p-4 max-w-lg sm:max-w-xl h-[90%] m-auto   flex flex-col border border-gray-600/50  rounded-2xl shadow-2xl overflow-hidden  justify-center items-center">
@@ -196,7 +218,7 @@ const AllChats = () => {
               {allFiltedUsers()?.map((user: UserProps) => (
                 <div
                   key={user?._id}
-                  className="flex gap-2 items-center hover:bg-[#0e6e5f] transition-colors duration-200 cursor-pointer bg-neutral-500/50 p-3 "
+                  className="flex gap-2 items-center hover:bg-[#0e6e5f] transition-colors duration-200 cursor-pointer bg-neutral-500/50  first:rounded-tl-xl first:rounded-tr-xl last:rounded:bl-xl last:rounded-b-r-xl py-3 px-5 "
                   onClick={() => handleAddChat(user?._id as string)}
                 >
                   {user?.picture && (
@@ -260,7 +282,7 @@ const AllChats = () => {
       )}
       {/* Search Bar */}
       {isSearchVisible && (
-        <div className="bg-[#0e4242] p-4 text-white flex items-center">
+        <div className="bg-[#187950] p-4 text-white flex items-center">
           <button
             onClick={() => {
               setIsSearchVisible(false);
@@ -275,7 +297,7 @@ const AllChats = () => {
             placeholder="Search chats..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full p-2 rounded-lg border border-gray-300 focus:outline-none focus:border-[#128C7E] text-gray-300 bg-transparent"
+            className="w-full p-2 rounded-lg border border-gray-300 focus:outline-none focus:border-[#128C7E] text-gray-300 "
           />
         </div>
       )}

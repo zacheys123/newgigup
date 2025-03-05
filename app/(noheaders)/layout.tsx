@@ -7,13 +7,8 @@ export default function NoHeadersLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="bg-black h-screen w-full overflow-hidden relative">
-      <div className="h-full absolute  z-50 ">
-        {/* <MobileSheet />
-        <UserButton /> */}
-
-        <ChatNavigation />
-      </div>
+    <div className="bg-black h-screen w-full overflow-hidden">
+      <ChatNavigation />
       <Toaster
         position="top-right"
         toastOptions={{
@@ -21,7 +16,6 @@ export default function NoHeadersLayout({
         }}
       />
       {children}
-      {/* <PagesNav /> */}
     </div>
   );
 }

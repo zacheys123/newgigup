@@ -18,6 +18,7 @@ const useStore = create<StoreState>((set) => ({
 
   setShowUpload: () =>
     set((state: StoreState) => ({ showUpload: !state.showUpload })),
+  setIsOpen: (data: boolean) => set(() => ({ isOpen: data })),
   setRefetchData: (data: boolean) => set(() => ({ refetchData: data })),
   setCurrentFollowers: (data: boolean) =>
     set(() => ({ currentFollowers: data })),
