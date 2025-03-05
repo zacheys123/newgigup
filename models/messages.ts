@@ -6,6 +6,7 @@ interface IMessage extends Document {
   content: string;
   chatId: mongoose.Types.ObjectId; // Reference to the chat
   reactions: string; // This field can be extended to hold reactions like "like", "dislike", "comment", etc.
+  read: boolean;
 }
 
 const messageSchema = new Schema<IMessage>(
@@ -18,6 +19,7 @@ const messageSchema = new Schema<IMessage>(
       ref: "Chat",
     },
     reactions: { type: String, required: true },
+    read: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

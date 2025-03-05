@@ -97,6 +97,8 @@ export interface StoreState {
   chats: Record<string, ChatProps>;
   onlineUsers: OnlineUser[];
   socket: Socket | null;
+  unreadCounts: Record<string, number>; // { chatId: unreadCount }
+  updateUnreadCount: (chatId: string, increment?: boolean) => void;
 
   setShowUpload: () => void;
   setRefetchData: (data: boolean) => void;

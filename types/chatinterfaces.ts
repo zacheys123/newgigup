@@ -15,6 +15,8 @@ export interface MessageProps {
   createdAt: Date; //
   reactions: string;
   tempId?: string;
+  receiver: string | null;
+  read: boolean;
 }
 
 export interface Messages {

@@ -5,7 +5,8 @@ import Chat from "@/models/chat";
 // import { getIO } from "@/lib/socket"; // Import Socket.io instance
 
 export async function POST(req: NextRequest) {
-  const { sender, receiver, content, chatId, reactions } = await req.json();
+  const { sender, receiver, content, chatId, reactions, read } =
+    await req.json();
   if (!sender || !receiver || !content || !chatId) {
     return NextResponse.json(
       { error: "Missing required fields" },
@@ -33,6 +34,7 @@ export async function POST(req: NextRequest) {
       content,
       chatId,
       reactions,
+      read,
     });
 
     await newMessage.save();

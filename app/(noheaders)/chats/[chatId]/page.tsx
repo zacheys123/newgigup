@@ -85,6 +85,7 @@ const ChatPage = () => {
       chatId,
       createdAt: new Date(),
       reactions: "😁",
+      read: false,
     };
 
     try {

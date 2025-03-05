@@ -4,7 +4,6 @@ import Chat from "@/models/chat";
 import connectDb from "@/lib/connectDb";
 
 export async function POST(req: NextRequest) {
-  await connectDb();
   const { users } = await req.json();
 
   if (!users || users.length !== 2) {
@@ -14,6 +13,7 @@ export async function POST(req: NextRequest) {
     );
   }
   try {
+    await connectDb();
     const existingChat = await Chat.findOne({ users: { $all: users } });
 
     if (existingChat) {

@@ -44,7 +44,14 @@ const useStore = create<StoreState>((set) => ({
   setRefetchGig: (data: boolean) => set(() => ({ refetchGig: data })),
   setMessages: (data: MessageProps[]) => set(() => ({ messages: data })),
   setOnlineUsers: (users) => set({ onlineUsers: users }),
-
+  unreadCounts: {},
+  updateUnreadCount: (chatId, increment = true) =>
+    set((state) => ({
+      unreadCounts: {
+        ...state.unreadCounts,
+        [chatId]: (state.unreadCounts[chatId] || 0) + (increment ? 1 : 0),
+      },
+    })),
   addChat: (chat: ChatProps) =>
     set((state: StoreState) => ({
       chats: { ...state.chats, [chat.chatId]: chat },

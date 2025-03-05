@@ -74,7 +74,9 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
     const handleIncomingMessage = (message: MessageProps) => {
       console.log("🟢 Received a message from the server:", message);
 
-      const { messages } = useStore.getState();
+      const { messages, updateUnreadCount } = useStore.getState();
+
+      // Check for duplicate messages
       const isDuplicate = messages.some(
         (msg) =>
           (msg._id && message._id && msg._id === message._id) ||
@@ -84,6 +86,11 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
       if (!isDuplicate) {
         console.log("🟢 Adding new message to Zustand store.");
         addMessage(message);
+
+        // If the message is for the logged-in user, update the unread count
+        if (message.receiver === user?._id) {
+          updateUnreadCount(message.chatId as string, true); // Increment unread count
+        }
       } else {
         console.log("🟡 Duplicate message detected, skipping update.");
       }
@@ -94,7 +101,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
     return () => {
       socket.off("getMessage", handleIncomingMessage);
     };
-  }, [socket, addMessage]);
+  }, [socket, addMessage, user?._id]);
 
   return (
     <SocketContext.Provider value={{ socket }}>
