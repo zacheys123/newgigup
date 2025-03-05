@@ -240,7 +240,8 @@ const ChatPage = () => {
         </div>
       )}
       {/* Chat messages container with ref for auto-scrolling */}
-      <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-4">
+      {/* Chat messages container with auto-scroll */}
+      <div ref={chatContainerRef} className="flex-1 overflow-y-auto px-4 pb-20">
         {searchMessage().map((message: MessageProps) => (
           <div
             key={message._id || message.tempId || uuidv4()}
@@ -270,7 +271,8 @@ const ChatPage = () => {
       </div>
 
       {/* Message input form */}
-      <div className="p-4 bg-white border-t border-gray-200">
+      {/* Message input form - Sticky to bottom */}
+      <div className="p-4 bg-white border-t border-gray-200 sticky bottom-0 w-full">
         <form onSubmit={handleSendMessage} className="flex space-x-2">
           <input
             type="text"

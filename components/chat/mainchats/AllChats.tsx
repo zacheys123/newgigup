@@ -165,7 +165,7 @@ const AllChats = () => {
   // }
   return (
     <div
-      className="h-screen bg-[#f0f2f5] flex flex-col overflow-y-auto"
+      className="h-screen bg-[#f0f2f5] flex flex-col overflow-y-auto pb-20"
       onClick={() => {
         setIsOpen(false);
       }}
