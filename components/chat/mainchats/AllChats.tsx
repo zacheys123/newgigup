@@ -139,7 +139,7 @@ const AllChats = () => {
   );
 
   // Use it in your component
-  if (chats) {
+  if (!chats) {
     return (
       <div className="flex-1 overflow-y-auto p-2 sm:p-4">
         {[...Array(7)].map((_, index) => (
@@ -172,7 +172,7 @@ const AllChats = () => {
     >
       <button
         onClick={() => setIsAddChat(true)}
-        className="fixed bottom-6 right-6 p-4 bg-[#128C7E] text-white rounded-full shadow-lg hover:bg-[#0e6e5f] transition-colors duration-200 bounce-icon"
+        className="fixed bottom-6 right-6 p-4 bg-[#128C7E] text-white rounded-full shadow-lg hover:bg-[#0e6e5f] transition-colors duration-200 bounce-icon z-50"
       >
         <FaUserPlus size={24} />
       </button>
