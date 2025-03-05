@@ -92,7 +92,7 @@ const ChatNavigation = () => {
 
       {/* Side Navigation */}
       <div
-        className={`fixed top-0 right-0 h-screen w-[61px] title  text-white transform transition-transform duration-500 ease-in-out  ${
+        className={`fixed top-0 right-0 h-screen w-[61px] title  z-50 text-white transform transition-transform duration-500 ease-in-out  ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
         onClick={() => {
