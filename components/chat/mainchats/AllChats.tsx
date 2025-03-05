@@ -165,20 +165,20 @@ const AllChats = () => {
   // }
   return (
     <div
-      className="h-screen bg-[#f0f2f5] flex flex-col"
+      className="h-screen bg-[#f0f2f5] flex flex-col overflow-y-auto"
       onClick={() => {
         setIsOpen(false);
       }}
     >
       <button
         onClick={() => setIsAddChat(true)}
-        className="fixed bottom-6 right-6 p-4 bg-[#128C7E] text-white rounded-full shadow-lg hover:bg-[#0e6e5f] transition-colors duration-200 bounce-icon z-50"
+        className="fixed bottom-6 right-6 p-4 bg-[#128C7E] text-white rounded-full shadow-lg hover:bg-[#0e6e5f] transition-colors duration-200 bounce-icon"
       >
         <FaUserPlus size={24} />
       </button>
       {isAddingChat && (
         <div className="fixed inset-0 flex items-center justify-center bg-black  bg-opacity-50 backdrop-blur-[4px] w-[100%] mx-auto h-full -py-6 z-50">
-          <div className="w-[90%] p-4 max-w-lg sm:max-w-xl h-[90%] m-auto   flex flex-col border border-gray-600/50  rounded-2xl shadow-2xl overflow-hidden  justify-center items-center">
+          <div className="w-[90%] p-4 max-w-lg sm:max-w-xl h-[90%] m-auto   flex flex-col border border-gray-600/50  rounded-2xl shadow-2xl overflow-y-auto  justify-center items-center">
             <BallLoader />
           </div>
         </div>
@@ -208,7 +208,7 @@ const AllChats = () => {
       )}
       {isAddChat && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-[4px] w-[100%] mx-auto h-full -py-6 z-50">
-          <div className="w-[90%] p-4 max-w-lg sm:max-w-xl h-[80%] m-auto flex flex-col border border-gray-600/50 rounded-2xl shadow-2xl bg-neutral-900/50 overflow-hidden">
+          <div className="w-[90%] p-4 max-w-lg sm:max-w-xl h-[80%] m-auto flex flex-col border border-gray-600/50 rounded-2xl shadow-2xl bg-neutral-900/50 overflow-y-auto">
             {" "}
             <div className="flex justify-between items-center  mt-4">
               {" "}
