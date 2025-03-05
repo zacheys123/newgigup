@@ -157,7 +157,7 @@ const ChatPage = () => {
 
   return (
     <div
-      className="h-screen flex flex-col bg-[#f0f2f5] pt-[65px] "
+      className="h-screen flex flex-col bg-[#f0f2f5] pt-[65px] pb-[60px] "
       onClick={() => {
         setIsMenuOpen(false);
         setIsOpen(false);
