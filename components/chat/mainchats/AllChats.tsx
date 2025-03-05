@@ -128,10 +128,23 @@ const AllChats = () => {
       setIsAddingChat(false);
     }
   };
+  const LoadingSkeleton = () => (
+    <div className="animate-pulse flex items-center p-3 space-x-4">
+      <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
+      <div className="flex-1 space-y-2">
+        <div className="h-8 bg-gray-300 rounded w-3/4"></div>
+        <div className="h-8 bg-gray-300 rounded w-1/2"></div>
+      </div>
+    </div>
+  );
+
+  // Use it in your component
   if (!chats) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="flex-1 overflow-y-auto p-2 sm:p-4">
+        {[...Array(15)].map((_, index) => (
+          <LoadingSkeleton key={index} />
+        ))}
       </div>
     );
   }
@@ -157,6 +170,12 @@ const AllChats = () => {
         setIsOpen(false);
       }}
     >
+      <button
+        onClick={() => setIsAddChat(true)}
+        className="fixed bottom-6 right-6 p-4 bg-[#128C7E] text-white rounded-full shadow-lg hover:bg-[#0e6e5f] transition-colors duration-200 bounce-icon"
+      >
+        <FaUserPlus size={24} />
+      </button>
       {isAddingChat && (
         <div className="fixed inset-0 flex items-center justify-center bg-black  bg-opacity-50 backdrop-blur-[4px] w-[100%] mx-auto h-full -py-6 z-50">
           <div className="w-[90%] p-4 max-w-lg sm:max-w-xl h-[90%] m-auto   flex flex-col border border-gray-600/50  rounded-2xl shadow-2xl overflow-hidden  justify-center items-center">
@@ -167,7 +186,9 @@ const AllChats = () => {
       {/* Header */}
       {!isSearchVisible && (
         <div className="bg-[#128C7E] p-4 text-white flex justify-between items-center">
-          <h1 className="text-xl sm:text-2xl font-bold">Chats</h1>
+          <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#ba51e4] to-[#e0ab16] bg-clip-text text-transparent">
+            Chats
+          </h1>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsSearchVisible(true)}
@@ -176,12 +197,12 @@ const AllChats = () => {
             >
               <FaSearch size={20} />
             </button>
-            <button
+            {/* <button
               onClick={() => setIsAddChat(true)}
               className="p-2 hover:bg-[#0e6e5f] rounded-full transition-colors duration-200"
             >
               <FaUserPlus size={20} />
-            </button>
+            </button> */}
           </div>
         </div>
       )}

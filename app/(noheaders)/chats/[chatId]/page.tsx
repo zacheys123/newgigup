@@ -9,6 +9,7 @@ import Image from "next/image";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import React, { useEffect, useState, useRef } from "react";
 import { IoArrowBack, IoEllipsisVertical, IoSearch } from "react-icons/io5";
+import { v4 as uuidv4 } from "uuid"; // Install uuid: npm install uuid
 
 const ChatPage = () => {
   const params = useParams();
@@ -26,12 +27,19 @@ const ChatPage = () => {
   const [isTyping, setIsTyping] = useState(false); // For typing indicator
   const { user } = useCurrentUser(userId || null);
   const [searchquery, setSearch] = useState<string>("");
-  const { messages, fetchMessages, addMessage, sendMessage, onlineUsers } =
-    useStore();
+  const {
+    messages,
+    fetchMessages,
+    addMessage,
+    sendMessage,
+    onlineUsers,
+    setIsOpen,
+  } = useStore();
+
   const { socket } = useSocket();
   // Ref for the chat container to enable auto-scrolling
   const chatContainerRef = useRef<HTMLDivElement>(null);
-
+  console.log(isTyping);
   // Fetch messages and other user's details on component mount
   useEffect(() => {
     const fetchUser = async () => {
@@ -126,7 +134,10 @@ const ChatPage = () => {
     });
     return filteredMessages;
   };
-
+  const online = "text-green-500 link";
+  const offline = "text-red-50 link";
+  // Checking if the user is online based on their
+  const isOnline = onlineUsers.some((user) => user.userId === otherUserId);
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -148,6 +159,7 @@ const ChatPage = () => {
       className="h-screen flex flex-col bg-[#f0f2f5] pt-[65px] "
       onClick={() => {
         setIsMenuOpen(false);
+        setIsOpen(false);
       }}
     >
       {/* Header with back icon, avatar, and other user's name */}
@@ -165,10 +177,18 @@ const ChatPage = () => {
               height={30}
             />
             <div>
-              <span className="font-semibold text-gray-200">
-                {otherUser?.firstname}
-              </span>
-              {isTyping && <p className="text-xs text-gray-500">Typing...</p>}
+              <div className="flex flex-col">
+                <span className="font-semibold text-gray-200">
+                  {otherUser?.firstname}
+                </span>
+                <span className={isOnline ? online : offline}>
+                  {isOnline ? (
+                    "Online"
+                  ) : (
+                    <span>last seen {moment(Date.now()).calendar()}</span>
+                  )}
+                </span>
+              </div>
             </div>
           </div>
         )}
@@ -222,7 +242,7 @@ const ChatPage = () => {
       <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-4">
         {searchMessage().map((message) => (
           <div
-            key={message._id}
+            key={message._id || message.tempId || uuidv4()}
             className={`mb-4 ${
               message.sender?._id === otherUserId ? "text-left" : "text-right"
             }`}

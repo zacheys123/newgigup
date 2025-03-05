@@ -1,5 +1,6 @@
 "use client";
 import useStore from "@/app/zustand/useStore";
+import { UserButton } from "@clerk/nextjs";
 import React, { useState, useEffect } from "react";
 import {
   FaHome,
@@ -16,7 +17,7 @@ const ChatNavigation = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState({
     x: window.innerWidth - 100,
-    y: window.innerHeight / 2,
+    y: window.innerHeight / 1.4,
   }); // Initial position
 
   const toggleNavigation = () => {
@@ -45,10 +46,6 @@ const ChatNavigation = () => {
   };
 
   useEffect(() => {
-    const handleWindowMouseMove = (ev: MouseEvent) => {
-      handleWindowMouseMove(ev);
-    };
-
     if (isDragging) {
       window.addEventListener("mousemove", handleWindowMouseMove);
       window.addEventListener("mouseup", handleMouseUp);
@@ -104,28 +101,29 @@ const ChatNavigation = () => {
       >
         <div className="p-6 h-[100%] flex justify-center items-center">
           <div className="h-fit p-2 bg-gradient-to-b from-gray-400 to-gray-100 shadow-2xl">
-            <ul className="space-y-4">
-              <li className="flex items-center space-x-4 p-3 rounded-lg hover:bg-gray-700 transition-all duration-200 cursor-pointer bg-gradient-to-br from-[#1b629c] via-[#717577] to-[#46bceb]">
-                <FaHome className="h-5 w-5 text-purple-200" />
+            <ul className="space-y-4 animate-in">
+              <li className="flex items-center space-x-2 p-3 rounded-lg hover:bg-gray-700 transition-all duration-200 cursor-pointer bg-gradient-to-br from-[#e9edf0] via-[#154958] to-[#0c6dc9]">
+                <FaHome className="h-4 w-5 text-red-400" />
               </li>
-              <li className="flex items-center space-x-4 p-3 rounded-lg hover:bg-gray-700 transition-all duration-200 cursor-pointer bg-gradient-to-br from-[#1b629c] via-[#717577] to-[#46bceb]">
-                <FaUser className="h-5 w-5 text-purple-200" />
+              <li className="flex items-center space-x-2 p-3 rounded-lg hover:bg-gray-700 transition-all duration-200 cursor-pointer bg-gradient-to-br from-[#e9edf0] via-[#154958] to-[#0c6dc9]">
+                <FaUser className="h-4 w-4 text-yellow-400" />
               </li>
-              <li className="flex items-center space-x-4 p-3 rounded-lg hover:bg-gray-700 transition-all duration-200 cursor-pointer bg-gradient-to-br from-[#1b629c] via-[#717577] to-[#46bceb]">
-                <FaComments className="h-5 w-5 text-purple-200" />
+              <li className="flex items-center space-x-2 p-3 rounded-lg hover:bg-gray-700 transition-all duration-200 cursor-pointer bg-gradient-to-br from-[#e9edf0] via-[#154958] to-[#0c6dc9]">
+                <FaComments className="h-4 w-4 text-amber-500" />
               </li>
-              <li className="flex items-center space-x-4 p-3 rounded-lg hover:bg-gray-700 transition-all duration-200 cursor-pointer bg-gradient-to-br from-[#1b629c] via-[#717577] to-[#46bceb]">
-                <FaBriefcase className="h-5 w-5 text-purple-200" />
+              <li className="flex items-center space-x-2 p-3 rounded-lg hover:bg-gray-700 transition-all duration-200 cursor-pointer bg-gradient-to-br from-[#e9edf0] via-[#154958] to-[#0c6dc9]">
+                <FaBriefcase className="h-4 w-4 text-purple-400" />
               </li>
-              <li className="flex items-center space-x-4 p-3 rounded-lg hover:bg-gray-700 transition-all duration-200 cursor-pointer bg-gradient-to-br from-[#1b629c] via-[#717577] to-[#46bceb]">
-                <FaVideo className="h-5 w-5 text-purple-200" />
+              <li className="flex items-center space-x-2 p-3 rounded-lg hover:bg-gray-700 transition-all duration-200 cursor-pointer bg-gradient-to-br from-[#e9edf0] via-[#154958] to-[#0c6dc9]">
+                <FaVideo className="h-4 w-4 text-green-2300" />
               </li>
-              <li className="flex items-center space-x-4 p-3 rounded-lg hover:bg-gray-700 transition-all duration-200 cursor-pointer bg-gradient-to-br from-[#1b629c] via-[#717577] to-[#46bceb]">
-                <FaStar className="h-5 w-5 text-purple-200" />
+              <li className="flex items-center space-x-2 p-3 rounded-lg hover:bg-gray-700 transition-all duration-200 cursor-pointer bg-gradient-to-br from-[#e9edf0] via-[#154958] to-[#0c6dc9]">
+                <FaStar className="h-4 w-4 text-fuchsia-400" />
               </li>
-              <li className="flex items-center space-x-4 p-3 rounded-lg hover:bg-gray-700 transition-all duration-200 cursor-pointer bg-gradient-to-br from-[#1b629c] via-[#717577] to-[#46bceb]">
-                <FaListAlt className="h-5 w-5 text-purple-200" />
+              <li className="flex items-center space-x-2 p-3 rounded-lg hover:bg-gray-700 transition-all duration-200 cursor-pointer bg-gradient-to-br from-[#e9edf0] via-[#154958] to-[#0c6dc9]">
+                <FaListAlt className="h-4 w-4 text-fuchsia-300" />
               </li>
+              <UserButton />
             </ul>
           </div>
         </div>
