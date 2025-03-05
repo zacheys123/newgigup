@@ -80,7 +80,7 @@ const ChatPage = () => {
 
     const newMsg = {
       sender: user,
-      receiver: otherUserId,
+      receiver: otherUserId as string,
       content: newMessage,
       chatId,
       createdAt: new Date(),

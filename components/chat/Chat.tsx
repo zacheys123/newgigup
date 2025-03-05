@@ -69,11 +69,12 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose, onOpenX }) => {
 
     const newMsg = {
       sender: myuser,
-      receiver: modal?.user?._id,
+      receiver: modal?.user?._id as string,
       content: newMessage,
       chatId,
       createdAt: new Date(),
       reactions: "😁",
+      read: false,
     };
 
     try {
