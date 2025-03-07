@@ -75,9 +75,9 @@ const ChatModal: React.FC<ProfileModalProps> = ({ user, onClose }) => {
                 : ""}
               : {gigCount}
             </div>
-            <p className="text-gray-700 flex">
+            <div className="text-gray-700 flex">
               Rating: <StarRating rating={rating} />
-            </p>
+            </div>
           </div>
         </div>
       </div>
