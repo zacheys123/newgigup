@@ -594,6 +594,27 @@ input[type="radio"] {
 .unread-badge:active {
   transform: scale(0.95);
 }
+/* Add this to your global CSS or a CSS module */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.slide-up {
+  animation: slideUp 0.7s ease-out;
+}
+@keyframes moveLeft {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(14%);
+  }
+}
 /* intro loader 
 /* From Uiverse.io by Nawsome */
 /* .loaderIn {

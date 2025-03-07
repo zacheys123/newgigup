@@ -1,5 +1,6 @@
 "use client";
 import useStore from "@/app/zustand/useStore";
+import ChatModal from "@/components/chat/mainchats/ChatModal";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import useSocket from "@/hooks/useSocket";
 import { MessageProps } from "@/types/chatinterfaces";
@@ -140,6 +141,17 @@ const ChatPage = () => {
   const offline = "text-red-50 link";
   // Checking if the user is online based on their
   const isOnline = onlineUsers.some((user) => user.userId === otherUserId);
+
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+
+  const handleAvatarClick = () => {
+    setIsProfileModalOpen(true);
+  };
+
+  const closeProfileModal = () => {
+    setIsProfileModalOpen(false);
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -170,7 +182,7 @@ const ChatPage = () => {
           <IoArrowBack className="text-2xl" />
         </button>
         {otherUser?.picture && (
-          <div className="flex items-center">
+          <div className="flex items-center" onClick={handleAvatarClick}>
             <Image
               src={otherUser?.picture}
               alt={otherUser?.firstname?.split("")[0] as string}
@@ -292,6 +304,10 @@ const ChatPage = () => {
             Send
           </button>
         </form>
+        {/* Profile Modal */}
+        {isProfileModalOpen && otherUser && (
+          <ChatModal user={otherUser} onClose={closeProfileModal} />
+        )}
       </div>
     </div>
   );

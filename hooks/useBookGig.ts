@@ -28,7 +28,7 @@ export function useBookGig() {
           .length
       : 0;
 
-    if (countUserPosts > 2) {
+    if (countUserPosts > 4) {
       toast.error("You have reached your maximum booking limit");
       return;
     }
