@@ -417,115 +417,120 @@ const AllChats = () => {
         </div>
       )}
       {/* Chat List */}
-
       <div className="flex-1 overflow-y-auto p-2 sm:p-4">
-        {filteredChats.length === 0 && searchAddChat ? (
+        {/* Case 1: No chats available at all */}
+        {filteredChats.length === 0 && !searchQuery ? (
           <div className="flex flex-col items-center justify-center h-full">
             <p className="text-gray-600 text-lg">No chats available</p>
             <button
               onClick={() => setIsAddChat(true)}
               className="mt-4 px-4 py-2 bg-[#128C7E] text-white rounded-lg hover:bg-[#0e6e5f] transition-colors duration-200"
             >
-              Start a new chat
+              Add Chat
             </button>
           </div>
-        ) : filteredChats.length === 0 && !searchAddChat ? (
-          <div className="flex justify-center items-center h-full">
-            <p className="text-neutral-400">No results found </p>
-          </div>
-        ) : filteredChats.length > 0 ? (
-          filteredChats.map(
-            (
-              chat: {
-                users: UserProps[];
-                _id: string;
-                messages: MessageProps[];
-              },
-              index: number
-            ) => {
-              const otherUser = chat.users.find(
-                (user) => user._id !== loggedInUserId
-              );
-              const unreadCount = unreadCounts[chat._id] || 0;
-
-              return (
-                <div
-                  key={chat._id}
-                  onMouseDown={() => handleLongPressStart(chat._id)} // Desktop long press
-                  onMouseUp={handleLongPressEnd} // Desktop long press end
-                  onMouseLeave={handleLongPressEnd} // Cancel long press if mouse leaves
-                  onTouchStart={() => handleLongPressStart(chat._id)} // Mobile long press
-                  onTouchEnd={handleLongPressEnd} // Mobile long press end
-                  onClick={() => {
-                    if (selectedChatId === chat._id) return; // Prevent click if long press is active
-                    handleChatClick(chat._id, otherUser?._id || "");
-                  }}
-                  className="flex items-center p-2 sm:p-3 hover:bg-gradient-to-br active:scale-6 hover:from-neutral-300/30 hover:to-yellow-200/10 hover:via-gray-300/10 active:scale-95 active:opacity-80 rounded-lg transition-all duration-75 ease-in-out cursor-pointer mb-2 relative"
-                  style={{
-                    animation: `fadeIn 0.5s ease-in-out ${
-                      index * 0.1
-                    }s forwards`,
-                    opacity: 0,
-                  }}
-                >
-                  {/* User Avatar */}
-                  <div className="flex-shrink-0">
-                    {otherUser?.picture ? (
-                      <Image
-                        src={otherUser?.picture}
-                        alt={otherUser?.firstname as string}
-                        width={40}
-                        height={40}
-                        className="rounded-full"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#128C7E] rounded-full flex items-center justify-center text-white font-bold">
-                        {otherUser?.firstname && !otherUser?.picture
-                          ? otherUser?.firstname[0]
-                          : "U"}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Chat Details */}
-                  <div className="flex-1 ml-3 sm:ml-4">
-                    <p className="text-sm sm:text-md font-semibold text-gray-800">
-                      {otherUser ? otherUser.firstname : "Unknown User"}
-                    </p>
-                    {chat.messages.length > 0 && (
-                      <p
-                        className={
-                          chat.messages[chat.messages.length - 1]?.read === true
-                            ? "text-xs sm:text-sm text-gray-600 truncate"
-                            : "text-md font-bold text-gray-800 truncate"
-                        }
-                      >
-                        {chat.messages[chat.messages.length - 1].content}
-                      </p>
-                    )}
-                  </div>
-                  {/* Unread Message Count */}
-                  {unreadCount > 0 && (
-                    <div className="ml-auto bg-[#128C7E] text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold hover:bg-[#0e6e5f] active:scale-95 transition-all duration-200 animate-pulse">
-                      {unreadCount}
-                    </div>
-                  )}
-                  {/* Delete Button (Visible on Long Press) */}
-                  {selectedChatId === chat._id && (
-                    <button
-                      onClick={() => handleDeleteChat(chat._id)}
-                      className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors duration-200"
-                      aria-label="Delete chat"
-                    >
-                      <FaTrash size={16} />
-                    </button>
-                  )}
-                </div>
-              );
-            }
-          )
         ) : (
-          ""
+          <>
+            {/* Case 2: No results found for the search query */}
+            {filteredChats.length === 0 && searchQuery ? (
+              <div className="flex justify-center items-center h-full">
+                <p className="text-neutral-400">No results found</p>
+              </div>
+            ) : (
+              // Case 3: Display the list of chats
+              filteredChats.map(
+                (
+                  chat: {
+                    users: UserProps[];
+                    _id: string;
+                    messages: MessageProps[];
+                  },
+                  index: number
+                ) => {
+                  const otherUser = chat.users.find(
+                    (user) => user._id !== loggedInUserId
+                  );
+                  const unreadCount = unreadCounts[chat._id] || 0;
+
+                  return (
+                    <div
+                      key={chat._id}
+                      onMouseDown={() => handleLongPressStart(chat._id)} // Desktop long press
+                      onMouseUp={handleLongPressEnd} // Desktop long press end
+                      onMouseLeave={handleLongPressEnd} // Cancel long press if mouse leaves
+                      onTouchStart={() => handleLongPressStart(chat._id)} // Mobile long press
+                      onTouchEnd={handleLongPressEnd} // Mobile long press end
+                      onClick={() => {
+                        if (selectedChatId === chat._id) return; // Prevent click if long press is active
+                        handleChatClick(chat._id, otherUser?._id || "");
+                      }}
+                      className="flex items-center p-2 sm:p-3 hover:bg-gradient-to-br active:scale-6 hover:from-neutral-300/30 hover:to-yellow-200/10 hover:via-gray-300/10 active:scale-95 active:opacity-80 rounded-lg transition-all duration-75 ease-in-out cursor-pointer mb-2 relative"
+                      style={{
+                        animation: `fadeIn 0.5s ease-in-out ${
+                          index * 0.1
+                        }s forwards`,
+                        opacity: 0,
+                      }}
+                    >
+                      {/* User Avatar */}
+                      <div className="flex-shrink-0">
+                        {otherUser?.picture ? (
+                          <Image
+                            src={otherUser?.picture}
+                            alt={otherUser?.firstname as string}
+                            width={40}
+                            height={40}
+                            className="rounded-full"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#128C7E] rounded-full flex items-center justify-center text-white font-bold">
+                            {otherUser?.firstname && !otherUser?.picture
+                              ? otherUser?.firstname[0]
+                              : "U"}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Chat Details */}
+                      <div className="flex-1 ml-3 sm:ml-4">
+                        <p className="text-sm sm:text-md font-semibold text-gray-800">
+                          {otherUser ? otherUser.firstname : "Unknown User"}
+                        </p>
+                        {chat.messages.length > 0 && (
+                          <p
+                            className={
+                              chat.messages[chat.messages.length - 1]?.read ===
+                              true
+                                ? "text-xs sm:text-sm text-gray-600 truncate"
+                                : "text-md font-bold text-gray-800 truncate"
+                            }
+                          >
+                            {chat.messages[chat.messages.length - 1].content}
+                          </p>
+                        )}
+                      </div>
+                      {/* Unread Message Count */}
+                      {unreadCount > 0 && (
+                        <div className="ml-auto bg-[#128C7E] text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold hover:bg-[#0e6e5f] active:scale-95 transition-all duration-200 animate-pulse">
+                          {unreadCount}
+                        </div>
+                      )}
+                      {/* Delete Button (Visible on Long Press) */}
+                      {selectedChatId === chat._id && (
+                        <button
+                          onClick={() => handleDeleteChat(chat._id)}
+                          className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors duration-200"
+                          aria-label="Delete chat"
+                        >
+                          <FaTrash size={16} />
+                        </button>
+                      )}
+                    </div>
+                  );
+                }
+              )
+            )}
+          </>
         )}
       </div>
 

@@ -116,7 +116,7 @@ const ChatPage = () => {
 
   const searchMessage = () => {
     // Filter messages based on search query
-    const filteredMessages = messages.filter((message) => {
+    const filteredMessages = messages?.filter((message) => {
       if (message.content.toLowerCase().includes(searchquery?.toLowerCase())) {
         return true;
       } else if (
@@ -156,6 +156,7 @@ const ChatPage = () => {
       await fetch(`/api/chat/clearmessages?chatId=${chatId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user?._id }), // Pass the current user's ID
       });
       fetchMessages(chatId); // Refetch messages to update the UI
       console.log("Chat cleared");
@@ -232,7 +233,18 @@ const ChatPage = () => {
           </button>
           {isMenuOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg">
-              <button className="block w-full px-4 py-2 text-left hover:bg-gray-100 title">
+              <button
+                className="block w-full px-4 py-2 text-left hover:bg-gray-100 title"
+                onClick={() => {
+                  if (otherUser?.isMusician) {
+                    router.push(`/search/${otherUser?.username}`);
+                  } else if (otherUser?.isClient) {
+                    router.push(`/client/search/${otherUser?.username}`);
+                  } else {
+                    return;
+                  }
+                }}
+              >
                 View Profile
               </button>
               <button className="block w-full px-4 py-2 text-left hover:bg-gray-100 title ">
@@ -277,7 +289,7 @@ const ChatPage = () => {
             </p>
           </div>
         )}
-        {searchMessage().map((message: MessageProps) => (
+        {searchMessage()?.map((message: MessageProps) => (
           <div
             key={message._id || message.tempId || uuidv4()}
             className={`mb-4 ${

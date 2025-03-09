@@ -6,20 +6,19 @@ import { NextResponse, NextRequest } from "next/server";
 export async function PUT(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const chatId = searchParams.get("chatId");
+  const { userId } = await req.json(); // Pass the current user's ID from the frontend
 
   try {
-    // Connect to the database
     await connectDb();
 
-    // Delete all messages associated with the chatId
+    // Add the user's ID to the `clearedBy` array
     await Chat.findByIdAndUpdate(
       { _id: chatId },
       {
-        $set: { messages: [] },
+        $addToSet: { clearedBy: userId }, // Use $addToSet to avoid duplicates
       }
     );
 
-    // Return a success response
     return NextResponse.json(
       { message: "Chat cleared successfully" },
       { status: 200 }

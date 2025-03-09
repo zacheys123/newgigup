@@ -30,6 +30,7 @@ export const initialState = {
     organization: "",
     refferences: [],
   },
+
   currentgig: {
     _id: "",
     postedBy: postedBy,
@@ -99,7 +100,8 @@ export interface StoreState {
   socket: Socket | null;
   unreadCounts: Record<string, number>; // { chatId: unreadCount }
   updateUnreadCount: (chatId: string, increment?: boolean) => void;
-
+  clearedChats: string[]; // Array of chat IDs that the user has cleared
+  clearChat: (chatId: string) => void; // Function to clear a chat
   setShowUpload: () => void;
   setRefetchData: (data: boolean) => void;
   setIsOpen: (data: boolean) => void;
