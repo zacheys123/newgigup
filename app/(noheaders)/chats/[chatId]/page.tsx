@@ -270,6 +270,13 @@ const ChatPage = () => {
       {/* Chat messages container with ref for auto-scrolling */}
       {/* Chat messages container with auto-scroll */}
       <div ref={chatContainerRef} className="flex-1 overflow-y-auto px-4 pb-20">
+        {messages?.length === 0 && (
+          <div className="flex h-full justify-center items-center">
+            <p className="text-center text-neutral-400">
+              Send a message to start a chat
+            </p>
+          </div>
+        )}
         {searchMessage().map((message: MessageProps) => (
           <div
             key={message._id || message.tempId || uuidv4()}
