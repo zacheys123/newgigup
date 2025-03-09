@@ -12,6 +12,7 @@ import { useAllUsers } from "@/hooks/useAllUsers";
 import BallLoader from "@/components/loaders/BallLoader";
 import { colors, fonts } from "@/utils";
 import useStore from "@/app/zustand/useStore";
+import { useAddChat } from "@/hooks/useAddChat";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -22,27 +23,32 @@ const AllChats = () => {
   const router = useRouter();
   const loggedInUserId = myuser?._id;
   console.log(users);
+  // Use localStorage to store and retrieve chats
+  const [localChats, setLocalChats] = useState<
+    { users: UserProps[]; _id: string; messages: MessageProps[] }[]
+  >([]);
+
+  // Fetch chats from the database and store them in localStorage
   const { data: chats, error } = useSWR("/api/chat/allchats", fetcher, {
     revalidateOnFocus: true,
     onErrorRetry: (error, key, config, revalidate, { retryCount }) => {
       if (retryCount >= 3) return; // Retry up to 3 times
       setTimeout(() => revalidate({ retryCount }), 5000); // Retry after 5 seconds
     },
+    onSuccess: (data) => {
+      // Store fetched chats in localStorage
+      localStorage.setItem("chats", JSON.stringify(data));
+      setLocalChats(data); // Update local state
+    },
   });
-  // const calculateUnreadMessages = (chat: {
-  //   users: UserProps[];
-  //   _id: string;
-  //   messages: MessageProps[];
-  // }) => {
-  //   const otherUser = chat.users.find((user) => user._id !== loggedInUserId);
-  //   const unreadMessages = chat.messages.filter(
-  //     (message) =>
-  //       message.sender?._id === otherUser?._id && // Messages sent by the other user
-  //       message.receiver === loggedInUserId && // Messages received by the logged-in user
-  //       !message.read // Messages that are unread
-  //   );
-  //   return unreadMessages.length;
-  // };
+
+  // Load chats from localStorage on initial render
+  useEffect(() => {
+    const storedChats = localStorage.getItem("chats");
+    if (storedChats) {
+      setLocalChats(JSON.parse(storedChats));
+    }
+  }, []);
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(
     null
   ); // Timer for long press
@@ -98,11 +104,16 @@ const AllChats = () => {
   }, [longPressTimer]);
   const { setIsOpen, updateUnreadCount, unreadCounts } = useStore();
   const [searchQuery, setSearchQuery] = useState(""); // State for search query
-  const [searchAddChat, setSearchAddChat] = useState(""); // State for search query
   const [isSearchVisible, setIsSearchVisible] = useState(false); // State to toggle search input
 
   const [isAddChat, setIsAddChat] = useState(false); // State to toggle search input
-
+  const {
+    allFiltedUsers,
+    handleAddChat,
+    isAddingChat,
+    searchAddChat,
+    setSearchAddChat,
+  } = useAddChat(chats);
   const handleChatClick = async (chatId: string, otherUserId: string) => {
     const response = await fetch("/api/chat/readmessages", {
       method: "POST",
@@ -124,7 +135,7 @@ const AllChats = () => {
     { users: UserProps[]; _id: string; messages: MessageProps[] }
   >();
 
-  chats?.forEach(
+  localChats?.forEach(
     (chat: { users: UserProps[]; _id: string; messages: MessageProps[] }) => {
       const otherUser = chat.users.find((user) => user._id !== loggedInUserId);
       if (otherUser && !uniqueChatsMap.has(otherUser._id as string)) {
@@ -141,71 +152,71 @@ const AllChats = () => {
     );
   });
 
-  // Filter users for the "Add Chat" modal
-  const filteredUsers = users?.users?.filter((user: UserProps) => {
-    // Exclude the current user
-    if (user?._id === loggedInUserId) return false;
+  // // Filter users for the "Add Chat" modal
+  // const filteredUsers = users?.users?.filter((user: UserProps) => {
+  //   // Exclude the current user
+  //   if (user?._id === loggedInUserId) return false;
 
-    // Exclude users already in the chat list
-    const isUserInChat = chats?.some((chat: { users: UserProps[] }) =>
-      chat?.users.some((u) => u._id === user._id)
-    );
-    if (isUserInChat) return false;
+  //   // Exclude users already in the chat list
+  //   const isUserInChat = chats?.some((chat: { users: UserProps[] }) =>
+  //     chat?.users.some((u) => u._id === user._id)
+  //   );
+  //   if (isUserInChat) return false;
 
-    // If the current user is a musician
-    if (myuser?.isMusician) {
-      return true && user?.refferences?.includes(user?._id as string);
-    }
+  //   // If the current user is a musician
+  //   if (myuser?.isMusician) {
+  //     return true && user?.refferences?.includes(user?._id as string);
+  //   }
 
-    // If the current user is a client
-    if (myuser.isClient) {
-      return true; // Show all musicians
-      // Show only clients who are in the current user's references
-    }
+  //   // If the current user is a client
+  //   if (myuser.isClient) {
+  //     return true; // Show all musicians
+  //     // Show only clients who are in the current user's references
+  //   }
 
-    return false;
-  });
-  const allFiltedUsers = () => {
-    const newData =
-      filteredUsers &&
-      filteredUsers?.filter((user: UserProps) => {
-        if (
-          user?.firstname?.toLowerCase().includes(searchAddChat.toLowerCase())
-        ) {
-          return true; // Show all clients who are in the current user's references
-        }
-      });
-    return newData;
-  };
-  const [isAddingChat, setIsAddingChat] = useState(false);
+  //   return false;
+  // });
+  // const allFiltedUsers = () => {
+  //   const newData =
+  //     filteredUsers &&
+  //     filteredUsers?.filter((user: UserProps) => {
+  //       if (
+  //         user?.firstname?.toLowerCase().includes(searchAddChat.toLowerCase())
+  //       ) {
+  //         return true; // Show all clients who are in the current user's references
+  //       }
+  //     });
+  //   return newData;
+  // };
+  // const [isAddingChat, setIsAddingChat] = useState(false);
 
-  const handleAddChat = async (otherUserId: string) => {
-    setIsAddingChat(true);
-    try {
-      const response = await fetch("/api/chat/createchat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ users: [loggedInUserId, otherUserId] }),
-      });
-      const { chatId } = await response.json();
-      console.log(chatId);
-      if (response.ok) {
-        if (chatId) {
-          router.push(`/chats/${chatId}?userId=${otherUserId}`);
-        } else {
-          console.log(chatId);
-        }
-      } else {
-        console.error("Failed to create chat");
-      }
-    } catch (error) {
-      console.error("Error creating chat:", error);
-    } finally {
-      setIsAddingChat(false);
-    }
-  };
+  // const handleAddChat = async (otherUserId: string) => {
+  //   setIsAddingChat(true);
+  //   try {
+  //     const response = await fetch("/api/chat/createchat", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ users: [loggedInUserId, otherUserId] }),
+  //     });
+  //     const { chatId } = await response.json();
+  //     console.log(chatId);
+  //     if (response.ok) {
+  //       if (chatId) {
+  //         router.push(`/chats/${chatId}?userId=${otherUserId}`);
+  //       } else {
+  //         console.log(chatId);
+  //       }
+  //     } else {
+  //       console.error("Failed to create chat");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error creating chat:", error);
+  //   } finally {
+  //     setIsAddingChat(false);
+  //   }
+  // };
   const LoadingSkeleton = () => (
     <div className="animate-pulse flex items-center p-3 space-x-4 mt-9">
       <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
@@ -271,7 +282,10 @@ const AllChats = () => {
           </h1>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setIsSearchVisible(true)}
+              onClick={() => {
+                console.log("true");
+                setIsSearchVisible(true);
+              }}
               className="p-2 hover:bg-[#0e6e5f] rounded-full transition-colors duration-200"
               aria-label="Search chats"
             >
@@ -398,14 +412,14 @@ const AllChats = () => {
             placeholder="Search chats..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full p-2 rounded-lg border border-gray-300 focus:outline-none focus:border-[#128C7E] text-gray-300 "
+            className="w-full p-2 rounded-lg border border-gray-300 focus:outline-none focus:border-[#128C7E] text-gray-500 "
           />
         </div>
       )}
       {/* Chat List */}
 
       <div className="flex-1 overflow-y-auto p-2 sm:p-4">
-        {filteredChats.length === 0 ? (
+        {filteredChats.length === 0 && searchAddChat ? (
           <div className="flex flex-col items-center justify-center h-full">
             <p className="text-gray-600 text-lg">No chats available</p>
             <button
@@ -415,7 +429,11 @@ const AllChats = () => {
               Start a new chat
             </button>
           </div>
-        ) : (
+        ) : filteredChats.length === 0 && !searchAddChat ? (
+          <div className="flex justify-center items-center h-full">
+            <p className="text-neutral-400">No results found </p>
+          </div>
+        ) : filteredChats.length > 0 ? (
           filteredChats.map(
             (
               chat: {
@@ -477,7 +495,7 @@ const AllChats = () => {
                     {chat.messages.length > 0 && (
                       <p
                         className={
-                          chat.messages[chat.messages.length - 1]?.read
+                          chat.messages[chat.messages.length - 1]?.read === true
                             ? "text-xs sm:text-sm text-gray-600 truncate"
                             : "text-md font-bold text-gray-800 truncate"
                         }
@@ -486,14 +504,12 @@ const AllChats = () => {
                       </p>
                     )}
                   </div>
-
                   {/* Unread Message Count */}
                   {unreadCount > 0 && (
                     <div className="ml-auto bg-[#128C7E] text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold hover:bg-[#0e6e5f] active:scale-95 transition-all duration-200 animate-pulse">
                       {unreadCount}
                     </div>
                   )}
-
                   {/* Delete Button (Visible on Long Press) */}
                   {selectedChatId === chat._id && (
                     <button
@@ -508,6 +524,8 @@ const AllChats = () => {
               );
             }
           )
+        ) : (
+          ""
         )}
       </div>
 
