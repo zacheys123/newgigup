@@ -151,6 +151,18 @@ const ChatPage = () => {
   const closeProfileModal = () => {
     setIsProfileModalOpen(false);
   };
+  const clearChat = async () => {
+    try {
+      await fetch(`/api/chat/clearmessages?chatId=${chatId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+      });
+      fetchMessages(chatId); // Refetch messages to update the UI
+      console.log("Chat cleared");
+    } catch (error) {
+      console.error("Failed to clear chat", error);
+    }
+  };
 
   if (loading) {
     return (
@@ -226,7 +238,10 @@ const ChatPage = () => {
               <button className="block w-full px-4 py-2 text-left hover:bg-gray-100 title ">
                 Block User
               </button>
-              <button className="block w-full px-4 py-2 text-left hover:bg-gray-100 title ">
+              <button
+                className="block w-full px-4 py-2 text-left hover:bg-gray-100 title "
+                onClick={clearChat}
+              >
                 Clear Chat
               </button>
             </div>
