@@ -3,17 +3,20 @@ import { GigProps } from "@/types/giginterface";
 import { initialState, StoreState } from "@/types/storeinterface";
 import { Review, UserProps } from "@/types/userinterfaces";
 import { create } from "zustand"; // Import SetState
+// import { unstable_batchedUpdates } from "react-dom";
 
-const loadClearedChats = (): string[] => {
-  if (typeof window !== "undefined") {
-    const storedClearedChats = localStorage.getItem("clearedChats");
-    return storedClearedChats ? JSON.parse(storedClearedChats) : [];
-  }
-  return [];
-};
+// const isDuplicateMessage = (
+//   messages: MessageProps[],
+//   newMessage: MessageProps
+// ) => {
+//   return messages.some(
+//     (msg) => msg._id === newMessage._id || msg.tempId === newMessage.tempId
+//   );
+// };
+
 const useStore = create<StoreState>((set) => ({
   ...initialState,
-  clearedChats: loadClearedChats(),
+
   setShowUpload: () =>
     set((state: StoreState) => ({ showUpload: !state.showUpload })),
   setIsOpen: (data: boolean) => set(() => ({ isOpen: data })),
@@ -54,19 +57,10 @@ const useStore = create<StoreState>((set) => ({
     set((state: StoreState) => ({
       chats: { ...state.chats, [chat.chatId]: chat },
     })),
-  // Function to clear a chat
-  clearChat: (chatId) =>
-    set((state) => {
-      const updatedClearedChats = [...state.clearedChats, chatId];
-      // Save to localStorage
-      if (typeof window !== "undefined") {
-        localStorage.setItem(
-          "clearedChats",
-          JSON.stringify(updatedClearedChats)
-        );
-      }
-      return { clearedChats: updatedClearedChats };
-    }),
+  // clearChat: (chatId) =>
+  //   set((state) => ({
+  //     clearedChats: [...state.clearedChats, chatId],
+  //   })),
   // addMessage: (newMessage) => {
   //   set((state: StoreState) => {
   //     // Check if message already exists
@@ -82,9 +76,8 @@ const useStore = create<StoreState>((set) => ({
   // },
   fetchMessages: async (chatId: string) => {
     try {
-      if (!chatId) return;
       const res = await fetch(`/api/chat/getmessages?chatId=${chatId}`);
-      if (!res.ok) console.log("Failed to fetch messages");
+      if (!res.ok) throw new Error("Failed to fetch messages");
 
       const { messages } = await res.json();
       set((state: StoreState) => ({
