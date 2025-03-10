@@ -61,7 +61,7 @@ export function useBookGig() {
         setRefetchGig(true);
 
         // Navigate the user if necessary
-        router.replace(`/execute/${gig?._id}`);
+        router.push(`/execute/${gig?._id}`);
       } else {
         toast.error(data.message || "Error occurred");
         router.replace(`/gigs/${userId}`);

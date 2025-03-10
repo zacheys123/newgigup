@@ -490,7 +490,6 @@ const AllChats = () => {
                           </div>
                         )}
                       </div>
-
                       {/* Chat Details */}
                       <div className="flex-1 ml-3 sm:ml-4">
                         <p className="text-sm sm:text-md font-semibold text-gray-800">
