@@ -23,6 +23,7 @@ const BookingPage = () => {
   const { socket } = useSocket();
   const forget = () =>
     forgetBookings(user?._id as string, currentgig, userId as string);
+  console.log(currentgig?.bookCount);
   useEffect(() => {
     if (currentgig?.isTaken === true) {
       router.push(`/gigs/${userId}`);
@@ -32,6 +33,8 @@ const BookingPage = () => {
       currentgig?.isTaken === false
     ) {
       return;
+    }
+    if (currentgig?.bookCount?.some((myuser) => myuser._id !== user?._id)) {
     }
   }, [currentgig?.isTaken, currentgig?.isPending]);
   const postedByUser = currentgig?.postedBy;

@@ -17,7 +17,7 @@ const Modal: React.FC<ModalProps> = ({ onClose, modal, user, onOpenX }) => (
     initial={{ scale: 0.8, opacity: 0 }}
     animate={{ scale: 1, opacity: 1 }}
     transition={{ duration: 0.3 }}
-    className=" rounded-lg p-6 shadow-lg max-w-md w-full text-white relative h-[100%] justify-center items-center"
+    className=" rounded-lg p-6 shadow-lg max-w-md w-full text-white relative flex  h-[100%] justify-center items-center"
   >
     <div className="h-[70%] ">
       <h2 className="text-xl font-bold mb-4">
@@ -34,22 +34,24 @@ const Modal: React.FC<ModalProps> = ({ onClose, modal, user, onOpenX }) => (
               <header className="my-3">{`${modal?.user?.firstname}'s Videos`}</header>
             )}
             {modal?.user?.videosProfile.length > 0 ? (
-              <div className="overflow-y-scroll h-full">
+              <div className="overflow-y-scroll h-full ">
                 {modal?.user?.videosProfile.map((video: VideoProfileProps) => (
                   <video
                     src={video?.url}
                     key={video?._id}
                     controls
-                    className="w-full h-full object-cover my-3 shadow-md shadow-yellow-800"
+                    className="w-full h-full object-cover my-3 shadow-md shadow-yellow-800 "
                   />
                 ))}
               </div>
             ) : (
-              <p className="text-center text-gray-400">
-                {modal?.user?.videosProfile?.length === 0
-                  ? "No videos found"
-                  : ""}
-              </p>
+              <div className="flex  h-[100%] justify-center items-center">
+                <p className="text-center text-gray-400">
+                  {modal?.user?.videosProfile?.length === 0
+                    ? "No videos found"
+                    : ""}
+                </p>
+              </div>
             )}
           </section>
         )}
