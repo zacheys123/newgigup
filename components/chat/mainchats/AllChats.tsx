@@ -8,7 +8,6 @@ import { useRouter } from "next/navigation";
 import useSWR, { mutate } from "swr";
 import { useEffect, useState } from "react"; // Import useState
 import { FaSearch, FaArrowLeft, FaUserPlus, FaTrash } from "react-icons/fa"; // Import icons for search and back
-import { useAllUsers } from "@/hooks/useAllUsers";
 import BallLoader from "@/components/loaders/BallLoader";
 import { colors, fonts } from "@/utils";
 import useStore from "@/app/zustand/useStore";
@@ -19,10 +18,10 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 const AllChats = () => {
   const { userId } = useAuth();
   const { user: myuser } = useCurrentUser(userId || null);
-  const { users } = useAllUsers();
+
   const router = useRouter();
   const loggedInUserId = myuser?._id;
-  console.log(users);
+  console.log(myuser);
   // Use localStorage to store and retrieve chats
   const [localChats, setLocalChats] = useState<
     { users: UserProps[]; _id: string; messages: MessageProps[] }[]
@@ -93,7 +92,7 @@ const AllChats = () => {
       setSelectedChatId(null); // Reset the selected chat ID
     }
   };
-
+  console.log(myuser);
   // Add a cleanup effect to clear the timer
   useEffect(() => {
     return () => {
@@ -152,71 +151,6 @@ const AllChats = () => {
     );
   });
 
-  // // Filter users for the "Add Chat" modal
-  // const filteredUsers = users?.users?.filter((user: UserProps) => {
-  //   // Exclude the current user
-  //   if (user?._id === loggedInUserId) return false;
-
-  //   // Exclude users already in the chat list
-  //   const isUserInChat = chats?.some((chat: { users: UserProps[] }) =>
-  //     chat?.users.some((u) => u._id === user._id)
-  //   );
-  //   if (isUserInChat) return false;
-
-  //   // If the current user is a musician
-  //   if (myuser?.isMusician) {
-  //     return true && user?.refferences?.includes(user?._id as string);
-  //   }
-
-  //   // If the current user is a client
-  //   if (myuser.isClient) {
-  //     return true; // Show all musicians
-  //     // Show only clients who are in the current user's references
-  //   }
-
-  //   return false;
-  // });
-  // const allFiltedUsers = () => {
-  //   const newData =
-  //     filteredUsers &&
-  //     filteredUsers?.filter((user: UserProps) => {
-  //       if (
-  //         user?.firstname?.toLowerCase().includes(searchAddChat.toLowerCase())
-  //       ) {
-  //         return true; // Show all clients who are in the current user's references
-  //       }
-  //     });
-  //   return newData;
-  // };
-  // const [isAddingChat, setIsAddingChat] = useState(false);
-
-  // const handleAddChat = async (otherUserId: string) => {
-  //   setIsAddingChat(true);
-  //   try {
-  //     const response = await fetch("/api/chat/createchat", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({ users: [loggedInUserId, otherUserId] }),
-  //     });
-  //     const { chatId } = await response.json();
-  //     console.log(chatId);
-  //     if (response.ok) {
-  //       if (chatId) {
-  //         router.push(`/chats/${chatId}?userId=${otherUserId}`);
-  //       } else {
-  //         console.log(chatId);
-  //       }
-  //     } else {
-  //       console.error("Failed to create chat");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error creating chat:", error);
-  //   } finally {
-  //     setIsAddingChat(false);
-  //   }
-  // };
   const LoadingSkeleton = () => (
     <div className="animate-pulse flex items-center p-3 space-x-4 mt-9">
       <div className="w-10 h-10 bg-gray-300 rounded-full"></div>

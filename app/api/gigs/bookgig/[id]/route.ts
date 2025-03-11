@@ -67,7 +67,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({
         gigstatus: true,
         message:
-          "Booked the gig successfully, wait for confirmationfrom client...",
+          "Booked the gig successfully, wait for confirmation from client...",
         // data: updateUsersBookedByfield,
       });
     }

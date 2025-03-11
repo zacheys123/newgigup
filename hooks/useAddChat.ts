@@ -13,30 +13,40 @@ export const useAddChat = (chats: []) => {
   const [isAddingChat, setIsAddingChat] = useState(false);
   const router = useRouter();
   const loggedInUserId = myuser?._id;
-
   const filteredUsers = users?.users?.filter((user: UserProps) => {
-    // Exclude the current user
+    if (!myuser) return false; // Ensure current user exists
+
+    // 1. Exclude the current user
     if (user?._id === loggedInUserId) return false;
 
-    // Exclude users already in the chat list
+    // 2. Exclude users already in the chat list
     const isUserInChat = chats?.some((chat: { users: UserProps[] }) =>
       chat?.users.some((u) => u._id === user._id)
     );
     if (isUserInChat) return false;
 
-    // If the current user is a musician
+    // 3. If the current user is a musician
     if (myuser?.isMusician) {
-      return true && user?.refferences?.includes(user?._id as string);
+      return (
+        user?.isMusician || myuser?.refferences?.includes(user?._id as string)
+      );
     }
 
-    // If the current user is a client
-    if (myuser.isClient) {
-      return true; // Show all musicians
-      // Show only clients who are in the current user's references
+    // 4. If the current user is a client
+    if (myuser?.isClient) {
+      return (
+        user?.isMusician ||
+        users?.users?.some(
+          (musician) =>
+            musician.isMusician &&
+            musician.refferences?.includes(user?._id as string)
+        )
+      );
     }
 
     return false;
   });
+
   const allFiltedUsers = () => {
     const newData =
       filteredUsers &&

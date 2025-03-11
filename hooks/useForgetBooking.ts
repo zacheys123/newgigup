@@ -77,8 +77,8 @@ export function useBookMusician() {
       if (data.gigstatus === true) {
         console.log(data);
         toast.success(data.message);
-
-        router.push(`/gigs/${userId}`);
+        console.log(data);
+        // router.push(`/gigs/${userId}`);
         setLoading(false);
       } else {
         toast.error(data.message);
