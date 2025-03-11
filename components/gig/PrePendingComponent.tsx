@@ -248,7 +248,7 @@ const PrePendingComponent = () => {
                   />
                   <UserIcon
                     className="w-5 h-5 sm:w-6 sm:h-6 text-green-300 cursor-pointer hover:text-green-400 transition-transform transform hover:scale-110"
-                    onClick={() => router.push(`/profile`)}
+                    onClick={() => router.push(`/search/${myuser?.username}`)}
                   />
                   <VideoCameraIcon
                     className="w-5 h-5 sm:w-6 sm:h-6 text-red-400 cursor-pointer hover:text-red-500 transition-transform transform hover:scale-110"
@@ -262,7 +262,7 @@ const PrePendingComponent = () => {
       </motion.div>
       {/* Modal */}
       {modal && (
-        <div className="fixed inset-0 flex items-center justify-center  bg-opacity-50 backdrop-blur-[4px] w-[100%] mx-auto h-full -py-6">
+        <div className="fixed inset-0 flex items-center justify-center  bg-opacity-70 backdrop-blur-[12px] w-[100%] mx-auto h-full -py-6">
           <Modal
             onClose={() => setModal(null)}
             modal={modal}

@@ -9,10 +9,11 @@ interface ProfileModalProps {
 }
 
 const ChatModal: React.FC<ProfileModalProps> = ({ user, onClose }) => {
-  const [gigCount, setGigCount] = useState<number>(0);
+  const [musicianCount, setMusicianGigCount] = useState<number>(0);
+  const [clientGigCount, setClientGigCount] = useState<number>(0);
   const [rating, setRating] = useState<number>(0);
   const { gigs } = useAllGigs();
-
+  console.log(gigs);
   useEffect(() => {
     if (!user._id || !gigs?.gigs) return;
 
@@ -25,8 +26,11 @@ const ChatModal: React.FC<ProfileModalProps> = ({ user, onClose }) => {
     const count = gigs.gigs.filter(
       (gig) => gig[keyToCheck as keyof typeof gig] === user._id
     ).length;
-
-    setGigCount(count);
+    const clientCount = gigs.gigs.filter(
+      (gig) => gig.postedBy?._id === user._id
+    ).length;
+    setMusicianGigCount(count);
+    setClientGigCount(clientCount);
     setRating(calculateRating(count));
   }, [user._id, user.isMusician, gigs?.gigs, user?.isClient]); // Optimized dependencies
 
@@ -68,16 +72,23 @@ const ChatModal: React.FC<ProfileModalProps> = ({ user, onClose }) => {
                 {" "}
                 {user.isMusician ? "Musician" : user.isClient ? "Client" : ""}
               </p>
-              {user.isMusician
-                ? "Gigs Booked"
-                : user.isClient
-                ? "Gigs Posted"
-                : ""}
-              : {gigCount}
+              {user.isMusician ? (
+                <>Gigs Booked: {musicianCount}</>
+              ) : user.isClient ? (
+                <>Gigs Posted: {clientGigCount}</>
+              ) : (
+                ""
+              )}
             </div>
-            <div className="text-gray-700 flex">
-              Rating: <StarRating rating={rating} />
-            </div>
+            {user.isMusician ? (
+              <div className="text-gray-700 flex">
+                Rating: <StarRating rating={rating} />
+              </div>
+            ) : user.isClient ? (
+              ""
+            ) : (
+              ""
+            )}
           </div>
         </div>
       </div>

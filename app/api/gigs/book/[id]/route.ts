@@ -57,5 +57,9 @@ export async function PUT(req: NextRequest) {
     });
   } catch (error) {
     console.log(error);
+    return NextResponse.json({
+      gigstatus: true,
+      message: "Filure to select musician" + error,
+    });
   }
 }

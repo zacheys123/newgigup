@@ -81,7 +81,7 @@ const FellowMusicians = ({ user, allUsers }) => {
     >
       <div className="inline-flex flex-shrink-0 scroll-smooth ">
         {myUsers
-          .filter((userd) => userd?.instrument?.length > 0)
+          .filter((userd) => userd?.instrument?.length > 0 && userd?.isClient)
           .map((otheruser) => {
             return (
               <ProfileComponent

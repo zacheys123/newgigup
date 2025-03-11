@@ -165,6 +165,9 @@ const ChatPage = () => {
     }
   };
 
+  useEffect(() => {
+    setIsProfileModalOpen(true);
+  }, []);
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -185,6 +188,9 @@ const ChatPage = () => {
     <div
       className="h-screen flex flex-col bg-[#f0f2f5] pt-[65px] pb-[60px] "
       onClick={() => {
+        if (isProfileModalOpen === true) {
+          setIsProfileModalOpen(false);
+        }
         setIsMenuOpen(false);
         setIsOpen(false);
       }}
