@@ -51,7 +51,7 @@ const Modal: React.FC<ModalProps> = ({ onClose, modal, user, onOpenX }) => (
 
     <button
       onClick={onClose}
-      className="absolute top-2 right-2 text-gray-400 hover:text-white transition-all"
+      className="absolute top-8 right-12 text-gray-200 hover:text-white transition-all"
     >
       ✕
     </button>
