@@ -1,7 +1,8 @@
 import connectDb from "@/lib/connectDb";
-import Gigs from "@/models/gigs";
+import Gig from "@/models/gigs";
 import User from "@/models/user";
 import { getAuth } from "@clerk/nextjs/server";
+import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function PUT(req: NextRequest) {
@@ -16,9 +17,12 @@ export async function PUT(req: NextRequest) {
   try {
     await connectDb();
 
-    const gig = await Gigs.findById(id)
-      .populate("bookedBy", User)
-      .populate("postedBy", User);
+    const gig = await Gig.findById({ _id: id }).populate({
+      path: "postedBy bookedBy",
+      model: User,
+    });
+    // .populate("bookedBy", User)
+    // .populate("postedBy", User);
 
     if (!gig) {
       return NextResponse.json({ message: "Gig not found" }, { status: 404 });
@@ -28,24 +32,31 @@ export async function PUT(req: NextRequest) {
       isTaken: true,
       bookedBy: musicianId,
       bookCount: [],
+      isPending: false,
     };
 
-    await gig.updateOne({ $set: updateGig }, { new: true });
-
-    if (gig.bookedBy?.refferences.includes(gig.postedBy?._id)) {
+    if (
+      gig?.bookedBy &&
+      gig.bookedBy?.refferences.includes(gig.postedBy?._id)
+    ) {
+      await gig.updateOne({ $set: updateGig }, { new: true });
       return NextResponse.json({
         gigstatus: true,
         message: "Booked successfully",
+        gig: gig,
       });
     } else {
+      await gig.updateOne({ $set: updateGig }, { new: true });
       await User.findByIdAndUpdate(
         musicianId,
         { $push: { refferences: gig.postedBy?._id } },
         { new: true }
       );
+
       return NextResponse.json({
         gigstatus: true,
         message: "Selected the Musician/Band successfully",
+        gig: gig,
       });
     }
   } catch (error) {

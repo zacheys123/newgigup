@@ -90,7 +90,6 @@ const PrePendingComponent = () => {
         });
       }
       setShowConfirmation(false);
-      toast.success("Musician booked successfully!");
     } else {
       toast.error("No booking ID selected.");
     }

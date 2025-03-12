@@ -54,8 +54,9 @@ export async function GET(req: NextRequest) {
       bio,
       handles,
       genre,
+      refferences,
     } = await User.findOne(query).populate({
-      path: "allreviews myreviews",
+      path: "allreviews myreviews refferences",
       model: Gig,
     });
 
@@ -89,6 +90,7 @@ export async function GET(req: NextRequest) {
       bio,
       handles,
       genre,
+      refferences,
     });
   } catch (error) {
     console.error("Error fetching user:", error);

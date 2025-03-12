@@ -26,7 +26,11 @@ export async function PUT(req: NextRequest) {
       model: User,
     });
 
-    if (newGig?.bookCount.length > 3 || newGig?.postedBy?.equals(userid)) {
+    if (
+      newGig?.bookCount.length > 3 ||
+      newGig?.postedBy?.equals(userid) ||
+      newGig?.bookCount?.includes(userid)
+    ) {
       return NextResponse.json({
         gigstatus: "false",
         message: "Cannot Book this Gig,already booked? ",

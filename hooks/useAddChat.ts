@@ -59,7 +59,7 @@ export const useAddChat = (chats: []) => {
       });
     return newData;
   };
-
+  console.log(myuser);
   const handleAddChat = async (otherUserId: string) => {
     setIsAddingChat(true);
     try {
