@@ -151,7 +151,7 @@ const ChatModal: React.FC<ProfileModalProps> = ({ user, onClose }) => {
               )}
             </div>
             {user.isMusician ? (
-              <div className="text-gray-700 flex">
+              <div className="text-gray-500 flex">
                 Rating: <StarRating rating={rating} />
               </div>
             ) : user?.isClient ? (
