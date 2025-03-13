@@ -1,6 +1,8 @@
 "use client";
 import useStore from "@/app/zustand/useStore";
 import ChatModal from "@/components/chat/mainchats/ChatModal";
+import RefferenceModal from "@/components/chat/mainchats/RefferenceModal";
+import SlideUpModal from "@/components/modals/SlideUpModal";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import useSocket from "@/hooks/useSocket";
 import { MessageProps } from "@/types/chatinterfaces";
@@ -36,6 +38,7 @@ const ChatPage = () => {
     sendMessage,
     onlineUsers,
     setIsOpen,
+    refferenceModalOpen,
   } = useStore();
 
   const { socket } = useSocket();
@@ -151,6 +154,7 @@ const ChatPage = () => {
   const closeProfileModal = () => {
     setIsProfileModalOpen(false);
   };
+
   const clearChat = async () => {
     try {
       await fetch(`/api/chat/clearmessages?chatId=${chatId}`, {
@@ -346,7 +350,14 @@ const ChatPage = () => {
         </form>
         {/* Profile Modal */}
         {isProfileModalOpen && otherUser && (
-          <ChatModal user={otherUser} onClose={closeProfileModal} />
+          <SlideUpModal>
+            <ChatModal user={otherUser} onClose={closeProfileModal} />
+          </SlideUpModal>
+        )}
+        {refferenceModalOpen && otherUser && (
+          <SlideUpModal>
+            <RefferenceModal user={otherUser} />
+          </SlideUpModal>
         )}
       </div>
     </div>

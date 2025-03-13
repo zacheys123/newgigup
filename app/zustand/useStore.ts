@@ -16,7 +16,8 @@ import { create } from "zustand"; // Import SetState
 
 const useStore = create<StoreState>((set) => ({
   ...initialState,
-
+  setRefferenceModalOpen: (data: boolean) =>
+    set(() => ({ refferenceModalOpen: data })),
   setShowUpload: () =>
     set((state: StoreState) => ({ showUpload: !state.showUpload })),
   setIsOpen: (data: boolean) => set(() => ({ isOpen: data })),

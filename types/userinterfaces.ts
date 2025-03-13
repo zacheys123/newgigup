@@ -59,7 +59,7 @@ export interface UserProps {
   bio: string;
   handles: string;
   genre: string;
-  refferences: string[];
+  refferences: UserProps[];
 }
 export interface Users {
   users: UserProps[]; // Optional}

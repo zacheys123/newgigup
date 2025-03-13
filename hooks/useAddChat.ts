@@ -13,52 +13,73 @@ export const useAddChat = (chats: []) => {
   const [isAddingChat, setIsAddingChat] = useState(false);
   const router = useRouter();
   const loggedInUserId = myuser?._id;
+  console.log(myuser?.refferences);
   const filteredUsers = users?.users?.filter((user: UserProps) => {
-    if (!myuser) return false; // Ensure current user exists
+    if (!myuser) return false; // Ensure the current user exists
 
-    // 1. Exclude the current user
+    // Exclude the logged-in user
     if (user?._id === loggedInUserId) return false;
 
-    // 2. Exclude users already in the chat list
+    // Exclude users already in the chat list
     const isUserInChat = chats?.some((chat: { users: UserProps[] }) =>
       chat?.users.some((u) => u._id === user._id)
     );
     if (isUserInChat) return false;
 
-    // 3. If the current user is a musician
     if (myuser?.isMusician) {
+      // Show all musicians and referenced users
       return (
-        user?.isMusician || myuser?.refferences?.includes(user?._id as string)
+        user.isMusician || myuser.refferences?.includes(user._id as string)
       );
     }
-
-    // 4. If the current user is a client
     if (myuser?.isClient) {
+      // Show all musicians and users in references of any musician
       return (
-        user?.isMusician ||
+        user.isMusician ||
         users?.users?.some(
           (musician) =>
             musician.isMusician &&
-            musician.refferences?.includes(user?._id as string)
+            musician.refferences?.includes(user._id as string)
         )
       );
     }
-
     return false;
   });
 
+  // Fetch users from `myuser.refferences`
+
+  // Merge both lists & remove duplicates
+  // const allFilteredUsers = [
+  //   ...filteredUsers,
+  //   ...referencedUsers.filter(
+  //     (user) => !filteredUsers.some((u) => u._id === user._id)
+  //   ),
+  // ];
+
+  // const allFiltedUsers = () => {
+  //   const newData =
+  //     filteredUsers &&
+  //     filteredUsers?.filter((user: UserProps) => {
+  //       if (
+  //         user?.firstname?.toLowerCase().includes(searchAddChat.toLowerCase())
+  //       ) {
+  //         return true; // Show all clients who are in the current user's references
+  //       }
+  //     });
+  //   return newData;
+  // };
   const allFiltedUsers = () => {
-    const newData =
-      filteredUsers &&
-      filteredUsers?.filter((user: UserProps) => {
-        if (
-          user?.firstname?.toLowerCase().includes(searchAddChat.toLowerCase())
-        ) {
-          return true; // Show all clients who are in the current user's references
-        }
-      });
-    return newData;
+    const mergedUsers = [...new Set(filteredUsers)];
+
+    if (searchAddChat.trim() !== "") {
+      return mergedUsers.filter((user) =>
+        user?.firstname?.toLowerCase().includes(searchAddChat.toLowerCase())
+      );
+    }
+
+    return mergedUsers;
   };
+
   console.log(myuser);
   const handleAddChat = async (otherUserId: string) => {
     setIsAddingChat(true);

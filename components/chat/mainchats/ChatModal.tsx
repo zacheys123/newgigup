@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { UserProps } from "@/types/userinterfaces";
 import { useAllGigs } from "@/hooks/useAllGigs";
 import Image from "next/image";
+import { User } from "lucide-react";
+import { fonts } from "@/utils";
+import useStore from "@/app/zustand/useStore";
 
 interface ProfileModalProps {
   user: UserProps;
@@ -13,69 +16,136 @@ const ChatModal: React.FC<ProfileModalProps> = ({ user, onClose }) => {
   const [clientGigCount, setClientGigCount] = useState<number>(0);
   const [rating, setRating] = useState<number>(0);
   const { gigs } = useAllGigs();
-  console.log(gigs);
+  const { setRefferenceModalOpen } = useStore();
+  // useEffect(() => {
+  //   if (!user._id || !gigs?.gigs) return;
+
+  //   // const keyToCheck = user.isMusician
+  //   //   ? "bookedBy"
+  //   //   : user.isClient
+  //   //   ? "postedBy"
+  //   //   : ""; // Dynamically set key
+
+  //   const count = gigs.gigs.filter(
+  //     (gig) => gig?.bookedBy?._id === user._id
+  //   ).length;
+  //   const clientCount = gigs.gigs.filter(
+  //     (gig) => gig.postedBy?._id === user._id
+  //   ).length;
+  //   setMusicianGigCount(count);
+  //   setClientGigCount(clientCount);
+  //   setRating(calculateRating(count));
+  // }, [user._id, user.isMusician, gigs?.gigs, user?.isClient]); // Optimized dependencies
+
+  // const calculateRating = (count: number): number => {
+  //   if (count >= 10) return 5;
+  //   if (count >= 7) return 4;
+  //   if (count >= 4) return 3;
+  //   if (count >= 1) return 2;
+  //   if (count === 1) return 1;
+  //   return 0;
+  // };
+  const calculateRating = (
+    reviews: { rating: number }[],
+    gigCount: number
+  ): number => {
+    if (!reviews || reviews.length === 0) return 0; // No reviews = 0 rating
+
+    // Average review rating
+    const avgReviewRating =
+      reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+
+    // Experience factor: More gigs make higher ratings possible
+    const experienceFactor = Math.log10(gigCount + 1) * 1.5; // Logarithmic scale, harder to reach 5
+
+    // Final calculated rating
+    const finalRating = Math.min(
+      5,
+      avgReviewRating * 0.7 + experienceFactor * 0.3
+    );
+
+    return Math.round(finalRating * 10) / 10; // Round to 1 decimal place
+  };
+
   useEffect(() => {
     if (!user._id || !gigs?.gigs) return;
 
-    const keyToCheck = user.isMusician
-      ? "bookedBy"
-      : user.isClient
-      ? "postedBy"
-      : ""; // Dynamically set key
-
-    const count = gigs.gigs.filter(
-      (gig) => gig[keyToCheck as keyof typeof gig] === user._id
+    const bookedGigs = gigs.gigs.filter(
+      (gig) => gig?.bookedBy?._id === user._id
     ).length;
-    const clientCount = gigs.gigs.filter(
-      (gig) => gig.postedBy?._id === user._id
+    const postedGigs = gigs.gigs.filter(
+      (gig) => gig?.postedBy?._id === user._id
     ).length;
-    setMusicianGigCount(count);
-    setClientGigCount(clientCount);
-    setRating(calculateRating(count));
-  }, [user._id, user.isMusician, gigs?.gigs, user?.isClient]); // Optimized dependencies
 
-  const calculateRating = (count: number): number => {
-    if (count >= 10) return 5;
-    if (count >= 7) return 4;
-    if (count >= 4) return 3;
-    if (count >= 1) return 2;
-    if (count === 1) return 1;
-    return 0;
-  };
+    setMusicianGigCount(bookedGigs);
+    setClientGigCount(postedGigs);
 
+    if (user.isMusician) {
+      setRating(calculateRating(user.allreviews || [], bookedGigs));
+    }
+  }, [user._id, user.isMusician, gigs?.gigs, user.allreviews]);
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center">
-      <div className="bg-white w-full max-w-md rounded-t-lg p-6 relative slide-up">
-        <button
-          onClick={onClose}
-          className="absolute top-2 right-2 text-gray-500"
-        >
-          &times;
-        </button>
-        <div className="text-center">
-          {user.picture && (
-            <Image
-              src={user.picture}
-              alt={user.firstname as string}
-              className="w-24 h-24 rounded-full mx-auto"
-              width={80}
-              height={80}
-            />
-          )}
-          <h2 className="text-xl font-semibold mt-4">
-            {user.firstname} {user.lastname}
-          </h2>
-          <p className="text-gray-600">{user.email}</p>
-          <div className="mt-4">
+    <div className="bg-neutral-800 w-full max-w-md rounded-t-lg p-6 relative slide-up rounded-tl-[50px] rounded-tr-[50px]">
+      <div
+        className="absolute rounded-full bg-amber-300 h-[35px] w-[35px] right-5 top-24 animate-bounce flex justify-center items-center"
+        onClick={() => {
+          onClose();
+          setRefferenceModalOpen(true);
+        }}
+      >
+        {user.picture && (
+          // <Image
+          //   src={user.picture}
+          //   alt={user.firstname as string}
+          //   className="w-[35px] h-[35px] rounded-full mx-auto"
+          //   width={35}
+          //   height={35}
+          // />
+          <User />
+        )}
+      </div>
+      <button
+        onClick={onClose}
+        className="absolute top-2 right-12 text-gray-300"
+      >
+        &times;
+      </button>
+      <div className="text-center">
+        {user.picture && (
+          <Image
+            src={user.picture}
+            alt={user.firstname as string}
+            className="w-24 h-24 rounded-full mx-auto"
+            width={80}
+            height={80}
+          />
+        )}
+        <h2 className="text-xl font-semibold mt-4 text-neutral-300">
+          {user.firstname} {user.lastname}
+        </h2>
+        <p className=" title text-neutral-400">{user.email}</p>
+        <div className="mt-4 flex justify-between items-center">
+          <>
+            {" "}
             <div className="text-gray-700">
               <p className="text-neutral-400">
                 {" "}
                 {user.isMusician ? "Musician" : user.isClient ? "Client" : ""}
               </p>
               {user.isMusician ? (
-                <>Gigs Booked: {musicianCount}</>
+                <p
+                  className="text-neutral-400 text-[11px]"
+                  style={{ fontFamily: fonts[30] }}
+                >
+                  Gigs Booked: {musicianCount}
+                </p>
               ) : user.isClient ? (
-                <>Gigs Posted: {clientGigCount}</>
+                <p
+                  className="text-neutral-400 text-[11px]"
+                  style={{ fontFamily: fonts[30] }}
+                >
+                  Gigs Posted: {clientGigCount}
+                </p>
               ) : (
                 ""
               )}
@@ -84,12 +154,17 @@ const ChatModal: React.FC<ProfileModalProps> = ({ user, onClose }) => {
               <div className="text-gray-700 flex">
                 Rating: <StarRating rating={rating} />
               </div>
-            ) : user.isClient ? (
-              ""
+            ) : user?.isClient ? (
+              <p
+                className="text-neutral-400 title"
+                style={{ fontFamily: fonts[217] }}
+              >
+                no rating
+              </p>
             ) : (
               ""
             )}
-          </div>
+          </>
         </div>
       </div>
     </div>
