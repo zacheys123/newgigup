@@ -112,6 +112,7 @@ export interface StoreState {
   setFollow: (data: boolean) => void;
   setRefferenceModalOpen: (data: boolean) => void;
   setCurrentGig: (data: Partial<GigProps>) => void;
+  setCurrentUser: (data: Partial<UserProps>) => void;
   setSearchQuery: (data: string) => void;
   setModalVisible: (data: boolean) => void;
   setDrawerVisible: () => void;
