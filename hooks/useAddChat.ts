@@ -28,19 +28,12 @@ export const useAddChat = (chats: []) => {
 
     if (myuser?.isMusician) {
       // Show all musicians and referenced users
-      return (
-        user.isMusician || myuser.refferences?.includes(user._id as string)
-      );
+      return user.isMusician;
     }
     if (myuser?.isClient) {
       // Show all musicians and users in references of any musician
       return (
-        user.isMusician ||
-        users?.users?.some(
-          (musician) =>
-            musician.isMusician &&
-            musician.refferences?.includes(user._id as string)
-        )
+        user.isMusician || users?.users?.some((musician) => musician.isMusician)
       );
     }
     return false;
