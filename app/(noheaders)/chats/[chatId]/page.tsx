@@ -1,12 +1,13 @@
 "use client";
 import useStore from "@/app/zustand/useStore";
 import ChatModal from "@/components/chat/mainchats/ChatModal";
-import RefferenceModal from "@/components/chat/mainchats/RefferenceModal";
+import RefferenceModal from "@/components/modals/RefferenceModal";
+import ReviewModal from "@/components/modals/ReviewModal";
 import SlideUpModal from "@/components/modals/SlideUpModal";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import useSocket from "@/hooks/useSocket";
 import { MessageProps } from "@/types/chatinterfaces";
-import { UserProps } from "@/types/userinterfaces";
+import { Review, UserProps } from "@/types/userinterfaces";
 import { useAuth } from "@clerk/nextjs";
 import moment from "moment";
 import Image from "next/image";
@@ -39,8 +40,14 @@ const ChatPage = () => {
     onlineUsers,
     setIsOpen,
     refferenceModalOpen,
+    reviewModalOpen,
   } = useStore();
 
+  const [reviewprops, setReviewProps] = useState<Review[]>();
+
+  const getReviews = (childProps: Review[]) => {
+    setReviewProps(childProps);
+  };
   const { socket } = useSocket();
   // Ref for the chat container to enable auto-scrolling
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -356,7 +363,16 @@ const ChatPage = () => {
         )}
         {refferenceModalOpen && otherUser && (
           <SlideUpModal>
-            <RefferenceModal user={otherUser} />
+            <RefferenceModal user={otherUser} getReviews={getReviews} />
+          </SlideUpModal>
+        )}
+        {reviewModalOpen && otherUser && (
+          <SlideUpModal>
+            <ReviewModal
+              reviewdata={reviewprops || []}
+              user={otherUser}
+              postedBy={user}
+            />
           </SlideUpModal>
         )}
       </div>

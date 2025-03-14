@@ -72,12 +72,14 @@ export const initialState = {
   onlineUsers: [],
   isOpen: false,
   refferenceModalOpen: false,
+  reviewModalOpen: false,
 };
 interface OnlineUser {
   userId: string;
   socketId: string;
 }
 export interface StoreState {
+  reviewModalOpen: boolean;
   refferenceModalOpen: boolean;
   isOpen: boolean;
   search: boolean;
@@ -111,6 +113,7 @@ export interface StoreState {
   setSearch: (data: boolean) => void;
   setFollow: (data: boolean) => void;
   setRefferenceModalOpen: (data: boolean) => void;
+  setReviewModalOpen: (data: boolean) => void;
   setCurrentGig: (data: Partial<GigProps>) => void;
   setCurrentUser: (data: Partial<UserProps>) => void;
   setSearchQuery: (data: string) => void;

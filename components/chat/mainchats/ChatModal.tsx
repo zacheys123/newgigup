@@ -85,7 +85,13 @@ const ChatModal: React.FC<ProfileModalProps> = ({ user, onClose }) => {
     }
   }, [user._id, user.isMusician, gigs?.gigs, user.allreviews]);
   return (
-    <div className="bg-neutral-800 w-full max-w-md rounded-t-lg p-6 relative slide-up rounded-tl-[50px] rounded-tr-[50px]">
+    <div className="bg-neutral-800 w-full max-w-md rounded-t-lg p-6 relative slide-up rounded-tl-[50px] rounded-tr-[50px] min-h-[320px] pt-14">
+      <div className="w-full flex justify-center items-center flex-col absolute top-1">
+        <span className="bg-neutral-600 w-[70%] mx-auto h-[1px] mb-2 rounded-full "></span>
+
+        <span className="bg-neutral-600 w-[60%] mx-auto h-[1px] mb-2 rounded-full "></span>
+        <span className="bg-neutral-600 w-[50%] mx-auto h-[1px] mb-2 rounded-full "></span>
+      </div>
       <div
         className="absolute rounded-full bg-amber-300 h-[35px] w-[35px] right-5 top-24 animate-bounce flex justify-center items-center"
         onClick={() => {
@@ -106,7 +112,7 @@ const ChatModal: React.FC<ProfileModalProps> = ({ user, onClose }) => {
       </div>
       <button
         onClick={onClose}
-        className="absolute top-2 right-12 text-gray-300"
+        className="absolute top-2 right-6 text-gray-300"
       >
         &times;
       </button>
