@@ -5,6 +5,7 @@ import PagesNav from "@/components/pages/PagesNav";
 import { UserButton } from "@clerk/nextjs";
 import { Toaster } from "sonner";
 import { motion, useScroll } from "framer-motion";
+import { Box } from "@mui/material";
 
 export default function GigLayout({
   children,
@@ -48,7 +49,7 @@ export default function GigLayout({
       </motion.button>
 
       {/* Slide Down Container */}
-      <div
+      <Box
         className={`fixed top-0 left-0 right-0 z-40 transition-transform duration-500 ease-in-out ${
           isVisible ? "translate-y-0" : "-translate-y-full"
         }`}
@@ -57,7 +58,7 @@ export default function GigLayout({
           <MobileSheet />
           <UserButton />
         </div>
-      </div>
+      </Box>
 
       <Toaster
         position="top-right"
@@ -66,7 +67,7 @@ export default function GigLayout({
         }}
       />
       {/* Dimmed Background */}
-      <div
+      {/* <div
         className={`transition-opacity duration-500 bg-neutral-700 ${
           isVisible ? "opacity-20" : "opacity-100"
         }`}
@@ -74,16 +75,16 @@ export default function GigLayout({
           ev.stopPropagation();
           toggleVisibility(false);
         }}
-      >
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            duration: 3000,
-          }}
-        />
-        {children}
-        <PagesNav />
-      </div>
+      > */}
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+        }}
+      />
+      {children}
+      <PagesNav />
     </div>
+    // </div>
   );
 }
