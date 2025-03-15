@@ -19,14 +19,14 @@ export default function GigLayout({
   };
 
   return (
-    <div className="inset-0 backdrop-blur-xl bg-opacity-40 bg-black h-screen w-full overflow-hidden">
+    <div className="inset-0 backdrop-blur-xl  h-screen w-full overflow-hidden relative">
       {/* Subtle Fixed Action Button */}
       <motion.button
         onClick={(ev) => {
           ev.stopPropagation();
           toggleVisibility(true);
         }}
-        className="fixed bottom-[120px] right-6 bg-gray-800/50 text-white p-3 rounded-full shadow-sm hover:bg-gray-800/70 transition-all duration-200 z-50 animate-pulse bg-gradient-to-r from-red-400 to-blue-600"
+        className=" bottom-[120px] right-6 bg-gray-800/50 text-white p-3 rounded-full shadow-sm hover:bg-gray-800/70 transition-all duration-200 z-50 animate-pulse bg-gradient-to-r from-red-400 to-blue-600 z-100 absolute"
         initial={{ opacity: 0, scale: 0.6 }}
         animate={{ opacity: scrollYProgress.get() > 0.1 ? 1 : 0, scale: 1 }}
         transition={{ duration: 0.3 }}
