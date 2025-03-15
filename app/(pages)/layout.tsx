@@ -23,7 +23,7 @@ export default function GigLayout({
       <button
         onClick={(ev) => {
           ev.stopPropagation();
-          toggleVisibility(true);
+          toggleVisibility(!isVisible);
         }}
         className="fixed bottom-[120px] right-6 bg-gray-800/50 text-white p-3 rounded-full shadow-sm hover:bg-gray-800/70 transition-all duration-200 z-50 animate-pulse bg-gradient-to-r from-red-400 to-blue-600 z-100"
       >
