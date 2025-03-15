@@ -75,12 +75,14 @@ export const initialState = {
   reviewModalOpen: false,
   videoModalOpen: false,
   IsProfileModalOpen: false,
+  isDescriptionModal: false,
 };
 interface OnlineUser {
   userId: string;
   socketId: string;
 }
 export interface StoreState {
+  isDescriptionModal: boolean;
   IsProfileModalOpen: boolean;
   videoModalOpen: boolean;
   reviewModalOpen: boolean;
@@ -117,6 +119,7 @@ export interface StoreState {
   setSearch: (data: boolean) => void;
   setFollow: (data: boolean) => void;
   setRefferenceModalOpen: (data: boolean) => void;
+  setIsDescriptionModal: (data: boolean) => void;
   setReviewModalOpen: (data: boolean) => void;
   setIsProfileModalOpen: (data: boolean) => void;
   setVideoModalOpen: (data: boolean) => void;

@@ -35,16 +35,18 @@ interface AllGigsComponentProps {
 const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
   const { userId } = useAuth();
   const [loadingPostId, setLoadingPostId] = useState<string>("");
-  const [gigdesc, setGigdesc] = useState<boolean>(false);
-  const [open, setOpen] = useState<boolean>(false);
   const { socket } = useSocketContext();
   const { gigs } = useAllGigs() || { gigs: [] }; // Default to empty array if null or undefined
   const [showvideo, setShowVideo] = useState<boolean>(false);
-  const handleClose = () => {
-    setOpen(false);
-    console.log("close", gigdesc);
-  };
-  const { currentUser, showModal, setShowModal, setRefetchGig } = useStore();
+
+  const {
+    currentUser,
+    showModal,
+    setShowModal,
+    setRefetchGig,
+    setIsDescriptionModal,
+    isDescriptionModal,
+  } = useStore();
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
   const [bookCount, setBookCount] = useState(gig.bookCount.length || 0);
   const { bookGig, bookLoading } = useBookGig();
@@ -61,8 +63,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
         body: JSON.stringify({ userid: currentUser?._id }),
       });
       const data: FetchResponse = await res.json();
-      setOpen(true);
-      setGigdesc(true);
+      setIsDescriptionModal(true);
 
       console.log(data);
     } catch (error) {
@@ -142,9 +143,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
   }, [gig._id, socket]);
   return (
     <>
-      {gigdesc && (
-        <GigDescription gig={gig} open={open} handleClose={handleClose} />
-      )}
+      {isDescriptionModal && <GigDescription gig={gig} />}
       <section
         className={
           "flex flex-col rounded-md w-[95%] mx-auto shadow-md shadow-zinc-600 bg-zinc-900 py-5 h-[118px] mt-2 mb-3 px-3 first:mt-1"
