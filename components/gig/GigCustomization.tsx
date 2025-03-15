@@ -32,7 +32,7 @@ const GigCustomization: React.FC<GigCustomizationProps> = ({
     <div className="fixed inset-0 flex items-center z-50 justify-center bg-black  h-[900px] bg-opacity-70 backdrop-blur-md animate-fadeIn mt-[25px] w-[90%] mx-auto">
       <div className="bg-white/20 backdrop-blur-0 p-6 rounded-2xl shadow-xl w-[420px]  h-[900px] border border-white/30 transition-all animate-slideUp overflow-hidden">
         {/* Scrollable Content */}
-        <div className="overflow-y-auto max-h-[800px] pr-2 mt-[50px]">
+        <div className="overflow-y-auto max-h-[800px] pr-2 mt-[20px]">
           {/* Font Selection */}
           <div className="mb-4">
             <label className="block text-sm text-white mb-1">Font:</label>
@@ -226,7 +226,7 @@ const GigCustomization: React.FC<GigCustomizationProps> = ({
                         src={
                           logo
                             ? logo
-                            : "https://www.svgrepo.com/show/4460/calendar.svg"
+                            : "../../public/assets/png/logo-no-background.png"
                         }
                         className="h-[24px] w-[24px] rounded-full"
                         alt="C"
@@ -247,7 +247,7 @@ const GigCustomization: React.FC<GigCustomizationProps> = ({
             onClick={closeModal}
             className="px-4 py-2 bg-white/20 text-white rounded-lg border border-white/30 hover:bg-white/30 transition hover:scale-105 shadow-md"
           >
-            Close
+            Save
           </button>
         </div>
       </div>
