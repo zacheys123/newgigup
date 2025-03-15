@@ -5,7 +5,7 @@ import PagesNav from "@/components/pages/PagesNav";
 import { UserButton } from "@clerk/nextjs";
 import { Toaster } from "sonner";
 import { Box } from "@mui/material";
-
+import { HiMenuAlt3 } from "react-icons/hi";
 export default function GigLayout({
   children,
 }: Readonly<{
@@ -27,20 +27,10 @@ export default function GigLayout({
         }}
         className="fixed bottom-[120px] right-6 bg-gray-800/50 text-white p-3 rounded-full shadow-sm hover:bg-gray-800/70 transition-all duration-200 z-50 animate-pulse bg-gradient-to-r from-red-400 to-blue-600 z-100"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M4 6h16M4 12h16m-7 6h7"
-          />
-        </svg>
+        <HiMenuAlt3
+          size={18} // Replace with your desired icon size
+          color="white" // Replace with your desired icon color
+        />
       </button>
 
       {/* Slide Down Container */}
