@@ -94,7 +94,8 @@ const ChatModal: React.FC<ProfileModalProps> = ({ user, onClose }) => {
       </div>
       <div
         className="absolute rounded-full bg-amber-300 h-[35px] w-[35px] right-5 top-24 animate-bounce flex justify-center items-center"
-        onClick={() => {
+        onClick={(ev) => {
+          ev.stopPropagation();
           onClose();
           setRefferenceModalOpen(true);
         }}

@@ -47,7 +47,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
   const { currentUser, showModal, setShowModal, setRefetchGig } = useStore();
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
   const [bookCount, setBookCount] = useState(gig.bookCount.length || 0);
-  const { bookGig } = useBookGig();
+  const { bookGig, bookLoading } = useBookGig();
   const myId = currentUser?._id;
   const router = useRouter();
   // conditionsl styling
@@ -301,7 +301,9 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                           }, 2000);
                         }}
                         title={
-                          loadingPostId === gig?._id ? "Booking..." : "Book Gig"
+                          loadingPostId === gig?._id && !bookLoading
+                            ? "Booking..."
+                            : "Book Gig"
                         }
                       />
                     </div>

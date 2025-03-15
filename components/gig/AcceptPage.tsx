@@ -65,7 +65,7 @@ const AcceptPage = ({
     if (isTaken === false) {
       router.push(`/gigs/${userId}`);
     }
-  }, [isTaken, isPending, userId, router]);
+  }, [isTaken, isPending, userId, router, bookCount]);
   const handleRatingChange = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -119,6 +119,7 @@ const AcceptPage = ({
     }
   };
   const [pers, setPers] = useState<boolean>(false);
+  console.log(bookedBy);
   return (
     <div className="h-[83%] w-full overflow-y-auto relative">
       {/* {!isTaken && (

@@ -6,7 +6,7 @@ import { useAuth } from "@clerk/nextjs";
 import { User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
-import { FaComment } from "react-icons/fa";
+import { MdInsertComment } from "react-icons/md";
 
 interface ProfileModalProps {
   user: UserProps;
@@ -50,29 +50,32 @@ const RefferenceModal: React.FC<ProfileModalProps> = ({ user, getReviews }) => {
           return (
             <div
               key={_id}
-              className="w-full text-white bg-neutral-800 hover:bg-blue-600 rounded-md py-3 px-3 flex gap-2 items-center justify-between my-1"
+              className="w-full text-white bg-neutral-800  rounded-md py-3 px-3 flex gap-2 items-center justify-between my-1"
             >
               <div>
-                <span className="text-[18px] font-bold text-gray-500 mr-2">
+                <span className="text-[15px] font-bold text-neutral-400 mr-2">
                   {firstname}
                 </span>
-                <span className="text-[18px] font-bold text-gray-500 ">
+                <span className="text-[15px] font-bold text-neutral-400 mr-2">
                   {lastname}
                 </span>
               </div>
               <div className="flex items-center h-[35px] w-[75px] justify-between">
-                <User
-                  className="text-[24px] text-blue-600"
+                <div className="bg-neutral-300 p-1 rounded-full flex justify-center items-center">
+                  <User
+                    className="text-[24px] text-gray-600 "
+                    style={{ fontSize: "24px" }}
+                    onClick={() => {
+                      setRefferenceModalOpen(false);
+                      router.push(`/client/profile/${userId}`);
+                    }}
+                  />
+                </div>
+                <MdInsertComment
+                  className="text-[24px] text-yellow-400"
                   style={{ fontSize: "24px" }}
-                  onClick={() => {
-                    setRefferenceModalOpen(false);
-                    router.push(`/client/profile/${userId}`);
-                  }}
-                />
-                <FaComment
-                  className="text-[24px] text-blue-600"
-                  style={{ fontSize: "24px" }}
-                  onClick={() => {
+                  onClick={(ev) => {
+                    ev.stopPropagation();
                     setRefferenceModalOpen(false);
                     setReviewModalOpen(true);
                     getReviews(myreviews);

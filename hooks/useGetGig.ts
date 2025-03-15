@@ -60,6 +60,7 @@ export function useGetGigs(id: string | null) {
         }
         const fetchedGig: GigProps = await res.json();
         if (isMounted) {
+          console.log(fetchedGig);
           setCurrentGig(fetchedGig);
         }
       } catch (error) {

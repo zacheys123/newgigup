@@ -4,10 +4,11 @@ import ChatModal from "@/components/chat/mainchats/ChatModal";
 import RefferenceModal from "@/components/modals/RefferenceModal";
 import ReviewModal from "@/components/modals/ReviewModal";
 import SlideUpModal from "@/components/modals/SlideUpModal";
+import VideoModal from "@/components/modals/VideoModal";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import useSocket from "@/hooks/useSocket";
 import { MessageProps } from "@/types/chatinterfaces";
-import { Review, UserProps } from "@/types/userinterfaces";
+import { Review, UserProps, VideoProps } from "@/types/userinterfaces";
 import { useAuth } from "@clerk/nextjs";
 import moment from "moment";
 import Image from "next/image";
@@ -41,12 +42,29 @@ const ChatPage = () => {
     setIsOpen,
     refferenceModalOpen,
     reviewModalOpen,
+    videoModalOpen,
+    IsProfileModalOpen,
+    setIsProfileModalOpen,
   } = useStore();
 
   const [reviewprops, setReviewProps] = useState<Review[]>();
 
   const getReviews = (childProps: Review[]) => {
     setReviewProps(childProps);
+  };
+  const [videoprops, setVideoprops] = useState<{
+    videos: VideoProps[];
+    gigId: string;
+  }>({
+    videos: [],
+    gigId: "",
+  });
+
+  const getVideos = (childProps: VideoProps[], gigId: string) => {
+    setVideoprops({
+      videos: childProps,
+      gigId: gigId,
+    });
   };
   const { socket } = useSocket();
   // Ref for the chat container to enable auto-scrolling
@@ -152,8 +170,6 @@ const ChatPage = () => {
   // Checking if the user is online based on their
   const isOnline = onlineUsers.some((user) => user.userId === otherUserId);
 
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-
   const handleAvatarClick = () => {
     setIsProfileModalOpen(true);
   };
@@ -199,7 +215,7 @@ const ChatPage = () => {
     <div
       className="h-screen flex flex-col bg-[#f0f2f5] pt-[65px] pb-[60px] "
       onClick={() => {
-        if (isProfileModalOpen === true) {
+        if (IsProfileModalOpen === true) {
           setIsProfileModalOpen(false);
         }
         setIsMenuOpen(false);
@@ -356,7 +372,7 @@ const ChatPage = () => {
           </button>
         </form>
         {/* Profile Modal */}
-        {isProfileModalOpen && otherUser && (
+        {IsProfileModalOpen && otherUser && (
           <SlideUpModal>
             <ChatModal user={otherUser} onClose={closeProfileModal} />
           </SlideUpModal>
@@ -371,7 +387,16 @@ const ChatPage = () => {
             <ReviewModal
               reviewdata={reviewprops || []}
               user={otherUser}
-              postedBy={user}
+              getVideos={getVideos}
+            />
+          </SlideUpModal>
+        )}
+        {videoModalOpen && otherUser && (
+          <SlideUpModal>
+            <VideoModal
+              videodata={videoprops?.videos || []}
+              gigId={videoprops?.gigId as string}
+              user={otherUser}
             />
           </SlideUpModal>
         )}

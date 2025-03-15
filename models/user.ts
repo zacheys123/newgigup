@@ -68,6 +68,12 @@ const userSchema = new mongoose.Schema(
         rating: { type: Number },
         comment: { type: String },
         gigId: { type: Schema.Types.ObjectId, ref: "Gig" }, // Add User model reference here
+        videoId: [
+          {
+            type: Schema.Types.ObjectId,
+            ref: "Video",
+          },
+        ],
         updatedAt: {
           type: Date,
           default: Date.now,

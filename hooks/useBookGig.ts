@@ -1,10 +1,11 @@
 "use cient";
 import { FetchResponse, GigProps } from "@/types/giginterface";
 import useSocket from "./useSocket";
+import { useState } from "react";
 export function useBookGig() {
   const { socket } = useSocket();
   // logic for useBookGig hook goes here
-
+  const [bookLoading, setBookloading] = useState(false);
   const bookGig = async (
     gig: GigProps,
     myId: string,
@@ -33,6 +34,7 @@ export function useBookGig() {
       return;
     }
 
+    setBookloading(true);
     try {
       const res = await fetch(`/api/gigs/bookgig/${gig?._id}`, {
         method: "PUT",
@@ -47,7 +49,7 @@ export function useBookGig() {
 
       if (data.gigstatus === true) {
         toast.success(data.message || "Booked successfully");
-
+        setBookloading(false);
         // Emit Socket.IO event before updating state
         if (socket) {
           socket.emit("gigBooked", {
@@ -70,8 +72,9 @@ export function useBookGig() {
     } catch (error) {
       console.error("Booking Error:", error);
       toast.error("Failed to book the gig. Please try again.");
+      setBookloading(false);
     }
   };
 
-  return { bookGig };
+  return { bookGig, bookLoading };
 }
