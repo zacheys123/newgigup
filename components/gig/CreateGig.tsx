@@ -237,7 +237,7 @@ const CreateGig = () => {
           <h6 className="text-gray-100 font-sans text-center text-lg font-semibold mb-6">
             Enter info to create a gig
           </h6>
-          <div className="flex w-full justify-between items-center mb-6">
+          <div className="flex w-full justify-between items-center gap-4 mb-6">
             <select
               onChange={handleBussinessChange}
               name="durationfrom"
@@ -252,7 +252,7 @@ const CreateGig = () => {
               onClick={() => setShowCustomization(true)}
               className="cursor-pointer"
             >
-              <h1 className="text-sm text-gray-100 bg-gradient-to-r from-blue-500 to-purple-600 py-2 px-4 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all">
+              <h1 className="text-sm text-gray-100 bg-gradient-to-r from-blue-500 to-purple-600 py-2 px-4 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all whitespace-nowrap">
                 Customize your Gig Card
               </h1>
             </div>
