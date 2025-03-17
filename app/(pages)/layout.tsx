@@ -18,7 +18,7 @@ export default function GigLayout({
   // };
 
   return (
-    <div className="inset-0 backdrop-blur-xl  h-screen w-full overflow-hidden">
+    <div className="inset-0 backdrop-blur-xl  bg-black  h-screen w-full overflow-hidden">
       {/* Subtle Fixed Action Button */}
       {/* <button
         onClick={(ev) => {
@@ -39,7 +39,7 @@ export default function GigLayout({
           isVisible ? "translate-y-0" : "-translate-y-full"
         }`} */}
 
-      <div className="flex items-center justify-between mt-4 mx-6">
+      <div className="flex items-center justify-between mt-4 mx-6 bg-inherit">
         <MobileSheet />
         <UserButton />
       </div>
