@@ -1,26 +1,26 @@
 "use client";
-import { useState } from "react";
+// import { useState } from "react";
 import MobileSheet from "@/components/pages/MobileSheet";
 import PagesNav from "@/components/pages/PagesNav";
 import { UserButton } from "@clerk/nextjs";
 import { Toaster } from "sonner";
-import { Box } from "@mui/material";
-import { HiMenuAlt3 } from "react-icons/hi";
+// import { Box } from "@mui/material";
+// import { HiMenuAlt3 } from "react-icons/hi";
 export default function GigLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [isVisible, setIsVisible] = useState(false);
+  // const [isVisible, setIsVisible] = useState(false);
 
-  const toggleVisibility = (vis: boolean) => {
-    setIsVisible(vis);
-  };
+  // const toggleVisibility = (vis: boolean) => {
+  //   setIsVisible(vis);
+  // };
 
   return (
     <div className="inset-0 backdrop-blur-xl  h-screen w-full overflow-hidden">
       {/* Subtle Fixed Action Button */}
-      <button
+      {/* <button
         onClick={(ev) => {
           ev.stopPropagation();
           toggleVisibility(!isVisible);
@@ -33,17 +33,16 @@ export default function GigLayout({
         />
       </button>
 
-      {/* Slide Down Container */}
-      <Box
+      Slide Down Container */}
+      {/* <Box
         className={`fixed top-0 left-0 right-0 z-40 transition-transform duration-500 ease-in-out ${
           isVisible ? "translate-y-0" : "-translate-y-full"
-        }`}
-      >
-        <div className="flex items-center justify-between mt-4 mx-6">
-          <MobileSheet />
-          <UserButton />
-        </div>
-      </Box>
+        }`} */}
+
+      <div className="flex items-center justify-between mt-4 mx-6">
+        <MobileSheet />
+        <UserButton />
+      </div>
 
       <Toaster
         position="top-right"
