@@ -27,10 +27,6 @@ const GigsPage = () => {
     user?.city ? user?.city : "all"
   );
 
-  useEffect(() => {
-    setLocation(user?.city || "");
-  }, []);
-
   return (
     <div className="h-[70%] w-[90%] mx-auto my-2 shadow-md shadow-orange-300 relative pb-[30px]">
       {/* Fixed Gigheader */}
