@@ -39,8 +39,10 @@ export default function GigLayout({
           isVisible ? "translate-y-0" : "-translate-y-full"
         }`} */}
 
-      <MobileSheet />
-      <UserButton />
+      <div className="flex items-center justify-between mt-4 mx-6 bg-inherit">
+        <MobileSheet />
+        <UserButton />
+      </div>
 
       <Toaster
         position="top-right"

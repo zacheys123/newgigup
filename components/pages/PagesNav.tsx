@@ -98,7 +98,7 @@ const PagesNav = () => {
   // }
 
   return (
-    <div className="fixed bottom-0 w-full z-50 bg-gradient-to-t from-zinc-900 via-blue-900 to-yellow-750 shadow-xl shadow-teal-600 py-2">
+    <div className="fixed bottom-12 w-full z-50 bg-gradient-to-t from-zinc-900 via-blue-900 to-yellow-750 shadow-xl shadow-teal-600 py-2">
       <div
         className={
           user?.isClient

@@ -20,6 +20,9 @@ interface UserInput {
   username?: string;
   emailAddresses: UserEmail[];
   phoneNumbers: UserPhone[];
+  city: string;
+  instrument: string;
+  experience: string;
 }
 
 export async function POST(req: NextRequest): Promise<Response> {
@@ -64,6 +67,9 @@ export async function POST(req: NextRequest): Promise<Response> {
               transformedUser.emailAddresses[0]?.verification?.status,
             isClient: body.isClient,
             isMusician: body.isMusician,
+            city: body.city,
+            instrument: body.instrument,
+            experience: body.experience,
           },
         },
         { new: true }
@@ -87,6 +93,9 @@ export async function POST(req: NextRequest): Promise<Response> {
         verification: transformedUser.emailAddresses[0]?.verification?.status,
         isClient: body.isClient,
         isMusician: body.isMusician,
+        city: body.city,
+        instrument: body.instrument,
+        experience: body.experience,
       });
 
       const mainUser = await newUser.save();
@@ -94,9 +103,9 @@ export async function POST(req: NextRequest): Promise<Response> {
       return NextResponse.json({
         userstatus: true,
         message: body.isClient
-          ? `Welcome to gigUp ${mainUser?.firstname}`
+          ? `Welcome to gigUp ${mainUser?.firstname} (client)`
           : body.isMusician
-          ? `Welcome to gigUp ${mainUser?.firstname}`
+          ? `Welcome to gigUp ${mainUser?.firstname} (musician)`
           : "",
         results: mainUser,
       });

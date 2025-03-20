@@ -1,6 +1,11 @@
 export const instruments = () => {
   const mydata = [
     {
+      id: 0,
+      val: "Select Instrument",
+      name: "Select Instrument",
+    },
+    {
       id: 1,
       val: "Piano",
       name: "piano",
@@ -50,12 +55,22 @@ export const instruments = () => {
       val: "Cello",
       name: "cello",
     },
+    {
+      id: 11,
+      val: "Vocalist",
+      name: "vocalist",
+    },
   ];
   return mydata;
 };
 
 export const experiences = () => {
   const mydata = [
+    {
+      id: 0,
+      val: "Choose Experience",
+      name: "Choose Experience",
+    },
     {
       id: 1,
       val: "No Experience",
