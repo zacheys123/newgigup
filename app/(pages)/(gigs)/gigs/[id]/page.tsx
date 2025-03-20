@@ -9,7 +9,7 @@ import { GigProps } from "@/types/giginterface";
 import { searchfunc } from "@/utils/index";
 import { useAuth } from "@clerk/nextjs";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const GigsPage = () => {
   const { userId } = useAuth();
@@ -27,7 +27,9 @@ const GigsPage = () => {
     user?.city ? user?.city : "all"
   );
 
-  console.log(gigQuery);
+  useEffect(() => {
+    setLocation(user?.city as string);
+  }, []);
 
   return (
     <div className="h-[70%] w-[90%] mx-auto my-2 shadow-md shadow-orange-300 relative pb-[30px]">

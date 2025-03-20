@@ -201,13 +201,13 @@ const CurrentUserProfile = () => {
                 <Input
                   type="text"
                   className="w-full bg-transparent border-none text-[12px] focus:ring-0 text-white"
-                  value={firstname || ""}
+                  value={firstname ? firstname : ""}
                   disabled
                 />
                 <Input
                   type="text"
                   className="w-full bg-transparent border-none text-[12px] focus:ring-0 text-white"
-                  value={lastname || ""}
+                  value={lastname ? lastname : ""}
                   disabled
                 />
               </>
@@ -230,13 +230,13 @@ const CurrentUserProfile = () => {
                 <Input
                   type="text"
                   className="w-full bg-transparent border-none  text-[12px] focus:ring-0 text-white"
-                  value={email || ""}
+                  value={email ? email : ""}
                   disabled
                 />
                 <Input
                   type="text"
                   className="w-full bg-transparent border-none  text-[12px] focus:ring-0 text-white"
-                  value={username || ""}
+                  value={username ? username : ""}
                   disabled
                 />
               </>
@@ -260,14 +260,14 @@ const CurrentUserProfile = () => {
                   type="text"
                   className="w-full bg-transparent border-none  text-[12px] focus:ring-0 text-white"
                   placeholder="City"
-                  value={city || ""}
+                  value={city ? city : ""}
                   onChange={(ev) => setCity(ev.target.value)}
                 />
                 <Input
                   type="text"
                   className="w-full bg-transparent border-none  text-[12px] focus:ring-0 text-white"
                   placeholder="Address"
-                  value={address || ""}
+                  value={address ? address : ""}
                   onChange={(ev) => setAddress(ev.target.value)}
                 />
               </>
