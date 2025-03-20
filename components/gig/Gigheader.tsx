@@ -36,6 +36,7 @@ const Gigheader = ({
   category,
   setLocation,
   gigQuery,
+  myuser,
 }: HeaderProps) => {
   const variant = {
     initial: { x: ["-200px"], opacity: 0 },
@@ -108,7 +109,7 @@ const Gigheader = ({
       <div className="overflow-x-hidden w-full flex items-center justify-between p-4 bg-neutral-800 rounded-lg">
         <select
           className="w-[85px] h-[35px] bg-neutral-800 text-gray-300 pl-4 pr-2 rounded-md text-[11px] font-semibold cursor-pointer focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300"
-          value={location || ""}
+          value={location ? location : myuser?.city}
           onChange={(ev) => setLocation(ev.target.value)}
         >
           {/* Disabled first option as a placeholder */}
