@@ -24,7 +24,7 @@ const MyGigs = () => {
     gigs?.gigs?.filter((gig: GigProps) => gig?.postedBy?._id === user?._id)
   );
   return (
-    <div className="h-[83%] w-[90%] mx-auto my-2 shadow-md shadow-orange-300 relative">
+    <div className="h-[70%] w-[90%] mx-auto my-2 shadow-md shadow-orange-300 relative">
       {/* Fixed Gigheader */}
       <div className="sticky top-0 z-10 shadow-md">
         <Gigheader
