@@ -28,7 +28,7 @@ const GigsPage = () => {
   );
 
   useEffect(() => {
-    setLocation(user?.city as string);
+    setLocation(user?.city || "");
   }, []);
 
   return (

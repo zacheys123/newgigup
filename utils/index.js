@@ -186,6 +186,11 @@ function gigme(query, data, sorted) {
     return sorted;
   } else if (data?.title?.toLowerCase().includes(query.toLowerCase())) {
     return sorted;
+  } else if (
+    data?.instrument?.toLowerCase().includes(query.toLowerCase()) ||
+    data?.businesscat?.toLowerCase().includes(query.toLowerCase())
+  ) {
+    return sorted;
   }
 }
 export const searchfunc = (data, searchquery, category, gigQuery, location) => {
