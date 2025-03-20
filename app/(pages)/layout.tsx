@@ -39,7 +39,7 @@ export default function GigLayout({
           isVisible ? "translate-y-0" : "-translate-y-full"
         }`} */}
 
-      <div className="flex items-center justify-between mt-4 mx-6 bg-inherit">
+      <div className="flex items-center justify-between mt-4 mx-6 bg-inherit h-[5%]">
         <MobileSheet />
         <UserButton />
       </div>

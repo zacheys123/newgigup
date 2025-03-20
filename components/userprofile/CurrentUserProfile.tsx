@@ -280,7 +280,7 @@ const CurrentUserProfile = () => {
               onClick={() => setOtherinfo(true)}
             >
               <div className="flex items-center justify-between text-gray-300">
-                Instrument{" "}
+                More Info{" "}
                 <ArrowDown
                   className="transform rotate-180 transition-transform duration-300"
                   size={15}
