@@ -2,10 +2,11 @@
 import { UserButton, useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 import Logo from "./Logo";
-import { Music, User, MessageCircleQuestion } from "lucide-react";
+import { User, MessageCircleQuestion } from "lucide-react";
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { MdEmail } from "react-icons/md";
 
 const Nav = () => {
   const { userId } = useAuth();
@@ -24,10 +25,10 @@ const Nav = () => {
         {userId ? (
           <div className="flex items-center gap-6">
             <Link
-              href={`/gigs/${userId}`}
+              href={`/contact`}
               className="flex items-center gap-2 p-3 rounded-full transition-all hover:bg-neutral-700 hover:scale-105"
             >
-              <Music size="21" />
+              <MdEmail size="21" />
               <span className="hidden md:inline">Gigs</span>
             </Link>
 
