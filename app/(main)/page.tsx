@@ -14,6 +14,7 @@ import { PlayIcon } from "@heroicons/react/24/solid";
 
 export default function Home() {
   const { isLoaded, userId } = useAuth();
+  const { user } = useCurrentUser(userId || null);
   const {
     user: { firstname },
   } = useCurrentUser(userId || null);
@@ -106,7 +107,15 @@ export default function Home() {
                 musicians around the world.
               </p>
               <Link
-                href="#features"
+                href={
+                  !user
+                    ? `/roles/${userId}`
+                    : user?.isClient
+                    ? "/create/" + userId
+                    : user?.isMusician
+                    ? "/gigs/" + userId
+                    : "/not-found"
+                }
                 className="bg-white text-black py-2 px-6 rounded-full font-semibold hover:bg-gray-200  clip-link-polygon"
               >
                 Get Started
@@ -218,7 +227,15 @@ export default function Home() {
               Ready to Jam?
             </h2>
             <Link
-              href={`/roles/${userId}`}
+              href={
+                !user
+                  ? `/roles/${userId}`
+                  : user?.isClient
+                  ? "/create/" + userId
+                  : user?.isMusician
+                  ? "/gigs/" + userId
+                  : "/not-found"
+              }
               className="px-8 py-4 bg-black text-yellow-500 rounded-lg font-bold hover:bg-gray-800 transition-all"
             >
               Join Now
