@@ -5,7 +5,7 @@ import Image from "next/image";
 import { BsCameraFill } from "react-icons/bs";
 import { colors, fonts } from "@/utils";
 import "../loaders/word.css";
-
+import altlogo from "../../public/assets/png/logo-no-background.png";
 interface CustomizationProps {
   fontColor: string;
   font: string;
@@ -234,11 +234,7 @@ const GigCustomization: React.FC<GigCustomizationProps> = ({
                   </span>
                   <div className="h-[27px] w-[27px] rounded-full bg-gray-400 flex justify-center items-center">
                     <Image
-                      src={
-                        logo
-                          ? logo
-                          : "../../public/assets/png/logo-no-background.png"
-                      }
+                      src={logo ? logo : altlogo}
                       className="h-[24px] w-[24px] rounded-full"
                       alt="C"
                       width={24}

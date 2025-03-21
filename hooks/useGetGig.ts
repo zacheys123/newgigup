@@ -57,6 +57,7 @@ export function useGetGigs(id: string | null) {
               logo: "",
               otherTimeline: "",
               gigTimeline: "",
+              day: "",
             });
           return;
         }
@@ -96,6 +97,7 @@ export function useGetGigs(id: string | null) {
             logo: "",
             otherTimeline: "",
             gigTimeline: "",
+            day: "",
           });
       } finally {
         if (isMounted) setLoading(false);

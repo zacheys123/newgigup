@@ -5,7 +5,16 @@ import { Button } from "../ui/button";
 // import DatePicker from "react-datepicker";
 // import "react-datepicker/dist/react-datepicker.css";
 import { Box, CircularProgress } from "@mui/material";
-import { ArrowDown01Icon, EyeIcon, EyeOff } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowDown01Icon,
+  ArrowUp,
+  BriefcaseConveyorBelt,
+  EyeIcon,
+  EyeOff,
+  InfoIcon,
+  Timer,
+} from "lucide-react";
 
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAuth } from "@clerk/nextjs";
@@ -13,6 +22,7 @@ import { toast } from "sonner";
 import GigCustomization from "./GigCustomization";
 import { fileupload } from "@/hooks/fileUpload";
 import useStore from "@/app/zustand/useStore";
+import { FaComment } from "react-icons/fa";
 // import useStore from "@/app/zustand/useStore";
 // import { useAuth } from "@clerk/nextjs";
 
@@ -31,6 +41,7 @@ interface GigInputs {
   bussinesscat: string;
   otherTimeline: string;
   gigTimeline: string;
+  day: string;
 }
 interface CustomProps {
   fontColor: string;
@@ -78,6 +89,7 @@ const CreateGig = () => {
     bussinesscat: "personal",
     otherTimeline: "",
     gigTimeline: "",
+    day: "",
   });
   const [userinfo, setUserInfo] = useState<UserInfo>({
     prefferences: [],
@@ -87,6 +99,21 @@ const CreateGig = () => {
   // const [errors, setErrors] = useState<string[]>([]);
   // const [success, setSuccess] = useState<boolean>(false);
   const [showduration, setshowduration] = useState<boolean>(false);
+  const [showCategories, setshowCategories] = useState<{
+    title: boolean;
+    description: boolean;
+    business: boolean;
+    gtimeline: boolean;
+    gduration: boolean;
+    othergig: boolean;
+  }>({
+    title: false,
+    description: false,
+    business: false,
+    gtimeline: false,
+    othergig: false,
+    gduration: false,
+  });
 
   // const minDate = new Date("2020-01-01");
   // const maxDate = new Date("2026-01-01");
@@ -96,7 +123,7 @@ const CreateGig = () => {
   // };
 
   // handle the image upload to cloudinary
-
+  const daysOfMonth = Array.from({ length: 31 }, (_, i) => i + 1);
   const handleFileChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const dep = "image";
@@ -218,6 +245,7 @@ const CreateGig = () => {
           bussinesscat: "personal",
           otherTimeline: "",
           gigTimeline: "",
+          day: "",
         });
         setUserInfo({ prefferences: [] });
         setBussinessCategory("");
@@ -271,117 +299,219 @@ const CreateGig = () => {
           </div>
           <div className="w-full space-y-4">
             <div className={!secretreturn ? `space-y-4` : `space-y-4 h-[70px]`}>
-              <div className="grid grid-cols-2 gap-4 w-full">
-                <div className="flex items-center rounded-lg bg-gray-800 p-2">
+              <div
+                className="flex justify-between items-center w-full bg-gray-800 p-3 rounded-lg cursor-pointer hover:bg-amber-700 transition-all text-white"
+                onClick={() =>
+                  setshowCategories({
+                    title: !showCategories.title,
+                    description: false,
+                    business: false,
+                    gtimeline: false,
+                    othergig: true,
+                    gduration: false,
+                  })
+                }
+              >
+                Title Information
+                <FaComment size="20" className="text-gray-400" />
+              </div>
+              {showCategories.title && (
+                <div className="flex flex-col gap-4 w-full">
+                  <div className="flex items-center rounded-lg bg-gray-800 p-2">
+                    <input
+                      autoComplete="off"
+                      onChange={handleInputChange}
+                      name="secret"
+                      value={gigInputs?.secret}
+                      type={!secretpass ? "password" : "text"}
+                      placeholder="Enter secret (valid only once)"
+                      className="w-full bg-transparent text-gray-100 text-sm focus:outline-none"
+                    />
+                    {secretpass ? (
+                      <EyeOff
+                        onClick={() => setSecretPass((prev) => !prev)}
+                        size="18px"
+                        className="text-gray-400 cursor-pointer"
+                      />
+                    ) : (
+                      <EyeIcon
+                        onClick={() => setSecretPass((prev) => !prev)}
+                        size="18px"
+                        className="text-gray-400 cursor-pointer"
+                      />
+                    )}
+                  </div>
                   <input
                     autoComplete="off"
                     onChange={handleInputChange}
-                    name="secret"
-                    value={gigInputs?.secret}
-                    type={!secretpass ? "password" : "text"}
-                    placeholder="Enter secret (valid only once)"
-                    className="w-full bg-transparent text-gray-100 text-sm focus:outline-none"
+                    name="title"
+                    value={gigInputs?.title}
+                    type="text"
+                    placeholder="Enter a title"
+                    className="w-full bg-gray-800 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
-                  {secretpass ? (
-                    <EyeOff
-                      onClick={() => setSecretPass((prev) => !prev)}
-                      size="18px"
-                      className="text-gray-400 cursor-pointer"
-                    />
-                  ) : (
-                    <EyeIcon
-                      onClick={() => setSecretPass((prev) => !prev)}
-                      size="18px"
-                      className="text-gray-400 cursor-pointer"
-                    />
-                  )}
                 </div>
-                <input
-                  autoComplete="off"
-                  onChange={handleInputChange}
-                  name="title"
-                  value={gigInputs?.title}
-                  type="text"
-                  placeholder="Enter a title"
-                  className="w-full bg-gray-800 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+              )}
               {secretreturn && (
                 <h6 className="text-red-500 text-sm -mt-2">{secretreturn}</h6>
               )}
             </div>
-            <Textarea
-              onChange={handleInputChange}
-              name="description"
-              value={gigInputs?.description}
-              style={{ resize: "none", height: "fit-content" }}
-              className="min-h-[100px] bg-gray-800 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter description (e.g., songs or vibe expected at the event/show)"
-            />
-            <div className="grid grid-cols-2 gap-4 w-full">
-              {" "}
-              <input
-                autoComplete="off"
-                type="text"
-                placeholder="Enter phone number"
-                className="w-full bg-gray-800 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                onChange={handleInputChange}
-                name="phoneNo"
-                value={gigInputs?.phoneNo}
-              />
-              <input
-                autoComplete="off"
-                type="text"
-                placeholder="Enter expected price range"
-                className="w-full bg-gray-800 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                onChange={handleInputChange}
-                name="price"
-                value={gigInputs?.price}
-              />
+            <div
+              className="flex justify-between items-center w-full bg-gray-800 p-3 rounded-lg cursor-pointer hover:bg-amber-700 transition-all text-white"
+              onClick={() =>
+                setshowCategories({
+                  title: false,
+                  description: !showCategories.description,
+                  business: false,
+                  gtimeline: false,
+                  othergig: true,
+                  gduration: false,
+                })
+              }
+            >
+              Description Information
+              <InfoIcon size="20" className="text-gray-400" />
             </div>
-            <div className="grid grid-cols-2 gap-4 w-full">
-              {" "}
-              <input
-                autoComplete="off"
-                type="text"
-                placeholder="Enter location"
-                className="w-full bg-gray-800 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            {showCategories.description && (
+              <Textarea
                 onChange={handleInputChange}
-                name="location"
-                value={gigInputs?.location}
-              />{" "}
-              <select
-                onChange={handleTimeline}
-                name="durationfrom"
-                value={gigTimeline ? gigTimeline : ""}
-                className="w-[150px] bg-gray-700 text-gray-100 h-[40px] rounded-lg text-xs px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value=""> Gig Timeline </option>
-                <option value="once">
-                  One Time(function,event,recording etc)
-                </option>
-                <option value="weekly">Every Week</option>
-                <option value="other">Other...</option>
-              </select>
+                name="description"
+                value={gigInputs?.description}
+                style={{ resize: "none", height: "fit-content" }}
+                className="min-h-[100px] bg-gray-800 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter description (e.g., songs or vibe expected at the event/show)"
+              />
+            )}
+            <div
+              className="flex justify-between items-center w-full bg-gray-800 p-3 rounded-lg cursor-pointer hover:bg-amber-700 transition-all text-white"
+              onClick={() =>
+                setshowCategories({
+                  title: false,
+                  description: false,
+                  business: !showCategories.business,
+                  gtimeline: false,
+                  othergig: true,
+                  gduration: false,
+                })
+              }
+            >
+              Business Information
+              <BriefcaseConveyorBelt size="20" className="text-gray-400" />
             </div>
-            {gigTimeline === "other" && (
-              <div className="w-full flex justify-center items-center">
+            {showCategories.business && (
+              <div className="flex flex-col gap-4 w-full">
+                {" "}
                 <input
                   autoComplete="off"
                   type="text"
-                  placeholder="Enter other timeline details"
+                  placeholder="Enter phone number"
                   className="w-full bg-gray-800 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   onChange={handleInputChange}
-                  name="otherTimeline"
-                  value={gigInputs?.otherTimeline}
-                  disabled={gigInputs?.durationfrom === "once"}
-                  required={gigInputs?.durationfrom === "once"}
+                  name="phoneNo"
+                  value={gigInputs?.phoneNo}
+                />
+                <input
+                  autoComplete="off"
+                  type="text"
+                  placeholder="Enter expected price range"
+                  className="w-full bg-gray-800 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  onChange={handleInputChange}
+                  name="price"
+                  value={gigInputs?.price}
                 />
               </div>
             )}
+            <div
+              className="flex justify-between items-center w-full bg-gray-800 p-3 rounded-lg cursor-pointer hover:bg-amber-700 transition-all text-white"
+              onClick={() =>
+                setshowCategories({
+                  title: false,
+                  description: false,
+                  business: false,
+                  gtimeline: !showCategories.gtimeline,
+                  othergig: true,
+                  gduration: false,
+                })
+              }
+            >
+              Gig Timeline Information
+              <Timer size="20" className="text-gray-400" />
+            </div>
+            {showCategories.gtimeline && (
+              <div className="grid grid-cols-2 gap-4 w-full">
+                {" "}
+                <input
+                  autoComplete="off"
+                  type="text"
+                  placeholder="Enter location"
+                  className="w-full bg-gray-800 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  onChange={handleInputChange}
+                  name="location"
+                  value={gigInputs?.location}
+                />{" "}
+                <select
+                  onChange={handleTimeline}
+                  name="durationfrom"
+                  value={gigTimeline ? gigTimeline : ""}
+                  className="w-[150px] bg-gray-700 text-gray-100 h-[40px] rounded-lg text-xs px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value=""> Gig Timeline </option>
+                  <option value="once">
+                    One Time(function,event,recording etc)
+                  </option>
+                  <option value="weekly">Every Week</option>
+                  <option value="other">Other...</option>
+                </select>
+                {gigTimeline === "other" && (
+                  <div className="w-full flex justify-center items-center">
+                    <input
+                      autoComplete="off"
+                      type="text"
+                      placeholder="Enter other timeline details"
+                      className="w-full bg-gray-800 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      onChange={handleInputChange}
+                      name="otherTimeline"
+                      value={gigInputs?.otherTimeline}
+                      disabled={gigInputs?.durationfrom === "once"}
+                      required={gigInputs?.durationfrom === "once"}
+                    />
+                  </div>
+                )}
+                {gigTimeline === "other" && (
+                  <select
+                    className="w-1/3 p-2 rounded-md bg-gray-700 text-gray-300 border-none focus:ring-0 text-[10px]"
+                    value={gigInputs?.day}
+                    onChange={handleInputChange}
+                  >
+                    {daysOfMonth.map((i) => (
+                      <option key={i} value={i.toString()}>
+                        {i}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+            )}
             {bussinesscat === "other" && (
-              <h6 className="text-gray-400 text-sm mb-2">
+              <h6
+                className="flex justify-between items-center w-full bg-gray-800 p-3 rounded-lg cursor-pointer hover:bg-amber-700 transition-all text-white"
+                onClick={() =>
+                  setshowCategories({
+                    title: false,
+                    description: false,
+                    business: false,
+                    gtimeline: false,
+                    othergig: !showCategories.othergig,
+                    gduration: false,
+                  })
+                }
+              >
                 Choose the setup of the show
+                {showCategories.othergig ? (
+                  <ArrowDown size="20" className="text-gray-400" />
+                ) : (
+                  <ArrowUp size="20" className="text-gray-400" />
+                )}
               </h6>
             )}
             {bussinesscat === "personal" && (
@@ -403,29 +533,38 @@ const CreateGig = () => {
                 <option value="percussion">Percussion</option>
               </select>
             )}
-            {bussinesscat === "other" && (
-              <div className="grid grid-cols-3 gap-1 bg-gray-800 p-4 rounded-lg px-">
-                {["vocalist", "piano", "sax", "guitar", "drums", "bass"].map(
-                  (item) => (
-                    <div key={item} className="flex items-center space-x-2">
-                      <input
-                        onChange={handleChange}
-                        type="checkbox"
-                        id={item}
-                        name={item}
-                        value={item}
-                        className="accent-blue-500"
-                      />
-                      <label
-                        htmlFor={item}
-                        className="text-gray-100 text-sm capitalize"
-                      >
-                        {item}
-                      </label>
-                    </div>
-                  )
-                )}
-              </div>
+            {!showCategories?.othergig && (
+              <>
+                {bussinesscat === "other" && (
+                  <div className="grid grid-cols-3 gap-1 bg-gray-800 p-4 rounded-lg px-">
+                    {[
+                      "vocalist",
+                      "piano",
+                      "sax",
+                      "guitar",
+                      "drums",
+                      "bass",
+                    ].map((item) => (
+                      <div key={item} className="flex items-center space-x-2">
+                        <input
+                          onChange={handleChange}
+                          type="checkbox"
+                          id={item}
+                          name={item}
+                          value={item}
+                          className="accent-blue-500"
+                        />
+                        <label
+                          htmlFor={item}
+                          className="text-gray-100 text-sm capitalize"
+                        >
+                          {item}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                )}{" "}
+              </>
             )}
             {showduration ? (
               <div className="bg-gray-800 p-4 rounded-lg relative">

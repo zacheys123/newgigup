@@ -33,6 +33,7 @@ export interface GigProps {
   logo: string;
   otherTimeline: string;
   gigTimeline: string;
+  day: string;
 }
 
 export interface Gigs {

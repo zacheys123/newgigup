@@ -58,6 +58,7 @@ export const initialState = {
     logo: "",
     otherTimeline: "",
     gigTimeline: "",
+    day: "",
   },
 
   searchQuery: "",
