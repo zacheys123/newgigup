@@ -9,7 +9,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 const ContactPage = () => {
   const [open, setOpen] = useState<boolean>(true);
   const router = useRouter();
@@ -18,22 +17,18 @@ const ContactPage = () => {
     setOpen(false);
   };
   return (
-    <div className=" w-[100vw] h-[86%] bg-slate-900 overflow-y-auto flex justify-center items-center">
+    <div className="w-[100vw] h-[86%] bg-slate-900 overflow-y-auto flex justify-center items-center">
       <Dialog
         open={open}
         onOpenChange={handleClose} // use onOpenChange to handle closing the dialog
       >
-        <DialogContent>
+        <DialogContent className="border-0 ">
           <DialogHeader>
             <DialogTitle style={{ color: "lightgray" }}>Reviews</DialogTitle>
           </DialogHeader>
           <EmailForm handleClose={handleClose} />
         </DialogContent>
-        <DialogFooter>
-          <Button variant="secondary" onClick={handleClose}>
-            Close
-          </Button>
-        </DialogFooter>
+        <DialogFooter></DialogFooter>
       </Dialog>
     </div>
   );
