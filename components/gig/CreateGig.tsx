@@ -237,7 +237,7 @@ const CreateGig = () => {
           <h6 className="text-gray-100 font-sans text-center text-lg font-semibold mb-6">
             Enter info to create a gig
           </h6>
-          <div className="flex w-full justify-between items-center gap-4 mb-6">
+          <div className="flex w-full justify-between items-center mb-6">
             <select
               onChange={handleBussinessChange}
               name="durationfrom"
@@ -252,7 +252,7 @@ const CreateGig = () => {
               onClick={() => setShowCustomization(true)}
               className="cursor-pointer"
             >
-              <h1 className="text-sm text-gray-100 bg-gradient-to-r from-blue-500 to-purple-600 py-2 px-4 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all whitespace-nowrap">
+              <h1 className="text-sm text-gray-100 bg-gradient-to-r from-blue-500 to-purple-600 py-2 px-4 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all ml-3">
                 Customize your Gig Card
               </h1>
             </div>
@@ -327,147 +327,126 @@ const CreateGig = () => {
                 value={gigInputs?.price}
               />
             </div>
-            <div className="grid grid-cols-2 gap-4 w-full">
-              <input
-                autoComplete="off"
-                type="text"
-                placeholder="Enter location"
-                className={
-                  !showduration
-                    ? "w-full bg-gray-800 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    : "hidden"
-                }
+
+            <input
+              autoComplete="off"
+              type="text"
+              placeholder="Enter location"
+              className="w-full bg-gray-800 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={handleInputChange}
+              name="location"
+              value={gigInputs?.location}
+            />
+            {bussinesscat === "other" && (
+              <h6 className="text-gray-400 text-sm mb-2">
+                Choose the setup of the show
+              </h6>
+            )}
+            {bussinesscat === "personal" && (
+              <select
                 onChange={handleInputChange}
-                name="location"
-                value={gigInputs?.location}
-              />
-              {bussinesscat === "other" && (
-                <h6 className="text-gray-400 text-sm mb-2">
-                  Choose the setup of the show
-                </h6>
-              )}
-              {bussinesscat === "personal" && (
-                <select
-                  onChange={handleInputChange}
-                  name="category"
-                  value={gigInputs?.category}
-                  className={
-                    !showduration
-                      ? "w-full bg-gray-800 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      : "hidden"
-                  }
-                >
-                  <option value="piano">Piano</option>
-                  <option value="guitar">Guitar</option>
-                  <option value="bass">Bass Guitar</option>
-                  <option value="saxophone">Saxophone</option>
-                  <option value="violin">Violin</option>
-                  <option value="ukulele">Ukulele</option>
-                  <option value="harp">Harp</option>
-                  <option value="xylophone">Xylophone</option>
-                  <option value="cello">Cello</option>
-                  <option value="percussion">Percussion</option>
-                </select>
-              )}
-              {bussinesscat === "other" && (
+                name="category"
+                value={gigInputs?.category}
+                className="w-full bg-gray-800 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="piano">Piano</option>
+                <option value="guitar">Guitar</option>
+                <option value="bass">Bass Guitar</option>
+                <option value="saxophone">Saxophone</option>
+                <option value="violin">Violin</option>
+                <option value="ukulele">Ukulele</option>
+                <option value="harp">Harp</option>
+                <option value="xylophone">Xylophone</option>
+                <option value="cello">Cello</option>
+                <option value="percussion">Percussion</option>
+              </select>
+            )}
+            {bussinesscat === "other" && (
+              <div className="grid grid-cols-2 gap-4 bg-gray-800 p-4 rounded-lg">
+                {["vocalist", "piano", "sax", "guitar", "drums", "bass"].map(
+                  (item) => (
+                    <div key={item} className="flex items-center space-x-2">
+                      <input
+                        onChange={handleChange}
+                        type="checkbox"
+                        id={item}
+                        name={item}
+                        value={item}
+                        className="accent-blue-500"
+                      />
+                      <label
+                        htmlFor={item}
+                        className="text-gray-100 text-sm capitalize"
+                      >
+                        {item}
+                      </label>
+                    </div>
+                  )
+                )}
+              </div>
+            )}
+            {showduration ? (
+              <div className="bg-gray-800 p-4 rounded-lg relative">
                 <div
-                  className={
-                    !showduration
-                      ? "grid grid-cols-2 gap-4 bg-gray-800 p-4 rounded-lg"
-                      : "hidden"
-                  }
+                  className="text-white absolute right-2 top-2 text-xl cursor-pointer"
+                  onClick={() => setshowduration(false)}
                 >
-                  {["vocalist", "piano", "sax", "guitar", "drums", "bass"].map(
-                    (item) => (
-                      <div key={item} className="flex items-center space-x-2">
-                        <input
-                          onChange={handleChange}
-                          type="checkbox"
-                          id={item}
-                          name={item}
-                          value={item}
-                          className="accent-blue-500"
-                        />
-                        <label
-                          htmlFor={item}
-                          className="text-gray-100 text-sm capitalize"
-                        >
-                          {item}
-                        </label>
-                      </div>
-                    )
-                  )}
+                  &times;
                 </div>
-              )}
-              {showduration ? (
-                <div
-                  className={
-                    !showduration
-                      ? "bg-gray-800 p-4 rounded-lg relative"
-                      : "bg-gray-800 p-4 rounded-lg relative w-[305px]"
-                  }
-                >
-                  <div
-                    className="text-white absolute right-2 top-2 text-xl cursor-pointer"
-                    onClick={() => setshowduration(false)}
-                  >
-                    &times;
+                <Box className="space-y-4">
+                  <div className="flex items-center gap-4">
+                    <h6 className="text-gray-100 text-sm w-[50px]">From:</h6>
+                    <input
+                      autoComplete="off"
+                      type="text"
+                      placeholder="Time (e.g., 10 means 10:00)"
+                      className="w-[120px] bg-gray-700 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      onChange={handleInputChange}
+                      name="start"
+                      value={gigInputs?.start}
+                    />
+                    <select
+                      onChange={handleInputChange}
+                      name="durationfrom"
+                      value={gigInputs?.durationfrom}
+                      className="w-[60px] bg-gray-700 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="pm">PM</option>
+                      <option value="am">AM</option>
+                    </select>
                   </div>
-                  <Box className="space-y-4">
-                    <div className="flex items-center gap-4">
-                      <h6 className="text-gray-100 text-sm w-[50px]">From:</h6>
-                      <input
-                        autoComplete="off"
-                        type="text"
-                        placeholder="Time (e.g., 10 means 10:00)"
-                        className="w-[120px] bg-gray-700 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        onChange={handleInputChange}
-                        name="start"
-                        value={gigInputs?.start}
-                      />
-                      <select
-                        onChange={handleInputChange}
-                        name="durationfrom"
-                        value={gigInputs?.durationfrom}
-                        className="w-[60px] bg-gray-700 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="pm">PM</option>
-                        <option value="am">AM</option>
-                      </select>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <h6 className="text-gray-100 text-sm w-[50px]">To:</h6>
-                      <input
-                        autoComplete="off"
-                        type="text"
-                        placeholder="Time (e.g., 10 means 10:00)"
-                        className="w-[120px] bg-gray-700 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        onChange={handleInputChange}
-                        name="end"
-                        value={gigInputs?.end}
-                      />
-                      <select
-                        onChange={handleInputChange}
-                        name="durationto"
-                        value={gigInputs?.durationto}
-                        className="w-[60px] bg-gray-700 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="pm">PM</option>
-                        <option value="am">AM</option>
-                      </select>
-                    </div>
-                  </Box>
-                </div>
-              ) : (
-                <Box
-                  onClick={() => setshowduration(true)}
-                  className="flex justify-between items-center w-full bg-gray-800 p-3 rounded-lg cursor-pointer hover:bg-gray-700 transition-all"
-                >
-                  <h6 className="text-gray-100 text-sm">Enter Duration</h6>
-                  <ArrowDown01Icon size="20" className="text-gray-400" />
+                  <div className="flex items-center gap-4">
+                    <h6 className="text-gray-100 text-sm w-[50px]">To:</h6>
+                    <input
+                      autoComplete="off"
+                      type="text"
+                      placeholder="Time (e.g., 10 means 10:00)"
+                      className="w-[120px] bg-gray-700 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      onChange={handleInputChange}
+                      name="end"
+                      value={gigInputs?.end}
+                    />
+                    <select
+                      onChange={handleInputChange}
+                      name="durationto"
+                      value={gigInputs?.durationto}
+                      className="w-[60px] bg-gray-700 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="pm">PM</option>
+                      <option value="am">AM</option>
+                    </select>
+                  </div>
                 </Box>
-              )}
-            </div>
+              </div>
+            ) : (
+              <Box
+                onClick={() => setshowduration(true)}
+                className="flex justify-between items-center w-full bg-gray-800 p-3 rounded-lg cursor-pointer hover:bg-gray-700 transition-all"
+              >
+                <h6 className="text-gray-100 text-sm">Enter Duration</h6>
+                <ArrowDown01Icon size="20" className="text-gray-400" />
+              </Box>
+            )}
             <div className="w-full flex justify-center mt-6">
               <Button
                 variant="destructive"
