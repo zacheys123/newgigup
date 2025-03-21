@@ -65,7 +65,7 @@ export default function Home() {
             autoPlay
             loop
             muted
-            className="absolute inset-0 w-full h-full object-cover z-0 opacity-50"
+            className="absolute inset-0 w-full h-full object-cover z-0 opacity-35"
           >
             <source
               src="https://res.cloudinary.com/dsziq73cb/video/upload/v1741577722/gigmeUpload/gww2kwzvdtkx4qxln6qu.mp4"
@@ -106,20 +106,22 @@ export default function Home() {
                 Share your jam sessions, create and book gigs, connect with
                 musicians around the world.
               </p>
-              <Link
-                href={
-                  !user
-                    ? `/roles/${userId}`
-                    : user?.isClient
-                    ? "/create/" + userId
-                    : user?.isMusician
-                    ? "/gigs/" + userId
-                    : "/not-found"
-                }
-                className="bg-white text-black py-2 px-6 rounded-full font-semibold hover:bg-gray-200  clip-link-polygon"
-              >
-                Get Started
-              </Link>
+              {user && (
+                <Link
+                  href={
+                    !user
+                      ? `/roles/${userId}`
+                      : user?.isClient
+                      ? "/create/" + userId
+                      : user?.isMusician
+                      ? "/gigs/" + userId
+                      : "/not-found"
+                  }
+                  className="bg-white text-black py-2 px-6 rounded-full font-semibold hover:bg-gray-200  clip-link-polygon"
+                >
+                  Get Started
+                </Link>
+              )}
             </motion.div>
           </div>
         </section>

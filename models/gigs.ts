@@ -58,6 +58,14 @@ const gigSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    gigtimeline: {
+      type: String,
+      required: true,
+    },
+    otherTimeline: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true }
 );

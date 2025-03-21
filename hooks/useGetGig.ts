@@ -55,6 +55,8 @@ export function useGetGigs(id: string | null) {
               fontColor: "",
               backgroundColor: "",
               logo: "",
+              otherTimeline: "",
+              gigTimeline: "",
             });
           return;
         }
@@ -92,6 +94,8 @@ export function useGetGigs(id: string | null) {
             fontColor: "",
             backgroundColor: "",
             logo: "",
+            otherTimeline: "",
+            gigTimeline: "",
           });
       } finally {
         if (isMounted) setLoading(false);

@@ -29,6 +29,8 @@ interface GigInputs {
   durationto: string;
   durationfrom: string;
   bussinesscat: string;
+  otherTimeline: string;
+  gigTimeline: string;
 }
 interface CustomProps {
   fontColor: string;
@@ -74,11 +76,14 @@ const CreateGig = () => {
     durationto: "pm",
     durationfrom: "am",
     bussinesscat: "personal",
+    otherTimeline: "",
+    gigTimeline: "",
   });
   const [userinfo, setUserInfo] = useState<UserInfo>({
     prefferences: [],
   });
   const [bussinesscat, setBussinessCategory] = useState<bussinesscat>("full");
+  const [gigTimeline, setGigTimeline] = useState<bussinesscat>("one");
   // const [errors, setErrors] = useState<string[]>([]);
   // const [success, setSuccess] = useState<boolean>(false);
   const [showduration, setshowduration] = useState<boolean>(false);
@@ -144,6 +149,9 @@ const CreateGig = () => {
   const handleBussinessChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setBussinessCategory(e.target.value);
   };
+  const handleTimeline = (e: ChangeEvent<HTMLSelectElement>) => {
+    setGigTimeline(e.target.value);
+  };
 
   // only used when you choose other
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -185,6 +193,8 @@ const CreateGig = () => {
           fontColor: gigcustom.fontColor,
           backgroundColor: gigcustom.backgroundColor,
           logo: imageUrl,
+          otherTimeline: gigInputs.otherTimeline,
+          gigTimeline: gigInputs.gigTimeline,
         }),
       });
       const data = await res.json();
@@ -206,6 +216,8 @@ const CreateGig = () => {
           durationto: "pm",
           durationfrom: "am",
           bussinesscat: "personal",
+          otherTimeline: "",
+          gigTimeline: "",
         });
         setUserInfo({ prefferences: [] });
         setBussinessCategory("");
@@ -327,16 +339,46 @@ const CreateGig = () => {
                 value={gigInputs?.price}
               />
             </div>
-
-            <input
-              autoComplete="off"
-              type="text"
-              placeholder="Enter location"
-              className="w-full bg-gray-800 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              onChange={handleInputChange}
-              name="location"
-              value={gigInputs?.location}
-            />
+            <div className="grid grid-cols-2 gap-4 w-full">
+              {" "}
+              <input
+                autoComplete="off"
+                type="text"
+                placeholder="Enter location"
+                className="w-full bg-gray-800 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onChange={handleInputChange}
+                name="location"
+                value={gigInputs?.location}
+              />{" "}
+              <select
+                onChange={handleTimeline}
+                name="durationfrom"
+                value={gigTimeline ? gigTimeline : ""}
+                className="w-[150px] bg-gray-700 text-gray-100 h-[40px] rounded-lg text-xs px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value=""> Gig Timeline </option>
+                <option value="once">
+                  One Time(function,event,recording etc)
+                </option>
+                <option value="weekly">Every Week</option>
+                <option value="other">Other...</option>
+              </select>
+            </div>
+            {gigTimeline === "other" && (
+              <div className="w-full flex justify-center items-center">
+                <input
+                  autoComplete="off"
+                  type="text"
+                  placeholder="Enter other timeline details"
+                  className="w-full bg-gray-800 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  onChange={handleInputChange}
+                  name="otherTimeline"
+                  value={gigInputs?.otherTimeline}
+                  disabled={gigInputs?.durationfrom === "once"}
+                  required={gigInputs?.durationfrom === "once"}
+                />
+              </div>
+            )}
             {bussinesscat === "other" && (
               <h6 className="text-gray-400 text-sm mb-2">
                 Choose the setup of the show

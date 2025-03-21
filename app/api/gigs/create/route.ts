@@ -22,6 +22,8 @@ type Info = {
   fontColor: string;
   backgroundColor: string;
   logo: string;
+  otherTimeline: string;
+  gigTimeline: string;
 };
 
 export async function POST(req: NextRequest) {
@@ -43,6 +45,8 @@ export async function POST(req: NextRequest) {
     fontColor,
     backgroundColor,
     logo,
+    otherTimeline,
+    gigTimeline,
   }: Info = await req.json();
 
   console.log(font);
@@ -59,7 +63,9 @@ export async function POST(req: NextRequest) {
     !to ||
     !from ||
     !bussinesscat ||
-    !secret
+    !secret ||
+    otherTimeline ||
+    gigTimeline
   ) {
     return NextResponse.json({
       gigstatus: "false",
@@ -123,6 +129,8 @@ export async function POST(req: NextRequest) {
       fontColor,
       backgroundColor,
       logo,
+      otherTimeline,
+      gigTimeline,
     });
 
     return NextResponse.json({

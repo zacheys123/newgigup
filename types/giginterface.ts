@@ -31,6 +31,8 @@ export interface GigProps {
   fontColor: string;
   backgroundColor: string;
   logo: string;
+  otherTimeline: string;
+  gigTimeline: string;
 }
 
 export interface Gigs {
