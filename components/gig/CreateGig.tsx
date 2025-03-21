@@ -404,7 +404,7 @@ const CreateGig = () => {
               </select>
             )}
             {bussinesscat === "other" && (
-              <div className="grid grid-cols-2 gap-4 bg-gray-800 p-4 rounded-lg">
+              <div className="grid grid-cols-3 gap-1 bg-gray-800 p-4 rounded-lg px-">
                 {["vocalist", "piano", "sax", "guitar", "drums", "bass"].map(
                   (item) => (
                     <div key={item} className="flex items-center space-x-2">

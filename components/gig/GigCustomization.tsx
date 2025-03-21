@@ -5,6 +5,7 @@ import Image from "next/image";
 import { BsCameraFill } from "react-icons/bs";
 import { colors, fonts } from "@/utils";
 import "../loaders/word.css";
+
 interface CustomizationProps {
   fontColor: string;
   font: string;
@@ -29,19 +30,26 @@ const GigCustomization: React.FC<GigCustomizationProps> = ({
   isUploading,
 }) => {
   return (
-    <div className="fixed inset-0 flex items-center z-50 justify-center bg-black  h-[900px] bg-opacity-70 backdrop-blur-md animate-fadeIn mt-[25px] w-[90%] mx-auto">
-      <div className="bg-white/20 backdrop-blur-0 p-6 rounded-2xl shadow-xl w-[420px]  h-[900px] border border-white/30 transition-all animate-slideUp overflow-hidden">
+    <div className="fixed inset-0 flex items-center z-50 justify-center bg-black/80 backdrop-blur-md animate-fadeIn">
+      {/* Polygon Background */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-20 -left-20 w-64 h-64 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-gradient-to-r from-blue-500/20 to-teal-500/20 rounded-full blur-3xl"></div>
+      </div>
+
+      {/* Modal */}
+      <div className=" -mt-9 relative bg-white/10 backdrop-blur-lg p-8 rounded-2xl shadow-2xl w-[450px] max-h-[90vh] border border-white/20 transition-all animate-slideUp overflow-hidden">
         {/* Scrollable Content */}
-        <div className="overflow-y-auto max-h-[800px] pr-2 mt-[20px]">
+        <div className="overflow-y-auto max-h-[80vh] pr-2">
           {/* Font Selection */}
-          <div className="mb-4">
-            <label className="block text-sm text-white mb-1">Font:</label>
+          <div className="mb-6">
+            <label className="block text-sm text-white/80 mb-2">Font:</label>
             <select
               value={customization.font}
               onChange={(e) =>
                 setCustomization((prev) => ({ ...prev, font: e.target.value }))
               }
-              className="w-full p-2 bg-white/10 text-white rounded-lg border border-white/20 focus:outline-none hover:bg-white/20 transition title h-[36px]"
+              className="w-full p-2 bg-white/10 text-white rounded-lg border border-white/20 focus:outline-none focus:border-white/40 hover:bg-white/20 transition h-[36px]"
             >
               {fonts.map((font) => (
                 <option key={font} value={font} className="text-black">
@@ -52,8 +60,10 @@ const GigCustomization: React.FC<GigCustomizationProps> = ({
           </div>
 
           {/* Font Color Selection */}
-          <div className="mb-4">
-            <label className="block text-sm text-white mb-1">Font Color:</label>
+          <div className="mb-6">
+            <label className="block text-sm text-white/80 mb-2">
+              Font Color:
+            </label>
             <div className="flex flex-wrap gap-2">
               {colors.map((color) => (
                 <div
@@ -73,8 +83,8 @@ const GigCustomization: React.FC<GigCustomizationProps> = ({
           </div>
 
           {/* Background Color Selection */}
-          <div className="mb-4">
-            <label className="block text-sm text-white mb-1">
+          <div className="mb-6">
+            <label className="block text-sm text-white/80 mb-2">
               Background Color:
             </label>
             <div className="flex flex-wrap gap-2">
@@ -99,20 +109,17 @@ const GigCustomization: React.FC<GigCustomizationProps> = ({
           </div>
 
           {/* Background Image Upload */}
-          <div className="mb-4">
-            <label
-              htmlFor="logo"
-              className="block text-sm text-white mb-1 bg-neutral-600 rounded-md max-w-[200px] p-2"
-            >
+          <div className="mb-6">
+            <label htmlFor="logo" className="block text-sm text-white/80 mb-2">
               {!isUploading ? (
-                <span className="flex gap-1 items-center justify-between">
-                  Choose Logo <BsCameraFill />
+                <span className="flex gap-2 items-center justify-center bg-neutral-700/50 rounded-md p-2 hover:bg-neutral-700/70 transition cursor-pointer">
+                  Choose Logo <BsCameraFill className="text-white/80" />
                 </span>
               ) : (
-                <div className="flex gap-2 items-center">
+                <div className="flex gap-2 items-center justify-center bg-neutral-700/50 rounded-md p-2">
                   <CircularProgress
                     size={17}
-                    sx={{ color: "white", fontBold: "500" }}
+                    sx={{ color: "white", fontWeight: "500" }}
                   />
                   <div className="card2 h-[18px]">
                     <div className="loaderin2">
@@ -139,28 +146,34 @@ const GigCustomization: React.FC<GigCustomizationProps> = ({
 
           {/* Live Preview */}
           <div
-            className="mt-4 p-4 rounded-lg border border-white/30 bg-white/10 backdrop-blur-lg text-center transition hover:scale-105"
+            className="mt-6 p-6 rounded-2xl border border-white/30 bg-white/10 backdrop-blur-lg text-center transition hover:scale-105 relative overflow-hidden"
             style={{
               backgroundColor: customization.backgroundColor,
-
               backgroundSize: "cover",
               backgroundPosition: "center",
-              minHeight: "120px",
+              minHeight: "150px",
             }}
           >
+            {/* Polygon Shape Overlay */}
+            <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full blur-2xl"></div>
+            <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-gradient-to-r from-blue-500/20 to-teal-500/20 rounded-full blur-2xl"></div>
+
             {!customization?.fontColor &&
             !customization?.font &&
             !customization?.backgroundColor &&
             !logo ? (
               <>
-                {" "}
-                <h3 className="text-lg font-semibold">Gig Preview</h3>
-                <p className="text-sm">See how your gig card looks live.</p>
+                <h3 className="text-lg font-semibold text-white/80">
+                  Gig Preview
+                </h3>
+                <p className="text-sm text-white/60">
+                  See how your gig card looks live.
+                </p>
               </>
             ) : (
-              <Box className="flex flex-col gap-1">
-                <div className="flex  justify-between items-center">
-                  <div className="flex flex-col">
+              <Box className="flex flex-col gap-2">
+                <div className="flex justify-between items-center">
+                  <div className="flex flex-col gap-1">
                     <span className="flex gap-1">
                       <span style={{ fontSize: "10px", color: "orange" }}>
                         gigtitle:
@@ -199,7 +212,6 @@ const GigCustomization: React.FC<GigCustomizationProps> = ({
                           fontSize: "12px",
                           fontFamily: customization.font,
                         }}
-                        className={`font-${customization.font} text-[${customization.fontColor}]`}
                       >
                         price information
                       </span>
@@ -207,34 +219,32 @@ const GigCustomization: React.FC<GigCustomizationProps> = ({
                   </div>
                   <Button
                     variant="destructive"
-                    className="h-[20px]  text-[11px] min-w-[41px] whitespace-nowrap"
+                    className="h-[20px] text-[11px] min-w-[41px] whitespace-nowrap"
                   >
                     Book Gig
                   </Button>
                 </div>
-                <Divider className="w-[full] h-[3px] bg-[#494949] mt-2" />
+                <Divider className="w-full h-[2px] bg-white/20 mt-2" />
                 <div className="flex justify-between items-center">
-                  <span className="flex items-center">
-                    <span className="text-red-600 gigtitle">Status:</span>
-                    <span className="text-gray-200 bg-blue-400  rounded-xl h-[20px]  px-2 gigtitle font-sans">
+                  <span className="flex items-center gap-1">
+                    <span className="text-red-600 text-sm">Status:</span>
+                    <span className="text-white bg-blue-500 rounded-full px-2 py-1 text-xs">
                       Available
                     </span>
                   </span>
-                  {
-                    <div className="h-[27px] w-[27px]  rounded-full bg-gray-400 flex justify-center items-center">
-                      <Image
-                        src={
-                          logo
-                            ? logo
-                            : "../../public/assets/png/logo-no-background.png"
-                        }
-                        className="h-[24px] w-[24px] rounded-full"
-                        alt="C"
-                        width={24}
-                        height={24}
-                      />
-                    </div>
-                  }
+                  <div className="h-[27px] w-[27px] rounded-full bg-gray-400 flex justify-center items-center">
+                    <Image
+                      src={
+                        logo
+                          ? logo
+                          : "../../public/assets/png/logo-no-background.png"
+                      }
+                      className="h-[24px] w-[24px] rounded-full"
+                      alt="C"
+                      width={24}
+                      height={24}
+                    />
+                  </div>
                 </div>
               </Box>
             )}
@@ -242,7 +252,7 @@ const GigCustomization: React.FC<GigCustomizationProps> = ({
         </div>
 
         {/* Close Button */}
-        <div className="flex justify-center mt-4">
+        <div className="flex justify-center mt-6">
           <button
             onClick={closeModal}
             className="px-4 py-2 bg-white/20 text-white rounded-lg border border-white/30 hover:bg-white/30 transition hover:scale-105 shadow-md"
