@@ -2,49 +2,17 @@
 
 import useStore from "@/app/zustand/useStore";
 import { GigProps, Gigs } from "@/types/giginterface";
-import { postedBy } from "@/utils";
 import { useEffect, useMemo, useState } from "react";
 
 export function useAllGigs() {
   const [loading, setLoading] = useState<boolean>(false);
   const { refetchGig } = useStore();
-  const [gigs, setGigs] = useState<{ gigs: GigProps[] } | null>({
-    gigs: [
-      {
-        _id: "",
-        postedBy: postedBy,
-        bookedBy: postedBy,
-        title: "",
-        secret: "",
-        description: "",
-        phone: "",
-        price: "",
-        category: "",
-        bandCategory: [],
-        bussinesscat: "",
-        location: "",
-        date: new Date(),
-        time: {},
-        isTaken: false,
-        isPending: false,
-        viewCount: [],
-        username: "",
-        updatedAt: new Date(),
-        createdAt: new Date(),
-        bookCount: [],
-        font: "",
-        fontColor: "",
-        backgroundColor: "",
-        logo: "",
-      },
-    ],
-  });
+  const [gigs, setGigs] = useState<{ gigs: GigProps[] } | null>(null);
 
-  // Memoize the URL to prevent unnecessary re-renders
   const url = useMemo(() => `/api/gigs/getgigs`, []);
 
   useEffect(() => {
-    let isMounted = true; // Guard to prevent state updates after unmount
+    let isMounted = true;
 
     const getGigs = async () => {
       try {
@@ -53,83 +21,24 @@ export function useAllGigs() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            Pragma: "no-cache",
+            Expires: "0",
           },
         });
 
         if (!res.ok) {
           console.error(`Failed to fetch gigs: ${res.statusText}`);
-          if (isMounted)
-            setGigs({
-              gigs: [
-                {
-                  _id: "",
-                  postedBy: postedBy,
-                  bookedBy: postedBy,
-                  title: "",
-                  secret: "",
-                  description: "",
-                  phone: "",
-                  price: "",
-                  category: "",
-                  bandCategory: [],
-                  bussinesscat: "",
-                  location: "",
-                  date: new Date(),
-                  time: {},
-                  isTaken: false,
-                  isPending: false,
-                  viewCount: [],
-                  username: "",
-                  updatedAt: new Date(),
-                  createdAt: new Date(),
-                  bookCount: [],
-                  font: "",
-                  fontColor: "",
-                  backgroundColor: "",
-                  logo: "",
-                },
-              ],
-            });
+          if (isMounted) setGigs(null);
           return;
         }
 
         const fetchedGigs: Gigs = await res.json();
-        console.log(fetchedGigs);
+        console.log(fetchedGigs); // Check if the fetched data is correct
         if (isMounted) setGigs(fetchedGigs);
       } catch (error) {
-        console.error("Error fetching user:", error);
-        if (isMounted)
-          setGigs({
-            gigs: [
-              {
-                _id: "",
-                postedBy: postedBy,
-                bookedBy: postedBy,
-                title: "",
-                secret: "",
-                description: "",
-                phone: "",
-                price: "",
-                category: "",
-                bandCategory: [],
-                bussinesscat: "",
-                location: "",
-                date: new Date(),
-                time: {},
-                isTaken: false,
-                isPending: false,
-                viewCount: [],
-                username: "",
-                updatedAt: new Date(),
-                createdAt: new Date(),
-                bookCount: [],
-                font: "",
-                fontColor: "",
-                backgroundColor: "",
-                logo: "",
-              },
-            ],
-          });
+        console.error("Error fetching gigs:", error);
+        if (isMounted) setGigs(null);
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -137,7 +46,6 @@ export function useAllGigs() {
 
     getGigs();
 
-    // Cleanup function to avoid setting state after component unmounts
     return () => {
       isMounted = false;
     };
@@ -145,10 +53,3 @@ export function useAllGigs() {
 
   return { loading, gigs };
 }
-
-// gigs = gigs?.filter((gig) => {
-//   if (gig?.postedBy?.clerkId.includes(id)) {
-//     return gigs;
-//   }
-//   return null;
-// });

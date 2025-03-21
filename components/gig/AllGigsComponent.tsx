@@ -46,6 +46,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
     setRefetchGig,
     setIsDescriptionModal,
     isDescriptionModal,
+    setCurrentGig,
   } = useStore();
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
   const [bookCount, setBookCount] = useState(gig.bookCount.length || 0);
@@ -64,7 +65,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
       });
       const data: FetchResponse = await res.json();
       setIsDescriptionModal(true);
-
+      setCurrentGig(gig);
       console.log(data);
     } catch (error) {
       console.log("error adding view for gigs", error);
@@ -141,9 +142,10 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
       socket.off("updateBookCount", handleUpdateBookCount);
     };
   }, [gig._id, socket]);
+  console.log("descccc", gig?.description);
   return (
     <>
-      {isDescriptionModal && <GigDescription gig={gig} />}
+      {isDescriptionModal && <GigDescription />}
       <section
         className={
           "flex flex-col rounded-md w-[95%] mx-auto shadow-md shadow-zinc-600 bg-zinc-900 py-5 h-[118px] mt-2 mb-3 px-3 first:mt-1"

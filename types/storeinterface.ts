@@ -109,7 +109,6 @@ export interface StoreState {
   socket: Socket | null;
   unreadCounts: Record<string, number>; // { chatId: unreadCount }
   updateUnreadCount: (chatId: string, increment?: boolean) => void;
-
   setShowUpload: () => void;
   setRefetchData: (data: boolean) => void;
   setIsOpen: (data: boolean) => void;
@@ -119,7 +118,7 @@ export interface StoreState {
   setSearch: (data: boolean) => void;
   setFollow: (data: boolean) => void;
   setRefferenceModalOpen: (data: boolean) => void;
-  setIsDescriptionModal: (data: boolean) => void;
+  setIsDescriptionModal: (isOpen: boolean) => void;
   setReviewModalOpen: (data: boolean) => void;
   setIsProfileModalOpen: (data: boolean) => void;
   setVideoModalOpen: (data: boolean) => void;

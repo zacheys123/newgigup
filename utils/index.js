@@ -186,10 +186,7 @@ function gigme(query, data, sorted) {
     return sorted;
   } else if (data?.title?.toLowerCase().includes(query.toLowerCase())) {
     return sorted;
-  } else if (
-    data?.instrument?.toLowerCase().includes(query.toLowerCase()) ||
-    data?.businesscat?.toLowerCase().includes(query.toLowerCase())
-  ) {
+  } else if (data?.category?.toLowerCase().includes(query.toLowerCase())) {
     return sorted;
   }
 }
@@ -207,7 +204,7 @@ export const searchfunc = (data, searchquery, category, gigQuery, location) => {
         gig?.category?.toLowerCase() === category?.toLowerCase()
       ) {
         return sortedData;
-      } else if (gig.bussinesscat?.toLowerCase() === category?.toLowerCase()) {
+      } else if (gig?.bussinesscat?.toLowerCase() === category?.toLowerCase()) {
         return sortedData;
       } else if (
         category.toLowerCase() === "all" &&
@@ -216,8 +213,8 @@ export const searchfunc = (data, searchquery, category, gigQuery, location) => {
         console.log(location);
         return sortedData;
       } else if (
-        category.toLowerCase() === "all" &&
-        location.toLowerCase() === "all"
+        category?.toLowerCase() === "all" &&
+        location?.toLowerCase() === "all"
       ) {
         return data;
       }

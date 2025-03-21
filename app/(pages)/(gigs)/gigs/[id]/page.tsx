@@ -9,7 +9,7 @@ import { GigProps } from "@/types/giginterface";
 import { searchfunc } from "@/utils/index";
 import { useAuth } from "@clerk/nextjs";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 const GigsPage = () => {
   const { userId } = useAuth();
@@ -50,9 +50,10 @@ const GigsPage = () => {
         {!loading ? (
           searchfunc(gigs?.gigs, typeOfGig, category, gigQuery, location)
             ?.filter((gig: GigProps) => gig?.isTaken === false)
-            ?.map((gig: GigProps) => (
-              <AllGigsComponent key={gig?._id} gig={gig} />
-            ))
+            ?.map((gig: GigProps) => {
+              console.log(gig?.description);
+              return <AllGigsComponent key={gig?._id} gig={gig} />;
+            })
         ) : (
           // <LoadingSpinner />
           <div className="flex justify-center items-center h-full w-full">
