@@ -7,16 +7,17 @@ import { useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import "./main.css";
-import { useRouter } from "next/navigation";
-// import UsersButton from "../../components/UsersButton";
+import { useState } from "react"; // Import useState for state management
+import thumbnailImage from "../../public/assets/discover4.webp"; // Import your thumbnail image
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { PlayIcon } from "@heroicons/react/24/solid";
 
 export default function Home() {
-  const router = useRouter();
   const { isLoaded, userId } = useAuth();
   const {
     user: { firstname },
   } = useCurrentUser(userId || null);
+  const [showVideo, setShowVideo] = useState(false); // State to toggle video playback
 
   if (!isLoaded && !userId) {
     localStorage.removeItem("user");
@@ -66,7 +67,7 @@ export default function Home() {
             className="absolute inset-0 w-full h-full object-cover z-0 opacity-50"
           >
             <source
-              src="https://res.cloudinary.com/dsziq73cb/video/upload/v1741989883/gigmeUpload/yokrhywny8wq1wfcwssi.mp4"
+              src="https://res.cloudinary.com/dsziq73cb/video/upload/v1741577722/gigmeUpload/gww2kwzvdtkx4qxln6qu.mp4"
               type="video/mp4"
             />
             Your browser does not support the video tag.
@@ -106,7 +107,7 @@ export default function Home() {
               </p>
               <Link
                 href="#features"
-                className="bg-white text-black py-2 px-6 rounded-full font-semibold hover:bg-gray-200"
+                className="bg-white text-black py-2 px-6 rounded-full font-semibold hover:bg-gray-200  clip-link-polygon"
               >
                 Get Started
               </Link>
@@ -142,23 +143,6 @@ export default function Home() {
                 others.
               </p>
             </motion.div>
-            {/* <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="bg-gray-700 p-6 rounded-lg shadow-lg"
-            >
-              <Image
-                src={postimag}
-                alt="Post"
-                className="mx-auto mb-6 h-20 w-20 object-fit"
-                width={20}
-                height={20}
-              />
-              <h3 className="text-2xl font-bold mb-4">Discover New Artists</h3>
-              <p className="text-gray-400">
-                Find incredible jams posted by other musicians from all over the
-                globe.
-              </p>
-            </motion.div> */}
             <motion.div
               whileHover={{ scale: 1.05 }}
               className="bg-gray-700 p-6 rounded-lg shadow-lg"
@@ -179,16 +163,47 @@ export default function Home() {
         </motion.section>
 
         {/* Tutorial Section */}
-        <section className="py-16 px-8 bg-gray-900">
+        <section
+          className="py-16 px-8 bg-gray-900 min-h-[500px]  "
+          id="features"
+        >
           <h2 className="text-4xl font-bold text-center mb-12">How It Works</h2>
           <div className="flex justify-center">
-            <video controls className="w-full max-w-4xl rounded-lg shadow-lg">
-              <source
-                src="https://res.cloudinary.com/dsziq73cb/video/upload/v1741577722/gigmeUpload/gww2kwzvdtkx4qxln6qu.mp4"
-                type="video/mp4"
-              />
-              Your browser does not support the video tag.
-            </video>
+            {!showVideo ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 1 }}
+                className="cursor-pointer relative"
+                onClick={() => setShowVideo(true)}
+              >
+                <Image
+                  src={thumbnailImage}
+                  alt="Video Thumbnail"
+                  className="w-full max-w-4xl rounded-lg shadow-lg h-full"
+                />
+                <div className="absolute inset-0 flex items-center justify-center ">
+                  <PlayIcon
+                    className="h-10 w-10 text-gray-200"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  />
+                </div>
+              </motion.div>
+            ) : (
+              <video
+                controls
+                autoPlay
+                className="w-full max-w-4xl rounded-lg shadow-lg aspect-video"
+              >
+                <source
+                  src="https://res.cloudinary.com/dsziq73cb/video/upload/v1742520206/ike81qltg0etsoblov4c.mp4"
+                  type="video/mp4"
+                />
+                Your browser does not support the video tag.
+              </video>
+            )}
           </div>
         </section>
 
@@ -203,7 +218,7 @@ export default function Home() {
               Ready to Jam?
             </h2>
             <Link
-              href={`/gigme/gigs/${userId}`}
+              href={`/roles/${userId}`}
               className="px-8 py-4 bg-black text-yellow-500 rounded-lg font-bold hover:bg-gray-800 transition-all"
             >
               Join Now
