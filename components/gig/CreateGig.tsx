@@ -317,7 +317,7 @@ const CreateGig = () => {
               </div>
               {showCategories.title && (
                 <div className="flex flex-col gap-4 w-full">
-                  <div className="flex items-center rounded-lg bg-gray-800 p-2">
+                  <div className="flex items-center rounded-lg bg-gray-300 p-2">
                     <input
                       autoComplete="off"
                       onChange={handleInputChange}
@@ -325,7 +325,7 @@ const CreateGig = () => {
                       value={gigInputs?.secret}
                       type={!secretpass ? "password" : "text"}
                       placeholder="Enter secret (valid only once)"
-                      className="w-full bg-transparent text-gray-100 text-sm focus:outline-none"
+                      className="w-full bg-transparent text-gray-800 text-sm focus:outline-none"
                     />
                     {secretpass ? (
                       <EyeOff
@@ -348,7 +348,7 @@ const CreateGig = () => {
                     value={gigInputs?.title}
                     type="text"
                     placeholder="Enter a title"
-                    className="w-full bg-gray-800 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full bg-gray-300 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               )}
@@ -378,7 +378,7 @@ const CreateGig = () => {
                 name="description"
                 value={gigInputs?.description}
                 style={{ resize: "none", height: "fit-content" }}
-                className="min-h-[100px] bg-gray-800 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="min-h-[100px] bg-gray-300 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter description (e.g., songs or vibe expected at the event/show)"
               />
             )}
@@ -405,7 +405,7 @@ const CreateGig = () => {
                   autoComplete="off"
                   type="text"
                   placeholder="Enter phone number"
-                  className="w-full bg-gray-800 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full bg-gray-300 text-gray800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   onChange={handleInputChange}
                   name="phoneNo"
                   value={gigInputs?.phoneNo}
@@ -414,7 +414,7 @@ const CreateGig = () => {
                   autoComplete="off"
                   type="text"
                   placeholder="Enter expected price range"
-                  className="w-full bg-gray-800 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full bg-gray-300 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   onChange={handleInputChange}
                   name="price"
                   value={gigInputs?.price}
@@ -444,7 +444,7 @@ const CreateGig = () => {
                   autoComplete="off"
                   type="text"
                   placeholder="Enter location"
-                  className="w-full bg-gray-800 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full bg-gray-300 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   onChange={handleInputChange}
                   name="location"
                   value={gigInputs?.location}
@@ -453,7 +453,7 @@ const CreateGig = () => {
                   onChange={handleTimeline}
                   name="durationfrom"
                   value={gigTimeline ? gigTimeline : ""}
-                  className="w-[150px] bg-gray-700 text-gray-100 h-[40px] rounded-lg text-xs px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-[150px] bg-gray-300 text-gray-800 h-[40px] rounded-lg text-xs px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value=""> Gig Timeline </option>
                   <option value="once">
@@ -468,7 +468,7 @@ const CreateGig = () => {
                       autoComplete="off"
                       type="text"
                       placeholder="Enter other timeline details"
-                      className="w-full bg-gray-800 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full bg-gray-300 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       onChange={handleInputChange}
                       name="otherTimeline"
                       value={gigInputs?.otherTimeline}
@@ -479,7 +479,7 @@ const CreateGig = () => {
                 )}
                 {gigTimeline === "other" && (
                   <select
-                    className="w-1/3 p-2 rounded-md bg-gray-700 text-gray-300 border-none focus:ring-0 text-[10px]"
+                    className="w-1/3 p-2 rounded-md bg-gray-300 text-gray-800 border-none focus:ring-0 text-[10px]"
                     value={gigInputs?.day}
                     onChange={handleInputChange}
                   >
@@ -519,7 +519,7 @@ const CreateGig = () => {
                 onChange={handleInputChange}
                 name="category"
                 value={gigInputs?.category}
-                className="w-full bg-gray-800 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-gray-300 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="piano">Piano</option>
                 <option value="guitar">Guitar</option>
@@ -536,7 +536,7 @@ const CreateGig = () => {
             {!showCategories?.othergig && (
               <>
                 {bussinesscat === "other" && (
-                  <div className="grid grid-cols-3 gap-1 bg-gray-800 p-4 rounded-lg px-">
+                  <div className="grid grid-cols-3 gap-1 bg-gray-300 p-4 rounded-lg px-2">
                     {[
                       "vocalist",
                       "piano",
@@ -556,7 +556,7 @@ const CreateGig = () => {
                         />
                         <label
                           htmlFor={item}
-                          className="text-gray-100 text-sm capitalize"
+                          className="text-gray-800 text-sm capitalize"
                         >
                           {item}
                         </label>
@@ -567,7 +567,7 @@ const CreateGig = () => {
               </>
             )}
             {showduration ? (
-              <div className="bg-gray-800 p-4 rounded-lg relative">
+              <div className="bg-gray-700 p-4 rounded-lg relative">
                 <div
                   className="text-white absolute right-2 top-2 text-xl cursor-pointer"
                   onClick={() => setshowduration(false)}
@@ -581,7 +581,7 @@ const CreateGig = () => {
                       autoComplete="off"
                       type="text"
                       placeholder="Time (e.g., 10 means 10:00)"
-                      className="w-[120px] bg-gray-700 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-[120px] bg-gray-200 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       onChange={handleInputChange}
                       name="start"
                       value={gigInputs?.start}
@@ -590,7 +590,7 @@ const CreateGig = () => {
                       onChange={handleInputChange}
                       name="durationfrom"
                       value={gigInputs?.durationfrom}
-                      className="w-[60px] bg-gray-700 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-[60px] bg-gray-200 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="pm">PM</option>
                       <option value="am">AM</option>
@@ -602,7 +602,7 @@ const CreateGig = () => {
                       autoComplete="off"
                       type="text"
                       placeholder="Time (e.g., 10 means 10:00)"
-                      className="w-[120px] bg-gray-700 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-[120px] bg-gray-200 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       onChange={handleInputChange}
                       name="end"
                       value={gigInputs?.end}
@@ -611,7 +611,7 @@ const CreateGig = () => {
                       onChange={handleInputChange}
                       name="durationto"
                       value={gigInputs?.durationto}
-                      className="w-[60px] bg-gray-700 text-gray-100 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-[60px] bg-gray-300 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="pm">PM</option>
                       <option value="am">AM</option>
