@@ -56,6 +56,8 @@ export const initialState = {
     fontColor: "",
     backgroundColor: "",
     logo: "",
+    otherTimeline: "",
+    gigTimeline: "",
   },
 
   searchQuery: "",
