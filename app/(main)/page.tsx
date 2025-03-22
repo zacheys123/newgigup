@@ -15,7 +15,7 @@ import { PlayIcon } from "@heroicons/react/24/solid";
 export default function Home() {
   const { isLoaded, userId } = useAuth()
     const {
-    user: { firstname,isClient,isMusician ,email},
+    user: { firstname,isClient,isMusician},
   } = useCurrentUser(userId || null);
   const [showVideo, setShowVideo] = useState(false); // State to toggle video playback
 
