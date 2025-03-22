@@ -105,7 +105,7 @@ export default function Home() {
                 Share your jam sessions, create and book gigs, connect with
                 musicians around the world.
               </p>
-              {user && (
+              {firstname && (
                 <Link
                   href={
                     !user.firstname
