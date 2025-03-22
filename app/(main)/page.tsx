@@ -231,11 +231,11 @@ export default function Home() {
               href={
                 firstname
                   ? `/roles/${userId}`
-                  : user?.isClient
+                  : isClient
                   ? "/create/" + userId
-                  : user?.isMusician
+                  : isMusician
                   ? "/gigs/" + userId
-                  : "/not-found"
+                  : "roles/"+userId"
               }
               className="px-8 py-4 bg-black text-yellow-500 rounded-lg font-bold hover:bg-gray-800 transition-all"
             >
