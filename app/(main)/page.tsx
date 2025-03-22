@@ -108,7 +108,7 @@ export default function Home() {
               {firstname && (
                 <Link
                   href={
-                    !user.firstname
+                    firstname
                       ? `/roles/${userId}`
                       : isClient
                       ? "/create/" + userId
@@ -229,7 +229,7 @@ export default function Home() {
             </h2>
             <Link
               href={
-                !user
+                firstname
                   ? `/roles/${userId}`
                   : user?.isClient
                   ? "/create/" + userId
