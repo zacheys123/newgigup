@@ -13,10 +13,9 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { PlayIcon } from "@heroicons/react/24/solid";
 
 export default function Home() {
-  const { isLoaded, userId } = useAuth();
-  const { user } = useCurrentUser(userId || null);
-  const {
-    user: { firstname },
+  const { isLoaded, userId } = useAuth()
+    const {
+    user: { firstname,isClient,isMusician },
   } = useCurrentUser(userId || null);
   const [showVideo, setShowVideo] = useState(false); // State to toggle video playback
 
@@ -109,13 +108,13 @@ export default function Home() {
               {user && (
                 <Link
                   href={
-                    !user
+                    !user.firstname
                       ? `/roles/${userId}`
-                      : user?.isClient
+                      : isClient
                       ? "/create/" + userId
-                      : user?.isMusician
+                      : isMusician
                       ? "/gigs/" + userId
-                      : "/not-found"
+                      :"roles/"+userId
                   }
                   className="bg-white text-black py-2 px-6 rounded-full font-semibold hover:bg-gray-200  clip-link-polygon"
                 >
