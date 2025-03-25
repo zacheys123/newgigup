@@ -177,6 +177,37 @@ export const searchFunc = (users: UserProps[], searchQuery: string) => {
 //     console.error("Error deleting video:", error);
 //   }
 // };
+// export const gigcards = [
+//   {
+//     role: "client",
+//     title: "Client",
+//     color: "orange",
+//     description:
+//       "Join as a client to create gigs for musicians and choose the best talent to deliver quality music for you.",
+//     onClick: () => handleRoleSelection(false),
+//     buttonText: clientload ? <BallLoader /> : "Join as Client",
+//     disabled: !!myuser?.isClient,
+//   },
+//   {
+//     role: "musician",
+//     title: "Musician",
+//     color: "blue",
+//     description:
+//       "Join as a musician to discover and book gigs while connecting with fellow musicians and clients.",
+//     onClick: () => handleRoleSelection(true),
+//     buttonText: musicianload ? <BallLoader /> : "Join as Musician",
+//     disabled: !!myuser?.isMusician,
+//   },
+//   {
+//     role: "both",
+//     title: "Both",
+//     color: "gray",
+//     description:
+//       "Join as both a Client and a musician to be able to create gigs and offer other musicians gigs and also be able to book a gig yourself.",
+//     buttonText: "Coming Soon",
+//     disabled: true,
+//   },
+// ];
 
 // Function to handle the follow action
 export const handleFollow = async (

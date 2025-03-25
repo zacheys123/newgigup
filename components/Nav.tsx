@@ -19,7 +19,6 @@ const Nav = () => {
       <div className="flex items-center">
         <Logo />
       </div>
-
       {/* Navigation items aligned to the right */}
       <div className="flex items-center gap-3 ml-auto">
         {userId ? (
@@ -31,29 +30,31 @@ const Nav = () => {
               <MdEmail size="21" />
               <span className="hidden md:inline">Gigs</span>
             </Link>
+            {user?.firstname && (
+              <>
+                <Link
+                  href={
+                    user?.isClient
+                      ? `/client/profile/${userId}`
+                      : user?.isMusician
+                      ? `/profile`
+                      : "/profile"
+                  }
+                  className="flex items-center gap-2 p-3 rounded-full transition-all hover:bg-neutral-700 hover:scale-105"
+                >
+                  <User size="21" />
+                  <span className="hidden md:inline">Profile</span>
+                </Link>
 
-            <Link
-              href={
-                user?.isClient
-                  ? `/client/profile/${userId}`
-                  : user?.isMusician
-                  ? `/profile`
-                  : "/profile"
-              }
-              className="flex items-center gap-2 p-3 rounded-full transition-all hover:bg-neutral-700 hover:scale-105"
-            >
-              <User size="21" />
-              <span className="hidden md:inline">Profile</span>
-            </Link>
-
-            <Link
-              href="/gigme/about"
-              className="flex items-center gap-2 p-3 rounded-full transition-all hover:bg-neutral-700 hover:scale-105"
-            >
-              <MessageCircleQuestion size="21" />
-              <span className="hidden md:inline">FAQ</span>
-            </Link>
-
+                <Link
+                  href="/gigme/about"
+                  className="flex items-center gap-2 p-3 rounded-full transition-all hover:bg-neutral-700 hover:scale-105"
+                >
+                  <MessageCircleQuestion size="21" />
+                  <span className="hidden md:inline">FAQ</span>
+                </Link>
+              </>
+            )}
             <UserButton afterSignOutUrl="/" />
           </div>
         ) : (

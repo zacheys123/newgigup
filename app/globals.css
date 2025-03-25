@@ -615,6 +615,48 @@ input[type="radio"] {
     transform: translateX(14%);
   }
 }
+/* main.css */
+.heading-primary {
+  font-size: 3rem;
+  font-weight: 800;
+  text-align: center;
+  line-height: 1.2;
+  background: linear-gradient(90deg, #facc15, #fbbf24);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: fadeInUp 1s ease-in-out;
+}
+
+.heading-secondary {
+  font-size: 2.5rem;
+  font-weight: 700;
+  text-align: center;
+  color: #facc15;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.heading-secondary::after {
+  content: "";
+  width: 60px;
+  height: 4px;
+  background: #fbbf24;
+  display: block;
+  margin: 8px auto 0;
+  border-radius: 2px;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* intro loader 
 /* From Uiverse.io by Nawsome */
 /* .loaderIn {
