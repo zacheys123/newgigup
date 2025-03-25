@@ -78,16 +78,19 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1 }}
           >
-            <h1 className="text-5xl font-extrabold tracking-wide leading-tight heading-primary">
+            <h1
+              className="text-5xl font-extrabold tracking-wide leading-tight text-transparent 
+  bg-gradient-to-r from-green-500 via-red-400  bg-clip-text from green-400 to-yellow-400"
+            >
               Discover. Create. Perform.
             </h1>
-            <p className="text-lg text-gray-300 mt-4">
+            <p className="text-lg text-gray-300 my-6">
               Join a global community of musicians and music lovers.
             </p>
             {firstname && (
               <Link
                 href={getDynamicHref()}
-                className="inline-block mt-6 px-6 py-3 bg-yellow-500 text-gray-900 text-lg font-semibold rounded-full shadow-lg hover:bg-yellow-400 transition"
+                className="mt-6 px-6 py-3 bg-amber-500 text-gray-900 text-lg font-semibold rounded-full shadow-lg hover:bg-yellow-400 transition clip-link-polygon"
               >
                 Get Started
               </Link>
@@ -100,7 +103,7 @@ export default function Home() {
         <div className="text-center">
           <h2
             className="text-4xl font-bold mb-12 text-transparent 
-  bg-gradient-to-r from-red-600 via-green-700  to-pink-400 bg-clip-text"
+  bg-gradient-to-r from-yellow-600/80   to-pink-400 bg-clip-text"
           >
             Our Features
           </h2>
@@ -179,22 +182,29 @@ export default function Home() {
               </video>
             )}
           </div>
-        </div>
+        </div>{" "}
+        {firstname && (
+          <p className="absolute bottom-10 text-gray-400 mt-6">
+            © {new Date().getFullYear()} gigUp. All rights reserved.
+          </p>
+        )}
       </section>{" "}
       <ScrollToTopButton />
       {/* Footer */}
-      <footer className="h-screen flex flex-col justify-center items-center bg-gray-900 snap-start">
-        <h2 className="text-4xl font-bold mb-4">Ready to Jam?</h2>
-        <Link
-          href={getDynamicHref()}
-          className="px-8 py-4 bg-yellow-500 text-gray-900 text-lg font-bold rounded-lg shadow-lg hover:bg-yellow-400 transition"
-        >
-          Join Now
-        </Link>
-        <p className="text-gray-400 mt-6">
-          © {new Date().getFullYear()} gigUp. All rights reserved.
-        </p>
-      </footer>
+      {!firstname && (
+        <footer className="h-screen flex flex-col justify-center items-center bg-gray-900 snap-start">
+          <h2 className="text-4xl font-bold mb-4">Ready to Gig?</h2>
+          <Link
+            href={getDynamicHref()}
+            className="px-6 py-2 bg-yellow-500 text-gray-900 text-lg font-bold rounded-lg shadow-lg hover:bg-yellow-400 transition  animate-pulse"
+          >
+            Join Now
+          </Link>
+          <p className="text-gray-400 mt-6 absolute bottom-10">
+            © {new Date().getFullYear()} gigUp. All rights reserved.
+          </p>
+        </footer>
+      )}
     </div>
   );
 }
