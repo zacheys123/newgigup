@@ -7,20 +7,31 @@ import { useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import "./main.css";
-import { useState } from "react"; // Import useState for state management
-import thumbnailImage from "../../public/assets/discover4.webp"; // Import your thumbnail image
+import { useState, useEffect } from "react"; // Added useEffect for side effects
+import thumbnailImage from "../../public/assets/discover4.webp";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { PlayIcon } from "@heroicons/react/24/solid";
 
 export default function Home() {
   const { isLoaded, userId } = useAuth();
   const {
-    user: { firstname, isClient, isMusician },
+    user: { firstname, isClient, isMusician } = {
+      firstname: "",
+      isClient: false,
+      isMusician: false,
+    }, // Safeguard against undefined
   } = useCurrentUser(userId || null);
-  const [showVideo, setShowVideo] = useState(false); // State to toggle video playback
+  const [showVideo, setShowVideo] = useState(false);
+  const [isClientSide, setIsClientSide] = useState(false); // Prevent SSR issues
+
+  useEffect(() => {
+    setIsClientSide(true);
+    if (!isLoaded && !userId) {
+      localStorage.removeItem("user");
+    }
+  }, [isLoaded, userId]);
 
   if (!isLoaded && !userId) {
-    localStorage.removeItem("user");
     return (
       <div className="h-screen w-full">
         <div className="flex justify-center items-center h-screen flex-col">
@@ -33,8 +44,9 @@ export default function Home() {
     );
   }
 
-  const sentence = `Welcome to gigUp, ${firstname}!`;
+  const sentence = `Welcome to gigUp, ${firstname || "User"}!`; // Fallback for undefined firstname
   const words = sentence.split(" ");
+
   const containerVariants = {
     hidden: { opacity: 1 },
     visible: {
@@ -54,16 +66,26 @@ export default function Home() {
     },
   };
 
+  // Memoize dynamic href to avoid recalculations
+  const getDynamicHref = () => {
+    if (!firstname) return `/roles/${userId}`;
+    return isClient
+      ? `/create/${userId}`
+      : isMusician
+      ? `/gigs/${userId}`
+      : `/roles/${userId}`;
+  };
+
   return (
     <>
       <div className="bg-gray-900 min-h-screen text-white font-sans">
-        {/* Hero Section with Video Background */}
+        {/* Hero Section */}
         <section className="relative flex flex-col items-center justify-center min-h-[520px] text-center overflow-hidden clip-polygon">
-          {/* Video Background */}
           <video
             autoPlay
             loop
             muted
+            playsInline // Added for iOS support
             className="absolute inset-0 w-full h-full object-cover z-0 opacity-35"
           >
             <source
@@ -72,29 +94,28 @@ export default function Home() {
             />
             Your browser does not support the video tag.
           </video>
-          {/* Overlay */}
           <div className="absolute inset-0 bg-black bg-opacity-50 z-1"></div>
-          {/* Content */}
           <div className="relative z-10 ml-6">
-            {firstname && (
-              <motion.div
-                className="mb-10"
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
-                style={{ display: "flex", gap: "6px" }}
-              >
-                {words.map((word, index) => (
-                  <motion.span
-                    key={index}
-                    variants={wordVariants}
-                    className="text-[16px] bg-gradient-to-l from-yellow-600 via-gray-400 to-red-600 inline-block text-transparent bg-clip-text font-bold"
-                  >
-                    {word}
-                  </motion.span>
-                ))}
-              </motion.div>
-            )}
+            {isClientSide &&
+              firstname && ( // Only render if client-side and firstname exists
+                <motion.div
+                  className="mb-10"
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                  style={{ display: "flex", gap: "6px" }}
+                >
+                  {words.map((word, index) => (
+                    <motion.span
+                      key={`${word}-${index}`} // More unique key
+                      variants={wordVariants}
+                      className="text-[16px] bg-gradient-to-l from-yellow-600 via-gray-400 to-red-600 inline-block text-transparent bg-clip-text font-bold"
+                    >
+                      {word}
+                    </motion.span>
+                  ))}
+                </motion.div>
+              )}
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -107,16 +128,8 @@ export default function Home() {
               </p>
               {firstname && (
                 <Link
-                  href={
-                    firstname
-                      ? `/roles/${userId}`
-                      : isClient
-                      ? "/create/" + userId
-                      : isMusician
-                      ? "/gigs/" + userId
-                      : "roles/" + userId
-                  }
-                  className="bg-white text-black py-2 px-6 rounded-full font-semibold hover:bg-gray-200  clip-link-polygon"
+                  href={getDynamicHref()}
+                  className="bg-white text-black py-2 px-6 rounded-full font-semibold hover:bg-gray-200 clip-link-polygon"
                 >
                   Get Started
                 </Link>
@@ -125,58 +138,54 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Polygon Styled Section */}
+        {/* Features Section */}
         <motion.section
           className="py-16 px-8 bg-gray-800 clip-polygon"
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
+          viewport={{ once: true }} // Optimize animation triggers
         >
           <h2 className="text-4xl font-bold text-center mb-12">
             What You Can Do
           </h2>
           <div className="grid md:grid-cols-3 gap-12 text-center">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="bg-gray-700 p-6 rounded-lg shadow-lg"
-            >
-              <Image
-                src={postimage}
-                alt="Post"
-                className="mx-auto mb-6 h-20 w-20 object-fit"
-                width={20}
-                height={20}
-              />
-              <h3 className="text-2xl font-bold mb-4">Post Your Jam</h3>
-              <p className="text-gray-400">
-                Upload your music jam sessions and share your passion with
-                others.
-              </p>
-            </motion.div>
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="bg-gray-700 p-6 rounded-lg shadow-lg"
-            >
-              <Image
-                src={reactimage}
-                alt="Post"
-                className="mx-auto mb-6 h-20 w-20 object-fit"
-                width={20}
-                height={20}
-              />
-              <h3 className="text-2xl font-bold mb-4">React & Interact</h3>
-              <p className="text-gray-400">
-                {`Like, comment, and share your thoughts on other people's videos.`}
-              </p>
-            </motion.div>
+            {[
+              {
+                image: postimage,
+                title: "Post Your Jam",
+                description:
+                  "Upload your music jam sessions and share your passion with others.",
+              },
+              {
+                image: reactimage,
+                title: "React & Interact",
+                description:
+                  "Like, comment, and share your thoughts on other people's videos.",
+              },
+            ].map((item, idx) => (
+              <motion.div
+                key={idx}
+                whileHover={{ scale: 1.05 }}
+                className="bg-gray-700 p-6 rounded-lg shadow-lg"
+              >
+                <Image
+                  src={item.image}
+                  alt={item.title}
+                  className="mx-auto mb-6 h-20 w-20 object-fit"
+                  width={80} // Increased for better quality
+                  height={80}
+                  priority={idx < 2} // Prioritize above-the-fold images
+                />
+                <h3 className="text-2xl font-bold mb-4">{item.title}</h3>
+                <p className="text-gray-400">{item.description}</p>
+              </motion.div>
+            ))}
           </div>
         </motion.section>
 
         {/* Tutorial Section */}
-        <section
-          className="py-16 px-8 bg-gray-900 min-h-[500px]  "
-          id="features"
-        >
+        <section className="py-16 px-8 bg-gray-900 min-h-[500px]" id="features">
           <h2 className="text-4xl font-bold text-center mb-12">How It Works</h2>
           <div className="flex justify-center">
             {!showVideo ? (
@@ -186,26 +195,26 @@ export default function Home() {
                 transition={{ duration: 1 }}
                 className="cursor-pointer relative"
                 onClick={() => setShowVideo(true)}
+                role="button"
+                aria-label="Play tutorial video"
               >
                 <Image
                   src={thumbnailImage}
                   alt="Video Thumbnail"
                   className="w-full max-w-4xl rounded-lg shadow-lg h-full"
+                  priority // Important for LCP
                 />
-                <div className="absolute inset-0 flex items-center justify-center ">
-                  <PlayIcon
-                    className="h-10 w-10 text-gray-200"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <PlayIcon className="h-10 w-10 text-gray-200" />
                 </div>
               </motion.div>
             ) : (
               <video
                 controls
                 autoPlay
+                playsInline
                 className="w-full max-w-4xl rounded-lg shadow-lg aspect-video"
+                onEnded={() => setShowVideo(false)} // Reset when video ends
               >
                 <source
                   src="https://res.cloudinary.com/dsziq73cb/video/upload/v1742520206/ike81qltg0etsoblov4c.mp4"
@@ -217,26 +226,19 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Call to Action */}
+        {/* CTA Section */}
         <section className="bg-yellow-500 py-16 px-8 text-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1 }}
+            viewport={{ once: true }}
           >
             <h2 className="text-4xl font-bold mb-6 text-gray-900">
               Ready to Jam?
             </h2>
             <Link
-              href={
-                firstname
-                  ? `/roles/${userId}`
-                  : isClient
-                  ? "/create/" + userId
-                  : isMusician
-                  ? "/gigs/" + userId
-                  : "roles/" + userId
-              }
+              href={getDynamicHref()}
               className="px-8 py-4 bg-black text-yellow-500 rounded-lg font-bold hover:bg-gray-800 transition-all"
             >
               Join Now
@@ -246,7 +248,7 @@ export default function Home() {
 
         {/* Footer */}
         <footer className="bg-gray-800 py-8 text-center text-gray-500">
-          <p>© 2024 gigUp. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} gigUp. All rights reserved.</p>
         </footer>
       </div>
     </>
