@@ -189,7 +189,7 @@ const ActionPage = () => {
       transition={{ duration: 0.5 }}
       className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 z-50"
     >
-      {myuser ? (
+      {myuser?.firstname ? (
         <div className="h-[180px] w-[80%] mx-auto bg-neutral-800 p-7 rounded-xl shadow shadow-zinc-700">
           <span className="flex flex-col">
             <span className="text-green-300">Status:</span>
@@ -285,7 +285,11 @@ const ActionPage = () => {
               }}
               className="w-full bg-orange-500 text-white py-2 rounded hover:bg-orange-600 transition-colors duration-300"
             >
-              Save and Continue
+              {musicianload || clientload ? (
+                <BallLoader />
+              ) : (
+                " Save and Continue "
+              )}
             </Button>
           </div>
         </motion.div>
@@ -316,7 +320,7 @@ const ActionPage = () => {
               description:
                 "Join as a client to create gigs for musicians and choose the best talent to deliver quality music for you.",
               onClick: () => handleRoleSelection(false),
-              buttonText: clientload ? <BallLoader /> : "Join as Client",
+              buttonText: "Join as Client",
               disabled: !!myuser?.isClient,
             },
             {
@@ -326,7 +330,7 @@ const ActionPage = () => {
               description:
                 "Join as a musician to discover and book gigs while connecting with fellow musicians and clients.",
               onClick: () => handleRoleSelection(true),
-              buttonText: musicianload ? <BallLoader /> : "Join as Musician",
+              buttonText: "Join as Musician",
               disabled: !!myuser?.isMusician,
             },
             {
