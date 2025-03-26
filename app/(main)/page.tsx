@@ -12,6 +12,9 @@ import thumbnailImage from "../../public/assets/discover4.webp";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { PlayIcon } from "@heroicons/react/24/solid";
 import ScrollToTopButton from "@/components/ScrollUp";
+import { colors, fonts } from "@/utils";
+import { BsOpencollective } from "react-icons/bs";
+import { AppWindowIcon } from "lucide-react";
 
 export default function Home() {
   const { isLoaded, userId } = useAuth();
@@ -87,14 +90,14 @@ export default function Home() {
             <p className="text-lg text-gray-300 my-6">
               Join a global community of musicians and music lovers.
             </p>
-            {firstname && (
+            {/* {firstname && (
               <Link
                 href={getDynamicHref()}
                 className="mt-6 px-6 py-3 bg-amber-500 text-gray-900 text-lg font-semibold rounded-full shadow-lg hover:bg-yellow-400 transition clip-link-polygon"
               >
                 Get Started
               </Link>
-            )}
+            )} */}
           </motion.div>
         )}
       </section>
@@ -184,9 +187,26 @@ export default function Home() {
           </div>
         </div>{" "}
         {firstname && (
-          <p className="absolute bottom-10 text-gray-400 mt-6">
-            © {new Date().getFullYear()} gigUp. All rights reserved.
-          </p>
+          <Link
+            className="absolute bottom-5 mt-6 px-6 py-1  text-gray-100 text-sm font-semibold rounded-br-xl  rounded-bl-xl roundedt-l-xl shadow-lg hover:bg-yellow-400 transition animate-bounce flex items-center"
+            style={{ fontFamily: fonts[24], backgroundColor: colors[15] }}
+            role="button"
+            href={getDynamicHref()}
+          >
+            <AppWindowIcon
+              className="h-6 w-6 text-[15px] text-gray-200 hover:text-yellow-400 transition gap-2"
+              size="20"
+              style={{
+                animation: "pulse 2s infinite",
+
+                animationDirection: "normal",
+                animationDuration: "2s",
+                animationFillMode: "forwards",
+                animationIterationCount: "infinite",
+              }}
+            />{" "}
+            Open gigup
+          </Link>
         )}
       </section>{" "}
       <ScrollToTopButton />
@@ -194,12 +214,12 @@ export default function Home() {
       {!firstname && (
         <footer className="h-screen flex flex-col justify-center items-center bg-gray-900 snap-start">
           <h2 className="text-4xl font-bold mb-4">Ready to Gig?</h2>
-          <Link
+          {/* <Link
             href={getDynamicHref()}
             className="px-6 py-2 bg-yellow-500 text-gray-900 text-lg font-bold rounded-lg shadow-lg hover:bg-yellow-400 transition  animate-pulse"
           >
             Join Now
-          </Link>
+          </Link> */}
           <p className="text-gray-400 mt-6 absolute bottom-10">
             © {new Date().getFullYear()} gigUp. All rights reserved.
           </p>
