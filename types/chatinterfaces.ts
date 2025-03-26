@@ -2,9 +2,10 @@ import { UserProps } from "./userinterfaces";
 
 export interface ChatProps {
   chatId: string;
-  receiver: string | undefined; // Renamed for clarity
+  receiver: string | undefined;
   sender: string | undefined;
-  messages: MessageProps[]; // Directly using an array instead of MessagesProps
+  users?: UserProps[]; // Make it optional
+  messages: MessageProps[];
 }
 
 export interface MessageProps {

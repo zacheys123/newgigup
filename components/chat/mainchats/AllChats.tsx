@@ -1,17 +1,18 @@
 "use client";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { MessageProps } from "@/types/chatinterfaces";
+import { ChatProps, MessageProps } from "@/types/chatinterfaces";
 import { UserProps } from "@/types/userinterfaces";
 import { useAuth } from "@clerk/nextjs";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import useSWR, { mutate } from "swr";
-import { useEffect, useState } from "react"; // Import useState
+import { useCallback, useEffect, useMemo, useState } from "react"; // Import useState
 import { FaSearch, FaArrowLeft, FaUserPlus, FaTrash } from "react-icons/fa"; // Import icons for search and back
 import BallLoader from "@/components/loaders/BallLoader";
 import { colors, fonts } from "@/utils";
 import useStore from "@/app/zustand/useStore";
 import { useAddChat } from "@/hooks/useAddChat";
+import { ChatSkeleton } from "./ChatSkeleton";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -22,55 +23,104 @@ const AllChats = () => {
   const router = useRouter();
   const loggedInUserId = myuser?._id;
   console.log(myuser);
-  // Use localStorage to store and retrieve chats
-  const [localChats, setLocalChats] = useState<
-    { users: UserProps[]; _id: string; messages: MessageProps[] }[]
-  >([]);
 
-  // Fetch chats from the database and store them in localStorage
-  const { data: chats, error } = useSWR("/api/chat/allchats", fetcher, {
-    revalidateOnFocus: true,
-    onErrorRetry: (error, key, config, revalidate, { retryCount }) => {
-      if (retryCount >= 3) return; // Retry up to 3 times
-      setTimeout(() => revalidate({ retryCount }), 5000); // Retry after 5 seconds
-    },
-    onSuccess: (data) => {
-      // Store fetched chats in localStorage
-      localStorage.setItem("chats", JSON.stringify(data));
-      setLocalChats(data); // Update local state
-    },
-  });
+  // Filter chats based on the search query
+  // Filter and process chats
+  // In your AllChats component:
 
-  // Load chats from localStorage on initial render
-  useEffect(() => {
-    const storedChats = localStorage.getItem("chats");
-    if (storedChats) {
-      setLocalChats(JSON.parse(storedChats));
+  // Replace the localStorage usage with this approach:
+
+  // Fetch chats from the database - don't store in localStorage
+  const { setIsOpen, updateUnreadCount, unreadCounts } = useStore();
+  const [searchQuery, setSearchQuery] = useState(""); // State for search query
+  const [isSearchVisible, setIsSearchVisible] = useState(false); // State to toggle search input
+
+  const [isAddChat, setIsAddChat] = useState(false); // State to toggle search input
+
+  const {
+    data: chats,
+    error,
+    isLoading,
+  } = useSWR(
+    loggedInUserId ? `/api/chat/allchats?userId=${loggedInUserId}` : null,
+    fetcher,
+    {
+      revalidateOnFocus: true,
+      revalidateIfStale: true,
+      revalidateOnReconnect: true,
+      revalidateOnMount: true,
+      // Dedupe requests with the same key for 5 seconds
+      dedupingInterval: 5000,
+      // Cache the data for 2 minutes
+      focusThrottleInterval: 120000,
+      onErrorRetry: (error, key, config, revalidate, { retryCount }) => {
+        if (error.status === 404 || error.status === 401) return;
+        if (retryCount >= 3) return;
+        setTimeout(() => revalidate({ retryCount }), 5000);
+      },
     }
-  }, []);
+  );
+
+  // Then your filteredChats can be simplified to:
+  // const filteredChats = useMemo(() => {
+  //   if (!chats) return [];
+
+  //   return chats.filter((chat) => {
+  //     // Find the other user in the chat
+  //     const otherUser = chat.users.find((user) => user._id !== loggedInUserId);
+  //     return otherUser?.firstname
+  //       ?.toLowerCase()
+  //       .includes(searchQuery.toLowerCase());
+  //   });
+  // }, [chats, loggedInUserId, searchQuery]);
+
+  // Remove these localStorage related effects:
+  // - Remove the onSuccess localStorage.setItem
+  // - Remove the useEffect that loads from localStorage
+
+  // Update your filteredChats to use chats directly:
+  const filteredChats = useMemo(() => {
+    if (!chats) return [];
+
+    return chats.filter((chat: ChatProps) => {
+      // Handle both cases (users array or sender/receiver)
+      if (chat.users) {
+        const otherUser = chat.users.find(
+          (user) => user._id !== loggedInUserId
+        );
+        return otherUser?.firstname
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase());
+      } else {
+        const otherUserId =
+          chat.sender === loggedInUserId ? chat.receiver : chat.sender;
+        // You might need to fetch user details here
+        return otherUserId?.toLowerCase().includes(searchQuery.toLowerCase());
+      }
+    });
+  }, [chats, loggedInUserId, searchQuery]);
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(
     null
   ); // Timer for long press
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null); // Track which chat is selected for deletion
 
   // Function to handle long press start
-  const handleLongPressStart = (chatId: string) => {
-    const timer = setTimeout(() => {
-      setSelectedChatId(chatId); // Set the chat ID for deletion
-    }, 1000); // 1 second long press
+  const handleLongPressStart = useCallback((chatId: string) => {
+    const timer = setTimeout(() => setSelectedChatId(chatId), 1000);
     setLongPressTimer(timer);
-  };
+  }, []);
 
   // Function to handle long press end
-  const handleLongPressEnd = () => {
+
+  const handleLongPressEnd = useCallback(() => {
     if (longPressTimer) {
-      clearTimeout(longPressTimer); // Clear the timer if the press is released early
+      clearTimeout(longPressTimer);
       setLongPressTimer(null);
     }
-  };
+  }, [longPressTimer]);
 
   // Function to delete a chat
-  const handleDeleteChat = async (chatId: string) => {
+  const handleDeleteChat = useCallback(async (chatId: string) => {
     try {
       const response = await fetch("/api/chat/deletechat", {
         method: "DELETE",
@@ -82,7 +132,7 @@ const AllChats = () => {
 
       if (response.ok) {
         // Refresh the chat list or remove the deleted chat from the state
-        mutate("/api/chat/allchats"); // Use SWR's mutate function to re-fetch the chats
+        mutate(`/api/chat/allchats?userId=${loggedInUserId}`); // Use SWR's mutate function to re-fetch the chats
       } else {
         console.error("Failed to delete chat");
       }
@@ -91,7 +141,7 @@ const AllChats = () => {
     } finally {
       setSelectedChatId(null); // Reset the selected chat ID
     }
-  };
+  }, []);
   console.log(myuser);
   // Add a cleanup effect to clear the timer
   useEffect(() => {
@@ -101,11 +151,6 @@ const AllChats = () => {
       }
     };
   }, [longPressTimer]);
-  const { setIsOpen, updateUnreadCount, unreadCounts } = useStore();
-  const [searchQuery, setSearchQuery] = useState(""); // State for search query
-  const [isSearchVisible, setIsSearchVisible] = useState(false); // State to toggle search input
-
-  const [isAddChat, setIsAddChat] = useState(false); // State to toggle search input
   const {
     allFiltedUsers,
     handleAddChat,
@@ -113,79 +158,107 @@ const AllChats = () => {
     searchAddChat,
     setSearchAddChat,
   } = useAddChat(chats);
-  const handleChatClick = async (chatId: string, otherUserId: string) => {
-    const response = await fetch("/api/chat/readmessages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ chatId, userId: loggedInUserId }),
-    });
-    console.log(response);
-    // Reset the unread count for this chat
-    updateUnreadCount(chatId, false); // Set unread count to 0
-    // Navigate to the chat keyswo...sikuweza jana
-    router.push(`/chats/${chatId}?userId=${otherUserId}`);
-  };
-
-  // Filter chats based on the search query
-  const uniqueChatsMap = new Map<
-    string,
-    { users: UserProps[]; _id: string; messages: MessageProps[] }
-  >();
-
-  localChats?.forEach(
-    (chat: { users: UserProps[]; _id: string; messages: MessageProps[] }) => {
-      const otherUser = chat.users.find((user) => user._id !== loggedInUserId);
-      if (otherUser && !uniqueChatsMap.has(otherUser._id as string)) {
-        uniqueChatsMap.set(otherUser._id as string, chat);
-      }
-    }
+  const handleChatClick = useCallback(
+    async (chatId: string, otherUserId: string) => {
+      await fetch("/api/chat/readmessages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chatId, userId: loggedInUserId }),
+      });
+      updateUnreadCount(chatId, false);
+      router.push(`/chats/${chatId}?userId=${otherUserId}`);
+    },
+    [loggedInUserId, router, updateUnreadCount]
   );
 
-  const filteredChats = Array.from(uniqueChatsMap.values()).filter((chat) => {
-    const otherUser = chat.users.find((user) => user._id !== loggedInUserId);
-    return (
-      otherUser?.firstname &&
-      otherUser?.firstname.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  });
-
-  const LoadingSkeleton = () => (
-    <div className="animate-pulse flex items-center p-3 space-x-4 mt-9">
-      <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
-      <div className="flex-1 space-y-5">
-        <div className="h-6 bg-gray-300  rounded-full"></div>
-        <div className="h-6 bg-gray-300  w-1/2 rounded-full"></div>
-      </div>
-    </div>
-  );
+  // const LoadingSkeleton = () => (
+  //   <div className="animate-pulse flex items-center p-3 space-x-4 mt-9">
+  //     <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
+  //     <div className="flex-1 space-y-5">
+  //       <div className="h-6 bg-gray-300  rounded-full"></div>
+  //       <div className="h-6 bg-gray-300  w-1/2 rounded-full"></div>
+  //     </div>
+  //   </div>
+  // );
 
   // Use it in your component
-  if (!chats) {
+  // In your AllChats component
+
+  // 1. Initial Loading State
+  if (isLoading) {
     return (
-      <div className="flex-1 overflow-y-auto p-2 sm:p-4">
-        {[...Array(7)].map((_, index) => (
-          <LoadingSkeleton key={index} />
-        ))}
+      <div className="h-screen bg-[#f0f2f5] flex flex-col overflow-y-auto pb-20">
+        <div className="bg-[#128C7E] p-4 text-white flex justify-between items-center">
+          <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#ba51e4] to-[#e0ab16] bg-clip-text text-transparent">
+            Chats
+          </h1>
+        </div>
+        <div className="flex-1 overflow-y-auto p-4">
+          <ChatSkeleton count={7} />
+        </div>
       </div>
     );
   }
 
+  // 2. Error State
   if (error) {
     return (
-      <div className="flex justify-center items-center h-screen text-red-500">
-        Error: {error.message}
+      <div className="h-screen bg-[#f0f2f5] flex flex-col items-center justify-center">
+        <div className="bg-white p-6 rounded-lg shadow-lg text-center max-w-md">
+          <h2 className="text-xl font-bold text-red-500 mb-2">
+            Error Loading Chats
+          </h2>
+          <p className="text-gray-600 mb-4">
+            {error.message || "Failed to load chats. Please try again."}
+          </p>
+          <button
+            onClick={() =>
+              mutate(`/api/chat/allchats?userId=${loggedInUserId}`)
+            }
+            className="px-4 py-2 bg-[#128C7E] text-white rounded hover:bg-[#0e6e5f]"
+          >
+            Retry
+          </button>
+        </div>
       </div>
     );
   }
-  // if (!isAddingChat) {
-  //   return (
-  //     <div className="fixed inset-0 flex items-center justify-center bg-black  bg-opacity-50 backdrop-blur-sl w-[100%] mx-auto h-full -py-6 z-50">
-  //       <div className="w-[90%] p-4 max-w-lg sm:max-w-xl h-[80%] m-auto   flex flex-col border border-gray-600/50  rounded-2xl shadow-2xl bg-neutral-900/70   "></div>
-  //     </div>
-  //   );
-  // }
+
+  // 3. Empty State
+  if (!isLoading && (!chats || chats.length === 0)) {
+    return (
+      <div className="h-screen bg-[#f0f2f5] flex flex-col overflow-y-auto pb-20">
+        <div className="bg-[#128C7E] p-4 text-white flex justify-between items-center">
+          <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#ba51e4] to-[#e0ab16] bg-clip-text text-transparent">
+            Chats
+          </h1>
+        </div>
+        <div className="flex-1 flex flex-col items-center justify-center">
+          <div className="text-center p-6">
+            <Image
+              src="/assets/no-chats.svg"
+              alt="No chats"
+              width={200}
+              height={200}
+              className="mx-auto mb-4"
+            />
+            <h3 className="text-xl font-semibold text-gray-700 mb-2">
+              No chats yet
+            </h3>
+            <p className="text-gray-500 mb-4">
+              Start a conversation to see it appear here
+            </p>
+            <button
+              onClick={() => setIsAddChat(true)}
+              className="px-4 py-2 bg-[#128C7E] text-white rounded-lg hover:bg-[#0e6e5f]"
+            >
+              Start New Chat
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <div
       className="h-screen bg-[#f0f2f5] flex flex-col overflow-y-auto pb-20"
