@@ -14,7 +14,7 @@ import { PlayIcon } from "@heroicons/react/24/solid";
 import ScrollToTopButton from "@/components/ScrollUp";
 import { colors, fonts } from "@/utils";
 
-import { AppWindowIcon } from "lucide-react";
+import { SaveAll } from "lucide-react";
 
 export default function Home() {
   const { isLoaded, userId } = useAuth();
@@ -188,12 +188,12 @@ export default function Home() {
         </div>{" "}
         {firstname && (
           <Link
-            className="absolute bottom-5 mt-6 px-6 py-1  text-gray-100 text-sm font-semibold rounded-br-xl  rounded-bl-xl roundedt-l-xl shadow-lg hover:bg-yellow-400 transition animate-bounce flex items-center"
+            className="absolute bottom-5 mt-6 px-6 py-1  text-gray-100 text-sm font-semibold rounded-xl  rounded-bl-xl roundedt-l-xl shadow-lg hover:bg-yellow-400 transition animate-bounce flex items-center"
             style={{ fontFamily: fonts[24], backgroundColor: colors[15] }}
             role="button"
             href={getDynamicHref()}
           >
-            <AppWindowIcon
+            <SaveAll
               className="h-6 w-6 text-[15px] text-gray-200 hover:text-yellow-400 transition gap-2"
               size="20"
               style={{

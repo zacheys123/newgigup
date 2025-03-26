@@ -23,6 +23,7 @@ import GigCustomization from "./GigCustomization";
 import { fileupload } from "@/hooks/fileUpload";
 import useStore from "@/app/zustand/useStore";
 import { FaComment } from "react-icons/fa";
+import { days } from "@/data";
 // import useStore from "@/app/zustand/useStore";
 // import { useAuth } from "@clerk/nextjs";
 
@@ -69,7 +70,6 @@ const CreateGig = () => {
 
   const [gigcustom, setGigCustom] = useState<CustomProps>({
     fontColor: "",
-
     font: "",
     backgroundColor: "",
   });
@@ -95,7 +95,6 @@ const CreateGig = () => {
     prefferences: [],
   });
   const [bussinesscat, setBussinessCategory] = useState<bussinesscat>("full");
-  const [gigTimeline, setGigTimeline] = useState<bussinesscat>("one");
   // const [errors, setErrors] = useState<string[]>([]);
   // const [success, setSuccess] = useState<boolean>(false);
   const [showduration, setshowduration] = useState<boolean>(false);
@@ -123,7 +122,6 @@ const CreateGig = () => {
   // };
 
   // handle the image upload to cloudinary
-  const daysOfMonth = Array.from({ length: 31 }, (_, i) => i + 1);
   const handleFileChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const dep = "image";
@@ -176,9 +174,6 @@ const CreateGig = () => {
   const handleBussinessChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setBussinessCategory(e.target.value);
   };
-  const handleTimeline = (e: ChangeEvent<HTMLSelectElement>) => {
-    setGigTimeline(e.target.value);
-  };
 
   // only used when you choose other
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -190,7 +185,7 @@ const CreateGig = () => {
     }));
   };
   //
-
+  console.log(gigInputs.gigTimeline);
   // submit your gig
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -222,6 +217,7 @@ const CreateGig = () => {
           logo: imageUrl,
           otherTimeline: gigInputs.otherTimeline,
           gigTimeline: gigInputs.gigTimeline,
+          day: gigInputs.day,
         }),
       });
       const data = await res.json();
@@ -266,7 +262,7 @@ const CreateGig = () => {
       setIsLoading(false);
     }
   };
-  console.log(imageUrl);
+
   return (
     <div>
       <form
@@ -450,9 +446,9 @@ const CreateGig = () => {
                   value={gigInputs?.location}
                 />{" "}
                 <select
-                  onChange={handleTimeline}
-                  name="durationfrom"
-                  value={gigTimeline ? gigTimeline : ""}
+                  onChange={handleInputChange} // Use the form's handleInputChange
+                  name="gigTimeline" // Add this name attribute
+                  value={gigInputs.gigTimeline} // Bind to form state
                   className="w-[150px] bg-gray-300 text-gray-800 h-[40px] rounded-lg text-xs px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value=""> Gig Timeline </option>
@@ -462,7 +458,7 @@ const CreateGig = () => {
                   <option value="weekly">Every Week</option>
                   <option value="other">Other...</option>
                 </select>
-                {gigTimeline === "other" && (
+                {gigInputs?.gigTimeline === "other" && (
                   <div className="w-full flex justify-center items-center">
                     <input
                       autoComplete="off"
@@ -477,19 +473,31 @@ const CreateGig = () => {
                     />
                   </div>
                 )}
-                {gigTimeline === "other" && (
+                {/* {gigTimeline === "other" && (
                   <select
                     className="w-1/3 p-2 rounded-md bg-gray-300 text-gray-800 border-none focus:ring-0 text-[10px]"
                     value={gigInputs?.day}
                     onChange={handleInputChange}
                   >
-                    {daysOfMonth.map((i) => (
+                    {daysOfWeek.map((i) => (
                       <option key={i} value={i.toString()}>
                         {i}
                       </option>
                     ))}
                   </select>
-                )}
+                )} */}
+                <select
+                  className="w-[150px] p-2 rounded-md bg-gray-300 text-gray-800 border-none focus:ring-0 text-[10px]"
+                  value={gigInputs?.day}
+                  onChange={handleInputChange}
+                  name="day"
+                >
+                  {days().map((i) => (
+                    <option key={i?.id} value={i.val}>
+                      {i?.name}
+                    </option>
+                  ))}
+                </select>
               </div>
             )}
             {bussinesscat === "other" && (

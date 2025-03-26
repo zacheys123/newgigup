@@ -60,9 +60,11 @@ const gigSchema = new mongoose.Schema(
     },
     gigtimeline: {
       type: String,
-      required: true,
     },
     otherTimeline: {
+      type: String,
+    },
+    day: {
       type: String,
       required: true,
     },

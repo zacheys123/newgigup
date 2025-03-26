@@ -171,20 +171,27 @@ const AllChats = () => {
     [loggedInUserId, router, updateUnreadCount]
   );
 
-  // const LoadingSkeleton = () => (
-  //   <div className="animate-pulse flex items-center p-3 space-x-4 mt-9">
-  //     <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
-  //     <div className="flex-1 space-y-5">
-  //       <div className="h-6 bg-gray-300  rounded-full"></div>
-  //       <div className="h-6 bg-gray-300  w-1/2 rounded-full"></div>
-  //     </div>
-  //   </div>
-  // );
+  const LoadingSkeleton = () => (
+    <div className="animate-pulse flex items-center p-3 space-x-4 mt-9">
+      <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
+      <div className="flex-1 space-y-5">
+        <div className="h-6 bg-gray-300  rounded-full"></div>
+        <div className="h-6 bg-gray-300  w-1/2 rounded-full"></div>
+      </div>
+    </div>
+  );
 
   // Use it in your component
-  // In your AllChats component
+  if (!chats) {
+    return (
+      <div className="flex-1 overflow-y-auto p-2 sm:p-4">
+        {[...Array(7)].map((_, index) => (
+          <LoadingSkeleton key={index} />
+        ))}
+      </div>
+    );
+  }
 
-  // 1. Initial Loading State
   if (isLoading) {
     return (
       <div className="h-screen bg-[#f0f2f5] flex flex-col overflow-y-auto pb-20">
@@ -223,42 +230,13 @@ const AllChats = () => {
       </div>
     );
   }
-
-  // 3. Empty State
-  if (!isLoading && (!chats || chats.length === 0)) {
-    return (
-      <div className="h-screen bg-[#f0f2f5] flex flex-col overflow-y-auto pb-20">
-        <div className="bg-[#128C7E] p-4 text-white flex justify-between items-center">
-          <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#ba51e4] to-[#e0ab16] bg-clip-text text-transparent">
-            Chats
-          </h1>
-        </div>
-        <div className="flex-1 flex flex-col items-center justify-center">
-          <div className="text-center p-6">
-            <Image
-              src="/assets/no-chats.svg"
-              alt="No chats"
-              width={200}
-              height={200}
-              className="mx-auto mb-4"
-            />
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">
-              No chats yet
-            </h3>
-            <p className="text-gray-500 mb-4">
-              Start a conversation to see it appear here
-            </p>
-            <button
-              onClick={() => setIsAddChat(true)}
-              className="px-4 py-2 bg-[#128C7E] text-white rounded-lg hover:bg-[#0e6e5f]"
-            >
-              Start New Chat
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // if (!isAddingChat) {
+  //   return (
+  //     <div className="fixed inset-0 flex items-center justify-center bg-black  bg-opacity-50 backdrop-blur-sl w-[100%] mx-auto h-full -py-6 z-50">
+  //       <div className="w-[90%] p-4 max-w-lg sm:max-w-xl h-[80%] m-auto   flex flex-col border border-gray-600/50  rounded-2xl shadow-2xl bg-neutral-900/70   "></div>
+  //     </div>
+  //   );
+  // }
   return (
     <div
       className="h-screen bg-[#f0f2f5] flex flex-col overflow-y-auto pb-20"

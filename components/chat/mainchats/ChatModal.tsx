@@ -92,6 +92,7 @@ const ChatModal: React.FC<ProfileModalProps> = ({ user, onClose }) => {
         <span className="bg-neutral-600 w-[60%] mx-auto h-[1px] mb-2 rounded-full "></span>
         <span className="bg-neutral-600 w-[50%] mx-auto h-[1px] mb-2 rounded-full "></span>
       </div>
+
       <div
         className="absolute rounded-full bg-amber-300 h-[35px] w-[35px] right-5 top-24 animate-bounce flex justify-center items-center"
         onClick={(ev) => {
@@ -111,6 +112,7 @@ const ChatModal: React.FC<ProfileModalProps> = ({ user, onClose }) => {
           <User />
         )}
       </div>
+
       <button
         onClick={onClose}
         className="absolute top-2 right-6 text-gray-300"

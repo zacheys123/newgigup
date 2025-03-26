@@ -32,6 +32,12 @@ const GigCustomization: React.FC<GigCustomizationProps> = ({
   return (
     <div className="fixed inset-0 flex items-center z-50 justify-center bg-black/80 backdrop-blur-md animate-fadeIn">
       {/* Polygon Background */}
+      <div
+        onClick={closeModal}
+        className="absolute right-4 top-[120px] text-gray-200 z-50 text-[30px]"
+      >
+        &times;
+      </div>
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-20 -left-20 w-64 h-64 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full blur-3xl"></div>
         <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-gradient-to-r from-blue-500/20 to-teal-500/20 rounded-full blur-3xl"></div>
@@ -248,14 +254,6 @@ const GigCustomization: React.FC<GigCustomizationProps> = ({
         </div>
 
         {/* Close Button */}
-        <div className="flex justify-center mt-6">
-          <button
-            onClick={closeModal}
-            className="px-4 py-2 bg-white/20 text-white rounded-lg border border-white/30 hover:bg-white/30 transition hover:scale-105 shadow-md"
-          >
-            Save
-          </button>
-        </div>
       </div>
     </div>
   );

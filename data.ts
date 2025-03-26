@@ -99,3 +99,44 @@ export const experiences = () => {
   ];
   return mydata;
 };
+
+export const days = () => {
+  const mydata = [
+    {
+      id: 0,
+      val: "Monday",
+      name: "Monday",
+    },
+    {
+      id: 1,
+      val: "Tuesday",
+      name: "Tuesday",
+    },
+    {
+      id: 2,
+      val: "wednesday",
+      name: "Wednesday",
+    },
+    {
+      id: 3,
+      val: "Thursday",
+      name: "Thursday",
+    },
+    {
+      id: 4,
+      val: "Friday",
+      name: "Friday",
+    },
+    {
+      id: 5,
+      val: "Saturday",
+      name: "Saturday",
+    },
+    {
+      id: 6,
+      val: "Sunday",
+      name: "Sunday",
+    },
+  ];
+  return mydata;
+};
