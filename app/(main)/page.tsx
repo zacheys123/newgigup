@@ -13,7 +13,7 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { PlayIcon } from "@heroicons/react/24/solid";
 import ScrollToTopButton from "@/components/ScrollUp";
 import { colors, fonts } from "@/utils";
-import { BsOpencollective } from "react-icons/bs";
+
 import { AppWindowIcon } from "lucide-react";
 
 export default function Home() {
