@@ -22,6 +22,10 @@ type Info = {
   fontColor: string;
   backgroundColor: string;
   logo: string;
+
+  otherTimeline: string;
+  gigTimeline: string;
+  day: string;
 };
 
 export async function PUT(req: NextRequest) {
@@ -44,29 +48,89 @@ export async function PUT(req: NextRequest) {
       fontColor,
       backgroundColor,
       logo,
+      otherTimeline,
+      gigTimeline,
+      day,
     }: Info = await req.json();
 
-    if (
-      !title ||
-      !description ||
-      !phoneNo ||
-      !price ||
-      !location ||
-      !to ||
-      !from ||
-      !bussinesscat ||
-      !secret
-    ) {
-      return NextResponse.json(
-        { gigstatus: "false", message: "All fields should be filled." },
-        { status: 400 }
-      );
-    }
     if (!logo) {
-      return NextResponse.json(
-        { gigstatus: "false", message: "Logo is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({
+        gigstatus: "false",
+        message: "logo is required",
+      });
+    }
+    if (!title) {
+      return NextResponse.json({
+        gigstatus: "false",
+        message: "Title is required",
+      });
+    }
+    if (!description) {
+      return NextResponse.json({
+        gigstatus: "false",
+        message: "Description is required",
+      });
+    }
+    if (!phoneNo) {
+      return NextResponse.json({
+        gigstatus: "false",
+        message: "Phone number is required",
+      });
+    }
+    if (!price) {
+      return NextResponse.json({
+        gigstatus: "false",
+        message: "Price is required",
+      });
+    }
+    if (!location) {
+      return NextResponse.json({
+        gigstatus: "false",
+        message: "Location is required",
+      });
+    }
+    if (!to) {
+      return NextResponse.json({
+        gigstatus: "false",
+        message: "To date is required",
+      });
+    }
+
+    if (!from) {
+      return NextResponse.json({
+        gigstatus: "false",
+        message: "From date is required",
+      });
+    }
+    if (!bussinesscat) {
+      return NextResponse.json({
+        gigstatus: "false",
+        message: "Business category is required",
+      });
+    }
+    if (!secret) {
+      return NextResponse.json({
+        gigstatus: "false",
+        message: "Secret is required",
+      });
+    }
+    if (!gigTimeline) {
+      return NextResponse.json({
+        gigstatus: "false",
+        message: "Gig timeline is required",
+      });
+    }
+    if (!day) {
+      return NextResponse.json({
+        gigstatus: "false",
+        message: "Day is required",
+      });
+    }
+    if (!fontColor || !backgroundColor) {
+      return NextResponse.json({
+        gigstatus: "false",
+        message: "Font, font color, background color and logo are required",
+      });
     }
 
     const { userId } = getAuth(req);
@@ -127,6 +191,9 @@ export async function PUT(req: NextRequest) {
         backgroundColor,
         logo,
         postedBy,
+        otherTimeline,
+        gigTimeline,
+        day,
       },
       { new: true }
     );

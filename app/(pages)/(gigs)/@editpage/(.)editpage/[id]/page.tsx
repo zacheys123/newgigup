@@ -11,7 +11,16 @@ import React, {
 // import DatePicker from "react-datepicker";
 // import "react-datepicker/dist/react-datepicker.css";
 import { Box, CircularProgress } from "@mui/material";
-import { ArrowDown01Icon, EyeIcon, EyeOff } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowDown01Icon,
+  ArrowUp,
+  BriefcaseConveyorBelt,
+  EyeIcon,
+  EyeOff,
+  InfoIcon,
+  Timer,
+} from "lucide-react";
 
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAuth } from "@clerk/nextjs";
@@ -23,6 +32,8 @@ import GigCustomization from "@/components/gig/GigCustomization";
 import { useParams, useRouter } from "next/navigation";
 import { useGetGigs } from "@/hooks/useGetGig";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { FaComment } from "react-icons/fa";
+import { days } from "@/data";
 // import useStore from "@/app/zustand/useStore";
 // import { useAuth } from "@clerk/nextjs";
 
@@ -39,6 +50,9 @@ interface GigInputs {
   durationto: string;
   durationfrom: string;
   bussinesscat: string;
+  otherTimeline: string;
+  gigTimeline: string;
+  day: string;
 }
 interface CustomProps {
   fontColor: string;
@@ -66,6 +80,21 @@ const EditPage = () => {
   const { user } = useCurrentUser(userId || null);
   const {} = useGetGigs(id as string | null);
 
+  const [showCategories, setshowCategories] = useState<{
+    title: boolean;
+    description: boolean;
+    business: boolean;
+    gtimeline: boolean;
+    gduration: boolean;
+    othergig: boolean;
+  }>({
+    title: false,
+    description: false,
+    business: false,
+    gtimeline: false,
+    othergig: false,
+    gduration: false,
+  });
   const [gigcustom, setGigCustom] = useState<CustomProps>({
     fontColor: "",
     font: "",
@@ -85,6 +114,9 @@ const EditPage = () => {
     durationto: "pm",
     durationfrom: "am",
     bussinesscat: "personal",
+    otherTimeline: "",
+    gigTimeline: "",
+    day: "",
   });
   useEffect(() => {
     if (currentgig && !gigInputs.title) {
@@ -93,7 +125,7 @@ const EditPage = () => {
         ...currentgig,
       }));
     }
-  }, [currentgig]);
+  }, [currentgig, gigInputs?.title]);
 
   const [userinfo, setUserInfo] = useState<UserInfo>({
     prefferences: [],
@@ -205,6 +237,9 @@ const EditPage = () => {
           fontColor: gigcustom.fontColor,
           backgroundColor: gigcustom.backgroundColor,
           logo: imageUrl,
+          otherTimeline: gigInputs.otherTimeline,
+          gigTimeline: gigInputs.gigTimeline,
+          day: gigInputs.day,
         }),
       });
       const data = await res.json();
@@ -226,6 +261,9 @@ const EditPage = () => {
           durationto: "pm",
           durationfrom: "am",
           bussinesscat: "personal",
+          otherTimeline: "",
+          gigTimeline: "",
+          day: "",
         });
         setUserInfo({ prefferences: [] });
         setBussinessCategory("");
@@ -259,343 +297,416 @@ const EditPage = () => {
         <DialogTitle className=" text-gray-300 font-sans text-center underline mb-3 ">
           Enter info to update a gig
         </DialogTitle>{" "}
-        <form onSubmit={onSubmit} className="h-full">
-          <div className="flex w-full justify-between">
-            <select
-              onChange={handleBussinessChange}
-              name="durationfrom"
-              value={bussinesscat ? bussinesscat : ""}
-              className="mb-5 w-[130px]  bg-neutral-300 h-[30px] rounded-md text-[12px] flex justify-center items-center p-2 font-mono"
-            >
-              <option value="full">Full Band</option>
-              <option value="personal">Individual</option>
-              <option value="other">other...</option>
-            </select>{" "}
-            <div onClick={() => setShowCustomization(true)}>
-              <h1 className="text-sm text-gray-300 bg-gradient-to-tr from-orange-300 via-green-800 to-yellow-900  py-1 px-2 rounded-md cursor-pointer">
-                Customize your Gig Card
-              </h1>
-            </div>
-          </div>
-          <div className="w-full  gap-4">
-            <div
-              className={
-                !secretreturn
-                  ? `flex flex-col gap-1  `
-                  : `flex flex-col gap-1 h-[70px] `
-              }
-            >
-              <div className="flex my-5items-center gap-2">
-                <input
-                  autoComplete="off"
-                  onChange={handleInputChange}
-                  name="secret"
-                  value={gigInputs?.secret}
-                  type={!secretpass ? "password" : "text"}
-                  placeholder="Enter secret,  NB://(valid only once)"
-                  className="font-mono  h-[35px] text-[12px]  bg-zinc-700 border-2 border-neutral-400 mb-7 focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-300"
-                />{" "}
-                {secretpass ? (
-                  <EyeOff
-                    onClick={() => setSecretPass((prev) => !prev)}
-                    size="18px"
-                  />
-                ) : (
-                  <EyeIcon
-                    onClick={() => setSecretPass((prev) => !prev)}
-                    size="18px"
-                  />
-                )}
-              </div>
-              {secretreturn && (
-                <h6 className="text-red-500 text-[13px] -mt-2">
-                  {secretreturn}
-                </h6>
-              )}
-            </div>
-            <input
-              autoComplete="off"
-              onChange={handleInputChange}
-              name="title"
-              value={gigInputs?.title}
-              type="text"
-              placeholder="Enter any title"
-              className="font-mono  h-[35px] text-[12px]  bg-zinc-700 border-2 border-neutral-400 mb-5  focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-300"
-            />{" "}
-            <Textarea
-              onChange={handleInputChange}
-              name="description"
-              value={gigInputs?.description}
-              style={{ resize: "none", height: "fit-content" }}
-              className="min-h-[70px] py-2 mb-5 font-mono  bg-zinc-700 border-2 border-neutral-400 text-neutral-300 px-3 "
-              placeholder=" Enter description e.g what songs or the vybe expected in the event/show"
-            />
-            <input
-              autoComplete="off"
-              type="text"
-              placeholder="Enter phone no: "
-              className="font-mono  h-[35px] text-[12px]  bg-zinc-700 border-2 border-neutral-400 mb-5  focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-300"
-              onChange={handleInputChange}
-              name="phoneNo"
-              value={gigInputs?.phone}
-            />{" "}
-            <input
-              autoComplete="off"
-              type="text"
-              placeholder="Enter price range expected  "
-              className="font-mono  h-[35px] text-[12px]  bg-zinc-700 border-2 border-neutral-400 mb-5  focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-300"
-              onChange={handleInputChange}
-              name="price"
-              value={gigInputs?.price}
-            />{" "}
-            <input
-              autoComplete="off"
-              type="text"
-              placeholder="Enter location  "
-              className="font-mono  h-[35px] text-[12px]  bg-zinc-700 border-2 border-neutral-400 mb-5  focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-300 w-full"
-              onChange={handleInputChange}
-              name="location"
-              value={gigInputs?.location}
-            />{" "}
-            <>
-              {bussinesscat === "other" ? (
-                <h6 className="choice mb-2 text-gray-400">
-                  Choose the setUp of the show
-                </h6>
-              ) : (
-                ""
-              )}
-              {bussinesscat === "personal" && (
+        <div>
+          <form
+            onSubmit={onSubmit}
+            className="h-[100vh] bg-gray-900 px-4 py-6 overflow-y-auto w-full" // Ensure overflow-y-auto is here
+          >
+            <div className="h-[100vh] overflow-y-auto">
+              <h6 className="text-gray-100 font-sans text-center text-lg font-semibold mb-6">
+                Enter info to create a gig
+              </h6>
+              <div className="flex w-full justify-between items-center mb-6">
                 <select
-                  onChange={handleInputChange}
-                  name="category"
-                  value={gigInputs?.category}
-                  className="mb-2 w-full text-neutral-400  bg-zinc-700 border-2 border-neutral-400   h-[40px] rounded-md p-3 text-[12px]  font-mono"
+                  onChange={handleBussinessChange}
+                  name="durationfrom"
+                  value={bussinesscat ? bussinesscat : ""}
+                  className="w-[150px] bg-gray-700 text-gray-100 h-[40px] rounded-lg text-sm px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="piano">Piano</option>
-                  <option value="guitar">Guitar</option>
-                  <option value="bass">Bass Guitar</option>
-                  <option value="saxophone">Saxophone</option>
-                  <option value="violin">Violin</option>
-                  <option value="ukulele">Ukulele</option>{" "}
-                  <option value="harp">Harp</option>
-                  <option value="xylophone">Xylophone</option>{" "}
-                  <option value="cello">Cello</option>
-                  <option value="percussion">Percussion</option>{" "}
+                  <option value="full">Full Band</option>
+                  <option value="personal">Individual</option>
+                  <option value="other">Other...</option>
                 </select>
-              )}
-              {bussinesscat === "other" && (
-                <div className="h-[80px] rounded-lg shadow-xl gap-5  bg-zinc-700  p-2 choice flex flex-wrap">
-                  <div>
-                    <input
-                      onChange={handleChange}
-                      type="checkbox"
-                      id="vocalist"
-                      name="vocalist"
-                      value="vocalist"
-                    />
-                    <label
-                      className="text-[12px] font-sans text-gray-300"
-                      htmlFor="vocalist"
-                    >
-                      vocalist
-                    </label>
-                  </div>
-                  <div>
-                    {" "}
-                    <input
-                      onChange={handleChange}
-                      type="checkbox"
-                      id="piano"
-                      name="piano"
-                      value="piano"
-                    />{" "}
-                    <label
-                      className="text-[12px] font-sans text-gray-300"
-                      htmlFor="piano"
-                    >
-                      Piano
-                    </label>
-                  </div>
-                  <div>
-                    {" "}
-                    <input
-                      onChange={handleChange}
-                      type="checkbox"
-                      id="sax"
-                      name="sax"
-                      value="sax"
-                    />{" "}
-                    <label
-                      className="text-[12px] font-sans text-gray-300"
-                      htmlFor="sax"
-                    >
-                      Saxophone
-                    </label>
-                  </div>{" "}
-                  <div>
-                    {" "}
-                    <input
-                      onChange={handleChange}
-                      type="checkbox"
-                      id="guitar"
-                      name="guitar"
-                      value="guitar"
-                    />{" "}
-                    <label
-                      className="text-[12px] font-sans text-gray-300"
-                      htmlFor="guitar"
-                    >
-                      Guitar
-                    </label>
-                  </div>{" "}
-                  <div>
-                    {" "}
-                    <input
-                      onChange={handleChange}
-                      type="checkbox"
-                      id="drums"
-                      name="drums"
-                      value="drums"
-                    />{" "}
-                    <label
-                      className="text-[12px] font-sans text-gray-300"
-                      htmlFor="drums"
-                    >
-                      Drums
-                    </label>
-                  </div>{" "}
-                  <div>
-                    {" "}
-                    <input
-                      onChange={handleChange}
-                      type="checkbox"
-                      id="bass"
-                      name="bass"
-                      value="bass"
-                    />{" "}
-                    <label
-                      className="text-[12px] font-sans text-gray-300"
-                      htmlFor="bass"
-                    >
-                      Bass
-                    </label>
-                  </div>
-                </div>
-              )}
-            </>
-            {showduration ? (
-              <div className="flex my-5items-center flex-col gap-2 mt-5 bg-gray-800 pt-2 rounded-md relative ">
-                {" "}
                 <div
-                  className="text-white absolute right-2 -top-1 text-[23px]"
-                  onClick={() => setshowduration(false)}
+                  onClick={() => setShowCustomization(true)}
+                  className="cursor-pointer"
                 >
-                  &times;
+                  <h1 className="text-sm text-gray-100 bg-gradient-to-r from-blue-500 to-purple-600 py-2 px-4 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all ml-3">
+                    Customize your Gig Card
+                  </h1>
                 </div>
-                <Box className="flex items-center flex-col  mt-4">
-                  <div className="flex my-5items-center gap-3">
-                    {" "}
-                    <h6 className="mb-2 w-[50px] text-white font-mono flex justify-center text-[11px]">
-                      from:
-                    </h6>
-                    <input
-                      autoComplete="off"
-                      type="text"
-                      placeholder=" Time e.g 10 means 10:00 "
-                      className="mb-2 p-3 focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-800 w-[124px] text-[11px]"
-                      onChange={handleInputChange}
-                      name="start"
-                      value={gigInputs?.start}
-                    />{" "}
-                    <select
-                      onChange={handleInputChange}
-                      name="durationfrom"
-                      value={gigInputs?.durationfrom}
-                      className="mb-2 w-[55px] bg-zinc-800 text-gray-200 h-[34px] rounded-full text-[11px] flex justify-center items-center p-2 font-mono"
-                    >
-                      <option value="pm">PM</option>
-                      <option value="am">AM</option>
-                    </select>{" "}
-                  </div>
-                  <div className="flex my-5items-center gap-3 ">
-                    <h6 className="mb-2 w-[50px] text-white font-mono flex justify-center text-[11px]">
-                      to:
-                    </h6>
-                    <input
-                      autoComplete="off"
-                      type="text"
-                      placeholder=" Time e.g 10 means 10:00 "
-                      className="mb-2 p-3 focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-800 w-[124px] text-[11px]"
-                      onChange={handleInputChange}
-                      name="end"
-                      value={gigInputs?.end}
-                    />{" "}
-                    <select
-                      onChange={handleInputChange}
-                      name="durationto"
-                      value={gigInputs?.durationto}
-                      className="mb-2 w-[55px] bg-zinc-800 text-gray-200 h-[34px] rounded-full text-[11px] flex justify-center items-center p-2 font-mono"
-                    >
-                      <option value="pm">PM</option>
-                      <option value="am">AM</option>
-                    </select>{" "}
-                  </div>
-                </Box>
-                {/* date here */}
-                {/* <DatePicker
-              selected={selectedDate}
-              onChange={handleDate}
-              dateFormat="DD/MM/YYYY"
-              minDate={minDate}
-              maxDate={maxDate}
-              title="Set Event Date"
-              className="font-mono  h-[35px] text-[12px]  bg-zinc-800 border-2 border-neutral-400 mb-5  focus-within:ring-0 outline-none rounded-xl  px-3 text-neutral-300 w-[300px]"
-            /> */}
               </div>
-            ) : (
-              <Box
-                onClick={() => setshowduration(true)}
-                className="flex justify-between items-center w-[70%] mt-3   mx-auto bg-gray-500 py-1 px-4 rounded-md"
-              >
-                <h6 className="text-[14px] text-gray-200 font-sans">
-                  Enter Duration
-                </h6>
-                <ArrowDown01Icon
-                  size="22"
-                  style={{
-                    color: "lightgray",
-                  }}
-                />
-              </Box>
-            )}
-            <div className="w-full flex justify-center">
-              <Button
-                variant="update"
-                type="submit"
-                className="mt-4 w-[60%] h-[30px] text-[12px]"
-                disabled={isLoading}
-              >
-                {!isLoading ? (
-                  "Update Gig"
-                ) : (
-                  <CircularProgress size="14px" sx={{ color: "white" }} />
+              <div className="w-full space-y-4">
+                <div
+                  className={!secretreturn ? `space-y-4` : `space-y-4 h-[70px]`}
+                >
+                  <div
+                    className="flex justify-between items-center w-full bg-gray-800 p-3 rounded-lg cursor-pointer hover:bg-amber-700 transition-all text-white"
+                    onClick={() =>
+                      setshowCategories({
+                        title: !showCategories.title,
+                        description: false,
+                        business: false,
+                        gtimeline: false,
+                        othergig: true,
+                        gduration: false,
+                      })
+                    }
+                  >
+                    Title Information
+                    <FaComment size="20" className="text-gray-400" />
+                  </div>
+                  {showCategories.title && (
+                    <div className="flex flex-col gap-4 w-full">
+                      <div className="flex items-center rounded-lg bg-gray-300 p-2">
+                        <input
+                          autoComplete="off"
+                          onChange={handleInputChange}
+                          name="secret"
+                          value={gigInputs?.secret}
+                          type={!secretpass ? "password" : "text"}
+                          placeholder="Enter secret (valid only once)"
+                          className="w-full bg-transparent text-gray-800 text-sm focus:outline-none"
+                        />
+                        {secretpass ? (
+                          <EyeOff
+                            onClick={() => setSecretPass((prev) => !prev)}
+                            size="18px"
+                            className="text-gray-400 cursor-pointer"
+                          />
+                        ) : (
+                          <EyeIcon
+                            onClick={() => setSecretPass((prev) => !prev)}
+                            size="18px"
+                            className="text-gray-400 cursor-pointer"
+                          />
+                        )}
+                      </div>
+                      <input
+                        autoComplete="off"
+                        onChange={handleInputChange}
+                        name="title"
+                        value={gigInputs?.title}
+                        type="text"
+                        placeholder="Enter a title"
+                        className="w-full bg-gray-300 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  )}
+                  {secretreturn && (
+                    <h6 className="text-red-500 text-sm -mt-2">
+                      {secretreturn}
+                    </h6>
+                  )}
+                </div>
+                <div
+                  className="flex justify-between items-center w-full bg-gray-800 p-3 rounded-lg cursor-pointer hover:bg-amber-700 transition-all text-white"
+                  onClick={() =>
+                    setshowCategories({
+                      title: false,
+                      description: !showCategories.description,
+                      business: false,
+                      gtimeline: false,
+                      othergig: true,
+                      gduration: false,
+                    })
+                  }
+                >
+                  Description Information
+                  <InfoIcon size="20" className="text-gray-400" />
+                </div>
+                {showCategories.description && (
+                  <Textarea
+                    onChange={handleInputChange}
+                    name="description"
+                    value={gigInputs?.description}
+                    style={{ resize: "none", height: "fit-content" }}
+                    className="min-h-[100px] bg-gray-300 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter description (e.g., songs or vibe expected at the event/show)"
+                  />
                 )}
-              </Button>
+                <div
+                  className="flex justify-between items-center w-full bg-gray-800 p-3 rounded-lg cursor-pointer hover:bg-amber-700 transition-all text-white"
+                  onClick={() =>
+                    setshowCategories({
+                      title: false,
+                      description: false,
+                      business: !showCategories.business,
+                      gtimeline: false,
+                      othergig: true,
+                      gduration: false,
+                    })
+                  }
+                >
+                  Business Information
+                  <BriefcaseConveyorBelt size="20" className="text-gray-400" />
+                </div>
+                {showCategories.business && (
+                  <div className="flex flex-col gap-4 w-full">
+                    {" "}
+                    <input
+                      autoComplete="off"
+                      type="text"
+                      placeholder="Enter phone number"
+                      className="w-full bg-gray-300 text-gray800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      onChange={handleInputChange}
+                      name="phoneNo"
+                      value={gigInputs?.phone}
+                    />
+                    <input
+                      autoComplete="off"
+                      type="text"
+                      placeholder="Enter expected price range"
+                      className="w-full bg-gray-300 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      onChange={handleInputChange}
+                      name="price"
+                      value={gigInputs?.price}
+                    />
+                  </div>
+                )}
+                <div
+                  className="flex justify-between items-center w-full bg-gray-800 p-3 rounded-lg cursor-pointer hover:bg-amber-700 transition-all text-white"
+                  onClick={() =>
+                    setshowCategories({
+                      title: false,
+                      description: false,
+                      business: false,
+                      gtimeline: !showCategories.gtimeline,
+                      othergig: true,
+                      gduration: false,
+                    })
+                  }
+                >
+                  Gig Timeline Information
+                  <Timer size="20" className="text-gray-400" />
+                </div>
+                {showCategories.gtimeline && (
+                  <div className="grid grid-cols-2 gap-4 w-full">
+                    {" "}
+                    <input
+                      autoComplete="off"
+                      type="text"
+                      placeholder="Enter location"
+                      className="w-full bg-gray-300 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      onChange={handleInputChange}
+                      name="location"
+                      value={gigInputs?.location}
+                    />{" "}
+                    <select
+                      onChange={handleInputChange} // Use the form's handleInputChange
+                      name="gigTimeline" // Add this name attribute
+                      value={gigInputs.gigTimeline} // Bind to form state
+                      className="w-[150px] bg-gray-300 text-gray-800 h-[40px] rounded-lg text-xs px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value=""> Gig Timeline </option>
+                      <option value="once">
+                        One Time(function,event,recording etc)
+                      </option>
+                      <option value="weekly">Every Week</option>
+                      <option value="other">Other...</option>
+                    </select>
+                    {gigInputs?.gigTimeline === "other" && (
+                      <div className="w-full flex justify-center items-center">
+                        <input
+                          autoComplete="off"
+                          type="text"
+                          placeholder="Enter other timeline details"
+                          className="w-full bg-gray-300 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          onChange={handleInputChange}
+                          name="otherTimeline"
+                          value={gigInputs?.otherTimeline}
+                          disabled={gigInputs?.durationfrom === "once"}
+                          required={gigInputs?.durationfrom === "once"}
+                        />
+                      </div>
+                    )}
+                    {/* {gigTimeline === "other" && (
+                  <select
+                    className="w-1/3 p-2 rounded-md bg-gray-300 text-gray-800 border-none focus:ring-0 text-[10px]"
+                    value={gigInputs?.day}
+                    onChange={handleInputChange}
+                  >
+                    {daysOfWeek.map((i) => (
+                      <option key={i} value={i.toString()}>
+                        {i}
+                      </option>
+                    ))}
+                  </select>
+                )} */}
+                    <select
+                      className="w-[150px] p-2 rounded-md bg-gray-300 text-gray-800 border-none focus:ring-0 text-[10px]"
+                      value={gigInputs?.day}
+                      onChange={handleInputChange}
+                      name="day"
+                    >
+                      {days().map((i) => (
+                        <option key={i?.id} value={i.val}>
+                          {i?.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+                {bussinesscat === "other" && (
+                  <h6
+                    className="flex justify-between items-center w-full bg-gray-800 p-3 rounded-lg cursor-pointer hover:bg-amber-700 transition-all text-white"
+                    onClick={() =>
+                      setshowCategories({
+                        title: false,
+                        description: false,
+                        business: false,
+                        gtimeline: false,
+                        othergig: !showCategories.othergig,
+                        gduration: false,
+                      })
+                    }
+                  >
+                    Choose the setup of the show
+                    {showCategories.othergig ? (
+                      <ArrowDown size="20" className="text-gray-400" />
+                    ) : (
+                      <ArrowUp size="20" className="text-gray-400" />
+                    )}
+                  </h6>
+                )}
+                {bussinesscat === "personal" && (
+                  <select
+                    onChange={handleInputChange}
+                    name="category"
+                    value={gigInputs?.category}
+                    className="w-full bg-gray-300 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="piano">Piano</option>
+                    <option value="guitar">Guitar</option>
+                    <option value="bass">Bass Guitar</option>
+                    <option value="saxophone">Saxophone</option>
+                    <option value="violin">Violin</option>
+                    <option value="ukulele">Ukulele</option>
+                    <option value="harp">Harp</option>
+                    <option value="xylophone">Xylophone</option>
+                    <option value="cello">Cello</option>
+                    <option value="percussion">Percussion</option>
+                  </select>
+                )}
+                {!showCategories?.othergig && (
+                  <>
+                    {bussinesscat === "other" && (
+                      <div className="grid grid-cols-3 gap-1 bg-gray-300 p-4 rounded-lg px-2">
+                        {[
+                          "vocalist",
+                          "piano",
+                          "sax",
+                          "guitar",
+                          "drums",
+                          "bass",
+                        ].map((item) => (
+                          <div
+                            key={item}
+                            className="flex items-center space-x-2"
+                          >
+                            <input
+                              onChange={handleChange}
+                              type="checkbox"
+                              id={item}
+                              name={item}
+                              value={item}
+                              className="accent-blue-500"
+                            />
+                            <label
+                              htmlFor={item}
+                              className="text-gray-800 text-sm capitalize"
+                            >
+                              {item}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    )}{" "}
+                  </>
+                )}
+                {showduration ? (
+                  <div className="bg-gray-700 p-4 rounded-lg relative">
+                    <div
+                      className="text-white absolute right-2 top-2 text-xl cursor-pointer"
+                      onClick={() => setshowduration(false)}
+                    >
+                      &times;
+                    </div>
+                    <Box className="space-y-4">
+                      <div className="flex items-center gap-4">
+                        <h6 className="text-gray-100 text-sm w-[50px]">
+                          From:
+                        </h6>
+                        <input
+                          autoComplete="off"
+                          type="text"
+                          placeholder="Time (e.g., 10 means 10:00)"
+                          className="w-[120px] bg-gray-200 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          onChange={handleInputChange}
+                          name="start"
+                          value={gigInputs?.start}
+                        />
+                        <select
+                          onChange={handleInputChange}
+                          name="durationfrom"
+                          value={gigInputs?.durationfrom}
+                          className="w-[60px] bg-gray-200 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                          <option value="pm">PM</option>
+                          <option value="am">AM</option>
+                        </select>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <h6 className="text-gray-100 text-sm w-[50px]">To:</h6>
+                        <input
+                          autoComplete="off"
+                          type="text"
+                          placeholder="Time (e.g., 10 means 10:00)"
+                          className="w-[120px] bg-gray-200 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          onChange={handleInputChange}
+                          name="end"
+                          value={gigInputs?.end}
+                        />
+                        <select
+                          onChange={handleInputChange}
+                          name="durationto"
+                          value={gigInputs?.durationto}
+                          className="w-[60px] bg-gray-300 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                          <option value="pm">PM</option>
+                          <option value="am">AM</option>
+                        </select>
+                      </div>
+                    </Box>
+                  </div>
+                ) : (
+                  <Box
+                    onClick={() => setshowduration(true)}
+                    className="flex justify-between items-center w-full bg-gray-800 p-3 rounded-lg cursor-pointer hover:bg-gray-700 transition-all"
+                  >
+                    <h6 className="text-gray-100 text-sm">Enter Duration</h6>
+                    <ArrowDown01Icon size="20" className="text-gray-400" />
+                  </Box>
+                )}
+                <div className="w-full flex justify-center mt-6">
+                  <Button
+                    variant="destructive"
+                    type="submit"
+                    className="w-[60%] h-[40px] text-sm font-semibold bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transition-all"
+                    disabled={isLoading}
+                  >
+                    {!isLoading ? (
+                      "Create Gig"
+                    ) : (
+                      <CircularProgress size="16px" sx={{ color: "white" }} />
+                    )}
+                  </Button>
+                </div>
+              </div>
             </div>
-          </div>{" "}
-        </form>{" "}
-        <div className="h-[1200px] w-full relative">
-          {showcustomization && (
-            <GigCustomization
-              customization={gigcustom}
-              setCustomization={setGigCustom}
-              closeModal={() => setShowCustomization(false)}
-              logo={imageUrl}
-              handleFileChange={handleFileChange}
-              isUploading={isUploading}
-            />
-          )}
+          </form>
+          <div className="h-full w-full relative">
+            {showcustomization && (
+              <GigCustomization
+                customization={gigcustom}
+                setCustomization={setGigCustom}
+                closeModal={() => setShowCustomization(false)}
+                logo={imageUrl}
+                handleFileChange={handleFileChange}
+                isUploading={isUploading}
+              />
+            )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>
