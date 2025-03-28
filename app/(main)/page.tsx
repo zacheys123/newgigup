@@ -186,7 +186,7 @@ export default function Home() {
             )}
           </div>
         </div>{" "}
-        {firstname && (
+        
           <Link
             className="absolute bottom-5 mt-6 px-6 py-1  text-gray-100 text-sm font-semibold rounded-xl  rounded-bl-xl roundedt-l-xl shadow-lg hover:bg-yellow-400 transition animate-bounce flex items-center"
             style={{ fontFamily: fonts[24], backgroundColor: colors[15] }}
@@ -207,7 +207,7 @@ export default function Home() {
             />{" "}
             Open gigup
           </Link>
-        )}
+      
       </section>{" "}
       <ScrollToTopButton />
       {/* Footer */}
