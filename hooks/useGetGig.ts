@@ -56,7 +56,7 @@ export function useGetGigs(id: string | null) {
               backgroundColor: "",
               logo: "",
               otherTimeline: "",
-              gigTimeline: "",
+              gigtimeline: "",
               day: "",
             });
           return;
@@ -96,7 +96,7 @@ export function useGetGigs(id: string | null) {
             backgroundColor: "",
             logo: "",
             otherTimeline: "",
-            gigTimeline: "",
+            gigtimeline: "",
             day: "",
           });
       } finally {
