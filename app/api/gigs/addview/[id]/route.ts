@@ -18,6 +18,7 @@ export async function PUT(req: NextRequest) {
 
     if (newGig?.viewCount?.includes(userid)) {
       console.log("Already viewed this gig", newGig.viewCount?.length);
+      console.log(newGig);
       return NextResponse.json({
         gigstatus: "false",
         message: "You have already viewed this gig",

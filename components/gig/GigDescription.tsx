@@ -33,7 +33,7 @@ const DetailValue = styled(Typography)(({ theme }) => ({
 
 const GigDescription = () => {
   const { setIsDescriptionModal, currentgig } = useStore();
-
+  console.log(currentgig);
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50 backdrop-blur-sm -mt-[140px]">
       <motion.div
@@ -153,7 +153,11 @@ const GigDescription = () => {
 
               <DetailItem>
                 <DetailLabel variant="body2">Posted By</DetailLabel>
-                <DetailValue variant="body2">
+                <DetailValue
+                  variant="body2"
+                  className="
+              "
+                >
                   {currentgig?.postedBy?.email}
                 </DetailValue>
               </DetailItem>
@@ -275,7 +279,7 @@ const GigDescription = () => {
                   }}
                 >
                   <ul style={{ margin: 0, paddingLeft: "20px" }}>
-                    {currentgig.bandCategory.map((band, idx) => (
+                    {[...new Set(currentgig.bandCategory)].map((band, idx) => (
                       <li key={idx}>
                         <Typography
                           variant="body2"
@@ -291,7 +295,7 @@ const GigDescription = () => {
             )}
 
           {/* Schedule Information */}
-          {currentgig?.gigTimeline === "" && (
+          {currentgig?.gigtimeline === "weekly" && (
             <Box className="my-6">
               <Chip
                 label="Schedule"
@@ -312,7 +316,34 @@ const GigDescription = () => {
               >
                 <Typography variant="body2" className="text-black">
                   <strong style={{ color: "#ff5252" }}>
-                    Every {currentgig?.day}
+                    Every week on {currentgig?.day}
+                  </strong>
+                </Typography>
+              </Box>
+            </Box>
+          )}
+          {currentgig?.gigtimeline === "other" && (
+            <Box className="my-6">
+              <Chip
+                label="Schedule"
+                sx={{
+                  mb: 2,
+                  fontWeight: 600,
+                  backgroundColor: "error.dark",
+                  color: "background.paper",
+                }}
+              />
+              <Box
+                sx={{
+                  backgroundColor: "background.paper",
+                  borderRadius: 2,
+                  boxShadow: 1,
+                  padding: 2,
+                }}
+              >
+                <Typography variant="body2" className="text-black">
+                  <strong style={{ color: "#ff5252" }}>
+                    {currentgig?.otherTimeline} Every {currentgig?.day}
                   </strong>
                 </Typography>
               </Box>

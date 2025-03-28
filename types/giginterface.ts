@@ -32,7 +32,7 @@ export interface GigProps {
   backgroundColor: string;
   logo: string;
   otherTimeline: string;
-  gigTimeline: string;
+  gigtimeline: string;
   day: string;
 }
 

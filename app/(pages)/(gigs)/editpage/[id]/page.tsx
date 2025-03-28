@@ -51,7 +51,7 @@ interface GigInputs {
   durationfrom: string;
   bussinesscat: string;
   otherTimeline: string;
-  gigTimeline: string;
+  gigtimeline: string;
   day: string;
 }
 interface CustomProps {
@@ -115,7 +115,7 @@ const EditPage = () => {
     durationfrom: "am",
     bussinesscat: "personal",
     otherTimeline: "",
-    gigTimeline: "",
+    gigtimeline: "",
     day: "",
   });
   useEffect(() => {
@@ -238,7 +238,7 @@ const EditPage = () => {
           backgroundColor: gigcustom.backgroundColor,
           logo: imageUrl,
           otherTimeline: gigInputs.otherTimeline,
-          gigTimeline: gigInputs.gigTimeline,
+          gigTimeline: gigInputs.gigtimeline,
           day: gigInputs.day,
         }),
       });
@@ -262,7 +262,7 @@ const EditPage = () => {
           durationfrom: "am",
           bussinesscat: "personal",
           otherTimeline: "",
-          gigTimeline: "",
+          gigtimeline: "",
           day: "",
         });
         setUserInfo({ prefferences: [] });
@@ -286,7 +286,7 @@ const EditPage = () => {
   };
 
   return (
-    <div>
+    <div className="z-0">
       <form
         onSubmit={onSubmit}
         className="h-[100vh] bg-gray-900 px-4 py-6 overflow-y-auto w-full" // Ensure overflow-y-auto is here
@@ -470,7 +470,7 @@ const EditPage = () => {
                 <select
                   onChange={handleInputChange} // Use the form's handleInputChange
                   name="gigTimeline" // Add this name attribute
-                  value={gigInputs.gigTimeline} // Bind to form state
+                  value={gigInputs.gigtimeline} // Bind to form state
                   className="w-[150px] bg-gray-300 text-gray-800 h-[40px] rounded-lg text-xs px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value=""> Gig Timeline </option>
@@ -480,7 +480,7 @@ const EditPage = () => {
                   <option value="weekly">Every Week</option>
                   <option value="other">Other...</option>
                 </select>
-                {gigInputs?.gigTimeline === "other" && (
+                {gigInputs?.gigtimeline === "other" && (
                   <div className="w-full flex justify-center items-center">
                     <input
                       autoComplete="off"
@@ -490,8 +490,6 @@ const EditPage = () => {
                       onChange={handleInputChange}
                       name="otherTimeline"
                       value={gigInputs?.otherTimeline}
-                      disabled={gigInputs?.durationfrom === "once"}
-                      required={gigInputs?.durationfrom === "once"}
                     />
                   </div>
                 )}

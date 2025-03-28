@@ -57,7 +57,7 @@ export const initialState = {
     backgroundColor: "",
     logo: "",
     otherTimeline: "",
-    gigTimeline: "",
+    gigtimeline: "",
     day: "",
   },
 

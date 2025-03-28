@@ -53,6 +53,9 @@ export async function PUT(req: NextRequest) {
       day,
     }: Info = await req.json();
 
+    console.log("otherTimeline", otherTimeline);
+    console.log("gigTimeline", gigTimeline);
+    console.log("day", day);
     if (!logo) {
       return NextResponse.json({
         gigstatus: "false",
@@ -191,8 +194,8 @@ export async function PUT(req: NextRequest) {
         backgroundColor,
         logo,
         postedBy,
-        otherTimeline,
-        gigTimeline,
+        otherTimeline: gigTimeline !== "other" ? "" : otherTimeline,
+        gigtimeline: gigTimeline,
         day,
       },
       { new: true }

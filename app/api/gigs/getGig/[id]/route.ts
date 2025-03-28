@@ -24,6 +24,7 @@ export const GET = async (req: NextRequest) => {
       console.log("Gig not found");
       return NextResponse.json({ error: "Gig not found" });
     }
+
     return NextResponse.json(gig);
   } catch (error) {
     console.error("Error fetching gig:", error);

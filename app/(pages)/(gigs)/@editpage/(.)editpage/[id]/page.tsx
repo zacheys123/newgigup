@@ -566,6 +566,7 @@ const EditPage = () => {
                     value={gigInputs?.category}
                     className="w-full bg-gray-300 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
+                    <option value="">No Caregory</option>
                     <option value="piano">Piano</option>
                     <option value="guitar">Guitar</option>
                     <option value="bass">Bass Guitar</option>
