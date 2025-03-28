@@ -186,45 +186,34 @@ export default function Home() {
             )}
           </div>
         </div>{" "}
-        
-          <Link
-            className="absolute bottom-5 mt-6 px-6 py-1  text-gray-100 text-sm font-semibold rounded-xl  rounded-bl-xl roundedt-l-xl shadow-lg hover:bg-yellow-400 transition animate-bounce flex items-center"
-            style={{ fontFamily: fonts[24], backgroundColor: colors[15] }}
-            role="button"
-            href={getDynamicHref()}
-          >
-            <SaveAll
-              className="h-6 w-6 text-[15px] text-gray-200 hover:text-yellow-400 transition gap-2"
-              size="20"
-              style={{
-                animation: "pulse 2s infinite",
+        <Link
+          className="absolute bottom-5 mt-6 px-6 py-1  text-gray-100 text-sm font-semibold rounded-xl  rounded-bl-xl roundedt-l-xl shadow-lg hover:bg-yellow-400 transition animate-bounce flex items-center"
+          style={{ fontFamily: fonts[24], backgroundColor: colors[15] }}
+          role="button"
+          href={getDynamicHref()}
+        >
+          <SaveAll
+            className="h-6 w-6 text-[15px] text-gray-200 hover:text-yellow-400 transition gap-2"
+            size="20"
+            style={{
+              animation: "pulse 2s infinite",
 
-                animationDirection: "normal",
-                animationDuration: "2s",
-                animationFillMode: "forwards",
-                animationIterationCount: "infinite",
-              }}
-            />{" "}
-            Open gigup
-          </Link>
-      
+              animationDirection: "normal",
+              animationDuration: "2s",
+              animationFillMode: "forwards",
+              animationIterationCount: "infinite",
+            }}
+          />{" "}
+          Open gigup
+        </Link>
       </section>{" "}
       <ScrollToTopButton />
       {/* Footer */}
-      {!firstname && (
-        <footer className="h-screen flex flex-col justify-center items-center bg-gray-900 snap-start">
-          <h2 className="text-4xl font-bold mb-4">Ready to Gig?</h2>
-          {/* <Link
-            href={getDynamicHref()}
-            className="px-6 py-2 bg-yellow-500 text-gray-900 text-lg font-bold rounded-lg shadow-lg hover:bg-yellow-400 transition  animate-pulse"
-          >
-            Join Now
-          </Link> */}
-          <p className="text-gray-400 mt-6 absolute bottom-10">
-            © {new Date().getFullYear()} gigUp. All rights reserved.
-          </p>
-        </footer>
-      )}
+      <footer className="h-screen flex flex-col justify-center items-center bg-gray-900 snap-start">
+        <p className="text-gray-400 mt-6 absolute bottom-10">
+          © {new Date().getFullYear()} gigUp. All rights reserved.
+        </p>
+      </footer>
     </div>
   );
 }
