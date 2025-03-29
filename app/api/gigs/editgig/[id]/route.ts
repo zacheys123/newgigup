@@ -129,12 +129,6 @@ export async function PUT(req: NextRequest) {
         message: "Day is required",
       });
     }
-    if (!fontColor || !backgroundColor) {
-      return NextResponse.json({
-        gigstatus: "false",
-        message: "Font, font color, background color and logo are required",
-      });
-    }
 
     const { userId } = getAuth(req);
     if (!userId) {
@@ -196,7 +190,7 @@ export async function PUT(req: NextRequest) {
         postedBy,
         otherTimeline: gigTimeline !== "other" ? "" : otherTimeline,
         gigtimeline: gigTimeline,
-        day,
+        day: date ? "" : day,
       },
       { new: true }
     );

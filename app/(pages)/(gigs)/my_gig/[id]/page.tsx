@@ -1,7 +1,9 @@
 "use client";
+import useStore from "@/app/zustand/useStore";
 import AllGigsComponent from "@/components/gig/AllGigsComponent";
 import Gigheader from "@/components/gig/Gigheader";
 import ColorLoading from "@/components/loaders/ColorLoading";
+import AlreadyReviewModal from "@/components/modals/AlreadyReviewModall";
 // import LoadingSpinner from "@/components/LoadingSpinner";
 import { useAllGigs } from "@/hooks/useAllGigs";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
@@ -23,6 +25,7 @@ const MyGigs = () => {
   console.log(
     gigs?.gigs?.filter((gig: GigProps) => gig?.postedBy?._id === user?._id)
   );
+  const { showModal } = useStore();
   return (
     <div className="h-[70%] w-[90%] mx-auto my-2 shadow-md shadow-orange-300 relative">
       {/* Fixed Gigheader */}
@@ -54,6 +57,16 @@ const MyGigs = () => {
             <ColorLoading />
           </div>
           // <LoadingSpinner />
+        )}{" "}
+        {showModal && (
+          <div className="fixed  w-[80%] mx-auto inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+            {/* Dim all other gigs */}
+            {/* Center modal on parent gig */}
+            <div className=" z-0 mt-10">
+              {" "}
+              <AlreadyReviewModal />
+            </div>
+          </div>
         )}
       </div>
     </div>

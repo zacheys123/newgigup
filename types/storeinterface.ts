@@ -5,6 +5,14 @@ import { ChatProps, MessageProps } from "./chatinterfaces";
 import { Socket } from "socket.io-client";
 
 export const initialState = {
+  selectedReview: {
+    _id: "",
+    rating: 0,
+    comment: "",
+    gigId: "", // assuming Gig ID is a string
+    postedBy: "",
+    postedTo: "",
+  },
   socket: null,
   messages: [],
   chats: {}, // Efficient dictionary for chat lookups
@@ -65,7 +73,6 @@ export const initialState = {
   follow: false,
   refetchData: false,
   showModal: false,
-  selectedReview: {},
   showUpload: false,
   modalVisible: false,
   drawerVisible: false,
@@ -98,7 +105,7 @@ export interface StoreState {
   follow: boolean;
   refetchData: boolean;
   showModal: boolean;
-  selectedReview: Record<string, Review>;
+  selectedReview: Review;
   showUpload: boolean;
   modalVisible: boolean;
   drawerVisible: boolean;
@@ -117,7 +124,7 @@ export interface StoreState {
   setIsOpen: (data: boolean) => void;
   setShowModal: (data: boolean) => void;
   setCurrentFollowers: (data: boolean) => void;
-  setSelectedReview: (data: Record<string, Review>) => void;
+  setSelectedReview: (data: Review) => void;
   setSearch: (data: boolean) => void;
   setFollow: (data: boolean) => void;
   setRefferenceModalOpen: (data: boolean) => void;

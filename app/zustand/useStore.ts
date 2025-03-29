@@ -16,7 +16,6 @@ import { create } from "zustand"; // Import SetState
 
 const useStore = create<StoreState>((set) => ({
   ...initialState,
-
   setIsDescriptionModal: (data: boolean) =>
     set(() => ({ isDescriptionModal: data })),
   setIsProfileModalOpen: (data: boolean) =>
@@ -32,8 +31,7 @@ const useStore = create<StoreState>((set) => ({
   setCurrentFollowers: (data: boolean) =>
     set(() => ({ currentFollowers: data })),
   setShowModal: (data: boolean) => set(() => ({ showModal: data })),
-  setSelectedReview: (data: Record<string, Review>) =>
-    set(() => ({ selectedReview: data })),
+  setSelectedReview: (data: Review) => set(() => ({ selectedReview: data })),
   setSearch: (data: boolean) => set(() => ({ search: data })),
   setFollow: (data: boolean) => set(() => ({ follow: data })),
   setCurrentUser: (data: Partial<UserProps>) =>

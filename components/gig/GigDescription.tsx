@@ -293,7 +293,33 @@ const GigDescription = () => {
                 </Box>
               </Box>
             )}
-
+          {currentgig?.gigtimeline === "once" && (
+            <Box className="my-6">
+              <Chip
+                label="Schedule"
+                sx={{
+                  mb: 2,
+                  fontWeight: 600,
+                  backgroundColor: "error.dark",
+                  color: "background.paper",
+                }}
+              />
+              <Box
+                sx={{
+                  backgroundColor: "background.paper",
+                  borderRadius: 2,
+                  boxShadow: 1,
+                  padding: 2,
+                }}
+              >
+                <Typography variant="body2" className="text-black">
+                  <strong style={{ color: "#ff5252" }}>
+                    Every week on {currentgig?.date?.toLocaleDateString()}
+                  </strong>
+                </Typography>
+              </Box>
+            </Box>
+          )}
           {/* Schedule Information */}
           {currentgig?.gigtimeline === "weekly" && (
             <Box className="my-6">
