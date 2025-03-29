@@ -48,6 +48,7 @@ const ViewGigDetails = () => {
             Reload page
             <TfiReload />
           </Button>
+          m
         </div>
       </div>
     );
@@ -58,9 +59,10 @@ const ViewGigDetails = () => {
         <BookingPage />
       )}
 
-      {currentgig?.postedBy?.clerkId.includes(userId as string) && (
-        <AcceptPage {...currentgig} />
-      )}
+      {currentgig?.postedBy?._id &&
+        currentgig?.postedBy?._id.includes(user?._id as string) && (
+          <AcceptPage {...currentgig} />
+        )}
     </>
   );
 };

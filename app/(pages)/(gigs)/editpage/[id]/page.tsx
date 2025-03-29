@@ -348,7 +348,7 @@ const EditPage = () => {
                 error ? "text-red-300 " : "text-green-300"
               }`}
               style={{
-                fontFamily: fonts[30],
+                fontFamily: fonts[34],
               }}
             >
               {editMessage}
