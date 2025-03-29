@@ -279,7 +279,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
             {hasBookedGig ? (
               <ButtonComponent
                 variant="secondary"
-                classname="!bg-indigo-600/90 hover:!bg-indigo-500 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
+                className="!bg-indigo-600/90 hover:!bg-indigo-500 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
                 onclick={() => {
                   setLoadingPostId(gig?._id || "");
                   setTimeout(() => {
@@ -292,7 +292,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
             ) : canEditGig ? (
               <ButtonComponent
                 variant="secondary"
-                classname="!bg-white/10 hover:!bg-white/20 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
+                className="!bg-white/10 hover:!bg-white/20 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
                 onclick={() => {
                   setLoadingPostId(gig?._id || "");
                   setTimeout(() => {
