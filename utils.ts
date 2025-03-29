@@ -363,7 +363,6 @@ export const fonts = [
   "DM Sans",
   "Manrope",
   "Lora",
-  ,
   "Merriweather",
   "Playfair Display",
   "Cormorant Garamond",
