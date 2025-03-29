@@ -351,7 +351,9 @@ export const handleFollowing = async (_id: string, user: UserProps) => {
 // };
 
 // Font Choices
+// Font Choices (Expanded List)
 export const fonts = [
+  // Modern Sans-Serif
   "Poppins",
   "Inter",
   "Roboto",
@@ -359,31 +361,67 @@ export const fonts = [
   "Open Sans",
   "Nunito",
   "Raleway",
-  ,
+  "Work Sans",
   "DM Sans",
   "Manrope",
+  "Fira Sans",
+  "Source Sans Pro",
+  "Noto Sans",
+  "Ubuntu",
+  "Segoe UI",
+  "SF Pro Display",
+  "Figtree",
+
+  // Elegant Serif
   "Lora",
   "Merriweather",
   "Playfair Display",
   "Cormorant Garamond",
   "Libre Baskerville",
+  "EB Garamond",
+  "Alegreya",
+  "Bitter",
+  "Vollkorn",
+
+  // Display & Headings
   "Oswald",
   "Bebas Neue",
   "Josefin Sans",
   "Alfa Slab One",
-  "Fira Sans",
-  "Source Sans Pro",
+  "Archivo Black",
+  "Anton",
+  "Impact",
+  "Abril Fatface",
+
+  // Rounded/Soft Sans-Serif
   "Quicksand",
   "Cabin",
-  "Ubuntu",
-  "Noto Sans",
-  "Sofia",
+  "Nunito Sans",
+  "Mukta",
+  "Comfortaa",
+  "Lexend",
+
+  // Monospace & Tech
+  "Courier New",
+  "Roboto Mono",
+  "Fira Code",
+  "Source Code Pro",
+  "IBM Plex Mono",
+
+  // Web-Safe Fallbacks
   "Arial",
   "Georgia",
   "Verdana",
-  "Courier New",
   "Times New Roman",
   "Trebuchet MS",
+  "Helvetica",
+
+  // Decorative/Cursive
+  "Sofia",
+  "Pacifico",
+  "Dancing Script",
+  "Great Vibes",
+  "Parisienne",
 ];
 
 // Professional Color Palette (Mini Circles)
