@@ -26,6 +26,7 @@ const MyGigs = () => {
     gigs?.gigs?.filter((gig: GigProps) => gig?.postedBy?._id === user?._id)
   );
   const { showModal } = useStore();
+  console.log(showModal);
   return (
     <div className="h-[70%] w-[90%] mx-auto my-2 shadow-md shadow-orange-300 relative">
       {/* Fixed Gigheader */}
@@ -59,7 +60,7 @@ const MyGigs = () => {
           // <LoadingSpinner />
         )}{" "}
         {showModal && (
-          <div className="fixed  w-[80%] mx-auto inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="fixed  w-[80%] mx-auto inset-0 bg-black/50 backdrop-blur-sm z-50 -mt-[150px] flex items-center justify-center">
             {/* Dim all other gigs */}
             {/* Center modal on parent gig */}
             <div className=" z-0 mt-10">

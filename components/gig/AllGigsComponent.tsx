@@ -79,16 +79,16 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
   };
 
   const handleReviewModal = (gig: GigProps) => {
-    // Find the review for this specific gig
     const review = gig?.postedBy?.myreviews?.find(
-      (review) => review.gigId === gig._id
+      (review) => review?.gigId === gig?._id
     );
 
     if (review) {
       setSelectedReview(review);
-      setCurrentGig(gig); // Make sure to set the current gig
+      setCurrentGig(gig);
       setShowModal(true);
     } else {
+      // Redirect to execute page if no review exists
       router.push(`/execute/${gig._id}`);
     }
   };
@@ -113,7 +113,8 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
 
   const isGigCreator = gig?.postedBy?._id === myId;
   const hasBookedGig = gig?.bookCount?.some((i) => i?._id === myId);
-  const isCurrentWhoCreatedGig = isGigCreator && !hasBookedGig && bookCount > 0;
+  const isCurrentWhoCreatedGig =
+    isGigCreator && !hasBookedGig && bookCount > 0 && gig?.isTaken === false;
   const isCurrentWhoBooked = hasBookedGig && !isGigCreator;
 
   const canEditGig =
@@ -143,7 +144,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
       socket.off("updateBookCount", handleUpdateBookCount);
     };
   }, [gig._id, socket]);
-  console.log(bookCount);
+
   return (
     <>
       {isDescriptionModal && <GigDescription />}
@@ -265,13 +266,19 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
             {isCreatorIsCurrentUserAndTaken(gig, myId as string) && (
               <button
                 onClick={() => handleReviewModal(gig)}
-                className="text-xs bg-amber-600/90 hover:bg-amber-500 px-2 py-1 rounded transition-colors"
+                className={`text-xs px-3 py-1.5 rounded-md transition-colors  ${
+                  gig.postedBy?.myreviews?.some(
+                    (review) => review.gigId === gig._id
+                  )
+                    ? "bg-gray-300 text-gray-600 cursor-default" // Reviewed state
+                    : "bg-amber-700 hover:bg-amber-600 text-white" // Review state
+                }`}
               >
-                {gig?.postedBy?.myreviews?.some(
-                  (review) => review.gigId === gig?._id
+                {gig.postedBy?.myreviews?.some(
+                  (review) => review.gigId === gig._id
                 )
                   ? "Reviewed"
-                  : "Review"}
+                  : "Leave Review"}
               </button>
             )}
             {/* Primary Action Button */}
