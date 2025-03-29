@@ -279,7 +279,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
             {hasBookedGig ? (
               <ButtonComponent
                 variant="secondary"
-                className="!bg-indigo-600/90 hover:!bg-indigo-500 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
+                classname="!bg-indigo-600/90 hover:!bg-indigo-500 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
                 onclick={() => {
                   setLoadingPostId(gig?._id || "");
                   setTimeout(() => {
@@ -292,7 +292,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
             ) : canEditGig ? (
               <ButtonComponent
                 variant="secondary"
-                className="!bg-white/10 hover:!bg-white/20 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
+                classname="!bg-white/10 hover:!bg-white/20 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
                 onclick={() => {
                   setLoadingPostId(gig?._id || "");
                   setTimeout(() => {
@@ -777,7 +777,7 @@ export default AllGigsComponent;
 //       {hasBookedGig ? (
 //         <ButtonComponent
 //           variant="secondary"
-//           classname="!bg-indigo-600 hover:!bg-indigo-500 h-10 text-sm font-normal text-white px-5 rounded-lg transition-all shadow-md"
+//           className="!bg-indigo-600 hover:!bg-indigo-500 h-10 text-sm font-normal text-white px-5 rounded-lg transition-all shadow-md"
 //           onclick={() => {
 //             setLoadingPostId(gig?._id || "");
 //             setTimeout(() => {
@@ -790,7 +790,7 @@ export default AllGigsComponent;
 //       ) : canEditGig ? (
 //         <ButtonComponent
 //           variant="secondary"
-//           classname="!bg-zinc-700 hover:!bg-zinc-600 h-10 text-sm font-normal text-white px-5 rounded-lg transition-all shadow-md"
+//           className="!bg-zinc-700 hover:!bg-zinc-600 h-10 text-sm font-normal text-white px-5 rounded-lg transition-all shadow-md"
 //           onclick={() => {
 //             setLoadingPostId(gig?._id || "");
 //             setTimeout(() => {
