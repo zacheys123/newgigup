@@ -16,7 +16,8 @@ interface ProfileModalProps {
 const RefferenceModal: React.FC<ProfileModalProps> = ({ user, getReviews }) => {
   const router = useRouter();
   const { userId } = useAuth();
-  const { setRefferenceModalOpen, setReviewModalOpen } = useStore();
+  const { setRefferenceModalOpen, setReviewModalOpen, setIsProfileModalOpen } =
+    useStore();
   const { user: myuser } = useCurrentUser(userId || null);
   return (
     <div className="bg-neutral-900 w-full max-w-md rounded-t-lg p-6 relative slide-up min-h-[340px] rounded-tl-[50px] rounded-tr-[50px] pt-12">
@@ -90,6 +91,19 @@ const RefferenceModal: React.FC<ProfileModalProps> = ({ user, getReviews }) => {
               );
             }
           )}
+
+      <div className="absolute bottom-2 left-3 ">
+        <button
+          onClick={(ev) => {
+            ev.stopPropagation();
+            setIsProfileModalOpen(true);
+            setRefferenceModalOpen(false);
+          }}
+          className="bg-green-700 text-white px-4  rounded-full hover:bg-[#0e6e5f] transition-colors duration-200"
+        >
+          back
+        </button>
+      </div>
     </div>
   );
 };

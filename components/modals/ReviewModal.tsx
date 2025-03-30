@@ -127,10 +127,14 @@ const ReviewModal = ({ reviewdata, user, getVideos }: ReviewProps) => {
       {reviewdata?.length > 0 && (
         <div className="absolute bottom-2 left-3 ">
           <button
-            onClick={() => setReviewModalOpen(false)}
+            onClick={(ev) => {
+              ev.stopPropagation();
+              setReviewModalOpen(false);
+              setRefferenceModalOpen(true);
+            }}
             className="bg-green-700 text-white px-4  rounded-full hover:bg-[#0e6e5f] transition-colors duration-200"
           >
-            Close
+            back
           </button>
         </div>
       )}
