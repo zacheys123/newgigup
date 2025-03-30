@@ -242,7 +242,7 @@ const CreateGig = () => {
           backgroundColor: gigcustom.backgroundColor,
           logo: imageUrl,
           otherTimeline: gigInputs.otherTimeline,
-          gigTimeline: gigInputs.gigtimeline,
+          gigtimeline: gigInputs.gigtimeline,
           day: gigInputs.day,
         }),
       });
