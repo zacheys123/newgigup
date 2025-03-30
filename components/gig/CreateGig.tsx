@@ -79,7 +79,7 @@ const CreateGig = () => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [imageUrl, setUrl] = useState<string>("");
   const [fileUrl, setFileUrl] = useState<string>("");
-  const { setRefetchData, currentgig } = useStore();
+  const { setRefetchData } = useStore();
   const { user } = useCurrentUser(userId || null);
   const {} = useGetGigs(id as string | null);
 
@@ -122,24 +122,6 @@ const CreateGig = () => {
     day: "",
     date: "", // Added date field
   });
-  useEffect(() => {
-    if (currentgig && !gigInputs.title) {
-      const dateValue = currentgig.date
-        ? new Date(currentgig.date).toISOString()
-        : "";
-
-      setGigs((prev) => ({
-        ...prev,
-        ...currentgig,
-        date: dateValue,
-      }));
-
-      if (currentgig.date) {
-        setSelectedDate(new Date(currentgig.date));
-      }
-    }
-  }, [currentgig, gigInputs?.title]);
-  console.log(currentgig);
   const [userinfo, setUserInfo] = useState<UserInfo>({
     prefferences: [],
   });
