@@ -472,7 +472,7 @@ const CreateGig = () => {
                   placeholder="Enter phone number"
                   className="w-full bg-gray-300 text-gray800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   onChange={handleInputChange}
-                  name="phoneNo"
+                  name="phone"
                   value={gigInputs?.phone}
                 />
                 <input
