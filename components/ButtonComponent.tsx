@@ -8,6 +8,7 @@ interface ButtonProps {
   title: string;
   loading?: boolean;
   loadingtitle?: string;
+  disabled?: boolean;
   // additional props to pass to the button component, e.g., disabled, href, etc.
 }
 const ButtonComponent = ({
@@ -17,9 +18,15 @@ const ButtonComponent = ({
   title,
   loading,
   loadingtitle,
+  disabled,
 }: ButtonProps) => {
   return (
-    <Button variant={variant} className={classname} onClick={onclick}>
+    <Button
+      variant={variant}
+      className={classname}
+      onClick={onclick}
+      disabled={disabled}
+    >
       {!loading ? title : loadingtitle}
     </Button>
   );

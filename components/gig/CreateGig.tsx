@@ -52,6 +52,7 @@ interface GigInputs {
   otherTimeline: string;
   gigtimeline: string;
   day: string;
+  date: string;
 }
 interface CustomProps {
   fontColor: string;
@@ -98,6 +99,7 @@ const CreateGig = () => {
     otherTimeline: "",
     gigtimeline: "",
     day: "",
+    date: "",
   });
   const [userinfo, setUserInfo] = useState<UserInfo>({
     prefferences: [],
@@ -230,7 +232,7 @@ const CreateGig = () => {
           bandCategory: userinfo.prefferences,
           location: gigInputs.location,
           secret: gigInputs.secret,
-          date: selectedDate,
+          date: gigInputs?.date,
           to: `${gigInputs.end}${gigInputs.durationto}`,
           from: `${gigInputs.start}${gigInputs.durationfrom}`,
           postedBy: user?._id,
@@ -266,6 +268,7 @@ const CreateGig = () => {
           otherTimeline: "",
           gigtimeline: "",
           day: "",
+          date: "",
         });
         setUserInfo({ prefferences: [] });
         setBussinessCategory("");

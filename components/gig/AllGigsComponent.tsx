@@ -303,6 +303,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                       setLoadingPostId("");
                     }, 2000);
                   }}
+                  disabled={loadingPostId.length > 0}
                   title={loadingPostId === gig._id ? "Opening..." : "View"}
                 />
               </div>
