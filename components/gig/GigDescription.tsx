@@ -4,6 +4,8 @@ import useStore from "@/app/zustand/useStore";
 import { Box, Chip, Typography, IconButton } from "@mui/material";
 import { X } from "lucide-react";
 import { styled } from "@mui/material/styles";
+import moment from "moment";
+import { colors } from "@/utils";
 
 const DetailItem = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -46,7 +48,7 @@ const GigDescription = () => {
         {/* Header Section */}
         <Box
           sx={{
-            backgroundColor: "primary.dark",
+            backgroundColor: "primary.light",
             padding: 2,
             display: "flex",
             justifyContent: "space-between",
@@ -312,9 +314,19 @@ const GigDescription = () => {
                   padding: 2,
                 }}
               >
-                <Typography variant="body2" className="text-black">
+                <Typography
+                  variant="body2"
+                  className="text-black flex flex-col gap-3"
+                >
                   <strong style={{ color: "#ff5252" }}>
-                    Every week on {currentgig?.date?.toLocaleDateString()}
+                    {moment(currentgig?.date).format("MMMM Do YYYY")}
+                  </strong>
+                  <strong
+                    style={{ color: colors[4] }}
+                    className="flex flex-col"
+                  >
+                    <span>StartTime:{currentgig?.time?.from}</span>
+                    <span>FinishTime:{currentgig?.time?.to}</span>
                   </strong>
                 </Typography>
               </Box>
