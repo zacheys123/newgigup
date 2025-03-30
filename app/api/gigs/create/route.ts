@@ -23,7 +23,7 @@ type Info = {
   backgroundColor: string;
   logo: string;
   otherTimeline: string;
-  gigTimeline: string;
+  gigtimeline: string;
   day: string;
 };
 
@@ -47,11 +47,11 @@ export async function POST(req: NextRequest) {
     backgroundColor,
     logo,
     otherTimeline,
-    gigTimeline,
+    gigtimeline,
     day,
   }: Info = await req.json();
 
-  console.log(gigTimeline);
+  console.log(gigtimeline);
   console.log(fontColor);
   console.log(backgroundColor);
   console.log(logo);
@@ -117,22 +117,16 @@ export async function POST(req: NextRequest) {
       message: "Secret is required",
     });
   }
-  if (!gigTimeline) {
+  if (!gigtimeline) {
     return NextResponse.json({
       gigstatus: "false",
       message: "Gig timeline is required",
     });
   }
-  if (!day) {
+  if ((!day && gigtimeline === "weekly") || gigtimeline === "other") {
     return NextResponse.json({
       gigstatus: "false",
       message: "Day is required",
-    });
-  }
-  if (!fontColor || !backgroundColor) {
-    return NextResponse.json({
-      gigstatus: "false",
-      message: "Font, font color, background color and logo are required",
     });
   }
 
@@ -186,7 +180,7 @@ export async function POST(req: NextRequest) {
       backgroundColor,
       logo,
       otherTimeline,
-      gigTimeline,
+      gigtimeline,
       day,
     });
 

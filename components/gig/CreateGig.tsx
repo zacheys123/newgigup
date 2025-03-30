@@ -247,7 +247,7 @@ const CreateGig = () => {
         }),
       });
       const data = await res.json();
-
+      console.log(data);
       if (data.gigstatus === "true") {
         setEditMessage(data.message);
         setError(false);
