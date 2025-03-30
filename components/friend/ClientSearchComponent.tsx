@@ -254,8 +254,8 @@ const ClientSearchComponent = () => {
             <div className="text-[12px] font-bold text-gray-500 flex gap-5 mt-3 justify-center">
               {friend?.handles &&
                 friend?.handles.split(",").map((handle, i) => (
-                  <div key={i} className="">
-                    <span className="text-[12px] font-bold text-gray-500 flex items-center ">
+                  <div key={i} className="mx-4">
+                    <span className="text-[12px]  font-bold text-gray-500 flex items-center ">
                       {handle.includes("instagram") && (
                         <BsInstagram
                           onClick={() =>

@@ -39,25 +39,16 @@ const AllChats = () => {
 
   const {
     data: chats,
-    error,
     isLoading,
+    error,
   } = useSWR(
     loggedInUserId ? `/api/chat/allchats?userId=${loggedInUserId}` : null,
     fetcher,
     {
-      revalidateOnFocus: true,
-      revalidateIfStale: true,
-      revalidateOnReconnect: true,
-      revalidateOnMount: true,
-      // Dedupe requests with the same key for 5 seconds
-      dedupingInterval: 5000,
-      // Cache the data for 2 minutes
-      focusThrottleInterval: 120000,
-      onErrorRetry: (error, key, config, revalidate, { retryCount }) => {
-        if (error.status === 404 || error.status === 401) return;
-        if (retryCount >= 3) return;
-        setTimeout(() => revalidate({ retryCount }), 5000);
-      },
+      revalidateOnFocus: false,
+      dedupingInterval: 10000, // Increase to 10 seconds
+      focusThrottleInterval: 300000, // 5 minutes
+      errorRetryInterval: 5000,
     }
   );
 
@@ -170,7 +161,16 @@ const AllChats = () => {
     },
     [loggedInUserId, router, updateUnreadCount]
   );
+  const uniqueChats = useMemo(() => {
+    if (!filteredChats) return [];
 
+    const seen = new Set();
+    return filteredChats.filter((chat: ChatProps) => {
+      const duplicate = seen.has(chat.chatId);
+      seen.add(chat.chatId);
+      return duplicate;
+    });
+  }, [filteredChats]);
   const LoadingSkeleton = () => (
     <div className="animate-pulse flex items-center p-3 space-x-4 mt-9">
       <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
@@ -194,7 +194,7 @@ const AllChats = () => {
 
   if (isLoading) {
     return (
-      <div className="h-screen bg-[#f0f2f5] flex flex-col overflow-y-auto pb-20">
+      <div className="h-screen bg-[#7f848b] flex flex-col overflow-y-auto pb-20">
         <div className="bg-[#128C7E] p-4 text-white flex justify-between items-center">
           <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#ba51e4] to-[#e0ab16] bg-clip-text text-transparent">
             Chats
@@ -239,7 +239,7 @@ const AllChats = () => {
   // }
   return (
     <div
-      className="h-screen bg-[#f0f2f5] flex flex-col overflow-y-auto pb-20"
+      className="h-screen bg-[#d4cfca] flex flex-col overflow-y-auto pb-20"
       onClick={() => {
         setIsOpen(false);
       }}
@@ -423,7 +423,7 @@ const AllChats = () => {
               </div>
             ) : (
               // Case 3: Display the list of chats
-              filteredChats.map(
+              uniqueChats.map(
                 (
                   chat: {
                     users: UserProps[];

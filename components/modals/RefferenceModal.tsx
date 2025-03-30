@@ -1,5 +1,6 @@
 "use client";
 import useStore from "@/app/zustand/useStore";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { Review, UserProps } from "@/types/userinterfaces";
 import { fonts } from "@/utils";
 import { useAuth } from "@clerk/nextjs";
@@ -16,7 +17,7 @@ const RefferenceModal: React.FC<ProfileModalProps> = ({ user, getReviews }) => {
   const router = useRouter();
   const { userId } = useAuth();
   const { setRefferenceModalOpen, setReviewModalOpen } = useStore();
-
+  const { user: myuser } = useCurrentUser(userId || null);
   return (
     <div className="bg-neutral-900 w-full max-w-md rounded-t-lg p-6 relative slide-up min-h-[340px] rounded-tl-[50px] rounded-tr-[50px] pt-12">
       {/* {[...Array(3)].map((i, index) => (
@@ -45,47 +46,50 @@ const RefferenceModal: React.FC<ProfileModalProps> = ({ user, getReviews }) => {
       <p className="text-neutral-400 mb-3">
         Contact a list of {user?.username} former clients
       </p>
-      {user?.refferences?.map(
-        ({ _id, firstname, lastname, myreviews }: UserProps) => {
-          return (
-            <div
-              key={_id}
-              className="w-full text-white bg-neutral-800  rounded-md py-3 px-3 flex gap-2 items-center justify-between my-1"
-            >
-              <div>
-                <span className="text-[15px] font-bold text-neutral-400 mr-2">
-                  {firstname}
-                </span>
-                <span className="text-[15px] font-bold text-neutral-400 mr-2">
-                  {lastname}
-                </span>
-              </div>
-              <div className="flex items-center h-[35px] w-[75px] justify-between">
-                <div className="bg-neutral-300 p-1 rounded-full flex justify-center items-center">
-                  <User
-                    className="text-[24px] text-gray-600 "
-                    style={{ fontSize: "24px" }}
-                    onClick={() => {
-                      setRefferenceModalOpen(false);
-                      router.push(`/client/profile/${userId}`);
-                    }}
-                  />
+      {myuser?._id &&
+        user?.refferences
+          ?.filter(({ _id }: UserProps) => _id !== myuser?._id)
+          ?.map(
+            ({ _id, firstname, lastname, myreviews, username }: UserProps) => {
+              return (
+                <div
+                  key={_id}
+                  className="w-full text-white bg-neutral-800  rounded-md py-3 px-3 flex gap-2 items-center justify-between my-1"
+                >
+                  <div>
+                    <span className="text-[15px] font-bold text-neutral-400 mr-2">
+                      {firstname}
+                    </span>
+                    <span className="text-[15px] font-bold text-neutral-400 mr-2">
+                      {lastname}
+                    </span>
+                  </div>
+                  <div className="flex items-center h-[35px] w-[75px] justify-between">
+                    <div className="bg-neutral-300 p-1 rounded-full flex justify-center items-center">
+                      <User
+                        className="text-[24px] text-gray-600 "
+                        style={{ fontSize: "24px" }}
+                        onClick={() => {
+                          setRefferenceModalOpen(false);
+                          router.push(`/client/search/${username}`);
+                        }}
+                      />
+                    </div>
+                    <MdInsertComment
+                      className="text-[24px] text-yellow-400"
+                      style={{ fontSize: "24px" }}
+                      onClick={(ev) => {
+                        ev.stopPropagation();
+                        setRefferenceModalOpen(false);
+                        setReviewModalOpen(true);
+                        getReviews(myreviews);
+                      }}
+                    />
+                  </div>
                 </div>
-                <MdInsertComment
-                  className="text-[24px] text-yellow-400"
-                  style={{ fontSize: "24px" }}
-                  onClick={(ev) => {
-                    ev.stopPropagation();
-                    setRefferenceModalOpen(false);
-                    setReviewModalOpen(true);
-                    getReviews(myreviews);
-                  }}
-                />
-              </div>
-            </div>
-          );
-        }
-      )}
+              );
+            }
+          )}
     </div>
   );
 };
