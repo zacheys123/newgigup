@@ -276,7 +276,7 @@ const CreateGig = () => {
       if (data.gigstatus === "false") {
         setEditMessage(data.message);
         setError(true);
-        setIsVisible(false);
+        setIsVisible(true);
       }
     } catch (error) {
       console.error(error);
