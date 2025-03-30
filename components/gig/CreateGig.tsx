@@ -7,7 +7,7 @@ import React, {
   useCallback,
   useEffect,
 } from "react";
-
+import { Button } from "../ui/button";
 // import DatePicker from "react-datepicker";
 // import "react-datepicker/dist/react-datepicker.css";
 import { Box, CircularProgress } from "@mui/material";
@@ -25,24 +25,21 @@ import {
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAuth } from "@clerk/nextjs";
 import { toast } from "sonner";
+import GigCustomization from "./GigCustomization";
 import { fileupload } from "@/hooks/fileUpload";
 import useStore from "@/app/zustand/useStore";
-import { Button } from "@/components/ui/button";
-import GigCustomization from "@/components/gig/GigCustomization";
-import { useParams } from "next/navigation";
-import { useGetGigs } from "@/hooks/useGetGig";
 import { FaComment } from "react-icons/fa";
 import { days } from "@/data";
+// import useStore from "@/app/zustand/useStore";
+// import { useAuth } from "@clerk/nextjs";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { motion } from "framer-motion";
 import { fonts } from "@/utils";
-// import useStore from "@/app/zustand/useStore";
-// import { useAuth } from "@clerk/nextjs";
 interface GigInputs {
   title: string;
   description: string;
-  phone: string;
+  phoneNo: string;
   price: string;
   category: string;
   location: string;
@@ -55,7 +52,6 @@ interface GigInputs {
   otherTimeline: string;
   gigtimeline: string;
   day: string;
-  date: string; // Update to accept both types
 }
 interface CustomProps {
   fontColor: string;
@@ -69,20 +65,47 @@ interface UserInfo {
 type bussinesscat = string | null;
 
 const CreateGig = () => {
-  const { id } = useParams();
   const { userId } = useAuth();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [secretpass, setSecretPass] = useState<boolean>(false);
   const [showcustomization, setShowCustomization] = useState<boolean>(false);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null); // Changed to useState
 
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [imageUrl, setUrl] = useState<string>("");
   const [fileUrl, setFileUrl] = useState<string>("");
   const { setRefetchData } = useStore();
   const { user } = useCurrentUser(userId || null);
-  const {} = useGetGigs(id as string | null);
 
+  const [gigcustom, setGigCustom] = useState<CustomProps>({
+    fontColor: "",
+    font: "",
+    backgroundColor: "",
+  });
+  const [secretreturn] = useState<string>("");
+  const [gigInputs, setGigs] = useState<GigInputs>({
+    title: "",
+    description: "",
+    phoneNo: "",
+    price: "",
+    category: "",
+    location: "",
+    secret: "",
+    end: "",
+    start: "",
+    durationto: "pm",
+    durationfrom: "am",
+    bussinesscat: "personal",
+    otherTimeline: "",
+    gigtimeline: "",
+    day: "",
+  });
+  const [userinfo, setUserInfo] = useState<UserInfo>({
+    prefferences: [],
+  });
+  const [bussinesscat, setBussinessCategory] = useState<bussinesscat>("full");
+  // const [errors, setErrors] = useState<string[]>([]);
+  // const [success, setSuccess] = useState<boolean>(false);
+  const [showduration, setshowduration] = useState<boolean>(false);
   const [showCategories, setshowCategories] = useState<{
     title: boolean;
     description: boolean;
@@ -98,37 +121,14 @@ const CreateGig = () => {
     othergig: false,
     gduration: false,
   });
-  const [gigcustom, setGigCustom] = useState<CustomProps>({
-    fontColor: "",
-    font: "",
-    backgroundColor: "",
-  });
-  const [secretreturn] = useState<string>("");
-  const [gigInputs, setGigs] = useState<GigInputs>({
-    title: "",
-    description: "",
-    phone: "",
-    price: "",
-    category: "",
-    location: "",
-    secret: "",
-    end: "",
-    start: "",
-    durationto: "pm",
-    durationfrom: "am",
-    bussinesscat: "personal",
-    otherTimeline: "",
-    gigtimeline: "",
-    day: "",
-    date: "", // Added date field
-  });
-  const [userinfo, setUserInfo] = useState<UserInfo>({
-    prefferences: [],
-  });
-  const [bussinesscat, setBussinessCategory] = useState<bussinesscat>("full");
-  // const [errors, setErrors] = useState<string[]>([]);
-  // const [success, setSuccess] = useState<boolean>(false);
-  const [showduration, setshowduration] = useState<boolean>(false);
+
+  // const minDate = new Date("2020-01-01");
+  // const maxDate = new Date("2026-01-01");
+
+  // const handleDate = (date: Date | null) => {
+  //   setSelectedDate(date);
+  // };
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null); // Changed to useState
 
   const minDate = new Date("2020-01-01");
   const maxDate = new Date("2026-01-01");
@@ -142,9 +142,11 @@ const CreateGig = () => {
       }));
     }
   };
+  const [editMessage, setEditMessage] = useState("");
+  const [error, setError] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   // handle the image upload to cloudinary
-
   const handleFileChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const dep = "image";
@@ -208,10 +210,6 @@ const CreateGig = () => {
     }));
   };
   //
-  const [editMessage, setEditMessage] = useState("");
-  const [error, setError] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
-
   // submit your gig
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -226,13 +224,13 @@ const CreateGig = () => {
         body: JSON.stringify({
           title: gigInputs.title,
           description: gigInputs.description,
-          phoneNo: gigInputs.phone,
+          phoneNo: gigInputs.phoneNo,
           price: gigInputs.price,
           category: gigInputs.category,
           bandCategory: userinfo.prefferences,
           location: gigInputs.location,
           secret: gigInputs.secret,
-          date: gigInputs.date,
+          date: selectedDate,
           to: `${gigInputs.end}${gigInputs.durationto}`,
           from: `${gigInputs.start}${gigInputs.durationfrom}`,
           postedBy: user?._id,
@@ -249,14 +247,13 @@ const CreateGig = () => {
       const data = await res.json();
 
       if (data.gigstatus === "true") {
-        setEditMessage(data?.message);
+        setEditMessage(data.message);
         setError(false);
         setIsVisible(true);
-        // Reset form fields
         setGigs({
           title: "",
           description: "",
-          phone: "",
+          phoneNo: "",
           price: "",
           category: "",
           location: "",
@@ -269,27 +266,21 @@ const CreateGig = () => {
           otherTimeline: "",
           gigtimeline: "",
           day: "",
-          date: "",
         });
         setUserInfo({ prefferences: [] });
         setBussinessCategory("");
       }
       if (data.gigstatus === "false") {
-        setError(true);
-
         setEditMessage(data.message);
-        setIsVisible(true);
+        setError(true);
+        setIsVisible(false);
       }
     } catch (error) {
       console.error(error);
-      setError(true);
-      setEditMessage("An error occurred while updating the gig");
-      setIsVisible(true);
     } finally {
       setIsLoading(false);
     }
   };
-
   useEffect(() => {
     let timer: NodeJS.Timeout;
 
@@ -304,9 +295,8 @@ const CreateGig = () => {
       if (timer) clearTimeout(timer);
     };
   }, [editMessage, isVisible]);
-
   return (
-    <div className="z-0">
+    <div>
       <form
         onSubmit={onSubmit}
         className="h-[100vh] bg-gray-900 px-4 py-6 overflow-y-auto w-full" // Ensure overflow-y-auto is here
@@ -472,8 +462,8 @@ const CreateGig = () => {
                   placeholder="Enter phone number"
                   className="w-full bg-gray-300 text-gray800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   onChange={handleInputChange}
-                  name="phone"
-                  value={gigInputs?.phone}
+                  name="phoneNo"
+                  value={gigInputs?.phoneNo}
                 />
                 <input
                   autoComplete="off"
@@ -537,6 +527,8 @@ const CreateGig = () => {
                       onChange={handleInputChange}
                       name="otherTimeline"
                       value={gigInputs?.otherTimeline}
+                      disabled={gigInputs?.durationfrom === "once"}
+                      required={gigInputs?.durationfrom === "once"}
                     />
                   </div>
                 )}
