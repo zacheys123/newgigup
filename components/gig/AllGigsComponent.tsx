@@ -74,6 +74,10 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
   const handleEditBooked = async (id: string) => {
     router.push(`/execute/${id}`);
   };
+
+  const handleBookedUsers = (id: string) => {
+    router.push(`/pre_execute/${id}`);
+  };
   const handleEdit = async (id: string) => {
     return router.push(`/editpage/${id}`);
   };
@@ -211,8 +215,8 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
           <span
             className={`text-[10px] px-2 py-0.5 rounded-full ml-2 ${
               gig?.isTaken
-                ? "bg-emerald-900/30 text-emerald-300"
-                : "bg-blue-900/30 text-blue-300"
+                ? "bg-emerald-900/50 text-emerald-300"
+                : "bg-blue-900/60 text-teal-400"
             }`}
           >
             {gig?.isTaken ? "Taken" : "Available"}
@@ -285,7 +289,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
             {isCurrentWhoCreatedGig && (
               <div className="w-full h-full relative">
                 <span className="w6 h-6">
-                  <span className="absolute right-0 -top-1 bg-yellow-600 rounded-full text-[8px] w-4 h-4 flex justify-center items-center ">
+                  <span className="absolute right-0 -top-1 bg-yellow-800 rounded-full text-[8px] w-4 h-4 flex justify-center items-center ">
                     {bookCount}
                   </span>
                 </span>
@@ -293,9 +297,9 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                   variant="secondary"
                   classname="!bg-indigo-600/90 hover:!bg-indigo-500 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
                   onclick={() => {
-                    setLoadingPostId(gig?._id || "");
+                    setLoadingPostId(gig?._id as string);
                     setTimeout(() => {
-                      handleEditBooked(gig?._id || "");
+                      handleBookedUsers(gig?._id as string);
                       setLoadingPostId("");
                     }, 2000);
                   }}

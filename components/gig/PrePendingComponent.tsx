@@ -25,7 +25,7 @@ const PrePendingComponent = () => {
   const { id } = useParams();
   const { loading } = useGetGigs(id as string);
   const { currentgig, setRefetchGig } = useStore();
-  const { user } = useCurrentUser(userId || "");
+  const { user } = useCurrentUser(userId || null);
   const router = useRouter();
   const { bookloading, bookgig } = useBookMusician();
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
@@ -107,7 +107,7 @@ const PrePendingComponent = () => {
     );
   }
   return (
-    <div className="p-6 bg-gradient-to-b from-gray-900 to-black text-white min-h-screen">
+    <div className="p-6 pb-[30px] bg-gradient-to-b from-gray-900 to-black text-white min-h-screen">
       {showConfirmation && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm z-50">
           <div className="bg-gray-700 p-6 rounded-lg shadow-lg ">
@@ -148,7 +148,7 @@ const PrePendingComponent = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="max-w-3xl mx-auto p-6 bg-gray-800 rounded-xl shadow-xl"
+        className="max-w-3xl mx-auto p-6 bg-gray-800 rounded-xl shadow-xl pb-[50px]"
       >
         <h1 className="text-3xl font-extrabold text-gray-100">
           {currentgig?.title}
@@ -169,12 +169,12 @@ const PrePendingComponent = () => {
             ? "Interested Musicians"
             : "No Musicians"}
         </h2>
-        <div className="mt-4 max-h-[370px] sm:max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800 space-y-4">
+        <div className="mt-1 max-h-[370px]  sm:max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800 space-y-4">
           {currentgig?.bookCount?.map((myuser: UserProps) => {
             return (
               <motion.div
                 key={myuser._id}
-                className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 bg-gray-700 rounded-lg transition-all shadow-md relative"
+                className="flex last:mb-30 flex-col sm:flex-row justify-between items-start sm:items-center p-4 bg-gray-700 rounded-lg transition-all shadow-md relative"
                 whileHover={{
                   scale: 1.02,
                   boxShadow: "0px 5px 15px rgba(255, 255, 255, 0.1)",
@@ -209,7 +209,7 @@ const PrePendingComponent = () => {
                     </p>
                   )}{" "}
                   {myuser.instrument === "drums" && (
-                    <p className="text-sm text-gray-300 italic">
+                    <p className="text-sm text-gray-300 italic flex gap-1 my-1">
                       <Drum /> {myuser.instrument}
                     </p>
                   )}{" "}

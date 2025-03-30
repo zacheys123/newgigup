@@ -1,7 +1,13 @@
 "use client";
 import { Textarea } from "flowbite-react";
-import React, { useState, ChangeEvent, FormEvent, useCallback } from "react";
-import { Button } from "../ui/button";
+import React, {
+  useState,
+  ChangeEvent,
+  FormEvent,
+  useCallback,
+  useEffect,
+} from "react";
+
 // import DatePicker from "react-datepicker";
 // import "react-datepicker/dist/react-datepicker.css";
 import { Box, CircularProgress } from "@mui/material";
@@ -19,18 +25,24 @@ import {
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAuth } from "@clerk/nextjs";
 import { toast } from "sonner";
-import GigCustomization from "./GigCustomization";
 import { fileupload } from "@/hooks/fileUpload";
 import useStore from "@/app/zustand/useStore";
+import { Button } from "@/components/ui/button";
+import GigCustomization from "@/components/gig/GigCustomization";
+import { useParams } from "next/navigation";
+import { useGetGigs } from "@/hooks/useGetGig";
 import { FaComment } from "react-icons/fa";
 import { days } from "@/data";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { motion } from "framer-motion";
+import { fonts } from "@/utils";
 // import useStore from "@/app/zustand/useStore";
 // import { useAuth } from "@clerk/nextjs";
-
 interface GigInputs {
   title: string;
   description: string;
-  phoneNo: string;
+  phone: string;
   price: string;
   category: string;
   location: string;
@@ -41,8 +53,9 @@ interface GigInputs {
   durationfrom: string;
   bussinesscat: string;
   otherTimeline: string;
-  gigTimeline: string;
+  gigtimeline: string;
   day: string;
+  date: string; // Update to accept both types
 }
 interface CustomProps {
   fontColor: string;
@@ -56,48 +69,20 @@ interface UserInfo {
 type bussinesscat = string | null;
 
 const CreateGig = () => {
+  const { id } = useParams();
   const { userId } = useAuth();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [secretpass, setSecretPass] = useState<boolean>(false);
   const [showcustomization, setShowCustomization] = useState<boolean>(false);
-  const [selectedDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null); // Changed to useState
 
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [imageUrl, setUrl] = useState<string>("");
   const [fileUrl, setFileUrl] = useState<string>("");
-  const { setRefetchData } = useStore();
+  const { setRefetchData, currentgig } = useStore();
   const { user } = useCurrentUser(userId || null);
+  const {} = useGetGigs(id as string | null);
 
-  const [gigcustom, setGigCustom] = useState<CustomProps>({
-    fontColor: "",
-    font: "",
-    backgroundColor: "",
-  });
-  const [secretreturn] = useState<string>("");
-  const [gigInputs, setGigs] = useState<GigInputs>({
-    title: "",
-    description: "",
-    phoneNo: "",
-    price: "",
-    category: "",
-    location: "",
-    secret: "",
-    end: "",
-    start: "",
-    durationto: "pm",
-    durationfrom: "am",
-    bussinesscat: "personal",
-    otherTimeline: "",
-    gigTimeline: "",
-    day: "",
-  });
-  const [userinfo, setUserInfo] = useState<UserInfo>({
-    prefferences: [],
-  });
-  const [bussinesscat, setBussinessCategory] = useState<bussinesscat>("full");
-  // const [errors, setErrors] = useState<string[]>([]);
-  // const [success, setSuccess] = useState<boolean>(false);
-  const [showduration, setshowduration] = useState<boolean>(false);
   const [showCategories, setshowCategories] = useState<{
     title: boolean;
     description: boolean;
@@ -113,15 +98,71 @@ const CreateGig = () => {
     othergig: false,
     gduration: false,
   });
+  const [gigcustom, setGigCustom] = useState<CustomProps>({
+    fontColor: "",
+    font: "",
+    backgroundColor: "",
+  });
+  const [secretreturn] = useState<string>("");
+  const [gigInputs, setGigs] = useState<GigInputs>({
+    title: "",
+    description: "",
+    phone: "",
+    price: "",
+    category: "",
+    location: "",
+    secret: "",
+    end: "",
+    start: "",
+    durationto: "pm",
+    durationfrom: "am",
+    bussinesscat: "personal",
+    otherTimeline: "",
+    gigtimeline: "",
+    day: "",
+    date: "", // Added date field
+  });
+  useEffect(() => {
+    if (currentgig && !gigInputs.title) {
+      const dateValue = currentgig.date
+        ? new Date(currentgig.date).toISOString()
+        : "";
 
-  // const minDate = new Date("2020-01-01");
-  // const maxDate = new Date("2026-01-01");
+      setGigs((prev) => ({
+        ...prev,
+        ...currentgig,
+        date: dateValue,
+      }));
 
-  // const handleDate = (date: Date | null) => {
-  //   setSelectedDate(date);
-  // };
+      if (currentgig.date) {
+        setSelectedDate(new Date(currentgig.date));
+      }
+    }
+  }, [currentgig, gigInputs?.title]);
+  console.log(currentgig);
+  const [userinfo, setUserInfo] = useState<UserInfo>({
+    prefferences: [],
+  });
+  const [bussinesscat, setBussinessCategory] = useState<bussinesscat>("full");
+  // const [errors, setErrors] = useState<string[]>([]);
+  // const [success, setSuccess] = useState<boolean>(false);
+  const [showduration, setshowduration] = useState<boolean>(false);
+
+  const minDate = new Date("2020-01-01");
+  const maxDate = new Date("2026-01-01");
+
+  const handleDate = (date: Date | null) => {
+    if (date) {
+      setSelectedDate(date);
+      setGigs((prev) => ({
+        ...prev,
+        date: date.toISOString(),
+      }));
+    }
+  };
 
   // handle the image upload to cloudinary
+
   const handleFileChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const dep = "image";
@@ -185,7 +226,10 @@ const CreateGig = () => {
     }));
   };
   //
-  console.log(gigInputs.gigTimeline);
+  const [editMessage, setEditMessage] = useState("");
+  const [error, setError] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+
   // submit your gig
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -200,13 +244,13 @@ const CreateGig = () => {
         body: JSON.stringify({
           title: gigInputs.title,
           description: gigInputs.description,
-          phoneNo: gigInputs.phoneNo,
+          phoneNo: gigInputs.phone,
           price: gigInputs.price,
           category: gigInputs.category,
           bandCategory: userinfo.prefferences,
           location: gigInputs.location,
           secret: gigInputs.secret,
-          date: selectedDate,
+          date: gigInputs.date,
           to: `${gigInputs.end}${gigInputs.durationto}`,
           from: `${gigInputs.start}${gigInputs.durationfrom}`,
           postedBy: user?._id,
@@ -216,20 +260,21 @@ const CreateGig = () => {
           backgroundColor: gigcustom.backgroundColor,
           logo: imageUrl,
           otherTimeline: gigInputs.otherTimeline,
-          gigTimeline: gigInputs.gigTimeline,
+          gigTimeline: gigInputs.gigtimeline,
           day: gigInputs.day,
         }),
       });
       const data = await res.json();
 
       if (data.gigstatus === "true") {
-        toast.success(data?.message, {
-          position: "top-center",
-        });
+        setEditMessage(data?.message);
+        setError(false);
+        setIsVisible(true);
+        // Reset form fields
         setGigs({
           title: "",
           description: "",
-          phoneNo: "",
+          phone: "",
           price: "",
           category: "",
           location: "",
@@ -240,35 +285,77 @@ const CreateGig = () => {
           durationfrom: "am",
           bussinesscat: "personal",
           otherTimeline: "",
-          gigTimeline: "",
+          gigtimeline: "",
           day: "",
+          date: "",
         });
         setUserInfo({ prefferences: [] });
         setBussinessCategory("");
       }
       if (data.gigstatus === "false") {
-        toast.error(data?.message, {
-          position: "top-center",
-          // autoClose: 3000, // 5 seconds
-          // hideProgressBar: false,
-          // closeOnClick: true,
-          // pauseOnHover: true,
-          // draggable: true,
-        });
+        setError(true);
+
+        setEditMessage(data.message);
+        setIsVisible(true);
       }
     } catch (error) {
       console.error(error);
+      setError(true);
+      setEditMessage("An error occurred while updating the gig");
+      setIsVisible(true);
     } finally {
       setIsLoading(false);
     }
   };
 
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+
+    if (editMessage && isVisible) {
+      timer = setTimeout(() => {
+        setIsVisible(false);
+        setEditMessage("");
+      }, 4500); // Hide after 4.5 seconds
+    }
+
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [editMessage, isVisible]);
+
   return (
-    <div>
+    <div className="z-0">
       <form
         onSubmit={onSubmit}
         className="h-[100vh] bg-gray-900 px-4 py-6 overflow-y-auto w-full" // Ensure overflow-y-auto is here
       >
+        {isVisible && editMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: "-200px" }}
+            exit={{
+              opacity: 0,
+              y: "-200px",
+              transition: { duration: 0.9 },
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+              transition: { duration: 0.9 },
+            }}
+            className="absolute top-10 p-4 rounded-md left-0 right-0 h-fit w-[80%] mx-auto z-9999 flex justify-center items-center bg-zinc-800 shadow-md shadow-orange-200 "
+          >
+            <span
+              className={`flex justify-center  ${
+                error ? "text-red-300 " : "text-green-300"
+              }`}
+              style={{
+                fontFamily: fonts[34],
+              }}
+            >
+              {editMessage}
+            </span>
+          </motion.div>
+        )}
         <div className="h-[100vh] overflow-y-auto">
           <h6 className="text-gray-100 font-sans text-center text-lg font-semibold mb-6">
             Enter info to create a gig
@@ -404,7 +491,7 @@ const CreateGig = () => {
                   className="w-full bg-gray-300 text-gray800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   onChange={handleInputChange}
                   name="phoneNo"
-                  value={gigInputs?.phoneNo}
+                  value={gigInputs?.phone}
                 />
                 <input
                   autoComplete="off"
@@ -448,7 +535,7 @@ const CreateGig = () => {
                 <select
                   onChange={handleInputChange} // Use the form's handleInputChange
                   name="gigTimeline" // Add this name attribute
-                  value={gigInputs.gigTimeline} // Bind to form state
+                  value={gigInputs.gigtimeline} // Bind to form state
                   className="w-[150px] bg-gray-300 text-gray-800 h-[40px] rounded-lg text-xs px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value=""> Gig Timeline </option>
@@ -458,7 +545,7 @@ const CreateGig = () => {
                   <option value="weekly">Every Week</option>
                   <option value="other">Other...</option>
                 </select>
-                {gigInputs?.gigTimeline === "other" && (
+                {gigInputs?.gigtimeline === "other" && (
                   <div className="w-full flex justify-center items-center">
                     <input
                       autoComplete="off"
@@ -468,8 +555,6 @@ const CreateGig = () => {
                       onChange={handleInputChange}
                       name="otherTimeline"
                       value={gigInputs?.otherTimeline}
-                      disabled={gigInputs?.durationfrom === "once"}
-                      required={gigInputs?.durationfrom === "once"}
                     />
                   </div>
                 )}
@@ -497,7 +582,22 @@ const CreateGig = () => {
                       {i?.name}
                     </option>
                   ))}
-                </select>
+                </select>{" "}
+                {gigInputs?.gigtimeline === "once" && (
+                  <DatePicker
+                    selected={selectedDate}
+                    onChange={(date: Date | null) => {
+                      if (date) {
+                        handleDate(date);
+                      }
+                    }}
+                    minDate={minDate}
+                    maxDate={maxDate}
+                    className="w-full bg-gray-300 text-gray-800 p-2 rounded-lg"
+                    placeholderText="Select date"
+                    isClearable
+                  />
+                )}
               </div>
             )}
             {bussinesscat === "other" && (
