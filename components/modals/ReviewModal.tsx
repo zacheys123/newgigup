@@ -99,7 +99,8 @@ const ReviewModal = ({ reviewdata, user, getVideos }: ReviewProps) => {
                   >
                     <Box className="shadow-sm shadow-neutral-400 my-3 p-3 rounded-xl overflow-y-auto">
                       <span className="flex gap-1 text-[11px] text-neutral-400 items-center">
-                        {review?.rating} <StarRating rating={review?.rating} />
+                        {review?.rating?.toFixed(1)}{" "}
+                        <StarRating rating={review?.rating} />
                       </span>
                       <p className="text-sm text-gray-300">{review?.comment}</p>
                       <div className="w-full flex justify-center mt-6  ">

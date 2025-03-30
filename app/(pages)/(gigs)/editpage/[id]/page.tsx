@@ -233,6 +233,14 @@ const EditPage = () => {
   // submit your gig
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const newdate =
+      gigInputs.gigtimeline === "weekly"
+        ? ""
+        : gigInputs.gigtimeline === "other"
+        ? ""
+        : gigInputs?.gigtimeline;
+
+    const newday = gigInputs.gigtimeline === "once" ? "" : gigInputs.day;
 
     try {
       setIsLoading(true);
@@ -250,7 +258,7 @@ const EditPage = () => {
           bandCategory: userinfo.prefferences,
           location: gigInputs.location,
           secret: gigInputs.secret,
-          date: gigInputs.date,
+          date: newdate,
           to: `${gigInputs.end}${gigInputs.durationto}`,
           from: `${gigInputs.start}${gigInputs.durationfrom}`,
           postedBy: user?._id,
@@ -261,7 +269,7 @@ const EditPage = () => {
           logo: imageUrl,
           otherTimeline: gigInputs.otherTimeline,
           gigTimeline: gigInputs.gigtimeline,
-          day: gigInputs.day,
+          day: newday,
         }),
       });
       const data = await res.json();
@@ -628,6 +636,7 @@ const EditPage = () => {
                 value={gigInputs?.category}
                 className="w-full bg-gray-300 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
+                <option value="">No Category</option>
                 <option value="piano">Piano</option>
                 <option value="guitar">Guitar</option>
                 <option value="bass">Bass Guitar</option>

@@ -24,7 +24,7 @@ type Info = {
   logo: string;
 
   otherTimeline: string;
-  gigTimeline: string;
+  gigtimeline: string;
   day: string;
 };
 
@@ -49,12 +49,12 @@ export async function PUT(req: NextRequest) {
       backgroundColor,
       logo,
       otherTimeline,
-      gigTimeline,
+      gigtimeline,
       day,
     }: Info = await req.json();
 
     console.log("otherTimeline", otherTimeline);
-    console.log("gigTimeline", gigTimeline);
+    console.log("gigtimeline", gigtimeline);
     console.log("day", day);
     if (!logo) {
       return NextResponse.json({
@@ -117,13 +117,13 @@ export async function PUT(req: NextRequest) {
         message: "Secret is required",
       });
     }
-    if (!gigTimeline) {
+    if (!gigtimeline) {
       return NextResponse.json({
         gigstatus: "false",
         message: "Gig timeline is required",
       });
     }
-    if (!day) {
+    if ((!day && gigtimeline === "weekly") || gigtimeline === "other") {
       return NextResponse.json({
         gigstatus: "false",
         message: "Day is required",
@@ -134,7 +134,13 @@ export async function PUT(req: NextRequest) {
     if (!userId) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
-
+    if (day && date) {
+      return NextResponse.json({
+        gigstatus: "false",
+        message:
+          "Cannot submit both Day and other Date ,delete either date or day,Choose what you need",
+      });
+    }
     await connectDb();
 
     // Find existing gig by secret and ensure user is the owner
@@ -188,9 +194,9 @@ export async function PUT(req: NextRequest) {
         backgroundColor,
         logo,
         postedBy,
-        otherTimeline: gigTimeline !== "other" ? "" : otherTimeline,
-        gigtimeline: gigTimeline,
-        day: date ? "" : day,
+        otherTimeline: gigtimeline !== "other" ? "" : otherTimeline,
+        gigtimeline: gigtimeline,
+        day,
       },
       { new: true }
     );

@@ -54,7 +54,7 @@ interface GigInputs {
   durationfrom: string;
   bussinesscat: string;
   otherTimeline: string;
-  gigTimeline: string;
+  gigtimeline: string;
   day: string;
   date: string; // Update to accept both types
 }
@@ -119,7 +119,7 @@ const EditPage = () => {
     durationfrom: "am",
     bussinesscat: "personal",
     otherTimeline: "",
-    gigTimeline: "",
+    gigtimeline: "",
     day: "",
     date: "", // Added date field
   });
@@ -234,6 +234,14 @@ const EditPage = () => {
   // submit your gig
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const newdate =
+      gigInputs.gigtimeline === "weekly"
+        ? ""
+        : gigInputs.gigtimeline === "other"
+        ? ""
+        : gigInputs?.gigtimeline;
+
+    const newday = gigInputs.gigtimeline === "once" ? "" : gigInputs.day;
 
     try {
       setIsLoading(true);
@@ -251,7 +259,7 @@ const EditPage = () => {
           bandCategory: userinfo.prefferences,
           location: gigInputs.location,
           secret: gigInputs.secret,
-          date: gigInputs.date,
+          date: newdate,
           to: `${gigInputs.end}${gigInputs.durationto}`,
           from: `${gigInputs.start}${gigInputs.durationfrom}`,
           postedBy: user?._id,
@@ -261,8 +269,8 @@ const EditPage = () => {
           backgroundColor: gigcustom.backgroundColor,
           logo: imageUrl,
           otherTimeline: gigInputs.otherTimeline,
-          gigTimeline: gigInputs.gigTimeline,
-          day: gigInputs.day,
+          gigtimeline: gigInputs.gigtimeline,
+          day: newday,
         }),
       });
       const data = await res.json();
@@ -286,7 +294,7 @@ const EditPage = () => {
           durationfrom: "am",
           bussinesscat: "personal",
           otherTimeline: "",
-          gigTimeline: "",
+          gigtimeline: "",
           day: "",
           date: "",
         });
@@ -551,8 +559,8 @@ const EditPage = () => {
                     />{" "}
                     <select
                       onChange={handleInputChange}
-                      name="gigTimeline"
-                      value={gigInputs.gigTimeline}
+                      name="gigtimeline"
+                      value={gigInputs.gigtimeline}
                       className="w-[150px] bg-gray-300 text-gray-800 h-[40px] rounded-lg text-xs px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value=""> Gig Timeline </option>
@@ -562,7 +570,7 @@ const EditPage = () => {
                       <option value="weekly">Every Week</option>
                       <option value="other">Other...</option>
                     </select>
-                    {gigInputs?.gigTimeline === "other" && (
+                    {gigInputs?.gigtimeline === "other" && (
                       <div className="w-full flex justify-center items-center">
                         <input
                           autoComplete="off"
@@ -589,7 +597,7 @@ const EditPage = () => {
                         </option>
                       ))}
                     </select>
-                    {gigInputs?.gigTimeline === "once" && (
+                    {gigInputs?.gigtimeline === "once" && (
                       <DatePicker
                         selected={selectedDate}
                         onChange={(date: Date | null) => {

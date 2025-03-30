@@ -103,6 +103,11 @@ export const experiences = () => {
 export const days = () => {
   const mydata = [
     {
+      id: 0 + "noday",
+      val: "",
+      name: "No Day",
+    },
+    {
       id: 0,
       val: "Monday",
       name: "Monday",
