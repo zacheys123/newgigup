@@ -46,12 +46,6 @@ const ReviewModal = ({ reviewdata, user, getVideos }: ReviewProps) => {
 
   return (
     <div className="bg-neutral-900 w-full max-w-md rounded-t-lg p-6 relative slide-up min-h-[340px] rounded-tl-[50px] rounded-tr-[50px] pt-12">
-      <button
-        onClick={() => setReviewModalOpen(false)}
-        className="absolute top-2 right-7 text-gray-300 text-[20px]"
-      >
-        &times;
-      </button>
       {reviewdata?.length > 0 && (
         <div className="flex justify-between absolute top-[10%] w-[90%] mx-auto px-2 transform -translate-y-1/2">
           <button
