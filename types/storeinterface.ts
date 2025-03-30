@@ -5,6 +5,7 @@ import { ChatProps, MessageProps } from "./chatinterfaces";
 import { Socket } from "socket.io-client";
 
 export const initialState = {
+  showVideo: false,
   selectedReview: {
     _id: "",
     rating: 0,
@@ -105,6 +106,7 @@ export interface StoreState {
   follow: boolean;
   refetchData: boolean;
   showModal: boolean;
+  showVideo: boolean;
   selectedReview: Review;
   showUpload: boolean;
   modalVisible: boolean;
@@ -120,6 +122,7 @@ export interface StoreState {
   unreadCounts: Record<string, number>; // { chatId: unreadCount }
   updateUnreadCount: (chatId: string, increment?: boolean) => void;
   setShowUpload: () => void;
+  setShowVideo: (data: boolean) => void;
   setRefetchData: (data: boolean) => void;
   setIsOpen: (data: boolean) => void;
   setShowModal: (data: boolean) => void;

@@ -10,17 +10,12 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAuth } from "@clerk/nextjs";
 import { Button } from "../ui/button";
 import { CircularProgress } from "@mui/material";
-import { FetchResponse, GigProps } from "@/types/giginterface";
+import { FetchResponse } from "@/types/giginterface";
 import { VideoProps } from "@/types/userinterfaces";
 import { useVideos } from "@/hooks/useVideos";
 import useStore from "@/app/zustand/useStore";
 
-interface videosProps {
-  setShowVideo: (showvideo: boolean) => void;
-  gigId: string;
-  gig: GigProps;
-}
-const Videos = ({ setShowVideo, gigId, gig }: videosProps) => {
+const Videos = () => {
   const [addvideo, setAddVideo] = useState<boolean>();
   const { userId } = useAuth();
   const { user } = useCurrentUser(userId || null);
@@ -32,7 +27,8 @@ const Videos = ({ setShowVideo, gigId, gig }: videosProps) => {
     title: "",
     description: "",
   });
-  const { setRefetchData } = useStore();
+  const { setRefetchData, setShowVideo, currentgig: gig } = useStore();
+  const gigId = gig?._id;
   const baseUrl = `/api/gigs/addvideo/${gigId}`;
   const validGigid = typeof gigId === "string" ? gigId : ""; // Default to empty string if undefined
   const validUserId =

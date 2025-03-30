@@ -1,12 +1,15 @@
 "use client";
+import useStore from "@/app/zustand/useStore";
 import AllGigsComponent from "@/components/gig/AllGigsComponent";
 import Gigheader from "@/components/gig/Gigheader";
+import Videos from "@/components/gig/Videos";
 import ColorLoading from "@/components/loaders/ColorLoading";
 import { useAllGigs } from "@/hooks/useAllGigs";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { GigProps } from "@/types/giginterface";
 import { searchfunc } from "@/utils/index";
 import { useAuth } from "@clerk/nextjs";
+import { motion } from "framer-motion";
 import React, { useState } from "react";
 
 const BookedGigs = () => {
@@ -18,7 +21,7 @@ const BookedGigs = () => {
   const [location, setLocation] = useState<string>(() =>
     user?.city ? user?.city : "all"
   );
-
+  const { showVideo } = useStore();
   let gigQuery;
   return (
     <div className="h-[70%] w-[90%] mx-auto my-2 shadow-md shadow-orange-300 relative pb-[30px]">
@@ -53,6 +56,21 @@ const BookedGigs = () => {
             <ColorLoading />
           </div>
           // <LoadingSpinner />
+        )}
+        {showVideo && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              className="w-full max-w-md bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700"
+            >
+              <Videos />
+            </motion.div>
+          </motion.div>
         )}
       </div>
     </div>

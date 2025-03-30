@@ -31,6 +31,7 @@ const useStore = create<StoreState>((set) => ({
   setCurrentFollowers: (data: boolean) =>
     set(() => ({ currentFollowers: data })),
   setShowModal: (data: boolean) => set(() => ({ showModal: data })),
+  setShowVideo: (data: boolean) => set(() => ({ showVideo: data })),
   setSelectedReview: (data: Review) => set(() => ({ selectedReview: data })),
   setSearch: (data: boolean) => set(() => ({ search: data })),
   setFollow: (data: boolean) => set(() => ({ follow: data })),

@@ -11,7 +11,6 @@ import { toast } from "react-toastify";
 import { useAuth } from "@clerk/nextjs";
 // import { ArrowRight } from "lucide-react";
 import Image from "next/image";
-import Videos from "./Videos";
 import { useVideos } from "@/hooks/useVideos";
 import { motion } from "framer-motion";
 import { useSocketContext } from "@/app/Context/socket";
@@ -34,7 +33,6 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
   const [loadingPostId, setLoadingPostId] = useState<string>("");
   const { socket } = useSocketContext();
   const { gigs } = useAllGigs() || { gigs: [] }; // Default to empty array if null or undefined
-  const [showvideo, setShowVideo] = useState<boolean>(false);
 
   const {
     currentUser,
@@ -45,6 +43,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
     isDescriptionModal,
     setCurrentGig,
 
+    setShowVideo,
     setSelectedReview,
   } = useStore();
 
@@ -105,7 +104,6 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
   const testfilteredvids = friendvideos?.videos?.filter(
     (video) => video.gigId === gig._id
   );
-  const [currentId, setCurrentId] = useState<string | null>();
   const canShowAddGigVideos =
     gig?.isPending === false &&
     gig?.isTaken === true &&
@@ -257,7 +255,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
             {canShowAddGigVideos && (
               <button
                 onClick={() => {
-                  setCurrentId(gig._id);
+                  setCurrentGig(gig);
                   setShowVideo(true);
                 }}
                 className="text-xs bg-emerald-600/90 hover:bg-emerald-500 px-2 py-1 rounded transition-colors flex items-center"
@@ -383,26 +381,6 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
           </div>
         </div>
         {/* Modals */}
-
-        {showvideo && currentId === gig?._id && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-          >
-            <motion.div
-              initial={{ scale: 0.95 }}
-              animate={{ scale: 1 }}
-              className="w-full max-w-md bg-zinc-800 rounded-xl overflow-hidden border border-zinc-700"
-            >
-              <Videos
-                setShowVideo={setShowVideo}
-                gigId={currentId || ""}
-                gig={gig}
-              />
-            </motion.div>
-          </motion.div>
-        )}
       </motion.div>
     </>
   ); // Example: Displaying the title
