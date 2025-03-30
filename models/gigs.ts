@@ -66,7 +66,6 @@ const gigSchema = new mongoose.Schema(
     },
     day: {
       type: String,
-      required: true,
     },
   },
   { timestamps: true }

@@ -83,12 +83,12 @@ const BookingPage = () => {
         // Refresh the page or redirect if needed
       });
 
-      // socket.on("updateGigStatus", ({ gigId, isTaken }) => {
-      //   // Refresh the page if the gig is taken
-      //   if (isTaken && gigId === gigId && currentgig?.bookedBy !== user?._id) {
-      //     router.push(`/gigs/${userId}`);
-      //   }
-      // });
+      socket.on("updateGigStatus", ({ gigId, isTaken }) => {
+        // Refresh the page if the gig is taken
+        if (isTaken && gigId && currentgig?.bookedBy !== user?._id) {
+          router.push(`/gigs/${userId}`);
+        }
+      });
 
       // Cleanup listeners on unmount
       return () => {

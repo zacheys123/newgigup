@@ -33,7 +33,7 @@ const PublishedGigs = () => {
         />
       </div>
       {/* Scrollable Gigs List */}
-      <div className="h-[calc(100%-60px)] overflow-y-auto bg-gray-900">
+      <div className="h-[calc(100%-60px)] overflow-y-auto bg-gray-900 w-[90%] ">
         {gigs?.gigs?.length === 0 && (
           <h1 className="text-white text-center font-bold py-5">
             No gigs found

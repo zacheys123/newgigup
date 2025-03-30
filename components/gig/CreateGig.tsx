@@ -324,7 +324,7 @@ const CreateGig = () => {
                 error ? "text-red-300 " : "text-green-300"
               }`}
               style={{
-                fontFamily: fonts[34],
+                fontFamily: fonts[20],
               }}
             >
               {editMessage}
