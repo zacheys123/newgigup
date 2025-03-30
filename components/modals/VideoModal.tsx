@@ -13,6 +13,8 @@ interface VideoPropsData {
 const VideoModal = ({ videodata, user, gigId }: VideoPropsData) => {
   const { setVideoModalOpen, setReviewModalOpen } = useStore();
   const myvideos = videodata?.filter((video) => video.gigId == gigId);
+  const video = myvideos?.[0];
+  console.log(video);
   return (
     <div
       className={
@@ -55,7 +57,11 @@ const VideoModal = ({ videodata, user, gigId }: VideoPropsData) => {
               className="w-full flex justify-center items-center flex-col my-4"
             >
               <Box className="w-[200px] h-[150px] my-2">
-                <video src={video.source} controls />
+                <video
+                  controls
+                  className="w-full h-full object-cover "
+                  src={video.source}
+                />
                 <div className="flex gap-2 ">
                   <div className="text-gray-500 text-sm">Uploaded At:</div>
                   <div className="text-gray-400 text-[10px]  tracking-wide">
