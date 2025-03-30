@@ -210,7 +210,7 @@ export default function Home() {
       <ScrollToTopButton />
       {/* Footer */}
       <footer className="h-screen flex flex-col justify-center items-center bg-gray-900 snap-start">
-        <p className="text-gray-400 mt-6 absolute bottom-10">
+        <p className="text-gray-400 mt-6 ">
           © {new Date().getFullYear()} gigUp. All rights reserved.
         </p>
       </footer>
