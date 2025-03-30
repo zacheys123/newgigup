@@ -506,7 +506,7 @@ const CreateGig = () => {
                 />{" "}
                 <select
                   onChange={handleInputChange} // Use the form's handleInputChange
-                  name="gigTimeline" // Add this name attribute
+                  name="gigtimeline" // Add this name attribute
                   value={gigInputs.gigtimeline} // Bind to form state
                   className="w-[150px] bg-gray-300 text-gray-800 h-[40px] rounded-lg text-xs px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
