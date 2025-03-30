@@ -168,7 +168,7 @@ const AllChats = () => {
     return filteredChats.filter((chat: ChatProps) => {
       const duplicate = seen.has(chat.chatId);
       seen.add(chat.chatId);
-      return duplicate;
+      return !duplicate;
     });
   }, [filteredChats]);
   const LoadingSkeleton = () => (
@@ -215,9 +215,7 @@ const AllChats = () => {
           <h2 className="text-xl font-bold text-red-500 mb-2">
             Error Loading Chats
           </h2>
-          <p className="text-gray-600 mb-4">
-            {error.message || "Failed to load chats. Please try again."}
-          </p>
+
           <button
             onClick={() =>
               mutate(`/api/chat/allchats?userId=${loggedInUserId}`)

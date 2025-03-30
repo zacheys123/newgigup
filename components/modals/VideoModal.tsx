@@ -42,7 +42,7 @@ const VideoModal = ({ videodata, user, gigId }: VideoPropsData) => {
         ""
       ) : (
         <div className=" w-full flex justify-center">
-          <h6 className="fixed text-center text-2xl text-neutral-300 -mt-6 capitalize font-bold z-50">{`${user?.firstname}'s Videos`}</h6>
+          <h6 className="fixed text-center text-md text-neutral-300 -mt-6 capitalize font-bold z-50">{`${user?.firstname}'s Review Videos`}</h6>
         </div>
       )}
       <div className="h-full overflow-y-auto ">
