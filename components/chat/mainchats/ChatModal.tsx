@@ -56,7 +56,7 @@ const ChatModal: React.FC<ProfileModalProps> = ({ user, onClose }) => {
       reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
 
     // Experience factor: More gigs make higher ratings possible
-    const experienceFactor = Math.log10(gigCount + 1) * 1.5; // Logarithmic scale, harder to reach 5
+    const experienceFactor = Math.log10(gigCount + 0.5) * 1.0; // Logarithmic scale, harder to reach 5
 
     // Final calculated rating
     const finalRating = Math.min(
@@ -134,46 +134,54 @@ const ChatModal: React.FC<ProfileModalProps> = ({ user, onClose }) => {
         </h2>
         <p className=" title text-neutral-400">{user.email}</p>
         <div className="mt-4 flex justify-between items-center">
-          <>
-            {" "}
-            <div className="text-gray-700">
-              <p className="text-neutral-400">
-                {" "}
-                {user.isMusician ? "Musician" : user.isClient ? "Client" : ""}
-              </p>
-              {user && user.isMusician ? (
-                <p
-                  className="text-neutral-400 text-[11px]"
-                  style={{ fontFamily: fonts[30] }}
-                >
-                  Gigs Booked: {musicianCount}
+          {!user?.firstname ? (
+            ""
+          ) : (
+            <>
+              {" "}
+              <div className="text-gray-700">
+                <p className="text-neutral-400">
+                  {" "}
+                  {user.isMusician && musicianCount
+                    ? "Musician"
+                    : user.isClient && clientGigCount
+                    ? "Client"
+                    : ""}
                 </p>
-              ) : user.isClient ? (
+                {musicianCount && user.isMusician ? (
+                  <p
+                    className="text-neutral-400 text-[11px]"
+                    style={{ fontFamily: fonts[30] }}
+                  >
+                    Gigs Booked: {musicianCount}
+                  </p>
+                ) : user.isClient && clientGigCount ? (
+                  <p
+                    className="text-neutral-400 text-[11px]"
+                    style={{ fontFamily: fonts[30] }}
+                  >
+                    Gigs Posted: {clientGigCount}
+                  </p>
+                ) : (
+                  ""
+                )}
+              </div>
+              {musicianCount && user.isMusician ? (
+                <div className="text-gray-500 flex">
+                  Rating: <StarRating rating={rating} />
+                </div>
+              ) : user.isClient && clientGigCount ? (
                 <p
-                  className="text-neutral-400 text-[11px]"
-                  style={{ fontFamily: fonts[30] }}
+                  className="text-neutral-400 title"
+                  style={{ fontFamily: fonts[217] }}
                 >
-                  Gigs Posted: {clientGigCount}
+                  no rating
                 </p>
               ) : (
                 ""
               )}
-            </div>
-            {user.isMusician ? (
-              <div className="text-gray-500 flex">
-                Rating: <StarRating rating={rating} />
-              </div>
-            ) : user?.isClient ? (
-              <p
-                className="text-neutral-400 title"
-                style={{ fontFamily: fonts[217] }}
-              >
-                no rating
-              </p>
-            ) : (
-              ""
-            )}
-          </>
+            </>
+          )}
         </div>
       </div>
     </div>
