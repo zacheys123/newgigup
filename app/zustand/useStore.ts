@@ -20,6 +20,7 @@ const useStore = create<StoreState>((set) => ({
     set(() => ({ isDescriptionModal: data })),
   setIsProfileModalOpen: (data: boolean) =>
     set(() => ({ IsProfileModalOpen: data })),
+  setConfirmEdit: (data: boolean) => set(() => ({ confirmEdit: data })),
   setVideoModalOpen: (data: boolean) => set(() => ({ videoModalOpen: data })),
   setReviewModalOpen: (data: boolean) => set(() => ({ reviewModalOpen: data })),
   setRefferenceModalOpen: (data: boolean) =>

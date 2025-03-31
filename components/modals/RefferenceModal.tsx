@@ -34,7 +34,7 @@ const RefferenceModal: React.FC<ProfileModalProps> = ({ user, getReviews }) => {
       </div>
       <button
         onClick={() => setRefferenceModalOpen(false)}
-        className="absolute top-2 right-7 text-gray-300  text-[20px]"
+        className="absolute top-2 right-7 text-gray-300  text-[25px]"
       >
         &times;
       </button>

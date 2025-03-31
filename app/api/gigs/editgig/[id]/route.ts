@@ -29,6 +29,10 @@ type Info = {
 };
 
 export async function PUT(req: NextRequest) {
+  const { userId } = getAuth(req);
+  if (!userId) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
   try {
     const {
       title,
@@ -130,10 +134,6 @@ export async function PUT(req: NextRequest) {
       });
     }
 
-    const { userId } = getAuth(req);
-    if (!userId) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
     if (day && date) {
       return NextResponse.json({
         gigstatus: "false",

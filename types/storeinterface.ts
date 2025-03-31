@@ -6,6 +6,7 @@ import { Socket } from "socket.io-client";
 
 export const initialState = {
   showVideo: false,
+  confirmEdit: false,
   selectedReview: {
     _id: "",
     rating: 0,
@@ -93,6 +94,7 @@ interface OnlineUser {
   socketId: string;
 }
 export interface StoreState {
+  confirmEdit: boolean;
   isDescriptionModal: boolean;
   IsProfileModalOpen: boolean;
   videoModalOpen: boolean;
@@ -126,6 +128,7 @@ export interface StoreState {
   setRefetchData: (data: boolean) => void;
   setIsOpen: (data: boolean) => void;
   setShowModal: (data: boolean) => void;
+  setConfirmEdit: (data: boolean) => void;
   setCurrentFollowers: (data: boolean) => void;
   setSelectedReview: (data: Review) => void;
   setSearch: (data: boolean) => void;

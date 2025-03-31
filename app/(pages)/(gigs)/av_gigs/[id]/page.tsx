@@ -20,9 +20,9 @@ const PublishedGigs = () => {
   );
 
   return (
-    <div className="h-[75%] w-[90%] mx-auto my-2 shadow-md shadow-orange-300 relative pb-[30px]">
-      {/* Fixed Gigheader */}
-      <div className="sticky top-0 z-10 shadow-md">
+    <div className="flex flex-col h-[calc(100vh-100px)] w-[90%] mx-auto my-2 shadow-md shadow-orange-300">
+      {/* Fixed Header */}
+      <div className="sticky top-0 z-10 bg-gray-900 shadow-md">
         <Gigheader
           typeOfGig={typeOfGig}
           setTypeOfGig={setTypeOfGig}
@@ -33,21 +33,23 @@ const PublishedGigs = () => {
         />
       </div>
       {/* Scrollable Gigs List */}
-      <div className="h-[calc(100%-60px)] overflow-y-auto bg-gray-900 w-[90%] ">
+      <div className="h-[85%] overflow-y-scroll bg-gray-900">
         {gigs?.gigs?.length === 0 && (
           <h1 className="text-white text-center font-bold py-5">
             No gigs found
           </h1>
         )}
         {!loading ? (
-          searchfunc(gigs?.gigs, typeOfGig, category, null, location)
-            ?.filter(
-              (gig: GigProps) =>
-                gig?.postedBy?._id !== user?._id && gig?.isTaken === false
-            )
-            ?.map((gig: GigProps) => (
-              <AllGigsComponent key={gig?._id} gig={gig} />
-            ))
+          <div className="space-y-3 p-2 pb-[74px] pt-3">
+            {searchfunc(gigs?.gigs, typeOfGig, category, null, location)
+              ?.filter(
+                (gig: GigProps) =>
+                  gig?.postedBy?._id !== user?._id && gig?.isTaken === false
+              )
+              ?.map((gig: GigProps) => (
+                <AllGigsComponent key={gig?._id} gig={gig} />
+              ))}
+          </div>
         ) : (
           <LoadingSpinner />
         )}

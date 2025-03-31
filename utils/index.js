@@ -177,18 +177,20 @@ export const handleRouting2 = (post, user) => {
 };
 
 function gigme(query, data, sorted) {
-  if (data?.location?.toLowerCase().includes(query.toLowerCase())) {
-    return sorted;
-  } else if (
+  // if (data?.location?.toLowerCase().includes(query.toLowerCase())) {
+  //   return sorted;
+  // } else
+  if (
     data?.time?.from?.toLowerCase().includes(query.toLowerCase()) ||
     data?.time?.to?.toLowerCase().includes(query.toLowerCase())
   ) {
     return sorted;
   } else if (data?.title?.toLowerCase().includes(query.toLowerCase())) {
     return sorted;
-  } else if (data?.category?.toLowerCase().includes(query.toLowerCase())) {
-    return sorted;
   }
+  // } else if (data?.category?.toLowerCase().includes(query.toLowerCase())) {
+  //   return sorted;
+  // }
 }
 export const searchfunc = (data, searchquery, category, gigQuery, location) => {
   let sortedData = data;

@@ -115,7 +115,7 @@ const ChatModal: React.FC<ProfileModalProps> = ({ user, onClose }) => {
 
       <button
         onClick={onClose}
-        className="absolute top-2 right-6 text-gray-300"
+        className="absolute top-2 right-6 text-gray-300 text-[25px]"
       >
         &times;
       </button>

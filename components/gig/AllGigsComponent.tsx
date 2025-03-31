@@ -42,12 +42,13 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
     setIsDescriptionModal,
     isDescriptionModal,
     setCurrentGig,
-
+    setConfirmEdit,
     setShowVideo,
     setSelectedReview,
   } = useStore();
 
   const [bookCount, setBookCount] = useState(gig.bookCount.length || 0);
+
   const { bookGig, bookLoading } = useBookGig();
   const myId = currentUser?._id;
   const router = useRouter();
@@ -76,9 +77,6 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
 
   const handleBookedUsers = (id: string) => {
     router.push(`/pre_execute/${id}`);
-  };
-  const handleEdit = async (id: string) => {
-    return router.push(`/editpage/${id}`);
   };
 
   const handleReviewModal = (gig: GigProps) => {
@@ -325,10 +323,11 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                 variant="secondary"
                 classname="!bg-white/10 hover:!bg-white/20 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
                 onclick={() => {
-                  setLoadingPostId(gig?._id || "");
+                  setLoadingPostId(gig?._id as string);
                   setTimeout(() => {
-                    handleEdit(gig?._id || "");
-                    setLoadingPostId("");
+                    setCurrentGig(gig);
+                    setConfirmEdit(true);
+                    setLoadingPostId(gig?._id as string);
                   }, 2000);
                 }}
                 title={loadingPostId === gig._id ? "Opening..." : "Edit"}
