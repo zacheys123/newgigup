@@ -141,7 +141,7 @@ const ChatModal: React.FC<ProfileModalProps> = ({ user, onClose }) => {
                 {" "}
                 {user.isMusician ? "Musician" : user.isClient ? "Client" : ""}
               </p>
-              {user.isMusician ? (
+              {user && user.isMusician ? (
                 <p
                   className="text-neutral-400 text-[11px]"
                   style={{ fontFamily: fonts[30] }}
