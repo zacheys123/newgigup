@@ -143,7 +143,7 @@ const AllChats = () => {
     };
   }, [longPressTimer]);
   const {
-    allFiltedUsers,
+    allfilteredUsers,
     handleAddChat,
     isAddingChat,
     searchAddChat,
@@ -313,7 +313,7 @@ const AllChats = () => {
               />
             </div>
             <div className="my-[5px] overflow-y-auto flex-1">
-              {allFiltedUsers()?.map((user: UserProps) => (
+              {allfilteredUsers()?.map((user: UserProps) => (
                 <div
                   key={user?._id}
                   className="flex gap-2 items-center hover:bg-[#0e6e5f] transition-colors duration-200 cursor-pointer bg-neutral-500/50  first:rounded-tl-xl first:rounded-tr-xl last:rounded:bl-xl last:rounded-b-r-xl py-3 px-5 "

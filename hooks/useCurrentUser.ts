@@ -37,6 +37,7 @@ export function useCurrentUser(userId: string | null) {
     mcLanguage: "",
     talentbio: "",
     vocalistGenre: "",
+    musicianhandles: [],
   });
 
   // Memoize the URL to prevent unnecessary re-renders
@@ -90,6 +91,7 @@ export function useCurrentUser(userId: string | null) {
         mcLanguage: "",
         talentbio: "",
         vocalistGenre: "",
+        musicianhandles: [],
       });
       return;
     }
@@ -135,6 +137,7 @@ export function useCurrentUser(userId: string | null) {
               mcLanguage: "",
               talentbio: "",
               vocalistGenre: "",
+              musicianhandles: [],
             });
           return;
         }
@@ -174,6 +177,7 @@ export function useCurrentUser(userId: string | null) {
             mcLanguage: "",
             talentbio: "",
             vocalistGenre: "",
+            musicianhandles: [],
           });
       } finally {
         if (isMounted) setLoading(false);

@@ -71,6 +71,15 @@ const FriendsComponent = () => {
             bio: "",
             genre: "",
             refferences: [],
+
+            roleType: "",
+            djGenre: "",
+            djEquipment: "",
+            mcType: "",
+            mcLanguage: "",
+            talentbio: "",
+            vocalistGenre: "",
+            musicianhandles: [{ platform: "", handle: "" }],
           });
         }
       } finally {

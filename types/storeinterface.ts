@@ -47,6 +47,7 @@ export const initialState = {
     mcLanguage: "",
     talentbio: "",
     vocalistGenre: "",
+    musicianhandles: [{ platform: "", handle: "" }],
   },
   currentgig: {
     _id: "",

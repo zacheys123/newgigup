@@ -77,6 +77,7 @@ const ClientSearchComponent = () => {
             mcLanguage: "",
             talentbio: "",
             vocalistGenre: "",
+            musicianhandles: [{ platform: "", handle: "" }],
           });
         }
       } finally {

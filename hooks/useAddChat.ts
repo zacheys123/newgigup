@@ -24,19 +24,20 @@ export const useAddChat = (chats: []) => {
     const isUserInChat = chats?.some((chat: { users: UserProps[] }) =>
       chat?.users.some((u) => u._id === user._id)
     );
-    if (isUserInChat) return false;
 
-    if (myuser?.isMusician) {
-      // Show all musicians and referenced users
-      return user.isMusician;
-    }
     if (myuser?.isClient) {
       // Show all musicians and users in references of any musician
       return (
-        user.isMusician || users?.users?.some((musician) => musician.isMusician)
+        user.isMusician ||
+        users?.users?.some((musician: UserProps) => musician.isMusician)
       );
     }
-    return false;
+    return (
+      isUserInChat &&
+      user?.isMusician &&
+      user?.roleType === "instrumentalist" &&
+      myuser?.followers?.includes(user?._id as string)
+    );
   });
 
   // Fetch users from `myuser.refferences`
@@ -61,19 +62,7 @@ export const useAddChat = (chats: []) => {
   //     });
   //   return newData;
   // };
-  const allFiltedUsers = () => {
-    const mergedUsers = [...new Set(filteredUsers)];
 
-    if (searchAddChat.trim() !== "") {
-      return mergedUsers.filter((user) =>
-        user?.firstname?.toLowerCase().includes(searchAddChat.toLowerCase())
-      );
-    }
-
-    return mergedUsers;
-  };
-
-  console.log(myuser);
   const handleAddChat = async (otherUserId: string) => {
     setIsAddingChat(true);
     try {
@@ -102,7 +91,7 @@ export const useAddChat = (chats: []) => {
     }
   };
   return {
-    allFiltedUsers,
+    allfilteredUsers: filteredUsers,
     handleAddChat,
     isAddingChat,
     searchAddChat,

@@ -40,6 +40,7 @@ export const postedBy = {
   mcLanguage: "",
   talentbio: "",
   vocalistGenre: "",
+  musicianhandles: [{ platform: "", handle: "" }],
 };
 
 export const instruments = [
