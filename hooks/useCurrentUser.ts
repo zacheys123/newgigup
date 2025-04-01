@@ -222,5 +222,6 @@ export function useCurrentUser(userId: string | null) {
     loading: !error && !data,
     reviews,
     mutateUser: mutate, // expose the mutate function
+    setReviews,
   };
 }

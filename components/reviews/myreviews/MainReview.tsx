@@ -2,7 +2,7 @@
 // import useStore from "@/app/zustand/useStore";
 import { useAllGigs } from "@/hooks/useAllGigs";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { Review } from "@/types/userinterfaces";
+import { Review, UserProps } from "@/types/userinterfaces";
 import { useAuth } from "@clerk/nextjs";
 import { Box, Divider } from "@mui/material";
 import { Edit, Trash2Icon } from "lucide-react";
@@ -16,7 +16,7 @@ const MainReview = ({ _id, gigId, comment, rating, createdAt }: Review) => {
   const { userId } = useAuth();
   const { reviews, setReviews } = useCurrentUser(userId || null);
   //   const [currentgig] = useStore();
-  const gig = gigs?.gigs?.find((gig) => gig._id === gigId);
+  const gig = gigs?.gigs?.find((gig: UserProps) => gig._id === gigId);
   const router = useRouter();
 
   console.log(reviews);
