@@ -60,6 +60,7 @@ export async function GET(req: NextRequest) {
       mcLanguages,
       talentbio,
       musicianhandles,
+      musiciangenres,
     } = await User.findOne(query).populate({
       path: "refferences",
       model: User,
@@ -102,6 +103,7 @@ export async function GET(req: NextRequest) {
       mcLanguages,
       talentbio,
       musicianhandles,
+      musiciangenres,
     });
   } catch (error) {
     console.error("Error fetching user:", error);

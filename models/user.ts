@@ -138,6 +138,10 @@ const userSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
+    musiciangenres: {
+      type: [String],
+      default: [],
+    },
   },
   { timestamps: true }
 );

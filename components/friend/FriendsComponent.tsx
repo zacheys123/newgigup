@@ -80,6 +80,7 @@ const FriendsComponent = () => {
             talentbio: "",
             vocalistGenre: "",
             musicianhandles: [{ platform: "", handle: "" }],
+            musiciangenres: [],
           });
         }
       } finally {

@@ -1,7 +1,7 @@
 "use client";
 
 import { CircularProgress } from "@mui/material";
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { colors } from "@/utils";
 
 interface UpdateResponse {
   updateStatus: boolean;
@@ -57,12 +58,11 @@ const CurrentUserProfile = () => {
   const [videoUrl, setVideoUrl] = useState<string | null>("");
   const [videos, setVideos] = useState<VideoProfileProps[]>([]);
   const [phone, setPhone] = useState<string>("");
-  const [bio, setBio] = useState<string>("");
   const [organization, setOrganization] = useState<string>("");
   const [handles, setHandles] = useState<
     { platform: string; handle: string }[]
   >([]);
-  const [genre, setGenre] = useState<string>("");
+  const [genre, setGenre] = useState<string[]>([]);
   const [djGenre, setDjGenre] = useState<string>("");
   const [djEquipment, setDjEquipment] = useState<string>("");
   const [mcType, setMcType] = useState<string>("");
@@ -110,10 +110,9 @@ const CurrentUserProfile = () => {
       setAddress(user?.address || "");
       setVideos(user?.videosProfile || []);
       setPhone(user?.phone || "");
-      setBio(user?.bio || "");
       setOrganization(user?.organization || "");
       setHandles(user?.musicianhandles || []);
-      setGenre(user?.genre || "");
+      setGenre(user?.musiciangenres || []);
       setDjGenre(user?.djGenre || "");
       setDjEquipment(user?.djEquipment || "");
       setMcType(user?.mcType || "");
@@ -134,7 +133,6 @@ const CurrentUserProfile = () => {
       year,
       address,
       phone,
-      bio,
       organization,
       handles,
       genre,
@@ -338,17 +336,6 @@ const CurrentUserProfile = () => {
               </h2>
               <div className="space-y-4">
                 <div>
-                  <Label className="text-neutral-400">Bio</Label>
-                  <Textarea
-                    className="bg-neutral-800 border-neutral-700 text-white mt-1"
-                    value={bio}
-                    onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
-                      setBio(e.target.value)
-                    }
-                    placeholder="Tell us about yourself..."
-                  />
-                </div>
-                <div>
                   <Label className="text-neutral-400">Talent Bio</Label>
                   <Textarea
                     className="bg-neutral-800 border-neutral-700 text-white mt-1"
@@ -453,7 +440,7 @@ const CurrentUserProfile = () => {
                       <div>
                         <Label className="text-neutral-400">MC Languages</Label>
                         <div className="flex flex-wrap gap-2 mt-2">
-                          {mcLanguages.map((lang) => (
+                          {mcLanguages.split(",").map((lang) => (
                             <Badge key={lang} variant="outline">
                               {lang}
                             </Badge>

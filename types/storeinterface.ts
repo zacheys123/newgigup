@@ -48,6 +48,7 @@ export const initialState = {
     talentbio: "",
     vocalistGenre: "",
     musicianhandles: [{ platform: "", handle: "" }],
+    musiciangenres: [],
   },
   currentgig: {
     _id: "",

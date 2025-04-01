@@ -41,6 +41,7 @@ export const postedBy = {
   talentbio: "",
   vocalistGenre: "",
   musicianhandles: [{ platform: "", handle: "" }],
+  musiciangenres: [],
 };
 
 export const instruments = [

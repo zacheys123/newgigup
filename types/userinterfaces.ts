@@ -73,6 +73,7 @@ export interface UserProps {
       handle: string;
     }
   ];
+  musiciangenres: string[];
 }
 export interface Users {
   users: UserProps[]; // Optional}

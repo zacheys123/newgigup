@@ -37,7 +37,8 @@ export function useCurrentUser(userId: string | null) {
     mcLanguage: "",
     talentbio: "",
     vocalistGenre: "",
-    musicianhandles: [],
+    musicianhandles: [{ platform: "", handle: "" }],
+    musiciangenres: [],
   });
 
   // Memoize the URL to prevent unnecessary re-renders
@@ -91,7 +92,8 @@ export function useCurrentUser(userId: string | null) {
         mcLanguage: "",
         talentbio: "",
         vocalistGenre: "",
-        musicianhandles: [],
+        musicianhandles: [{ platform: "", handle: "" }],
+        musiciangenres: [],
       });
       return;
     }
@@ -137,7 +139,8 @@ export function useCurrentUser(userId: string | null) {
               mcLanguage: "",
               talentbio: "",
               vocalistGenre: "",
-              musicianhandles: [],
+              musicianhandles: [{ platform: "", handle: "" }],
+              musiciangenres: [],
             });
           return;
         }
@@ -177,7 +180,8 @@ export function useCurrentUser(userId: string | null) {
             mcLanguage: "",
             talentbio: "",
             vocalistGenre: "",
-            musicianhandles: [],
+            musicianhandles: [{ platform: "", handle: "" }],
+            musiciangenres: [],
           });
       } finally {
         if (isMounted) setLoading(false);

@@ -59,7 +59,8 @@ const VideoProfile = () => {
             mcLanguage: "",
             talentbio: "",
             vocalistGenre: "",
-            musicianhandles: [],
+            musicianhandles: [{ platform: "", handle: "" }],
+            musiciangenres: [],
           });
         }
       } finally {
