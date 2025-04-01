@@ -5,6 +5,7 @@ import { ChatProps, MessageProps } from "./chatinterfaces";
 import { Socket } from "socket.io-client";
 
 export const initialState = {
+  loadingPostId: "",
   showVideo: false,
   confirmEdit: false,
   selectedReview: {
@@ -39,6 +40,13 @@ export const initialState = {
     genre: "",
     organization: "",
     refferences: [],
+    roleType: "",
+    djGenre: "",
+    djEquipment: "",
+    mcType: "",
+    mcLanguage: "",
+    talentbio: "",
+    vocalistGenre: "",
   },
   currentgig: {
     _id: "",
@@ -94,6 +102,7 @@ interface OnlineUser {
   socketId: string;
 }
 export interface StoreState {
+  loadingPostId: string;
   confirmEdit: boolean;
   isDescriptionModal: boolean;
   IsProfileModalOpen: boolean;
@@ -122,6 +131,7 @@ export interface StoreState {
   onlineUsers: OnlineUser[];
   socket: Socket | null;
   unreadCounts: Record<string, number>; // { chatId: unreadCount }
+  setLoadingPostId: (data: string) => void;
   updateUnreadCount: (chatId: string, increment?: boolean) => void;
   setShowUpload: () => void;
   setShowVideo: (data: boolean) => void;

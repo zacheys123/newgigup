@@ -18,7 +18,6 @@ export async function GET(req: NextRequest) {
       path: "postedBy",
       model: User,
     });
-    console.log(videos);
     return NextResponse.json({
       videos,
     });

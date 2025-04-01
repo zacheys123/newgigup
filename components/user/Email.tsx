@@ -44,7 +44,7 @@ const EmailForm: React.FC<EmailFormProps> = ({ handleClose }) => {
       router.push("/");
     } catch (error) {
       setResponseMessage("Failed to send email. Please try again later.");
-      console.error(error);
+      console.log(error);
     } finally {
       setIsSending(false);
     }

@@ -33,6 +33,13 @@ export const postedBy = {
   bio: "",
   genre: "",
   refferences: [],
+  roleType: "",
+  djGenre: "",
+  djEquipment: "",
+  mcType: "",
+  mcLanguage: "",
+  talentbio: "",
+  vocalistGenre: "",
 };
 
 export const instruments = [

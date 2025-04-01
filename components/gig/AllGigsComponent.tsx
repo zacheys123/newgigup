@@ -30,7 +30,7 @@ interface AllGigsComponentProps {
 
 const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
   const { userId } = useAuth();
-  const [loadingPostId, setLoadingPostId] = useState<string>("");
+
   const { socket } = useSocketContext();
   const { gigs } = useAllGigs() || { gigs: [] }; // Default to empty array if null or undefined
 
@@ -45,6 +45,8 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
     setConfirmEdit,
     setShowVideo,
     setSelectedReview,
+    loadingPostId,
+    setLoadingPostId,
   } = useStore();
 
   const [bookCount, setBookCount] = useState(gig.bookCount.length || 0);

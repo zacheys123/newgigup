@@ -95,7 +95,7 @@ const CreateGig = () => {
     start: "",
     durationto: "pm",
     durationfrom: "am",
-    bussinesscat: "personal",
+    bussinesscat: "",
     otherTimeline: "",
     gigtimeline: "",
     day: "",
@@ -104,7 +104,7 @@ const CreateGig = () => {
   const [userinfo, setUserInfo] = useState<UserInfo>({
     prefferences: [],
   });
-  const [bussinesscat, setBussinessCategory] = useState<bussinesscat>("full");
+  const [bussinesscat, setBussinessCategory] = useState<bussinesscat>("");
   // const [errors, setErrors] = useState<string[]>([]);
   // const [success, setSuccess] = useState<boolean>(false);
   const [showduration, setshowduration] = useState<boolean>(false);
@@ -340,11 +340,16 @@ const CreateGig = () => {
               onChange={handleBussinessChange}
               name="durationfrom"
               value={bussinesscat ? bussinesscat : ""}
-              className="w-[150px] bg-gray-700 text-gray-100 h-[40px] rounded-lg text-sm px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-[163px] bg-gray-700 text-gray-100 h-[40px] rounded-lg text-[12px] px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
             >
+              <option value="" className="bg-gray-700 ">
+                Who do you want ?
+              </option>
               <option value="full">Full Band</option>
               <option value="personal">Individual</option>
-              <option value="other">Other...</option>
+              <option value="other">Create your own band</option>
+              <option value="mc">Mcee</option>
+              <option value="dj">Dj</option>
             </select>
             <div
               onClick={() => setShowCustomization(true)}

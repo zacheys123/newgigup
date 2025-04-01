@@ -60,6 +60,13 @@ export interface UserProps {
   handles: string;
   genre: string;
   refferences: UserProps[];
+  roleType: string;
+  djGenre: string;
+  djEquipment: string;
+  mcType: string;
+  mcLanguage: string;
+  talentbio: string;
+  vocalistGenre: string;
 }
 export interface Users {
   users: UserProps[]; // Optional}

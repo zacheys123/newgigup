@@ -52,6 +52,13 @@ const VideoProfile = () => {
             bio: "",
             genre: "",
             refferences: [],
+            roleType: "",
+            djGenre: "",
+            djEquipment: "",
+            mcType: "",
+            mcLanguage: "",
+            talentbio: "",
+            vocalistGenre: "",
           });
         }
       } finally {

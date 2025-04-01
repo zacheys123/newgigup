@@ -29,6 +29,8 @@ type Info = {
 };
 
 export async function PUT(req: NextRequest) {
+  const searchUrl = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
+
   const { userId } = getAuth(req);
   if (!userId) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -142,12 +144,23 @@ export async function PUT(req: NextRequest) {
       });
     }
     await connectDb();
-
+    console.log(searchUrl);
     // Find existing gig by secret and ensure user is the owner
-    const existingGig = await Gigs.findOne({ secret }).populate({
+    const existingGig = await Gigs.findOne({
+      $or: [{ _id: searchUrl }, { secret: secret }],
+    }).populate({
       path: "postedBy",
       model: User,
     });
+    // both id and secret and other fieldconst existingGig = await Gigs.findOne({
+    //   $or: [
+    //     { _id: searchUrl, secret: secret },  // both must match
+    //     { someOtherField: someValue }         // or this condition
+    //   ]
+    // }).populate({
+    //   path: "postedBy",
+    //   model: User,
+    // });
 
     if (!existingGig) {
       return NextResponse.json(

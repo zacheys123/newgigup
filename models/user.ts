@@ -110,6 +110,30 @@ const userSchema = new mongoose.Schema(
     handles: { type: String, lowercase: true },
     genres: { type: String, lowercase: true },
     refferences: [{ type: Schema.Types.ObjectId, ref: "User", default: [] }],
+
+    roleType: {
+      type: String,
+    },
+    djGenre: {
+      type: String,
+    },
+    djEquipment: {
+      type: String,
+    },
+    mcType: {
+      type: String,
+    },
+    mcLanguages: {
+      type: String,
+    },
+    talentbio: {
+      type: String,
+
+      lowercase: true,
+    },
+    vocalistGenre: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

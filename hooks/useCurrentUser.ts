@@ -30,6 +30,13 @@ export function useCurrentUser(userId: string | null) {
     handles: "",
     genre: "",
     refferences: [],
+    roleType: "",
+    djGenre: "",
+    djEquipment: "",
+    mcType: "",
+    mcLanguage: "",
+    talentbio: "",
+    vocalistGenre: "",
   });
 
   // Memoize the URL to prevent unnecessary re-renders
@@ -76,6 +83,13 @@ export function useCurrentUser(userId: string | null) {
         handles: "",
         genre: "",
         refferences: [],
+        roleType: "",
+        djGenre: "",
+        djEquipment: "",
+        mcType: "",
+        mcLanguage: "",
+        talentbio: "",
+        vocalistGenre: "",
       });
       return;
     }
@@ -114,6 +128,13 @@ export function useCurrentUser(userId: string | null) {
               handles: "",
               genre: "",
               refferences: [],
+              roleType: "",
+              djGenre: "",
+              djEquipment: "",
+              mcType: "",
+              mcLanguage: "",
+              talentbio: "",
+              vocalistGenre: "",
             });
           return;
         }
@@ -146,6 +167,13 @@ export function useCurrentUser(userId: string | null) {
             handles: "",
             genre: "",
             refferences: [],
+            roleType: "",
+            djGenre: "",
+            djEquipment: "",
+            mcType: "",
+            mcLanguage: "",
+            talentbio: "",
+            vocalistGenre: "",
           });
       } finally {
         if (isMounted) setLoading(false);

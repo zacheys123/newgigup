@@ -127,7 +127,6 @@ const GigDescription = () => {
               </DetailItem>
             </Box>
           </Box>
-
           {/* Contact Information Section */}
           <Box sx={{ mb: 3 }}>
             <Chip
@@ -172,7 +171,6 @@ const GigDescription = () => {
               </DetailItem>
             </Box>
           </Box>
-
           {/* Description Section */}
           <Box sx={{ mb: 3 }}>
             <Chip
@@ -201,7 +199,6 @@ const GigDescription = () => {
               </Typography>
             </Box>
           </Box>
-
           {/* Category-Specific Information */}
           {currentgig?.bussinesscat === "personal" && currentgig?.category && (
             <Box sx={{ mb: 3 }}>
@@ -231,7 +228,6 @@ const GigDescription = () => {
               </Box>
             </Box>
           )}
-
           {currentgig?.bussinesscat === "full" && (
             <Box sx={{ mb: 3 }}>
               <Chip
@@ -258,7 +254,56 @@ const GigDescription = () => {
               </Box>
             </Box>
           )}
-
+          {currentgig?.bussinesscat === "mc" && (
+            <Box sx={{ mb: 3 }}>
+              <Chip
+                label="Requirements"
+                sx={{
+                  mb: 2,
+                  fontWeight: 600,
+                  backgroundColor: "warning.dark",
+                  color: "background.paper",
+                }}
+              />
+              <Box
+                sx={{
+                  backgroundColor: "background.paper",
+                  borderRadius: 2,
+                  boxShadow: 1,
+                  padding: 2,
+                }}
+              >
+                <Typography variant="body2" className="text-gray-500 ">
+                  An Mc required(Master of Ceremony)
+                </Typography>
+              </Box>
+            </Box>
+          )}{" "}
+          {currentgig?.bussinesscat === "dj" && (
+            <Box sx={{ mb: 3 }}>
+              <Chip
+                label="Requirements"
+                sx={{
+                  mb: 2,
+                  fontWeight: 600,
+                  backgroundColor: "warning.dark",
+                  color: "background.paper",
+                }}
+              />
+              <Box
+                sx={{
+                  backgroundColor: "background.paper",
+                  borderRadius: 2,
+                  boxShadow: 1,
+                  padding: 2,
+                }}
+              >
+                <Typography variant="body2" className="text-gray-500 ">
+                  A Dj needed
+                </Typography>
+              </Box>
+            </Box>
+          )}
           {currentgig?.bussinesscat === "other" &&
             currentgig?.bandCategory &&
             currentgig?.bandCategory?.length > 0 && (

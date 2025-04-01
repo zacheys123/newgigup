@@ -10,11 +10,13 @@ const ForgotSecret = ({
   secret,
   postedBy,
   setForgotSecret,
+  mutateGigs,
 }: {
   _id?: string | undefined;
   secret: string;
   postedBy: UserProps;
   setForgotSecret: (forgetsecret: boolean) => void;
+  mutateGigs: () => void;
 }) => {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
@@ -189,12 +191,10 @@ const ForgotSecret = ({
               }`}
               disabled={secretErrors.length > 0 || !newSecret || !confirmSecret}
               onClick={async () => {
-                // TODO: Update secret logic
                 setLoadingSecret(true);
                 try {
                   const data = await fetch(
                     `/api/gigs/secret_update?gigId=${_id}`,
-
                     {
                       method: "PUT",
                       headers: {
@@ -203,9 +203,19 @@ const ForgotSecret = ({
                       body: JSON.stringify({ newSecret }),
                     }
                   );
-                  const gigs = await data.json();
-                  console.log(gigs);
-                  setLoadingSecret(false);
+                  const response = await data.json();
+
+                  // Revalidate the gigs data
+                  mutateGigs(); // This will trigger a refetch of all gigs
+
+                  setSuccess(response?.message);
+                  setError("");
+                  setTimeout(() => {
+                    setSuccess("");
+                    setConfirmEdit(true);
+                    setForgotSecret(false);
+                    setLoadingSecret(false);
+                  }, 2000);
                 } catch (error) {
                   setLoadingSecret(false);
                   console.error("Error updating secret:", error);

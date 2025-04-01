@@ -23,6 +23,14 @@ interface UserInput {
   city: string;
   instrument: string;
   experience: string;
+  roleType: string;
+  djGenre: string;
+  djEquipment: string;
+  mcType: string;
+  mcLanguages: string;
+  djExperience: string;
+  talentbio: string;
+  vocalistGenre: string;
 }
 
 export async function POST(req: NextRequest): Promise<Response> {
@@ -70,6 +78,13 @@ export async function POST(req: NextRequest): Promise<Response> {
             city: body.city,
             instrument: body.instrument,
             experience: body.experience,
+            roleType: body.roleType,
+            djGenre: body.djGenre,
+            djEquipment: body.djEquipment,
+            mcType: body.mcType,
+            mcLanguages: body.mcLanguages,
+            talentbio: body.talentbio,
+            vocalistGenre: body.vocalistGenre,
           },
         },
         { new: true }
@@ -96,6 +111,13 @@ export async function POST(req: NextRequest): Promise<Response> {
         city: body.city,
         instrument: body.instrument,
         experience: body.experience,
+        roleType: body.roleType,
+        djGenre: body.djGenre,
+        djEquipment: body.djEquipment,
+        mcType: body.mcType,
+        mcLanguages: body.mcLanguages,
+        talentbio: body.talentbio,
+        vocalistGenre: body.vocalistGenre,
       });
 
       const mainUser = await newUser.save();

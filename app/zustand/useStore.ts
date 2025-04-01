@@ -16,6 +16,7 @@ import { create } from "zustand"; // Import SetState
 
 const useStore = create<StoreState>((set) => ({
   ...initialState,
+  setLoadingPostId: (data: string) => set(() => ({ loadingPostId: data })),
   setIsDescriptionModal: (data: boolean) =>
     set(() => ({ isDescriptionModal: data })),
   setIsProfileModalOpen: (data: boolean) =>
