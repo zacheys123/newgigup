@@ -26,7 +26,6 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { colors } from "@/utils";
 
 interface UpdateResponse {
   updateStatus: boolean;
@@ -229,8 +228,8 @@ const CurrentUserProfile = () => {
   }
 
   return (
-    <div className="w-full h-full overflow-scroll flex-1 relative bg-gradient-to-b from-neutral-900 to-black p-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="w-full h-full overflow-scroll flex-1 relative bg-gradient-to-b from-neutral-900 to-black  py-1">
+      <div className="max-w-4xl mx-auto pb-[50px]">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <div className="flex items-center gap-4 mb-4 md:mb-0">
@@ -617,22 +616,28 @@ const CurrentUserProfile = () => {
                 <Lock size={18} /> Account Type
               </h2>
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <Label className="text-neutral-400">Musician Account</Label>
-                  <Switch
-                    checked={isMusician}
-                    onCheckedChange={setIsMusician}
-                    className="data-[state=checked]:bg-rose-600"
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label className="text-neutral-400">Client Account</Label>
-                  <Switch
-                    checked={isClient}
-                    onCheckedChange={setIsClient}
-                    className="data-[state=checked]:bg-rose-600"
-                  />
-                </div>
+                {user?.isMusician && (
+                  <div className="flex items-center justify-between">
+                    <Label className="text-neutral-400">
+                      Musician/Talent Account
+                    </Label>
+                    <Switch
+                      checked={isMusician}
+                      onCheckedChange={setIsMusician}
+                      className="data-[state=checked]:bg-rose-600"
+                    />
+                  </div>
+                )}
+                {user?.isClient && (
+                  <div className="flex items-center justify-between">
+                    <Label className="text-neutral-400">Client Account</Label>
+                    <Switch
+                      checked={isClient}
+                      onCheckedChange={setIsClient}
+                      className="data-[state=checked]:bg-rose-600"
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>
