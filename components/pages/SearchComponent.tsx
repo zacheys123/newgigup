@@ -34,7 +34,7 @@ const SearchComponent = () => {
       {/* <GigsModal /> */}
 
       <div className="bg-black w-[100vw] h-[calc(100vh-80px)] lg:hidden overflow-hidden">
-        <div className="overflow-y-auto h-full w-full my-4 py-10 space-y-4">
+        <div className="overflow-y-auto h-full w-full my-4 py-10 space-y-4 pb-[106px]">
           {users &&
             searchFunc(users?.users, searchQuery)
               .filter((user: UserProps) => user.clerkId !== userId)

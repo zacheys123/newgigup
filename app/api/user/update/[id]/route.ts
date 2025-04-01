@@ -28,7 +28,7 @@ export async function PUT(req: NextRequest) {
     isClient,
   } = await req.json();
   console.log(month);
-  if (!age || !month || !year) {
+  if ((isMusician && !age) || !month || !year) {
     return NextResponse.json({
       updateStatus: false,
       message: "Date ,Month and year are required",
@@ -51,31 +51,33 @@ export async function PUT(req: NextRequest) {
         { _id: id },
         {
           $set: {
-            instrument,
-            experience,
-            date: age,
-            month,
-            year,
+            instrument: isClient ? "" : instrument,
+            experience: isClient ? "" : experience,
+            date: age === isClient ? "" : age,
+            month: isClient ? "" : month,
+            year: isClient ? "" : instrument,
             city,
             address,
             phone,
-            organization,
-            musicianhandles: myhandles,
-            musiciangenres: genre,
-            djGenre,
-            djEquipment,
-            mcType,
-            mcLanguages,
+            organization: isMusician ? "" : organization,
+            musicianhandles: myhandles === isClient ? "" : myhandles,
+            musiciangenres: genre === isClient ? "" : genre,
+            djGenre: isClient ? "" : djGenre,
+            djEquipment: isClient ? "" : djEquipment,
+            mcType: isClient ? "" : mcType,
+            mcLanguages: isClient ? "" : mcLanguages,
             talentbio,
             isMusician: isClient === true ? false : true,
             isClient: isMusician === true ? false : true,
           },
           $push: {
-            videosProfile: {
-              url: videoUrl,
-              title,
-              createdAt: new Date(),
-            },
+            videosProfile: isClient
+              ? {}
+              : {
+                  url: videoUrl,
+                  title,
+                  createdAt: new Date(),
+                },
           },
         }
       );

@@ -47,7 +47,7 @@ const ClientProfile = () => {
             : "",
         username: myuser?.username || "",
         location: myuser?.city || "",
-        bio: myuser?.bio || "",
+        bio: myuser?.bio ? myuser?.bio : myuser?.talentbio || "",
         handles: myuser?.handles || "",
         organization: myuser?.organization || "",
         picture: user?.imageUrl,

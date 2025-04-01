@@ -4,7 +4,7 @@ import SearchComponent from "@/components/pages/SearchComponent";
 
 const SearchPage = async () => {
   return (
-    <div className=" w-[100vw] h-[86%] bg-slate-900 overflow-y-hidden">
+    <div className=" w-[100vw] h-[100%] bg-slate-900 pb-[60px] overflow-y-hidden">
       <FormData />
       <SearchComponent />
 

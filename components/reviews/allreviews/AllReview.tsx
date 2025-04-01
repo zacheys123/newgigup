@@ -3,6 +3,7 @@
 import { useAllGigs } from "@/hooks/useAllGigs";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useGetVideos } from "@/hooks/useGetVideos";
+import { GigProps } from "@/types/giginterface";
 import { Review } from "@/types/userinterfaces";
 import { useAuth } from "@clerk/nextjs";
 import { Box, Divider } from "@mui/material";
@@ -25,7 +26,7 @@ const AllReview = ({
   const { gigs, loading } = useAllGigs();
   const { user } = useCurrentUser(userId || null);
   //   const [currentgig] = useStore();
-  const gig = gigs?.gigs?.find((gig) => gig._id === gigId);
+  const gig = gigs?.gigs?.find((gig: GigProps) => gig._id === gigId);
   const router = useRouter();
   const { friendvideos } = useGetVideos();
 
