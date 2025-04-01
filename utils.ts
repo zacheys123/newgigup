@@ -476,6 +476,7 @@ export const dataCounties = [
   "Tharaka-Nithi",
   "Kajiado",
   "Kericho",
+  "Naivasha",
   "Lamu",
   "Nyeri",
   "Nakuru",
