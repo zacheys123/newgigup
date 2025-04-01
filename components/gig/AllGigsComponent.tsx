@@ -287,7 +287,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
             {isCurrentWhoCreatedGig && (
               <div className="w-full h-full relative">
                 <span className="w6 h-6">
-                  <span className="absolute right-0 -top-1 bg-yellow-800 rounded-full text-[8px] w-4 h-4 flex justify-center items-center ">
+                  <span className="absolute right-0 -top-1 bg-yellow-800 text-white rounded-full text-[8px] w-4 h-4 flex justify-center items-center ">
                     {bookCount}
                   </span>
                 </span>
@@ -350,7 +350,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                       bookGig(
                         gig,
                         myId as string,
-                        gigs?.gigs || [],
+                        gigs || [],
                         userId as string,
                         toast,
                         setRefetchGig,

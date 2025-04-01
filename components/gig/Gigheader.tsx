@@ -514,7 +514,7 @@ const Gigheader = ({
             value={location ? location : myuser?.city}
             onChange={(ev) => setLocation(ev.target.value)}
           >
-            <option value="" disabled className="text-gray-500">
+            <option value="" className="text-gray-500">
               Select Location
             </option>
             {dataCounties.map((d, idx) => (

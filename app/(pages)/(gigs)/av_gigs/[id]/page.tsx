@@ -34,7 +34,8 @@ const PublishedGigs = () => {
       </div>
       {/* Scrollable Gigs List */}
       <div className="h-[85%] overflow-y-scroll bg-gray-900">
-        {gigs?.length === 0 && (
+        {searchfunc(gigs, typeOfGig, category, null, location)?.length ===
+          0 && (
           <h1 className="text-white text-center font-bold py-5">
             No gigs found
           </h1>
