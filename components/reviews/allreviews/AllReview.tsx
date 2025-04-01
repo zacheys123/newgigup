@@ -26,7 +26,7 @@ const AllReview = ({
   const { gigs, loading } = useAllGigs();
   const { user } = useCurrentUser(userId || null);
   //   const [currentgig] = useStore();
-  const gig = gigs?.gigs?.find((gig: GigProps) => gig._id === gigId);
+  const gig = gigs?.find((gig: GigProps) => gig._id === gigId);
   const router = useRouter();
   const { friendvideos } = useGetVideos();
 
