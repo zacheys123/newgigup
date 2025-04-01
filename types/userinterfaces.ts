@@ -67,12 +67,7 @@ export interface UserProps {
   mcLanguage: string;
   talentbio: string;
   vocalistGenre: string;
-  musicianhandles: [
-    {
-      platform: string;
-      handle: string;
-    }
-  ];
+  musicianhandles: { platform: string; handle: string }[]; // Changed to array
   musiciangenres: string[];
 }
 export interface Users {

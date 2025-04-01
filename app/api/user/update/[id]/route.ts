@@ -6,15 +6,26 @@ export async function PUT(req: NextRequest) {
   const id = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
 
   const {
-    address,
+    videoUrl,
+    title,
+    city,
     instrument,
     experience,
     age,
     month,
     year,
-    city,
-    videoUrl,
-    title,
+    address,
+    phone,
+    organization,
+    myhandles,
+    genre,
+    djGenre,
+    djEquipment,
+    mcType,
+    mcLanguages,
+    talentbio,
+    isMusician,
+    isClient,
   } = await req.json();
   console.log(month);
   if (!age || !month || !year) {
@@ -47,6 +58,17 @@ export async function PUT(req: NextRequest) {
             year,
             city,
             address,
+            phone,
+            organization,
+            musicianhandles: myhandles,
+            musiciangenres: genre,
+            djGenre,
+            djEquipment,
+            mcType,
+            mcLanguages,
+            talentbio,
+            isMusician: isClient === true ? false : true,
+            isClient: isMusician === true ? false : true,
           },
           $push: {
             videosProfile: {

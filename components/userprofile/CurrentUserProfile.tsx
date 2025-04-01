@@ -26,6 +26,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import Image from "next/image";
 
 interface UpdateResponse {
   updateStatus: boolean;
@@ -133,7 +134,7 @@ const CurrentUserProfile = () => {
       address,
       phone,
       organization,
-      handles,
+      myhandles: handles,
       genre,
       djGenre,
       djEquipment,
@@ -235,10 +236,12 @@ const CurrentUserProfile = () => {
           <div className="flex items-center gap-4 mb-4 md:mb-0">
             <div className="relative">
               {user?.picture ? (
-                <img
+                <Image
                   src={user.picture}
                   alt="Profile"
                   className="w-20 h-20 rounded-full object-cover border-2 border-rose-600"
+                  width={20}
+                  height={20}
                 />
               ) : (
                 <div className="w-20 h-20 rounded-full bg-neutral-800 flex items-center justify-center border-2 border-rose-600">
@@ -335,9 +338,9 @@ const CurrentUserProfile = () => {
               </h2>
               <div className="space-y-4">
                 <div>
-                  <Label className="text-neutral-400">Talent Bio</Label>
+                  <Label className="text-neutral-400"> Bio</Label>
                   <Textarea
-                    className="bg-neutral-800 border-neutral-700 text-white mt-1"
+                    className="bg-neutral-800 border-neutral-700 text-white mt-1 text-[13px]"
                     value={talentbio}
                     onChange={(e) => setTalentbio(e.target.value)}
                     placeholder="Describe your talents and skills..."
@@ -352,20 +355,24 @@ const CurrentUserProfile = () => {
                 <Briefcase size={18} /> Experience
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-neutral-400">Primary Instrument</Label>
-                  <select
-                    className="w-full p-2 rounded-md bg-neutral-800 text-gray-300 border-neutral-700 focus:ring-0 text-sm mt-1"
-                    value={instrument}
-                    onChange={(ev) => setInstrument(ev.target.value)}
-                  >
-                    {instruments().map((ins) => (
-                      <option key={ins.id} value={ins.name}>
-                        {ins.val}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                {instrument && (
+                  <div>
+                    <Label className="text-neutral-400">
+                      Primary Instrument
+                    </Label>
+                    <select
+                      className="appearance-none w-full p-2 rounded-md bg-neutral-800 text-gray-300 border-neutral-700 focus:ring-0 text-sm mt-1"
+                      value={instrument}
+                      onChange={(ev) => setInstrument(ev.target.value)}
+                    >
+                      {instruments().map((ins) => (
+                        <option key={ins.id} value={ins.name}>
+                          {ins.val}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
                 <div>
                   <Label className="text-neutral-400">Experience Level</Label>
                   <select
@@ -389,11 +396,14 @@ const CurrentUserProfile = () => {
                           <Badge
                             key={g}
                             variant="outline"
-                            className="flex items-center gap-1"
+                            className="flex items-center gap-1 text-gray-300"
                           >
                             {g}
-                            <button onClick={() => removeGenre(g)}>
-                              <X size={14} />
+                            <button
+                              onClick={() => removeGenre(g)}
+                              className="text-red-600 text-[10px]"
+                            >
+                              <X size={12} />
                             </button>
                           </Badge>
                         ))}
@@ -435,7 +445,7 @@ const CurrentUserProfile = () => {
                         />
                       </div>
                     )}
-                    {mcLanguages && mcLanguages.length > 0 && (
+                    {mcLanguages && mcLanguages.split(",").length > 0 && (
                       <div>
                         <Label className="text-neutral-400">MC Languages</Label>
                         <div className="flex flex-wrap gap-2 mt-2">
@@ -465,7 +475,7 @@ const CurrentUserProfile = () => {
                   <Label className="text-neutral-400">First Name</Label>
                   <Input
                     className="bg-neutral-800 border-neutral-700 text-white mt-1"
-                    value={firstname || ""}
+                    value={firstname ? firstname : ""}
                     disabled
                   />
                 </div>
@@ -473,7 +483,7 @@ const CurrentUserProfile = () => {
                   <Label className="text-neutral-400">Last Name</Label>
                   <Input
                     className="bg-neutral-800 border-neutral-700 text-white mt-1"
-                    value={lastname || ""}
+                    value={lastname ? lastname : ""}
                     disabled
                   />
                 </div>
@@ -481,7 +491,7 @@ const CurrentUserProfile = () => {
                   <Label className="text-neutral-400">Date of Birth</Label>
                   <div className="flex gap-2 mt-1">
                     <select
-                      className="w-1/3 p-2 rounded-md bg-neutral-800 text-gray-300 border-neutral-700 focus:ring-0 text-sm"
+                      className="appearance-none w-1/3 p-2 rounded-md bg-neutral-800 text-gray-300 border-neutral-700 focus:ring-0 text-sm"
                       value={age}
                       onChange={(ev) => setAge(ev.target.value)}
                     >
@@ -492,7 +502,7 @@ const CurrentUserProfile = () => {
                       ))}
                     </select>
                     <select
-                      className="w-1/3 p-2 rounded-md bg-neutral-800 text-gray-300 border-neutral-700 focus:ring-0 text-sm"
+                      className="appearance-none w-1/3 p-2 rounded-md bg-neutral-800 text-gray-300 border-neutral-700 focus:ring-0 text-sm"
                       value={month}
                       onChange={(ev) => setMonth(ev.target.value)}
                     >
@@ -690,7 +700,7 @@ const CurrentUserProfile = () => {
             <div className="flex justify-end gap-2 mt-6">
               <Button
                 variant="outline"
-                className="text-white border-neutral-600"
+                className="text-black border-neutral-600"
                 onClick={() => setShowSocialModal(false)}
               >
                 Cancel
@@ -708,8 +718,8 @@ const CurrentUserProfile = () => {
 
       {/* Genre Modal */}
       {showGenreModal && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-          <div className="bg-neutral-800 rounded-lg p-6 max-w-md w-full">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 w-[100%]">
+          <div className="bg-neutral-800 rounded-lg p-6 max-w-md w-[80%]">
             <h3 className="text-lg font-bold text-white mb-4">
               Add Music Genre
             </h3>
@@ -717,17 +727,17 @@ const CurrentUserProfile = () => {
               <div>
                 <Label className="text-neutral-400">Genre</Label>
                 <Input
-                  className="bg-neutral-700 border-neutral-600 text-white mt-1"
+                  className="bg-neutral-700 border-neutral-600 text-white mt-1 text-[13px]"
                   value={newGenre}
                   onChange={(e) => setNewGenre(e.target.value)}
-                  placeholder="Rock, Jazz, Hip-Hop, etc."
+                  placeholder="Rock, Jazz, Hip-Hop,RnB,Afrobeat,African, etc."
                 />
               </div>
             </div>
             <div className="flex justify-end gap-2 mt-6">
               <Button
                 variant="outline"
-                className="text-white border-neutral-600"
+                className="text-black border-neutral-600"
                 onClick={() => setShowGenreModal(false)}
               >
                 Cancel
