@@ -70,6 +70,13 @@ const ClientSearchComponent = () => {
             bio: "",
             genre: "",
             refferences: [],
+            roleType: "",
+            djGenre: "",
+            djEquipment: "",
+            mcType: "",
+            mcLanguage: "",
+            talentbio: "",
+            vocalistGenre: "",
           });
         }
       } finally {

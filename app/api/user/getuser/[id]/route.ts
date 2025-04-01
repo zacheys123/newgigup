@@ -26,7 +26,6 @@ export async function GET(req: NextRequest) {
     };
     const {
       _id,
-      name,
       email,
       clerkId, // Required and unique
       picture,
@@ -68,7 +67,6 @@ export async function GET(req: NextRequest) {
     console.log(refferences);
     return NextResponse.json({
       _id,
-      name,
       email,
       clerkId, // Required and unique
       picture,

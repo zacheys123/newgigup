@@ -1,13 +1,17 @@
 "use client";
 import { useAllUsers } from "@/hooks/useAllUsers";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { UserProps } from "@/types/userinterfaces";
+import { useAuth } from "@clerk/nextjs";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
-
 import React from "react";
 
 const Musicians = ({ _id }: UserProps) => {
-  const { users: allusers } = useAllUsers();
+  const { userId } = useAuth();
+  const { users: allusers, loading } = useAllUsers();
+  const { user } = useCurrentUser(userId || null);
   const router = useRouter();
   const NotCurrentUserOrClientIsmusucian = allusers?.users?.filter(
     (myuser: UserProps) =>
@@ -15,49 +19,127 @@ const Musicians = ({ _id }: UserProps) => {
       myuser?.instrument &&
       myuser?.isClient === false &&
       myuser?.isMusician === true
+    // myuser?.roleType === "instrumentalist"
   );
-  return (
-    <div className="h-[150px]  mt-[100px] w-[98%] mx-auto flex flex-col gap-2 p-3">
-      <h2 className="text-gray-400 text-[13px] font-bold">
-        Musicians you may know
-      </h2>
+  const CurrentMusicianAroundWhereIam = allusers?.users?.filter(
+    (myuser: UserProps) =>
+      myuser?.city === user?.city && myuser?.instrument === user?.instrument
+    // myuser?.roleType === "instrumentalist"
+  );
+  // const randomUser =
+  //   NotCurrentUserOrClientIsmusucian[
+  //     Math.floor(Math.random() * NotCurrentUserOrClientIsmusucian.length)
+  //   ];
 
-      <div className="flex bg-zinc-800 h-full w-full rounded-md overflow-x-auto overflow-y-hidden items-center">
-        {NotCurrentUserOrClientIsmusucian?.map((myuser: UserProps) => {
-          return (
+  if (loading) {
+    return (
+      <div className="mt-16 w-full max-w-6xl mx-auto px-4">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <div className="h-7 w-48 bg-neutral-800 rounded-md mb-2"></div>
+            <div className="h-4 w-64 bg-neutral-800 rounded-md"></div>
+          </div>
+          <div className="h-6 w-16 bg-neutral-800 rounded-full"></div>
+        </div>
+
+        <div className="relative">
+          <div className="flex gap-5 pb-6 overflow-x-auto scrollbar-hide">
+            {[...Array(6)].map((_, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="flex flex-col items-center flex-shrink-0 w-28 mx-5 animate-pulse"
+              >
+                <div className="relative mb-3">
+                  <div className="absolute inset-0 bg-neutral-800 rounded-full blur-md -z-10 w-20"></div>
+                  <div className="relative flex items-center justify-center w-24 h-24 rounded-full bg-neutral-800 border-2 border-neutral-700 overflow-hidden">
+                    <div className="w-full h-full bg-neutral-800 animate-pulse"></div>
+                  </div>
+                </div>
+
+                <div className="text-center w-full">
+                  <div className="h-4 w-20 bg-neutral-800 rounded-md mx-auto mb-2 animate-pulse"></div>
+                  <div className="h-3 w-16 bg-neutral-800 rounded-full mx-auto mt-1 animate-pulse"></div>
+                  <div className="h-3 w-12 bg-neutral-800 rounded-md mx-auto mt-2 animate-pulse"></div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-16 w-full max-w-6xl mx-auto px-4">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-neutral-100 text-xl font-bold">
+          Musicians Near You
+          <span className="block text-sm font-normal text-neutral-400 mt-1">
+            Connect with local talent
+          </span>
+        </h2>
+        <span className="text-xs bg-orange-500/30 text-orange-300 px-3 py-1.5 rounded-full font-medium">
+          {CurrentMusicianAroundWhereIam?.length || 0} nearby
+        </span>
+      </div>
+
+      <div className="relative">
+        <div className="flex gap-5 pb-6 overflow-x-auto scrollbar-hide">
+          {NotCurrentUserOrClientIsmusucian?.map((myuser: UserProps) => (
             <motion.div
-              initial={{ opacity: 0, y: 50 }}
+              initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, delay: 0.2 }}
+              whileHover={{ y: -5 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
               key={myuser._id}
-              className="flex justify-center items-center flex-col h-[80px] w-[70px] rounded-full  shadow-md cursor-pointer hover:shadow-xl mx-2"
+              className="flex flex-col items-center flex-shrink-0 w-28 cursor-pointer group"
               onClick={() => router.push(`/search/${myuser?.username}`)}
             >
-              {/* {myuser?.picture && (
-                  <Image
-                    className="w-[120px] h-[120px] object-cover rounded-full"
-                    src={myuser?.picture}
-                    alt=" Pic"
-                    width={120}
-                    height={120}
-                  />
-                )}
-                 */}
-              <div className="text-gray-600  font-bold bg-neutral-800 w-[70px] h-[80px] p-3 rounded-full flex justify-center items-center border border-b-4 border-b-orange-300">
-                <span className="text-red-300 text-[20px]">
-                  {myuser?.firstname?.split("")[0]?.toUpperCase()}
-                </span>
-                <span className="text-neutral-300">
-                  {myuser?.lastname?.split("")[0]}
-                </span>
+              <div className="relative mb-3">
+                <div className="absolute inset-0 bg-gradient-to-br from-orange-500/40 to-purple-500/30 rounded-full blur-md group-hover:blur-lg transition-all duration-300 -z-10" />
+                <div className="relative flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-neutral-800 to-neutral-900 border-2 border-neutral-700 group-hover:border-orange-400 transition-all duration-300 overflow-hidden">
+                  {myuser?.picture ? (
+                    <Image
+                      src={myuser.picture}
+                      alt={`${myuser.firstname}'s profile`}
+                      className="w-full h-full object-cover"
+                      width={14}
+                      height={14}
+                    />
+                  ) : (
+                    <>
+                      <span className="text-orange-300 text-3xl font-bold">
+                        {myuser?.firstname?.split("")[0]?.toUpperCase()}
+                      </span>
+                      <span className="text-neutral-100 text-2xl">
+                        {myuser?.lastname?.split("")[0]}
+                      </span>
+                    </>
+                  )}
+                </div>
               </div>
-              <h2 className="text-gray-400 text-sm">
-                {myuser?.firstname?.slice(0, 4)}
-                {myuser?.lastname?.slice(0)}
-              </h2>{" "}
+
+              <div className="text-center w-full">
+                <h3 className="text-neutral-100 text-sm font-semibold truncate">
+                  {myuser?.firstname} {myuser?.lastname?.split("")[0]}.
+                </h3>
+                {myuser?.instrument && (
+                  <p className="text-xs text-orange-400 mt-1 font-medium bg-orange-500/10 px-2 py-0.5 rounded-full inline-block">
+                    {myuser.instrument}
+                  </p>
+                )}
+                {myuser?.genre && (
+                  <p className="text-[11px] text-neutral-400 mt-1.5">
+                    {myuser.genre}
+                  </p>
+                )}
+              </div>
             </motion.div>
-          );
-        })}
+          ))}
+        </div>
       </div>
     </div>
   );
