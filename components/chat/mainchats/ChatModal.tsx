@@ -5,6 +5,7 @@ import Image from "next/image";
 import { User } from "lucide-react";
 import { fonts } from "@/utils";
 import useStore from "@/app/zustand/useStore";
+import { GigProps } from "@/types/giginterface";
 
 interface ProfileModalProps {
   user: UserProps;
@@ -71,10 +72,10 @@ const ChatModal: React.FC<ProfileModalProps> = ({ user, onClose }) => {
     if (!user._id || !gigs?.gigs) return;
 
     const bookedGigs = gigs.gigs.filter(
-      (gig) => gig?.bookedBy?._id === user._id
+      (gig: GigProps) => gig?.bookedBy?._id === user._id
     ).length;
     const postedGigs = gigs.gigs.filter(
-      (gig) => gig?.postedBy?._id === user._id
+      (gig: GigProps) => gig?.postedBy?._id === user._id
     ).length;
 
     setMusicianGigCount(bookedGigs);
