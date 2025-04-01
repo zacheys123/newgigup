@@ -62,7 +62,7 @@ export async function GET(req: NextRequest) {
       musicianhandles,
       musiciangenres,
     } = await User.findOne(query).populate({
-      path: "refferences",
+      path: "refferences followers followings",
       model: User,
     });
 

@@ -572,6 +572,24 @@ input[type="radio"] {
   }
 }
 
+@keyframes pulse {
+  0% {
+    opacity: 0.5;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 0.5;
+    transform: scale(0.95);
+  }
+}
+
+.group:hover .pulse-effect {
+  animation: pulse 2s infinite ease-in-out;
+}
 .unread-badge {
   background-color: #128c7e;
   color: white;

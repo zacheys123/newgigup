@@ -6,6 +6,10 @@ export async function PUT(req: NextRequest) {
   const id = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
 
   const {
+    firstname,
+    lastname,
+    email,
+    username,
     videoUrl,
     title,
     city,
@@ -24,6 +28,7 @@ export async function PUT(req: NextRequest) {
     mcType,
     mcLanguages,
     talentbio,
+    clienthandles,
     isMusician,
     isClient,
   } = await req.json();
@@ -51,6 +56,10 @@ export async function PUT(req: NextRequest) {
         { _id: id },
         {
           $set: {
+            firstname,
+            lastname,
+            email,
+            username,
             instrument: isClient ? "" : instrument,
             experience: isClient ? "" : experience,
             date: age === isClient ? "" : age,
@@ -61,14 +70,15 @@ export async function PUT(req: NextRequest) {
             phone,
             organization: isMusician ? "" : organization,
             musicianhandles: myhandles === isClient ? "" : myhandles,
+            handles: isClient ? clienthandles : "",
             musiciangenres: genre === isClient ? "" : genre,
             djGenre: isClient ? "" : djGenre,
             djEquipment: isClient ? "" : djEquipment,
             mcType: isClient ? "" : mcType,
             mcLanguages: isClient ? "" : mcLanguages,
             talentbio,
-            isMusician: isClient === true ? false : true,
-            isClient: isMusician === true ? false : true,
+            isMusician,
+            isClient,
           },
           $push: {
             videosProfile: isClient
