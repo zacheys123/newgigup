@@ -33,11 +33,22 @@ export async function PUT(req: NextRequest) {
     isMusician,
     isClient,
   } = await req.json();
-  console.log(month);
-  if ((isMusician && !age) || !month || !year) {
+  console.log(isMusician);
+  console.log("client", isClient);
+  if (isMusician === true && !age) {
     return NextResponse.json({
       updateStatus: false,
-      message: "Date ,Month and year are required",
+      message: "Date is required",
+    });
+  } else if (isMusician === true && !month) {
+    return NextResponse.json({
+      updateStatus: false,
+      message: " Month  is required",
+    });
+  } else if (isMusician === true && !year) {
+    return NextResponse.json({
+      updateStatus: false,
+      message: "  Year is required",
     });
   } else if (!city) {
     return NextResponse.json({

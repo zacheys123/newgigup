@@ -80,7 +80,7 @@ const MobileSheet = () => {
         </Link>
 
         <Link
-          href={user?.isClient ? `/client/profile/${userId}` : `/profile`}
+          href={`/profile`}
           className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 hover:text-white rounded-md transition-all"
         >
           <User size="20" className="text-white" />

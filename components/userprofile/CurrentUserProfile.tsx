@@ -32,6 +32,8 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 
 import CountUp from "react-countup";
+import useSocket from "@/hooks/useSocket";
+import { useAllGigs } from "@/hooks/useAllGigs";
 
 interface UpdateResponse {
   updateStatus: boolean;
@@ -124,6 +126,7 @@ const CurrentUserProfile = () => {
     () => userdata?.emailAddresses || [],
     [userdata?.emailAddresses]
   );
+  const { socket } = useSocket();
 
   // Initialize user data
   useEffect(() => {
@@ -151,6 +154,7 @@ const CurrentUserProfile = () => {
       setTalentbio(user?.talentbio || "");
       setIsMusician(user?.isMusician || false);
       setIsClient(user?.isClient || false);
+      setClientHandles(user?.handles);
     }
   }, [
     user,
@@ -159,7 +163,8 @@ const CurrentUserProfile = () => {
     emailAddresses,
     userdata?.username,
   ]);
-
+  const { gigs } = useAllGigs();
+  const myGigs = gigs?.filter((gig) => gig?.bookCount.includes(user?._id));
   // Handle profile update
   const handleUpdate = async () => {
     const datainfo = {
@@ -200,6 +205,14 @@ const CurrentUserProfile = () => {
         const resData: UpdateResponse = await res.json();
 
         if (resData.updateStatus) {
+          if (socket) {
+            myGigs.forEach((gig) => {
+              socket.emit("cancelBooking", {
+                gigId: gig._id,
+                bookCount: (gig?.bookCount?.length || 0) - 1, // Decrement count
+              });
+            });
+          }
           toast.success(resData.message);
           setRefetchData(true);
           mutateUser();
@@ -265,6 +278,7 @@ const CurrentUserProfile = () => {
   //     user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
   //     user.email.toLowerCase().includes(searchTerm.toLowerCase())
   // );
+
   if (!user) {
     return (
       <div className="h-screen w-screen flex justify-center items-center animate-pulse">
@@ -652,7 +666,7 @@ const CurrentUserProfile = () => {
               <div>
                 <Label className="text-neutral-400">Social Media</Label>
                 <Input
-                  className="w-full bg-neutral-700 text-white p-2 rounded-lg mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full bg-neutral-700 text-white p-2 rounded-lg mt-2  title focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={clienthandles}
                   onChange={(e) => setClientHandles(e.target.value)}
                   placeholder="Enter social media links, comma-separated"
