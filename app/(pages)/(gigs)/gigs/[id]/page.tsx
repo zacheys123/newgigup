@@ -42,14 +42,14 @@ const GigsPage = () => {
       </div>
       {/* Scrollable Gigs List */}
       <div className="h-[85%] overflow-y-scroll bg-gray-900">
-        {gigs?.gigs?.length === 0 && (
+        {gigs?.length === 0 && (
           <h1 className="text-white text-center font-bold py-5">
             No gigs found
           </h1>
         )}
         {!loading ? (
           <div className="space-y-3 p-2 pb-[74px] pt-3">
-            {searchfunc(gigs?.gigs, typeOfGig, category, gigQuery, location)
+            {searchfunc(gigs, typeOfGig, category, gigQuery, location)
               ?.filter((gig: GigProps) => gig?.isTaken === false)
               ?.map((gig: GigProps) => {
                 console.log(gig?.description);

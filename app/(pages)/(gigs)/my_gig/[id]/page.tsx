@@ -37,7 +37,7 @@ const MyGigs = () => {
   } = useStore();
   const [loadingSecret, setLoadingSecret] = useState<boolean>(false);
   const [forgotsecret, setForgotSecret] = useState<boolean>(false);
-
+  console.log(gigs);
   const checkSecret = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!secret.trim()) {
@@ -186,14 +186,14 @@ const MyGigs = () => {
           />
         </div>
         <div className="h-[85%] overflow-y-scroll bg-gray-900">
-          {gigs?.gigs?.length === 0 && (
+          {gigs?.length === 0 && (
             <h1 className="text-white text-center font-bold py-5">
               No gigs found
             </h1>
           )}
           {!loading ? (
             <div className="space-y-3 p-2 pb-[74px] pt-3">
-              {searchfunc(gigs?.gigs, typeOfGig, category, gigQuery, location)
+              {searchfunc(gigs, typeOfGig, category, gigQuery, location)
                 ?.filter((gig: GigProps) => gig?.postedBy?._id === user?._id)
                 ?.map((gig: GigProps) => (
                   <AllGigsComponent key={gig?._id} gig={gig} />

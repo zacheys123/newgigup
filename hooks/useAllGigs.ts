@@ -54,19 +54,27 @@
 //   return { loading, gigs };
 // }
 
-import { useMemo } from "react";
+import { GigProps } from "@/types/giginterface";
+import { useMemo, useState } from "react";
 import useSWR from "swr";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export function useAllGigs() {
+  const [allgigs, setAllGigs] = useState<GigProps[]>([]); // Initialize as empty array
   const urldata = useMemo(() => `/api/gigs/getgigs`, []);
-  const { data, error, mutate } = useSWR(urldata, fetcher);
+  const { data, error, mutate } = useSWR(urldata, fetcher, {
+    onSuccess: (data) => {
+      console.log(data);
+      setTimeout(() => mutate(urldata), 1000000);
+      setAllGigs(data.gigs || []); // Assuming the API returns { gigs: [...] }
+    },
+  });
 
   return {
-    gigs: data,
+    gigs: allgigs, // Now this is directly the array
     loading: !error && !data,
     error,
-    mutateGigs: mutate, // expose the mutate function
+    mutateGigs: mutate,
   };
 }

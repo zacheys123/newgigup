@@ -1,4 +1,5 @@
 import connectDb from "@/lib/connectDb";
+import Gig from "@/models/gigs";
 import User from "@/models/user";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -52,6 +53,13 @@ export async function PUT(req: NextRequest) {
     console.log("instrument", instrument);
     try {
       await connectDb();
+      await Gig.updateMany(
+        {
+          bookCount: id,
+          bookedBy: { $ne: id }, // Ensures id is NOT in bookedBy
+        },
+        { $pull: { bookCount: id } }
+      );
       const user = await User.findByIdAndUpdate(
         { _id: id },
         {

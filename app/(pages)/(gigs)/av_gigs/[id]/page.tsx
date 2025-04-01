@@ -18,7 +18,7 @@ const PublishedGigs = () => {
   const [location, setLocation] = useState<string>(() =>
     user?.city ? user?.city : "all"
   );
-
+  console.log(gigs);
   return (
     <div className="flex flex-col h-[calc(100vh-100px)] w-[90%] mx-auto my-2 shadow-md shadow-orange-300">
       {/* Fixed Header */}
@@ -34,14 +34,14 @@ const PublishedGigs = () => {
       </div>
       {/* Scrollable Gigs List */}
       <div className="h-[85%] overflow-y-scroll bg-gray-900">
-        {gigs?.gigs?.length === 0 && (
+        {gigs?.length === 0 && (
           <h1 className="text-white text-center font-bold py-5">
             No gigs found
           </h1>
         )}
         {!loading ? (
           <div className="space-y-3 p-2 pb-[74px] pt-3">
-            {searchfunc(gigs?.gigs, typeOfGig, category, null, location)
+            {searchfunc(gigs, typeOfGig, category, null, location)
               ?.filter(
                 (gig: GigProps) =>
                   gig?.postedBy?._id !== user?._id && gig?.isTaken === false
