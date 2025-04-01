@@ -14,7 +14,7 @@ import { FaStar } from "react-icons/fa";
 const MainReview = ({ _id, gigId, comment, rating, createdAt }: Review) => {
   const { gigs, loading } = useAllGigs();
   const { userId } = useAuth();
-  const { reviews, setReviews } = useCurrentUser(userId || null);
+  const { reviews, setReviews, mutateUser } = useCurrentUser(userId || null);
   //   const [currentgig] = useStore();
   const gig = gigs?.gigs?.find((gig: UserProps) => gig._id === gigId);
   const router = useRouter();
@@ -31,6 +31,7 @@ const MainReview = ({ _id, gigId, comment, rating, createdAt }: Review) => {
       if (reviews && Array.isArray(reviews)) {
         const newReviews = reviews.filter((review) => review._id !== reviewId);
         setReviews(newReviews);
+        mutateUser();
         console.log("Updated reviews:", newReviews); // Debugging
       } else {
         console.warn("Reviews is not an array or is undefined");
