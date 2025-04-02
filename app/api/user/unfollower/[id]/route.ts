@@ -15,7 +15,7 @@ export async function PUT(req: NextRequest) {
   try {
     await connectDb();
     let friend = await User.findById(id);
-    await friend.updateOne({ $pull: { followers: follower } });
+    await friend?.updateOne({ $pull: { followers: follower } });
     friend = await User.findById(id);
     console.log("YOU HAVE UNFOLLOWED THIS::::::", friend);
     return NextResponse.json({ result: friend, status: 200 });

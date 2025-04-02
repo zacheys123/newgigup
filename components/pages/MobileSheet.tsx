@@ -8,6 +8,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import {
+  BookA,
   BookCopy,
   Home,
   Menu,
@@ -60,10 +61,19 @@ const MobileSheet = () => {
         )}
 
         <Link
-          href={`/allreviews/${user?._id}/*${user?.firstname}${user?.lastname}`}
+          href={`/dashboard`}
           className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 hover:text-white rounded-md transition-all"
         >
           <MdDashboard size="20" className="text-white" />
+          <SheetDescription className="text-lg font-medium title text-neutral-400 ">
+            DashBoard
+          </SheetDescription>
+        </Link>
+        <Link
+          href={`/allreviews/${user?._id}/*${user?.firstname}${user?.lastname}`}
+          className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 hover:text-white rounded-md transition-all"
+        >
+          <BookA size="20" className="text-white" />
           <SheetDescription className="text-lg font-medium title text-neutral-400 ">
             Reviews
           </SheetDescription>

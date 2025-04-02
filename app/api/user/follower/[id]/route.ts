@@ -13,11 +13,11 @@ export async function PUT(req: NextRequest) {
   try {
     await connectDb();
     let friend = await User.findById(id);
-    if (friend.followers.includes(follower)) {
+    if (friend?.followers.includes(follower)) {
       return NextResponse.json({ result: friend, status: 403 });
     }
 
-    await friend.updateOne({ $push: { followers: follower } });
+    await friend?.updateOne({ $push: { followers: follower } });
     friend = await User.findById(id);
     // console.log("YOU HAVE FOLLOWED THIS::::::", friend);
     return NextResponse.json({ result: friend, status: 200 });

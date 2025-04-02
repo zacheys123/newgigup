@@ -1,6 +1,5 @@
 import connectDb from "@/lib/connectDb";
 import User from "@/models/user";
-import { VideoProfileProps } from "@/types/userinterfaces";
 import { getAuth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -26,7 +25,7 @@ export async function DELETE(req: NextRequest) {
     // Filter out the video to delete
     const initialLength = user.videosProfile.length;
     user.videosProfile = user.videosProfile.filter(
-      (video: VideoProfileProps) => video._id.toString() !== videoId
+      (video) => video._id.toString() !== videoId
     );
 
     if (user.videosProfile.length === initialLength) {

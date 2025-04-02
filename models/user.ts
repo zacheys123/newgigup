@@ -41,6 +41,7 @@ interface IUser extends Document {
   isMusician: boolean;
   isClient: boolean;
   videosProfile: {
+    _id: string;
     url: string;
     createdAt?: Date;
   }[];
@@ -115,6 +116,8 @@ const userSchema = new Schema<IUser>(
     isClient: { type: Boolean, default: false },
     videosProfile: [
       {
+        _id: { type: mongoose.Schema.Types.ObjectId, auto: true }, // Ensure _id is generated
+
         url: { type: String },
         createdAt: { type: Date, default: Date.now },
       },

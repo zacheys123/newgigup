@@ -34,7 +34,11 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     console.error("Subscription check failed:", error);
     return NextResponse.json(
-      { isPro: false, nextBillingDate: null },
+      {
+        isPro: false,
+        nextBillingDate: null,
+        message: "Subscription status check failed:",
+      },
       { status: 500 }
     );
   }

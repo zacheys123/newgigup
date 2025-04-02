@@ -8,32 +8,46 @@ import React, { useEffect, useState } from "react";
 
 const Actions = () => {
   const router = useRouter();
-  const { userId } = useAuth();
-  const { user } = useCurrentUser(userId || "");
-  const [isCheckingUser, setIsCheckingUser] = useState(true);
+  const { isLoaded: isAuthLoaded, userId } = useAuth();
+  const { user, loading } = useCurrentUser(userId || "");
+  const [status, setStatus] = useState<
+    "loading" | "unregistered" | "registered"
+  >("loading");
 
-  // components/start/Actions.tsx
   useEffect(() => {
-    if (!user) {
-      setIsCheckingUser(false);
+    // Only proceed when auth and user data are loaded
+    if (!isAuthLoaded || loading) return;
+
+    // No user logged in (shouldn't happen due to middleware)
+    if (!userId) {
+      router.push("/sign-in");
       return;
     }
 
+    // User exists but no MongoDB record
+    if (!user) {
+      setStatus("unregistered");
+      return;
+    }
+
+    // User has completed registration
     if (
       typeof user.isMusician === "boolean" &&
       typeof user.isClient === "boolean"
     ) {
-      // Redirect to dashboard after registration instead of specific pages
-      if (user.isMusician || user.isClient) {
-        router.push(`/dashboard`);
+      if (user?.isMusician || user?.isClient) {
+        setStatus("registered");
+        router.push("/dashboard");
         return;
       }
     }
 
-    setIsCheckingUser(false);
-  }, [user, userId, router]);
+    // User record exists but roles aren't set
+    setStatus("unregistered");
+  }, [isAuthLoaded, loading, user, userId, router]);
 
-  if (!user || isCheckingUser) {
+  // Loading state
+  if (status === "loading" || !isAuthLoaded || loading) {
     return (
       <div className="h-full w-full bg-black">
         <span className="flex flex-col items-center">
@@ -44,22 +58,18 @@ const Actions = () => {
     );
   }
 
-  // If user roles aren't properly defined, show ActionPage
-  if (
-    typeof user.isMusician !== "boolean" ||
-    typeof user.isClient !== "boolean"
-  ) {
-    return (
-      <div>
-        <ActionPage />
-      </div>
-    );
+  // Show registration page if user needs to complete profile
+  if (status === "unregistered") {
+    return <ActionPage />;
   }
 
-  // Default case - show ActionPage
+  // Default fallback (should redirect in useEffect)
   return (
-    <div>
-      <ActionPage />
+    <div className="h-full w-full bg-black">
+      <span className="flex flex-col items-center">
+        <BallLoader />
+        Redirecting...
+      </span>
     </div>
   );
 };

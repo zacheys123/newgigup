@@ -1,18 +1,28 @@
 import { Sidebar } from "@/components/dashboard/SideBar";
-import { checkSubscription } from "@/lib/subscription";
-import { getAuth } from "@clerk/nextjs/server";
-import { NextRequest } from "next/server";
+import { checkEnvironment } from "@/utils";
+
+async function getSubscription() {
+  try {
+    const res = await fetch(`${checkEnvironment()}/api/user/subscription`);
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch subscription status");
+    }
+    console.log(res);
+
+    const { isPro } = await res.json();
+    return isPro;
+  } catch (error) {
+    console.error("Error fetching subscription status:", error);
+  }
+}
 
 export default async function DashboardLayout({
-  req,
   children,
 }: {
-  req: NextRequest;
   children: React.ReactNode;
 }) {
-  const { userId } = getAuth(req);
-  const { isPro } = await checkSubscription(userId as string);
-
+  const isPro = await getSubscription();
   return (
     <div className="flex h-screen bg-black">
       <Sidebar isPro={isPro} />

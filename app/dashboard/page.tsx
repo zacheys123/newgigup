@@ -13,6 +13,7 @@ export default function Dashboard() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<{
+    isClient: boolean;
     isMusician: boolean;
     firstLogin: boolean;
   } | null>(null);
@@ -30,8 +31,8 @@ export default function Dashboard() {
 
         // Fetch user data and subscription status in parallel
         const [userRes, subscriptionRes] = await Promise.all([
-          fetch(`/api/users/getuser/${userId}`),
-          fetch(`/api/subscription}`),
+          fetch(`/api/user/getuser/${userId}`),
+          fetch(`/api/user/subscription}`),
         ]);
 
         if (!userRes.ok || !subscriptionRes.ok) {
