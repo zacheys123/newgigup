@@ -1,6 +1,5 @@
 import connectDb from "@/lib/connectDb";
 import User from "@/models/user";
-import { UserProps } from "@/types/userinterfaces";
 import { NextRequest, NextResponse } from "next/server";
 import { getAuth } from "@clerk/nextjs/server";
 export async function GET(req: NextRequest) {
@@ -13,7 +12,7 @@ export async function GET(req: NextRequest) {
     await connectDb();
     const AllOtherUsersNotLoggedIn = await User.find();
     const users = AllOtherUsersNotLoggedIn?.filter(
-      (user: UserProps) => user.clerkId !== userId
+      (user) => user.clerkId !== userId
     );
     return NextResponse.json({ users });
   } catch (error) {

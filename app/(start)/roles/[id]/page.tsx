@@ -12,24 +12,21 @@ const Actions = () => {
   const { user } = useCurrentUser(userId || "");
   const [isCheckingUser, setIsCheckingUser] = useState(true);
 
+  // components/start/Actions.tsx
   useEffect(() => {
     if (!user) {
       setIsCheckingUser(false);
       return;
     }
 
-    // Debugging - consider removing in production
-    console.log("User:", user);
-
-    // Ensure we have valid user data before proceeding
     if (
       typeof user.isMusician === "boolean" &&
       typeof user.isClient === "boolean"
     ) {
-      if (user.isMusician && !user.isClient) {
-        router.push(`/gigs/${userId}`);
-      } else if (user.isClient && !user.isMusician) {
-        router.push(`/create/${userId}`);
+      // Redirect to dashboard after registration instead of specific pages
+      if (user.isMusician || user.isClient) {
+        router.push(`/dashboard`);
+        return;
       }
     }
 

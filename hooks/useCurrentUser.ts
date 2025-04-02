@@ -212,13 +212,15 @@ export function useCurrentUser(userId: string | null) {
   const [reviews, setReviews] = useState<Review[]>();
   const { data, error, mutate } = useSWR(urldata, fetcher, {
     onSuccess: (userdata) => {
-      setCurrentUser(userdata);
-      setReviews(userdata?.myReviews);
+      if (userdata?.user) {
+        setCurrentUser(userdata.user);
+        setReviews(userdata.user.myReviews || []); // Default to empty array if `myReviews` is not available
+      }
     },
   });
 
   return {
-    user: data,
+    user: data?.user,
     loading: !error && !data,
     reviews,
     mutateUser: mutate, // expose the mutate function

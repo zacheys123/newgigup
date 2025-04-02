@@ -33,13 +33,7 @@ const Nav = () => {
             {user?.firstname && (
               <>
                 <Link
-                  href={
-                    user?.isClient
-                      ? `/client/profile/${userId}`
-                      : user?.isMusician
-                      ? `/profile`
-                      : "/profile"
-                  }
+                  href={"/profile"}
                   className="flex items-center gap-2 p-3 rounded-full transition-all hover:bg-neutral-700 hover:scale-105"
                 >
                   <User size="21" />

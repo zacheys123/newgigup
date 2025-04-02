@@ -18,13 +18,8 @@ import { SaveAll } from "lucide-react";
 
 export default function Home() {
   const { isLoaded, userId } = useAuth();
-  const {
-    user: { firstname, isClient, isMusician } = {
-      firstname: "",
-      isClient: false,
-      isMusician: false,
-    },
-  } = useCurrentUser(userId || null);
+
+  const { user } = useCurrentUser(userId || null);
 
   const [showVideo, setShowVideo] = useState(false);
   const [isClientSide, setIsClientSide] = useState(false);
@@ -48,10 +43,11 @@ export default function Home() {
   }
 
   const getDynamicHref = () => {
-    if (!firstname || (!isClient && !isMusician)) return `/roles/${userId}`;
-    return isClient
+    if (!userId || !user?.firstname || (!user?.isClient && !user?.isMusician))
+      return `/roles/${userId}`;
+    return user?.isClient
       ? `/create/${userId}`
-      : isMusician
+      : user?.isMusician
       ? `/gigs/${userId}`
       : `/roles/${userId}`;
   };

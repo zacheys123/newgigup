@@ -292,7 +292,7 @@ const CurrentUserProfile = () => {
 
   return (
     <div className="w-full h-full overflow-scroll flex-1 relative bg-gradient-to-b from-neutral-900 to-black py-1">
-      <div className="max-w-4xl mx-auto pb-[50px]">
+      <div className="max-w-4xl mx-auto pb-[100px]">
         {/* Profile Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <div className="flex items-center gap-4 mb-4 md:mb-0">
@@ -390,7 +390,10 @@ const CurrentUserProfile = () => {
               },
             },
             { label: "Reviews", value: user?.allreviews?.length || 0 },
-            { label: "Videos", value: user?.videosProfile?.length || 0 },
+
+            ...(!user?.isClient
+              ? [{ label: "Videos", value: user?.videosProfile?.length || 0 }]
+              : []),
           ].map((stat, index) => (
             <div
               key={index}

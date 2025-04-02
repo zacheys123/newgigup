@@ -1,4 +1,4 @@
-import User from "@/models/user";
+import User, { IUser } from "@/models/user";
 import { NextResponse } from "next/server";
 import connectDb from "@/lib/connectDb";
 import { NextRequest } from "next/server";
@@ -24,86 +24,13 @@ export async function GET(req: NextRequest) {
         ...(isValidObjectId(searchUrl || "") ? [{ _id: searchUrl }] : []),
       ],
     };
-    const {
-      _id,
-      email,
-      clerkId, // Required and unique
-      picture,
-      firstname,
-      lastname,
-      city,
-      date,
-      month,
-      year,
-      address,
-      instrument,
-      experience,
-      phone,
-      verification,
-      username, // Required, unique, and lowercase
-      followers, // Array of User IDs
-      followings, // Array of User IDs
-      allreviews,
-      myreviews,
-      videosProfile,
-      isMusician,
-      isClient,
-      organization,
-      bio,
-      handles,
-      genre,
-      refferences,
-      roleType,
-      djGenre,
-      djEquipment,
-      mcType,
-      mcLanguages,
-      talentbio,
-      musicianhandles,
-      musiciangenres,
-    } = await User.findOne(query).populate({
+    const user = (await User.findOne(query).populate({
       path: "refferences followers followings",
       model: User,
-    });
+    })) as IUser | null;
 
-    console.log(refferences);
     return NextResponse.json({
-      _id,
-      email,
-      clerkId, // Required and unique
-      picture,
-      firstname,
-      lastname,
-      city,
-      date,
-      month,
-      year,
-      address,
-      instrument,
-      experience,
-      phone,
-      verification,
-      username, // Required, unique, and lowercase
-      followers, // Array of User IDs
-      followings, // Array of User ID
-      allreviews,
-      myreviews,
-      videosProfile,
-      isMusician,
-      isClient,
-      organization,
-      bio,
-      handles,
-      genre,
-      refferences,
-      roleType,
-      djGenre,
-      djEquipment,
-      mcType,
-      mcLanguages,
-      talentbio,
-      musicianhandles,
-      musiciangenres,
+      user,
     });
   } catch (error) {
     console.error("Error fetching user:", error);

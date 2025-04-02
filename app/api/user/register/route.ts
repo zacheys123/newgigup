@@ -14,6 +14,7 @@ interface UserPhone {
 }
 
 interface UserInput {
+  id: string;
   firstName?: string;
   lastName?: string;
   imageUrl?: string;
@@ -31,9 +32,15 @@ interface UserInput {
   djExperience: string;
   talentbio: string;
   vocalistGenre: string;
+  tier: string; // Default to free tier
+  nextBillingDate: Date;
+  monthlyGigsPosted: number; //
+  monthlyMessages: number; //
+  monthlyGigsBooked: number; //
+  firstLogin: boolean; // Add this flag
 }
 
-export async function POST(req: NextRequest): Promise<Response> {
+export async function POST(req: NextRequest) {
   try {
     const { userId } = getAuth(req); // Use getAuth for server-side authentication
     const body = await req.json(); // Parse JSON body
@@ -48,60 +55,13 @@ export async function POST(req: NextRequest): Promise<Response> {
 
     await connectDb();
 
-    const existingUser = await User.findOne({
-      $or: [
-        { clerkId: userId },
-        { email: transformedUser.emailAddresses[0]?.emailAddress },
-      ],
-    });
-    let updateUser;
-    if (transformedUser && userId && existingUser) {
-      updateUser = await User.findOneAndUpdate(
-        {
-          $or: [
-            { clerkId: userId },
-            { email: transformedUser.emailAddresses[0]?.emailAddress },
-          ],
-        },
-        {
-          $set: {
-            firstname: transformedUser.firstName,
-            lastname: transformedUser.lastName,
-            picture: existingUser?.picture || transformedUser.imageUrl,
-            email: transformedUser.emailAddresses[0]?.emailAddress,
-            username: transformedUser.username,
-            phone: transformedUser.phoneNumbers[0]?.phoneNumber,
-            verification:
-              transformedUser.emailAddresses[0]?.verification?.status,
-            isClient: body.isClient,
-            isMusician: body.isMusician,
-            city: body.city,
-            instrument: body.instrument,
-            experience: body.experience,
-            roleType: body.roleType,
-            djGenre: body.djGenre,
-            djEquipment: body.djEquipment,
-            mcType: body.mcType,
-            mcLanguages: body.mcLanguages,
-            talentbio: body.talentbio,
-            vocalistGenre: body.vocalistGenre,
-          },
-        },
-        { new: true }
-      );
-    }
-    if (transformedUser && userId && existingUser) {
-      return NextResponse.json({
-        userstatus: false,
-        message: "User already exists",
-        results: updateUser,
-      });
-    } else {
-      const newUser = new User({
-        clerkId: userId,
+    await User.findOneAndUpdate(
+      { clerkId: userId },
+
+      {
         firstname: transformedUser.firstName,
         lastname: transformedUser.lastName,
-        picture: existingUser?.picture || transformedUser.imageUrl,
+        picture: transformedUser.imageUrl,
         email: transformedUser.emailAddresses[0]?.emailAddress,
         username: transformedUser.username,
         phone: transformedUser.phoneNumbers[0]?.phoneNumber,
@@ -118,20 +78,19 @@ export async function POST(req: NextRequest): Promise<Response> {
         mcLanguages: body.mcLanguages,
         talentbio: body.talentbio,
         vocalistGenre: body.vocalistGenre,
-      });
-
-      const mainUser = await newUser.save();
-
-      return NextResponse.json({
-        userstatus: true,
-        message: body.isClient
-          ? `Welcome to gigUp ${mainUser?.firstname} (client)`
-          : body.isMusician
-          ? `Welcome to gigUp ${mainUser?.firstname} (musician)`
-          : "",
-        results: mainUser,
-      });
-    }
+        tier: body.tier,
+        nextBillingDate: body.nextBillingDate,
+        monthlyGigsPosted: body.monthlyGigsPosted,
+        monthlyMessages: body.monthlyMessages,
+        monthlyGigsBooked: body.monthlyGigsBooked,
+        firstLogin: body.firstLogin,
+      },
+      { upsert: true, new: true }
+    );
+    return NextResponse.json({
+      success: true,
+      redirectUrl: "/dashboard", // Force dashboard redirect
+    });
   } catch (error) {
     console.error("Error processing request:", error);
 

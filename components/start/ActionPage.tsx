@@ -158,6 +158,11 @@ const ActionPage = () => {
               mcLanguages,
               talentbio,
               vocalistGenre,
+              tier: "free", // Default to free tier
+              nextBillingDate: Date.now(),
+              monthlyGigsPosted: 0,
+              monthlyMessages: 0,
+              monthlyGigsBooked: 0,
             }),
           }),
         });
@@ -198,26 +203,25 @@ const ActionPage = () => {
       const success = await registerUser(true);
       if (success) {
         setMoreInfo(false);
-        setTimeout(() => router.push("/profile"), 1000);
-        toast.success("Musician registration successful!");
+        toast.success("Registration successful!");
+        router.push("/dashboard"); // Unified dashboard redirect
       }
     } finally {
       setMusicianLoad(false);
     }
   }, [registerUser, router]);
-
   const connectAsClient = useCallback(async () => {
     setClientLoad(true);
     try {
       const success = await registerUser(false);
       if (success) {
-        setTimeout(() => router.push(`/client/profile/${userId}`), 3000);
-        toast.success("Welcome to Gigup!!!");
+        toast.success("Registration successful!");
+        router.push("/dashboard"); // Unified dashboard redirect
       }
     } finally {
       setClientLoad(false);
     }
-  }, [registerUser, router, userId]);
+  }, [registerUser, router]);
 
   useEffect(() => {
     const timer = setTimeout(() => setUserload(true), 3000);

@@ -101,7 +101,7 @@ export async function PUT(req: NextRequest) {
           },
           $push: {
             videosProfile: isClient
-              ? {}
+              ? []
               : {
                   url: videoUrl,
                   title,
