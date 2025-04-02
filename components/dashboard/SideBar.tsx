@@ -12,7 +12,7 @@ import {
 import Link from "next/link";
 
 // components/Sidebar.tsx
-export function Sidebar({ isPro }: { isPro: boolean }) {
+export function Sidebar({ isPro }: { isPro?: boolean }) {
   const { userId } = useAuth();
   const { user } = useCurrentUser(userId || null);
   const musicianLinks = [

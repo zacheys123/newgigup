@@ -1,44 +1,52 @@
 import { NextRequest, NextResponse } from "next/server";
 import User from "@/models/user";
 import { getAuth } from "@clerk/nextjs/server";
+import connectDb from "@/lib/connectDb";
 
 // GET: Check subscription status
+
 export async function GET(req: NextRequest) {
   try {
-    const { userId } = getAuth(req);
+    await connectDb();
+
+    const { searchParams } = new URL(req.url);
+    const userId = searchParams.get("userId") || getAuth(req).userId;
+
     if (!userId) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-    if (!userId) {
-      return NextResponse.json(
-        { isPro: false, nextBillingDate: null },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await User.findOne({ clerkId: userId }).select([
-      "tier",
-      "nextBillingDate",
+    // Fetch user and subscription data in parallel
+    const [user, subscription] = await Promise.all([
+      User.findOne({ clerkId: userId }),
+      User.findOne({ clerkId: userId }).select(["tier", "nextBillingDate"]),
     ]);
 
     if (!user) {
-      return NextResponse.json({ isPro: false, nextBillingDate: null });
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    return NextResponse.json({
-      isPro:
-        user.tier === "pro" &&
-        (!user.nextBillingDate || user.nextBillingDate > new Date()),
-      nextBillingDate: user.nextBillingDate || null,
-    });
-  } catch (error) {
-    console.error("Subscription check failed:", error);
-    return NextResponse.json(
-      {
-        isPro: false,
-        nextBillingDate: null,
-        message: "Subscription status check failed:",
+    const responseData = {
+      user: {
+        isClient: user.isClient,
+        isMusician: user.isMusician,
+        firstLogin: user.firstLogin,
+        clerkId: user.clerkId,
       },
+      subscription: {
+        isPro:
+          subscription?.tier === "pro" &&
+          (!subscription?.nextBillingDate ||
+            new Date(subscription.nextBillingDate) > new Date()),
+        nextBillingDate: subscription?.nextBillingDate || null,
+      },
+    };
+
+    return NextResponse.json(responseData);
+  } catch (error) {
+    console.error("Dashboard API error:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
       { status: 500 }
     );
   }
