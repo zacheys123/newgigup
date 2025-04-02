@@ -1,24 +1,21 @@
 "use client";
 
 import { OnboardingModal } from "@/components/dashboard/onboarding";
-import { Sidebar } from "@/components/dashboard/SideBar";
 import BallLoader from "@/components/loaders/BallLoader";
-
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { DashboardData } from "@/types/dashboard";
 import { getDashboardData } from "../actions/getDashBoardData";
-
 import { ClientDashboard } from "@/components/dashboard/client";
 import { MusicianDashboard } from "@/components/dashboard/muscian";
+import useStore from "../zustand/useStore";
 
 export default function Dashboard() {
   const { userId, isLoaded } = useAuth();
   const router = useRouter();
-  const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { subscriptiondata: data, setData } = useStore();
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -61,33 +58,29 @@ export default function Dashboard() {
   }
 
   if (!data) {
-    return null; // or a "no data" state
+    return null;
   }
 
   return (
-    <div className="flex h-screen bg-black">
-      <Sidebar isPro={data.subscription.isPro} />
+    <>
+      {data.user.isMusician ? (
+        <MusicianDashboard
+          gigsBooked={data.user.gigsBooked ?? 0}
+          earnings={data.user.earnings ?? 0}
+        />
+      ) : (
+        <ClientDashboard />
+      )}
 
-      <main className="flex-1 overflow-y-auto p-6">
-        {data.user.isMusician ? (
-          <MusicianDashboard
-            gigsBooked={data.user.gigsBooked ?? 0} // Default to 0 if undefined
-            earnings={data.user.earnings ?? 0} // Default to 0 if undefined
-          />
-        ) : (
-          <ClientDashboard />
-        )}
+      {/* {!data.subscription.isPro && (
+        <div className="mb-6 bg-gradient-to-r from-orange-900/50 to-amber-900/30 p-4 rounded-lg">
+          <p className="text-orange-300 text-sm md:text-base">
+            Upgrade to Pro for unlimited features
+          </p>
+        </div>
+      )} */}
 
-        {!data.subscription.isPro && (
-          <div className="mb-6 bg-gradient-to-r from-orange-900/50 to-amber-900/30 p-4 rounded-lg">
-            <p className="text-orange-300 text-sm">
-              Upgrade to Pro for unlimited features
-            </p>
-          </div>
-        )}
-
-        {data.user.firstLogin && <OnboardingModal />}
-      </main>
-    </div>
+      {data.user.firstLogin && <OnboardingModal />}
+    </>
   );
 }

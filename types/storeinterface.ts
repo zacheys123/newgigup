@@ -3,8 +3,20 @@ import { Review, UserProps } from "./userinterfaces";
 import { GigProps } from "./giginterface";
 import { ChatProps, MessageProps } from "./chatinterfaces";
 import { Socket } from "socket.io-client";
+import { DashboardData } from "./dashboard";
 
 export const initialState = {
+  subscriptiondata: {
+    user: {
+      isClient: false,
+      isMusician: false,
+      firstLogin: false,
+      clerkId: "",
+      gigsBooked: 0, // Add this
+      earnings: 0, // Add this
+    },
+    subscription: { isPro: false, nextBillingDate: new Date() || null },
+  },
   loadingPostId: "",
   showVideo: false,
   confirmEdit: false,
@@ -104,6 +116,7 @@ interface OnlineUser {
   socketId: string;
 }
 export interface StoreState {
+  subscriptiondata: DashboardData;
   loadingPostId: string;
   confirmEdit: boolean;
   isDescriptionModal: boolean;
@@ -133,6 +146,7 @@ export interface StoreState {
   onlineUsers: OnlineUser[];
   socket: Socket | null;
   unreadCounts: Record<string, number>; // { chatId: unreadCount }
+  setData: (data: DashboardData) => void;
   setLoadingPostId: (data: string) => void;
   updateUnreadCount: (chatId: string, increment?: boolean) => void;
   setShowUpload: () => void;

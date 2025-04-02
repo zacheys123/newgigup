@@ -1,4 +1,6 @@
 import { ChatProps, MessageProps } from "@/types/chatinterfaces";
+import { DashboardData } from "@/types/dashboard";
+
 import { GigProps } from "@/types/giginterface";
 import { initialState, StoreState } from "@/types/storeinterface";
 import { Review, UserProps } from "@/types/userinterfaces";
@@ -16,6 +18,7 @@ import { create } from "zustand"; // Import SetState
 
 const useStore = create<StoreState>((set) => ({
   ...initialState,
+  setData: (data: DashboardData) => set(() => ({ subscriptiondata: data })),
   setLoadingPostId: (data: string) => set(() => ({ loadingPostId: data })),
   setIsDescriptionModal: (data: boolean) =>
     set(() => ({ isDescriptionModal: data })),
