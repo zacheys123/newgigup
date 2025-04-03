@@ -2,19 +2,37 @@
 import { dark } from "@clerk/themes";
 import { ClerkProvider } from "@clerk/nextjs";
 
-// ...
-export function Providers({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ClerkProvider
       appearance={{
         baseTheme: dark,
         variables: {
-          colorPrimary: "white",
-          fontSize: "8px",
+          colorPrimary: "#6366f1",
+          colorTextOnPrimaryBackground: "#ffffff", // Ensures button text is white
+          colorBackground: "#111827",
+          colorInputBackground: "#1f2937",
+        },
+        elements: {
+          formButtonPrimary: `
+            bg-indigo-600 
+            hover:bg-indigo-700 
+            text-white
+            py-3
+            w-full
+            transition-colors
+          `,
+          // Add these to ensure all buttons are visible
+          socialButtonsBlockButton: `
+            bg-gray-800 
+            text-gray-200 
+            border-gray-700
+            hover:bg-gray-700sss
+          `,
+          footerActionLink: `
+            text-indigo-400 
+            hover:text-indigo-300
+          `,
         },
       }}
     >
@@ -22,5 +40,3 @@ export function Providers({
     </ClerkProvider>
   );
 }
-
-// create a nextjs appp where you create posts that has postedby and bookedby field refferenced from the user model and has a istaken field thats boolean that updates when a another user that did not create the post clicks on a seen button.No other user can click on the seen button then use pusher to show the update in realtime,also have a chat model that has an aray named users that has refferences from user model and a messages field refference from the message model,a message model that has the senderId and recieverid refferenced from  user Model using pusher fro realtime messaging

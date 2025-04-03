@@ -271,12 +271,12 @@ input[type="radio"] {
 .cl-signIn-start,
 .cl-signUp-start {
   width: 19rem;
-  height: 30rem;
+  height: 40rem;
 }
 .cl-card .cl-card,
 .cl-signUp-start {
   width: 20rem;
-  height: 48rem;
+  height: 60rem;
 }
 .cl-headerTitle {
   font-family: "Poppins", sans-serif;

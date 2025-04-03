@@ -1,13 +1,14 @@
+import { Providers } from "@/app/providers";
 import { SignUp } from "@clerk/nextjs";
-import React from "react";
 
 export default function Page() {
   return (
-    <div className=" h-screen bg-black w-full overflow-hidden">
-      <div className="flex justify-center items-center  h-full w-full shadow-slate-700 shadow-xl">
-        {" "}
-        <SignUp />;
+    <Providers>
+      <div className="min-h-screen w-full bg-gray-900 flex items-center justify-center p-4">
+        <div className="w-full max-w-md bg-gray-800 rounded-xl p-6">
+          <SignUp />
+        </div>
       </div>
-    </div>
+    </Providers>
   );
 }
