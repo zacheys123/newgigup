@@ -14,8 +14,14 @@ export const initialState = {
       clerkId: "",
       gigsBooked: 0, // Add this
       earnings: 0, // Add this
+      gigsPosted: 0,
+      total: 0,
     },
-    subscription: { isPro: false, nextBillingDate: new Date() || null },
+    subscription: {
+      tier: "",
+      isPro: false,
+      nextBillingDate: new Date() || null,
+    },
   },
   loadingPostId: "",
   showVideo: false,
