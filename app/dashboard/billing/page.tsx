@@ -6,17 +6,21 @@ import { MobileUsageMeter } from "@/components/dashboard/MobileUsageMeter";
 
 import GigChart from "@/components/dashboard/GigChart";
 import BillingComponent from "@/components/dashboard/BillingComponent";
+import { UserButton } from "@clerk/nextjs";
 
 export default function BillingPage() {
   return (
     <div className="space-y-6 p-4 md:space-y-8 md:p-6">
-      <div>
-        <h1 className="text-xl md:text-2xl font-bold text-white">
-          Billing & Plans
-        </h1>
-        <p className="text-sm md:text-base text-gray-400">
-          Manage your subscription and usage
-        </p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-xl md:text-2xl font-bold text-white">
+            Billing & Plans
+          </h1>
+          <p className="text-sm md:text-base text-gray-400">
+            Manage your subscription and usage
+          </p>
+        </div>
+        <UserButton />
       </div>
 
       <BillingComponent />

@@ -9,7 +9,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-black pt-20">
+    <div className="flex flex-col md:flex-row h-screen bg-black  ">
       {/* Sidebar */}
       <div className="hidden md:block">
         <Sidebar />
@@ -17,11 +17,6 @@ export default function DashboardLayout({
 
       <main className="flex-1 overflow-y-auto pb-16 md:pb-0">
         {" "}
-        <div className="flex items-center gap-2">
-          <h2 className="md:hidden text-lg font-bold text-orange-500 mx-4">
-            GigUp
-          </h2>
-        </div>
         {children}
         <MobileUpgradeBanner />
       </main>
