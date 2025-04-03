@@ -4,9 +4,15 @@ import { UpgradeBanner } from "./UpgradBanner";
 import { UsageMeter } from "./UsageMeter";
 import { Calendar, DollarSign, Music } from "lucide-react";
 
-export async function ClientDashboard() {
+export async function ClientDashboard({
+  gigsPosted,
+  total,
+}: {
+  gigsPosted: number;
+  total: number;
+}) {
   //   const { activeGigs, totalSpent } = await getClientStats(userId);
-
+  console.log(gigsPosted, total);
   return (
     <div className="space-y-8">
       <UpgradeBanner />

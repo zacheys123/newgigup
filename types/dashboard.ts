@@ -5,9 +5,12 @@ export type UserData = {
   clerkId: string;
   gigsBooked?: number; // Add this
   earnings?: number; // Add this
+  gigsPosted: number; // Add this
+  total: number;
 };
 
 export type SubscriptionData = {
+  tier: string;
   isPro: boolean;
   nextBillingDate: Date | null;
 };

@@ -28,6 +28,10 @@ export default function Dashboard() {
         }
 
         setLoading(true);
+        // const result = await fetch(
+        //   `/api/subscription?clerkId=${userId}`
+        // );
+        // const mydata = await result.json();
         const result = await getDashboardData(userId);
         setData(result);
       } catch (err) {
@@ -69,7 +73,10 @@ export default function Dashboard() {
           earnings={data.user.earnings ?? 0}
         />
       ) : (
-        <ClientDashboard />
+        <ClientDashboard
+          gigsPosted={data.user.gigsPosted}
+          total={data.user.total}
+        />
       )}
 
       {/* {!data.subscription.isPro && (

@@ -4,11 +4,15 @@ import { SubscriptionCard } from "./SubscriptionCard";
 import { MobileSubscriptionCard } from "./MobileSubscriptionCard";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAuth } from "@clerk/nextjs";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const BillingComponent = () => {
   const { userId } = useAuth();
   const { user } = useCurrentUser(userId || null);
+  const { subscription } = useSubscription(userId as string);
   console.log(user);
+  const isPro = subscription?.isPro ?? false;
+
   const plans = useMemo(() => {
     return [
       {
@@ -20,19 +24,27 @@ const BillingComponent = () => {
               "Basic profile visibility",
               "Message 3 clients",
               "Performance analytics",
+              "7 days of access",
             ]
-          : [
+          : user?.isClient
+          ? [
               "Post 3 gigs/month",
               "Browse musician profiles",
               "Message 5 musicians",
               "Basic hiring tools",
-            ],
-        cta: "Current Plan",
-        current: true,
+              "7 days of access",
+            ]
+          : [],
+        cta: isPro ? "Downgrade" : "Current Plan",
+        current: !isPro,
       },
       {
         name: "Pro Tier",
-        price: user?.isMusician ? "$15/month" : "$20/month",
+        price: user?.isMusician
+          ? "$15/month"
+          : user?.isClient
+          ? "$20/month"
+          : "",
         features: user?.isMusician
           ? [
               "Unlimited gig applications",
@@ -42,7 +54,8 @@ const BillingComponent = () => {
               "Direct booking options",
               "Unlimited messaging",
             ]
-          : [
+          : user?.isClient
+          ? [
               "Unlimited gig postings",
               "Featured listing placement",
               "Advanced search filters",
@@ -50,24 +63,24 @@ const BillingComponent = () => {
               "Booking management tools",
               "Unlimited messaging",
               "Dedicated support",
-            ],
-        cta: "Upgrade",
-        current: false,
+            ]
+          : [],
+        cta: isPro ? "Current Plan" : "Upgrade",
+        current: isPro,
       },
     ];
-  }, [user?.isMusician]); // Recreate plans only when user type changes
-
+  }, [user?.isMusician, user?.isClient, isPro]);
   return (
     <div className="flex flex-col space-y-8">
       <div className="hidden md:grid grid-cols-1 gap-4 md:gap-6 md:grid-cols-2">
-        {plans.map((plan) => (
-          <SubscriptionCard key={plan.name} plan={plan} />
-        ))}
+        {user &&
+          plans.map((plan) => <SubscriptionCard key={plan.name} plan={plan} />)}
       </div>
       <div className="md:hidden grid grid-cols-1 gap-4 md:gap-6 md:grid-cols-2">
-        {plans.map((plan) => (
-          <MobileSubscriptionCard key={plan.name} plan={plan} />
-        ))}
+        {user &&
+          plans.map((plan) => (
+            <MobileSubscriptionCard key={plan.name} plan={plan} />
+          ))}
       </div>
     </div>
   );

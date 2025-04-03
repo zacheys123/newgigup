@@ -12,20 +12,26 @@ import {
   UsersIcon,
 } from "lucide-react";
 import Link from "next/link";
+import { MdDashboard } from "react-icons/md";
 
 export function Sidebar() {
   const { userId } = useAuth();
   const { user } = useCurrentUser(userId || null);
   const { subscriptiondata: data } = useStore();
-
   const musicianLinks = [
     {
-      name: "Gig Feed",
+      name: "Dashboard",
+      href: "/dashboard",
+      icon: <MdDashboard className="w-5 h-5" />,
+      exact: true,
+    },
+    {
+      name: "Gigs",
       href: "/dashboard/gigs",
       icon: <MusicIcon className="w-5 h-5" />,
     },
     {
-      name: "My Bookings",
+      name: "Bookings",
       href: "/dashboard/bookings",
       icon: <CalendarIcon className="w-5 h-5" />,
     },
@@ -38,17 +44,23 @@ export function Sidebar() {
       name: "Billing",
       href: "/dashboard/billing",
       icon: <CreditCardIcon className="w-5 h-5" />,
-    }, // Add this line
+    },
   ];
 
   const clientLinks = [
     {
-      name: "Post Gig",
+      name: "Dashboard",
+      href: "/dashboard",
+      icon: <MdDashboard className="w-5 h-5" />,
+      exact: true,
+    },
+    {
+      name: "Post",
       href: "/dashboard/create",
       icon: <PlusIcon className="w-5 h-5" />,
     },
     {
-      name: "My Events",
+      name: "Events",
       href: "/dashboard/events",
       icon: <CalendarIcon className="w-5 h-5" />,
     },
@@ -61,7 +73,7 @@ export function Sidebar() {
       name: "Billing",
       href: "/dashboard/billing",
       icon: <CreditCardIcon className="w-5 h-5" />,
-    }, // Add this line
+    },
   ];
 
   return (
@@ -85,7 +97,12 @@ export function Sidebar() {
       </div>
 
       <nav className="space-y-2">
-        {(user?.IsMusician ? musicianLinks : clientLinks).map((link) => (
+        {(user?.isMusician
+          ? musicianLinks
+          : user?.isClient
+          ? clientLinks
+          : []
+        ).map((link) => (
           <Link
             key={link.name}
             href={link.href}

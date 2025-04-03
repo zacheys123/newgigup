@@ -63,6 +63,7 @@ interface IUser extends Document {
   musiciangenres: string[];
   tier: "free" | "pro";
   earnings: number;
+  totalSpent: number;
   nextBillingDate?: Date;
   monthlyGigsPosted: number;
   monthlyMessages: number;
@@ -152,6 +153,7 @@ const userSchema = new Schema<IUser>(
     monthlyGigsPosted: Number,
     monthlyMessages: Number,
     monthlyGigsBooked: Number,
+    totalSpent: Number,
     earnings: Number,
     firstLogin: { type: Boolean, default: true },
     onboardingComplete: { type: Boolean, default: false },

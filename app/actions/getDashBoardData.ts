@@ -1,4 +1,4 @@
-"use server";
+// ... existing imports
 
 import connectDb from "@/lib/connectDb";
 import User from "@/models/user";
@@ -12,9 +12,17 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
       throw new Error("Unauthorized");
     }
 
-    const [user, subscription] = await Promise.all([
-      User.findOne({ clerkId: userId }),
-      User.findOne({ clerkId: userId }).select(["tier", "nextBillingDate"]),
+    const user = await User.findOne({ clerkId: userId }).select([
+      "isClient",
+      "isMusician",
+      "firstLogin",
+      "clerkId",
+      "earnings",
+      "monthlyGigsBooked",
+      "monthlyGigsPosted",
+      "totalSpent",
+      "tier",
+      "nextBillingDate",
     ]);
 
     if (!user) {
@@ -29,13 +37,16 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
         clerkId: user.clerkId,
         earnings: user?.earnings,
         gigsBooked: user?.monthlyGigsBooked,
+        gigsPosted: user?.monthlyGigsPosted,
+        total: user?.totalSpent,
       },
       subscription: {
         isPro:
-          subscription?.tier === "pro" &&
-          (!subscription?.nextBillingDate ||
-            new Date(subscription.nextBillingDate) > new Date()),
-        nextBillingDate: subscription?.nextBillingDate || null,
+          user.tier === "pro" &&
+          (!user.nextBillingDate ||
+            new Date(user.nextBillingDate) > new Date()),
+        nextBillingDate: user?.nextBillingDate || null,
+        tier: user.tier,
       },
     };
   } catch (error) {

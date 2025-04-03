@@ -1,84 +1,90 @@
+// app/api/subscription/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import User from "@/models/user";
-import { getAuth } from "@clerk/nextjs/server";
 import connectDb from "@/lib/connectDb";
+import User from "@/models/user";
 
-// GET: Check subscription status
-
-export async function GET(req: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
     await connectDb();
 
-    const { searchParams } = new URL(req.url);
-    const userId = searchParams.get("userId") || getAuth(req).userId;
+    const { searchParams } = new URL(request.url);
+    const clerkId = searchParams.get("clerkId");
 
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!clerkId) {
+      return NextResponse.json({ error: "User ID required" }, { status: 400 });
     }
 
-    // Fetch user and subscription data in parallel
-    const [user, subscription] = await Promise.all([
-      User.findOne({ clerkId: userId }),
-      User.findOne({ clerkId: userId }).select(["tier", "nextBillingDate"]),
+    const user = await User.findOne({ clerkId }).select([
+      "tier",
+      "nextBillingDate",
     ]);
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
-
-    const responseData = {
-      user: {
-        isClient: user.isClient,
-        isMusician: user.isMusician,
-        firstLogin: user.firstLogin,
-        clerkId: user.clerkId,
-      },
-      subscription: {
-        isPro:
-          subscription?.tier === "pro" &&
-          (!subscription?.nextBillingDate ||
-            new Date(subscription.nextBillingDate) > new Date()),
-        nextBillingDate: subscription?.nextBillingDate || null,
-      },
-    };
-
-    return NextResponse.json(responseData);
+    console.log("tier", user?.tier);
+    return NextResponse.json({
+      tier: user.tier,
+      nextBillingDate: user.nextBillingDate,
+      isPro:
+        user.tier === "pro" &&
+        (!user.nextBillingDate || new Date(user.nextBillingDate) > new Date()),
+    });
   } catch (error) {
-    console.error("Dashboard API error:", error);
+    console.error("Failed to fetch subscription:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Failed to fetch subscription" },
       { status: 500 }
     );
   }
 }
 
-// POST: Update subscription status (used for Clerk webhook)
-export async function POST(req: NextRequest) {
+export async function PUT(request: NextRequest) {
   try {
-    const body = await req.json();
-    const { userId, status, nextBillingDate } = body;
+    await connectDb();
 
-    if (!userId || !status) {
+    const { clerkId, tier } = await request.json();
+    console.log("clerkId", clerkId);
+    console.log("tier", tier);
+    if (!clerkId || !tier) {
       return NextResponse.json(
-        { message: "Invalid request data" },
+        { error: "User ID and tier are required" },
         { status: 400 }
       );
     }
 
-    await User.findOneAndUpdate(
-      { clerkId: userId },
-      {
-        tier: status === "active" ? "pro" : "free",
-        nextBillingDate: nextBillingDate || null,
-      },
-      { upsert: true }
-    );
+    const updateData: { tier: string; nextBillingDate: Date | null } = {
+      tier,
+      nextBillingDate: null,
+    };
 
-    return NextResponse.json({ message: "Subscription updated" });
+    if (tier === "pro") {
+      const nextBillingDate = new Date();
+      nextBillingDate.setMonth(nextBillingDate.getMonth() + 1);
+      updateData.nextBillingDate = nextBillingDate;
+    } else {
+      updateData.nextBillingDate = null;
+    }
+
+    const user = await User.findOneAndUpdate({ clerkId }, updateData, {
+      new: true,
+    }).select(["tier", "nextBillingDate"]);
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({
+      tier: user.tier,
+      nextBillingDate: user.nextBillingDate,
+      isPro:
+        user.tier === "pro" &&
+        (!user.nextBillingDate || new Date(user.nextBillingDate) > new Date()),
+    });
   } catch (error) {
-    console.error("Subscription update failed:", error);
+    console.error("Failed to update subscription:", error);
     return NextResponse.json(
-      { message: "Internal server error" },
+      { error: "Failed to update subscription" },
       { status: 500 }
     );
   }

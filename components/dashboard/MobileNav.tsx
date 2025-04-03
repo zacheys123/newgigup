@@ -10,12 +10,21 @@ import {
   UsersIcon,
 } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { MdDashboard } from "react-icons/md";
 
 export function MobileNav() {
   const { userId } = useAuth();
   const { user } = useCurrentUser(userId || null);
+  const pathname = usePathname();
 
   const musicianLinks = [
+    {
+      name: "Dashboard",
+      href: "/dashboard",
+      icon: <MdDashboard className="w-5 h-5" />,
+      exact: true,
+    },
     {
       name: "Gigs",
       href: "/dashboard/gigs",
@@ -35,10 +44,16 @@ export function MobileNav() {
       name: "Billing",
       href: "/dashboard/billing",
       icon: <CreditCardIcon className="w-5 h-5" />,
-    }, // Add this
+    },
   ];
 
   const clientLinks = [
+    {
+      name: "Dashboard",
+      href: "/dashboard",
+      icon: <MdDashboard className="w-5 h-5" />,
+      exact: true,
+    },
     {
       name: "Post",
       href: "/dashboard/create",
@@ -58,23 +73,64 @@ export function MobileNav() {
       name: "Billing",
       href: "/dashboard/billing",
       icon: <CreditCardIcon className="w-5 h-5" />,
-    }, // Add this
+    },
   ];
 
+  const links = user?.isMusician ? musicianLinks : clientLinks;
+
+  // Improved active link detection
+  const isActive = (href: string, exact: boolean = false) => {
+    if (exact) {
+      return pathname === href;
+    }
+    return (
+      pathname.startsWith(href) &&
+      (pathname === href || pathname.startsWith(`${href}/`))
+    );
+  };
+
   return (
-    <div className="fixed bottom-4 left-0 right-0 px-4 z-10 md:hidden">
-      <nav className="flex justify-around">
-        {(user?.isMusician ? musicianLinks : clientLinks).map((link) => (
-          <Link
-            key={link.name}
-            href={link.href}
-            className="flex flex-col items-center p-2 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors"
-            title={link.name}
-          >
-            {link.icon}
-            <span className="text-xs mt-1">{link.name}</span>
-          </Link>
-        ))}
+    <div className="fixed inset-x-0 bottom-0 z-50 md:hidden">
+      <nav className="flex items-center justify-around bg-background/95 backdrop-blur-lg border-t border-border px-1 py-2">
+        {links.map((link) => {
+          const active = isActive(link.href, link.exact);
+          return (
+            <Link
+              key={link.name}
+              href={link.href}
+              className={`
+                flex flex-col items-center w-full mx-1 rounded-lg transition-all
+                ${
+                  active
+                    ? "text-primary"
+                    : "text-muted-foreground hover:text-primary"
+                }
+                group
+              `}
+              title={link.name}
+            >
+              <div
+                className={`
+                  p-2 rounded-full transition-all
+                  ${
+                    active
+                      ? "bg-primary/10 text-primary"
+                      : "group-hover:bg-accent/50 text-muted-foreground"
+                  }
+                `}
+              >
+                {link.icon}
+              </div>
+              <span
+                className={`text-xs font-medium mt-1 transition-colors ${
+                  active ? "text-primary" : "text-muted-foreground"
+                }`}
+              >
+                {link.name}
+              </span>
+            </Link>
+          );
+        })}
       </nav>
     </div>
   );
