@@ -1,4 +1,4 @@
-import { GigChart } from "@/components/dashboard/GigChart";
+import GigChart from "@/components/dashboard/GigChart";
 import { RecentActivity } from "@/components/dashboard/RecentActivity";
 
 export default function ProgressPage() {

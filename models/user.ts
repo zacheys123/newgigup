@@ -20,6 +20,7 @@ interface IUser extends Document {
   followers: mongoose.Types.ObjectId[];
   followings: mongoose.Types.ObjectId[];
   allreviews: {
+    _id: mongoose.Types.ObjectId;
     postedBy: mongoose.Types.ObjectId;
     postedTo: mongoose.Types.ObjectId;
     rating?: number;
@@ -29,6 +30,7 @@ interface IUser extends Document {
     createdAt?: Date;
   }[];
   myreviews: {
+    _id: mongoose.Types.ObjectId;
     postedBy: mongoose.Types.ObjectId;
     postedTo: mongoose.Types.ObjectId;
     rating?: number;
@@ -91,6 +93,7 @@ const userSchema = new Schema<IUser>(
     followings: [{ type: Schema.Types.ObjectId, ref: "User" }],
     allreviews: [
       {
+        _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
         postedBy: { type: Schema.Types.ObjectId, ref: "User" },
         postedTo: { type: Schema.Types.ObjectId, ref: "User" },
         rating: Number,
@@ -102,6 +105,7 @@ const userSchema = new Schema<IUser>(
     ],
     myreviews: [
       {
+        _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
         postedBy: { type: Schema.Types.ObjectId, ref: "User" },
         postedTo: { type: Schema.Types.ObjectId, ref: "User" },
         rating: Number,

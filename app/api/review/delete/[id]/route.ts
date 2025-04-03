@@ -1,6 +1,5 @@
 import connectDb from "@/lib/connectDb";
 import User from "@/models/user";
-import { Review } from "@/types/userinterfaces";
 import { getAuth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -28,7 +27,7 @@ export async function DELETE(req: NextRequest) {
 
     // Remove the review from the myreviews array
     user.myreviews = user.myreviews.filter(
-      (review: Review) => review._id.toString() !== reviewId
+      (review) => review._id.toString() !== reviewId
     );
     await user.save();
 

@@ -56,7 +56,7 @@ export async function PUT(req: NextRequest) {
 
       const booker = await User.findById({ _id: newGig?.bookedBy?._id });
       const poster = await User.findById({ _id: newGig?.postedBy?._id });
-      await booker.updateOne(
+      await booker?.updateOne(
         {
           $push: {
             allreviews: {
@@ -71,7 +71,7 @@ export async function PUT(req: NextRequest) {
         },
         { new: true }
       );
-      await poster.updateOne(
+      await poster?.updateOne(
         {
           $push: {
             myreviews: {
@@ -87,11 +87,6 @@ export async function PUT(req: NextRequest) {
         },
         { new: true }
       );
-
-      return NextResponse.json({
-        gigstatus: true,
-        message: "Reviewed Gig successfully",
-      });
 
       return NextResponse.json({
         gigstatus: true,
