@@ -37,6 +37,7 @@ type RoleSteps = {
   dj: string[];
   mc: string[];
   vocalist: string[];
+  client: string[];
   default: string[];
 };
 
@@ -259,6 +260,7 @@ const ActionPage = () => {
   console.log(experience);
   console.log(talentbio);
   const [currentStep, setCurrentStep] = useState(0);
+  console.log(roles.client);
 
   // More Information Modal starts here
   const renderMoreInfoModal = () => {
@@ -266,6 +268,8 @@ const ActionPage = () => {
       instrumentalist: ["city", "instrument", "experience", "talentbio"],
       dj: ["city", "genre", "equipment", "experience", "talentbio"],
       mc: ["city", "type", "languages", "experience", "talentbio"],
+
+      client: ["organization", "talentbio"],
       vocalist: ["city", "vocalistgenre", "experience", "talentbio"],
       default: ["city", "talentbio"],
     };
@@ -307,7 +311,7 @@ const ActionPage = () => {
               <>
                 <input
                   type="text"
-                  placeholder="Your City"
+                  placeholder="Enter Your Organization/Company Name"
                   value={organization}
                   onChange={(e) => setOrganization(e.target.value)}
                   className="w-full p-2 rounded bg-gray-700 text-[12px] text-white"

@@ -25,6 +25,7 @@ export async function GET(request: NextRequest) {
       "totalSpent",
       "tier",
       "nextBillingDate",
+      "onboardingComplete",
     ]);
 
     if (!userdata) {

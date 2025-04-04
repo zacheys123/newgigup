@@ -81,9 +81,9 @@ export function MobileNav() {
   ];
 
   const links =
-    user?.isMusician && !user?.firstLogin
+    user?.isMusician && user?.firstLogin === false
       ? musicianLinks
-      : user?.isClient && !user?.firstLogin
+      : user?.isClient && user?.firstLogin === false
       ? clientLinks
       : [];
 

@@ -35,48 +35,55 @@ export function OnboardingModal() {
     try {
       await fetch("/api/user/onboarding", { method: "POST" });
       router.refresh();
+      setLoading(false);
     } catch (error) {
       console.error(error);
+      setLoading(false);
     }
   };
 
   return (
     <>
       {loading && <LoadingGame isLoading={loading} />}
-      {user?.firstLogin && !loading && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center">
-          <div className="bg-gray-800 rounded-xl p-6 max-w-md">
-            <h2 className="text-xl font-bold text-orange-400 mb-4">
-              Welcome to GigUp!
-            </h2>
-            <ul className="space-y-3 mb-6">
-              {(isMusician ? steps.musician : isClient ? steps.client : []).map(
-                (step, i) => (
+      {user?.firstLogin === true &&
+        user?.onboardingComplete === false &&
+        !loading && (
+          <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center">
+            <div className="bg-gray-800 rounded-xl p-6 max-w-md">
+              <h2 className="text-xl font-bold text-orange-400 mb-4">
+                Welcome to GigUp!
+              </h2>
+              <ul className="space-y-3 mb-6">
+                {(isMusician
+                  ? steps.musician
+                  : isClient
+                  ? steps.client
+                  : []
+                ).map((step, i) => (
                   <li key={i} className="flex items-center gap-3">
                     <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center">
                       {i + 1}
                     </div>
                     <span className="text-gray-200">{step}</span>
                   </li>
-                )
-              )}
-            </ul>
-            <button
-              onClick={markOnboardingComplete}
-              className="w-full py-2 bg-orange-600 rounded-lg hover:bg-orange-700"
-            >
-              {loading ? (
-                <CircularProgress
-                  size={24}
-                  className="animate-spin text-white"
-                />
-              ) : (
-                "Get Started"
-              )}
-            </button>
+                ))}
+              </ul>
+              <button
+                onClick={markOnboardingComplete}
+                className="w-full py-2 bg-orange-600 rounded-lg hover:bg-orange-700"
+              >
+                {loading ? (
+                  <CircularProgress
+                    size={24}
+                    className="animate-spin text-white"
+                  />
+                ) : (
+                  "Get Started"
+                )}
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
     </>
   );
 }

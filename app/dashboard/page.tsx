@@ -43,7 +43,7 @@ export default function Dashboard() {
     fetchData();
   }, [userId, isLoaded, router]);
 
-  console.log(data?.user?.firstLogin);
+  console.log(data?.user);
 
   if (!isLoaded || loading) {
     return (
@@ -89,8 +89,9 @@ export default function Dashboard() {
           </p>
         </div>
       )} */}
-
-      {data && data?.user?.firstLogin && <OnboardingModal />}
+      {data &&
+        data?.user?.firstLogin === true &&
+        data?.user?.onboardingComplete === false && <OnboardingModal />}
     </>
   );
 }

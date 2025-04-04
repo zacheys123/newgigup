@@ -38,7 +38,7 @@ const Actions = () => {
     ) {
       if (user?.isMusician || user?.isClient) {
         setStatus("registered");
-        if (user?.firstLogin === true) {
+        if (user?.firstLogin === true && user?.onboardingComplete === false) {
           router.push("/dashboard");
         }
       } else {
