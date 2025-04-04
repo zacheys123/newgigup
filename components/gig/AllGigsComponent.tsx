@@ -373,7 +373,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                   e.stopPropagation();
                   handleModal(gig);
                 }}
-                className="text-white hover:text-white p-1 transition-colors"
+                className="text-white hover:text-white p-1 transition-colors bg-neutral-600 rounded-full"
                 aria-label="More options"
               >
                 <PiDotsThreeVerticalBold size={16} />

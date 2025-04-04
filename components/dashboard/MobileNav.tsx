@@ -27,7 +27,7 @@ export function MobileNav() {
     },
     {
       name: "Gigs",
-      href: "/dashboard/gigs",
+      href: `/gigs/${userId}`,
       icon: <MusicIcon className="w-5 h-5" />,
     },
     {
@@ -56,7 +56,7 @@ export function MobileNav() {
     },
     {
       name: "Create ",
-      href: "/dashboard/create",
+      href: "/gigs/create",
       icon: <PlusIcon className="w-5 h-5" />,
     },
     {

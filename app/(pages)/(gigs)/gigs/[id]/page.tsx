@@ -1,15 +1,14 @@
 "use client";
+
 import AllGigsComponent from "@/components/gig/AllGigsComponent";
 import Gigheader from "@/components/gig/Gigheader";
 import Clockwise from "@/components/loaders/Clockwise";
-// import LoadingSpinner from "@/components/LoadingSpinner";
 import { useAllGigs } from "@/hooks/useAllGigs";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { GigProps } from "@/types/giginterface";
 import { searchfunc } from "@/utils/index";
 import { useAuth } from "@clerk/nextjs";
-
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 
 const GigsPage = () => {
   const { userId } = useAuth();
@@ -19,18 +18,18 @@ const GigsPage = () => {
   const [category, setCategory] = useState<string>("all");
   let gigQuery;
 
-  // const [loadingview, setLoadingView] = useState<boolean>();
-  // const [loadingPostId, setLoadingPostId] = useState<object | null>(null);
-  // const [loadingId, setLoadingId] = useState<boolean>();
+  const [location, setLocation] = useState<string>("all");
 
-  const [location, setLocation] = useState<string>(() =>
-    user?.city ? user?.city : "all"
-  );
+  useEffect(() => {
+    if (user?.city) {
+      setLocation(user.city);
+    }
+  }, [user]);
 
   return (
-    <div className="flex flex-col h-[calc(100vh-100px)] w-[90%] mx-auto my-2 shadow-md shadow-orange-300">
-      {/* Fixed Header */}
-      <div className="sticky top-0 z-10 bg-gray-900 shadow-md">
+    <div className="flex flex-col h-full w-[90%] mx-auto md:w-full my-2 md:shadow-lg md:shadow-orange-300/20 md:rounded-xl md:overflow-hidden">
+      {/* Enhanced Header */}
+      <div className="sticky top-0 z-10 bg-gray-900 shadow-md md:shadow-lg md:rounded-t-xl">
         <Gigheader
           typeOfGig={typeOfGig}
           setTypeOfGig={setTypeOfGig}
@@ -38,26 +37,30 @@ const GigsPage = () => {
           setCategory={setCategory}
           location={location}
           setLocation={setLocation}
+          myuser={user}
         />
       </div>
-      {/* Scrollable Gigs List */}
-      <div className="h-[85%] overflow-y-scroll bg-gray-900">
+
+      {/* Enhanced Gigs List */}
+      <div className="h-[85%] overflow-y-scroll bg-gray-900 md:bg-gradient-to-b md:from-gray-900 md:to-gray-950">
         {gigs?.length === 0 && (
-          <h1 className="text-white text-center font-bold py-5">
-            No gigs found
-          </h1>
+          <div className="flex flex-col items-center justify-center py-12">
+            <h1 className="text-white text-xl font-bold mb-4">No gigs found</h1>
+            <p className="text-gray-400 max-w-md text-center">
+              Try adjusting your filters or check back later for new
+              opportunities
+            </p>
+          </div>
         )}
         {!loading ? (
-          <div className="space-y-3 p-2 pb-[74px] pt-3">
+          <div className="space-y-3 p-2 pb-[74px] pt-3 md:space-y-4 md:p-4 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-4">
             {searchfunc(gigs, typeOfGig, category, gigQuery, location)
               ?.filter((gig: GigProps) => gig?.isTaken === false)
-              ?.map((gig: GigProps) => {
-                console.log(gig?.description);
-                return <AllGigsComponent key={gig?._id} gig={gig} />;
-              })}
+              ?.map((gig: GigProps) => (
+                <AllGigsComponent key={gig?._id} gig={gig} />
+              ))}
           </div>
         ) : (
-          // <LoadingSpinner />
           <div className="flex justify-center items-center h-full w-full">
             <Clockwise />
           </div>
@@ -66,5 +69,4 @@ const GigsPage = () => {
     </div>
   );
 };
-
 export default GigsPage;

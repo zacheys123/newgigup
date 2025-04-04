@@ -11,7 +11,7 @@ export function MusicianDashboard({
   earnings: number;
 }) {
   const { subscriptiondata: data } = useStore();
-
+  console.log(data);
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}

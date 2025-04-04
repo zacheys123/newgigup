@@ -41,6 +41,8 @@ export async function GET(request: NextRequest) {
         firstLogin: userdata.firstLogin,
         clerkId: userdata.clerkId,
         earnings: userdata.earnings,
+      },
+      subscription: {
         tier: userdata.tier,
         nextBillingDate: userdata.nextBillingDate,
         isPro:
