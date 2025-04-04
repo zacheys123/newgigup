@@ -124,6 +124,7 @@ const CreateGig = () => {
     gduration: false,
   });
 
+  console.log(user);
   // const minDate = new Date("2020-01-01");
   // const maxDate = new Date("2026-01-01");
 

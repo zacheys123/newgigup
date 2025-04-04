@@ -67,6 +67,7 @@ export const initialState = {
     vocalistGenre: "",
     musicianhandles: [{ platform: "", handle: "" }],
     musiciangenres: [],
+    firstLogin: false,
   },
   currentgig: {
     _id: "",
