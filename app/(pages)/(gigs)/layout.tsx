@@ -25,7 +25,7 @@ export default function GigLayout({ children, editpage }: GigLayoutProps) {
       <div className="flex-1 flex flex-col md:ml-[150px] lg:ml-[200px] w-full transition-all duration-300">
         {editpage}
         <main className="flex-1 overflow-auto pb-16 md:pb-0 w-full">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
             {children}
           </div>
         </main>

@@ -7,6 +7,7 @@ import { CircularProgress } from "@mui/material";
 import { useRouter } from "next/navigation";
 import "@/components/loaders/word.css";
 import React, { useCallback, useEffect, useState, useRef } from "react";
+import useStore from "@/app/zustand/useStore";
 
 const Authenticate = () => {
   const [firstloader, setfirstloader] = useState<boolean>(false);
@@ -15,6 +16,7 @@ const Authenticate = () => {
   const [fourthloader, setforthloader] = useState<boolean>(false);
   const [mainloader, setMainloader] = useState<boolean>(false);
   const router = useRouter();
+  const { currentUser: user } = useStore();
   const { isLoaded, userId } = useAuth();
   const LoadingPage = useCallback(() => {
     setfirstloader(true);
@@ -46,8 +48,10 @@ const Authenticate = () => {
                       setTimeout(() => {
                         // toast.success("Successfully logged in, Welcome!");
                         setMainloader(false);
-
-                        router.push(`/roles/${userId}`);
+                        if (!user?._id) {
+                          router.push(`/roles/${userId}`);
+                        }
+                        router.push("/");
                       }, 5000)
                     );
                   }, 4000)

@@ -14,6 +14,7 @@ const Actions = () => {
     "loading" | "unregistered" | "registered"
   >("loading");
 
+  console.log(user);
   useEffect(() => {
     // Only proceed when auth and user data are loaded
     if (!isAuthLoaded || loading) return;
@@ -29,7 +30,7 @@ const Actions = () => {
       setStatus("unregistered");
       return;
     }
-
+    console.log(user);
     // User has completed registration
     if (
       typeof user.isMusician === "boolean" &&

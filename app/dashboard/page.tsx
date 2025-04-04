@@ -48,7 +48,10 @@ export default function Dashboard() {
   if (!isLoaded || loading) {
     return (
       <div className="flex h-screen items-center justify-center bg-black">
-        <BallLoader />
+        <div className="flex flex-col items-center w-full ">
+          <BallLoader />
+          <span className="text-yellow-400 font-mono">Loading ...</span>
+        </div>
       </div>
     );
   }
