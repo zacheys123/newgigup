@@ -5,6 +5,9 @@ import { NextRequest, NextResponse } from "next/server";
 // app/api/user/onboarding/route.ts
 export async function POST(req: NextRequest) {
   const { userId } = getAuth(req);
-  await User.updateOne({ clerkId: userId }, { $set: { firstLogin: false } });
+  await User.updateOne(
+    { clerkId: userId },
+    { $set: { firstLogin: false, onboardingComplete: true } }
+  );
   return NextResponse.json({ success: true });
 }

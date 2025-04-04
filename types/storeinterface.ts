@@ -10,12 +10,13 @@ export const initialState = {
     user: {
       isClient: false,
       isMusician: false,
-      firstLogin: false,
+      firstLogin: true,
       clerkId: "",
       gigsBooked: 0, // Add this
       earnings: 0, // Add this
       gigsPosted: 0,
       total: 0,
+      onboardingComplete: false,
     },
     subscription: {
       tier: "",
@@ -67,7 +68,8 @@ export const initialState = {
     vocalistGenre: "",
     musicianhandles: [{ platform: "", handle: "" }],
     musiciangenres: [],
-    firstLogin: false,
+    firstLogin: true,
+    onboardingComplete: false,
   },
   currentgig: {
     _id: "",

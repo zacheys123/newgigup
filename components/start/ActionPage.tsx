@@ -169,6 +169,7 @@ const ActionPage = () => {
               totalSpent: 0,
               firstLogin: true,
               organization,
+              onboardingComplete: false,
             }),
           }),
         });

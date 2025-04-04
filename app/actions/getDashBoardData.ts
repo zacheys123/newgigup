@@ -24,6 +24,7 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
       "totalSpent",
       "tier",
       "nextBillingDate",
+      "onboardingComplete",
     ]);
 
     console.log("User found:", user);
@@ -42,6 +43,7 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
         gigsBooked: user?.monthlyGigsBooked,
         gigsPosted: user?.monthlyGigsPosted,
         total: user?.totalSpent,
+        onboardingComplete: user?.onboardingComplete,
       },
       subscription: {
         isPro:

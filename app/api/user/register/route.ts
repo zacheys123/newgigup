@@ -43,6 +43,7 @@ interface UserInput {
   isMusician: boolean;
   earnings: number; //
   organization: string; //
+  onboardingComplete: boolean; //
 }
 
 export async function POST(req: NextRequest) {
@@ -92,6 +93,7 @@ export async function POST(req: NextRequest) {
         totalSpent: body.totalSpent,
         earnings: body.earnings, //
         organization: body.organization, //
+        onboardingComplete: body.onboardingComplete, //
       },
       { upsert: true, new: true }
     );

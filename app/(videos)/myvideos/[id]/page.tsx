@@ -61,7 +61,8 @@ const VideoProfile = () => {
             vocalistGenre: "",
             musicianhandles: [{ platform: "", handle: "" }],
             musiciangenres: [],
-            firstLogin: false,
+            firstLogin: true,
+            onboardingComplete: false,
           });
         }
       } finally {

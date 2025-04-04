@@ -42,7 +42,8 @@ export const postedBy = {
   vocalistGenre: "",
   musicianhandles: [{ platform: "", handle: "" }],
   musiciangenres: [],
-  firstLogin: false,
+  firstLogin: true,
+  onboardingComplete: false,
 };
 
 export const instruments = [

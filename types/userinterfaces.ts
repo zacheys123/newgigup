@@ -70,6 +70,7 @@ export interface UserProps {
   musicianhandles: { platform: string; handle: string }[]; // Changed to array
   musiciangenres: string[];
   firstLogin: boolean;
+  onboardingComplete: boolean;
 }
 export interface Users {
   users: UserProps[]; // Optional}

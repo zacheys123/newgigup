@@ -79,6 +79,8 @@ const ClientSearchComponent = () => {
             vocalistGenre: "",
             musiciangenres: [],
             musicianhandles: [{ platform: "", handle: "" }],
+            firstLogin: true,
+            onboardingComplete: false,
           });
         }
       } finally {

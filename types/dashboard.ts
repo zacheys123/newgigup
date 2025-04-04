@@ -7,6 +7,7 @@ export type UserData = {
   earnings?: number; // Add this
   gigsPosted: number; // Add this
   total: number;
+  onboardingComplete: boolean;
 };
 
 export type SubscriptionData = {
