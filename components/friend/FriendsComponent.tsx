@@ -81,6 +81,8 @@ const FriendsComponent = () => {
             vocalistGenre: "",
             musicianhandles: [{ platform: "", handle: "" }],
             musiciangenres: [],
+            firstLogin: true,
+            onboardingComplete: false,
           });
         }
       } finally {
