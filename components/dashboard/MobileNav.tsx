@@ -5,6 +5,7 @@ import {
   CalendarIcon,
   CreditCardIcon,
   DollarSignIcon,
+  HomeIcon,
   MusicIcon,
   PlusIcon,
   UsersIcon,
@@ -80,12 +81,31 @@ export function MobileNav() {
     },
   ];
 
-  const links =
+  const baseLinks = [
+    {
+      name: "Home",
+      href: "/",
+      icon: <HomeIcon className="w-5 h-5" />,
+      exact: true,
+    },
+  ];
+
+  const roleLinks =
     user?.isMusician && user?.firstLogin === false
       ? musicianLinks
       : user?.isClient && user?.firstLogin === false
       ? clientLinks
       : [];
+
+  // Filter out the current route's link
+  const filteredLinks = roleLinks.filter((link) => {
+    if (link.exact) {
+      return pathname !== link.href;
+    }
+    return !pathname.startsWith(link.href);
+  });
+
+  const allLinks = [...baseLinks, ...filteredLinks];
 
   const isActive = (href: string, exact: boolean = false) => {
     if (exact) {
@@ -137,8 +157,8 @@ export function MobileNav() {
                 className="absolute bottom-full left-0 right-0 mb-2 px-4"
               >
                 <div className="bg-white rounded-xl shadow-lg p-2">
-                  <div className="grid grid-cols-6  mx-2 last:-mr-5">
-                    {links.map((link, index) => {
+                  <div className="grid grid-cols-6 mx-2 last:-mr-5">
+                    {allLinks.map((link, index) => {
                       const active = isActive(link.href, link.exact);
                       return (
                         <motion.div
@@ -227,10 +247,6 @@ export function MobileNav() {
           {/* Main Trigger Button - Centered with white background */}
           <div className="absolute left-1/2 bottom-0 transform -translate-x-1/2 z-50 flex justify-center w-full">
             <div className="relative">
-              {/* White background circle that matches the nav bar */}
-              {/* <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-14 h-14 rounded-full bg-white"></div> */}
-
-              {/* Plus button */}
               <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="relative flex items-center justify-center w-14 h-14 rounded-full bg-primary text-white shadow-lg hover:bg-primary/90 transition-all z-10"
