@@ -47,7 +47,7 @@ const Authenticate = () => {
                         // toast.success("Successfully logged in, Welcome!");
                         setMainloader(false);
 
-                        router.push(`/`);
+                        router.push(`/roles/${userId}`);
                       }, 5000)
                     );
                   }, 4000)

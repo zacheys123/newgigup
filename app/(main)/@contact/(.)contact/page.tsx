@@ -24,7 +24,7 @@ const ContactPage = () => {
       >
         <DialogContent className="border-0 ">
           <DialogHeader>
-            <DialogTitle style={{ color: "lightgray" }}>Reviews</DialogTitle>
+            <DialogTitle style={{ color: "lightgray" }}>Email Us</DialogTitle>
           </DialogHeader>
           <EmailForm handleClose={handleClose} />
         </DialogContent>

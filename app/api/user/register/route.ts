@@ -38,6 +38,11 @@ interface UserInput {
   monthlyMessages: number; //
   monthlyGigsBooked: number; //
   firstLogin: boolean; // Add this flag
+  totalSpent: number;
+  isClient: boolean;
+  isMusician: boolean;
+  earnings: number; //
+  organization: string; //
 }
 
 export async function POST(req: NextRequest) {
@@ -84,6 +89,9 @@ export async function POST(req: NextRequest) {
         monthlyMessages: body.monthlyMessages,
         monthlyGigsBooked: body.monthlyGigsBooked,
         firstLogin: body.firstLogin,
+        totalSpent: body.totalSpent,
+        earnings: body.earnings, //
+        organization: body.organization, //
       },
       { upsert: true, new: true }
     );

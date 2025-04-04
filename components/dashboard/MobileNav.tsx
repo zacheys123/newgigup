@@ -1,6 +1,6 @@
 "use client";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth, UserButton } from "@clerk/nextjs";
 import {
   CalendarIcon,
   CreditCardIcon,
@@ -55,17 +55,17 @@ export function MobileNav() {
       exact: true,
     },
     {
-      name: "Post",
+      name: "Create ",
       href: "/dashboard/create",
       icon: <PlusIcon className="w-5 h-5" />,
     },
     {
-      name: "Events",
-      href: "/dashboard/events",
+      name: "Gigs",
+      href: "/dashboard/gigs",
       icon: <CalendarIcon className="w-5 h-5" />,
     },
     {
-      name: "Artists",
+      name: "Talent",
       href: "/dashboard/artists",
       icon: <UsersIcon className="w-5 h-5" />,
     },
@@ -76,7 +76,11 @@ export function MobileNav() {
     },
   ];
 
-  const links = user?.isMusician ? musicianLinks : clientLinks;
+  const links = user?.isMusician
+    ? musicianLinks
+    : user?.isClient
+    ? clientLinks
+    : [];
 
   // Improved active link detection
   const isActive = (href: string, exact: boolean = false) => {
@@ -103,7 +107,7 @@ export function MobileNav() {
                 ${
                   active
                     ? "text-primary"
-                    : "text-muted-foreground hover:text-primary"
+                    : "text-blue-700 font-bold hover:text-primary"
                 }
                 group
               `}
@@ -131,6 +135,7 @@ export function MobileNav() {
             </Link>
           );
         })}
+        <UserButton />
       </nav>
     </div>
   );

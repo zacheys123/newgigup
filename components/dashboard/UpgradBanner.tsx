@@ -18,7 +18,7 @@ export function UpgradeBanner({ className }: UpgradeBannerProps) {
         <div>
           <h3 className="font-medium text-white">Unlock Pro Tier</h3>
           <p className="text-sm text-orange-200 mt-1">
-            Get unlimited gigs, featured listings, and analytics.
+            Create unlimited gigs, featured listings, and analytics.
           </p>
         </div>
         <Link

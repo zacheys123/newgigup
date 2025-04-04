@@ -270,12 +270,12 @@ input[type="radio"] {
 .cl-card .cl-card,
 .cl-signIn-start,
 .cl-signUp-start {
-  width: 19rem;
+  width: 100%;
   height: 40rem;
 }
 .cl-card .cl-card,
 .cl-signUp-start {
-  width: 20rem;
+  width: 100%;
   height: 60rem;
 }
 .cl-headerTitle {

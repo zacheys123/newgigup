@@ -53,12 +53,6 @@ const EmailForm: React.FC<EmailFormProps> = ({ handleClose }) => {
   return (
     <div className=" relative max-w-md mx-auto p-6 bg-white shadow rounded">
       {" "}
-      <span
-        className="flex justify-end right-3 top-5 font-bold text-[20px]"
-        onClick={handleClose}
-      >
-        &times;
-      </span>
       <h2 className="text-2xl font-bold mb-4">Contact Us</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">

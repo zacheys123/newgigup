@@ -14,21 +14,40 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "User ID required" }, { status: 400 });
     }
 
-    const user = await User.findOne({ clerkId }).select([
+    const userdata = await User.findOne({ clerkId }).select([
+      "isClient",
+      "isMusician",
+      "firstLogin",
+      "clerkId",
+      "earnings",
+      "monthlyGigsBooked",
+      "monthlyGigsPosted",
+      "totalSpent",
       "tier",
       "nextBillingDate",
     ]);
 
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    if (!userdata) {
+      return NextResponse.json(
+        { error: "Userdata not found" },
+        { status: 404 }
+      );
     }
-    console.log("tier", user?.tier);
+    console.log("tier", userdata?.tier);
     return NextResponse.json({
-      tier: user.tier,
-      nextBillingDate: user.nextBillingDate,
-      isPro:
-        user.tier === "pro" &&
-        (!user.nextBillingDate || new Date(user.nextBillingDate) > new Date()),
+      user: {
+        isClient: userdata.isClient,
+        isMusician: userdata.isMusician,
+        firstLogin: userdata.firstLogin,
+        clerkId: userdata.clerkId,
+        earnings: userdata.earnings,
+        tier: userdata.tier,
+        nextBillingDate: userdata.nextBillingDate,
+        isPro:
+          userdata.tier === "pro" &&
+          (!userdata.nextBillingDate ||
+            new Date(userdata.nextBillingDate) > new Date()),
+      },
     });
   } catch (error) {
     console.error("Failed to fetch subscription:", error);

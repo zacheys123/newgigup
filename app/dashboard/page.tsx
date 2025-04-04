@@ -5,7 +5,6 @@ import BallLoader from "@/components/loaders/BallLoader";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getDashboardData } from "../actions/getDashBoardData";
 import { ClientDashboard } from "@/components/dashboard/client";
 import { MusicianDashboard } from "@/components/dashboard/muscian";
 import useStore from "../zustand/useStore";
@@ -28,12 +27,11 @@ export default function Dashboard() {
         }
 
         setLoading(true);
-        // const result = await fetch(
-        //   `/api/subscription?clerkId=${userId}`
-        // );
-        // const mydata = await result.json();
-        const result = await getDashboardData(userId);
-        setData(result);
+        const result = await fetch(`/api/user/subscription?clerkId=${userId}`);
+        const mydata = await result.json();
+        // const result = await getDashboardData(userId);
+        console.log(mydata);
+        setData(mydata);
       } catch (err) {
         console.error("Failed to load dashboard:", err);
         setError("Failed to load dashboard data");
@@ -44,6 +42,8 @@ export default function Dashboard() {
 
     fetchData();
   }, [userId, isLoaded, router]);
+
+  console.log(data?.user?.isMusician);
 
   if (!isLoaded || loading) {
     return (
@@ -67,17 +67,17 @@ export default function Dashboard() {
 
   return (
     <>
-      {data.user.isMusician ? (
+      {data?.user?.isMusician === true ? (
         <MusicianDashboard
-          gigsBooked={data.user.gigsBooked ?? 0}
-          earnings={data.user.earnings ?? 0}
+          gigsBooked={data?.user?.gigsBooked ?? 0}
+          earnings={data?.user?.earnings ?? 0}
         />
-      ) : (
+      ) : data?.user?.isClient === true ? (
         <ClientDashboard
-          gigsPosted={data.user.gigsPosted}
-          total={data.user.total}
+          gigsPosted={data?.user?.gigsPosted}
+          total={data?.user?.total}
         />
-      )}
+      ) : null}
 
       {/* {!data.subscription.isPro && (
         <div className="mb-6 bg-gradient-to-r from-orange-900/50 to-amber-900/30 p-4 rounded-lg">
@@ -87,7 +87,7 @@ export default function Dashboard() {
         </div>
       )} */}
 
-      {data.user.firstLogin && <OnboardingModal />}
+      {data?.user?.firstLogin === false && <OnboardingModal />}
     </>
   );
 }

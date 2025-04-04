@@ -4,15 +4,15 @@ import { UpgradeBanner } from "./UpgradBanner";
 import { UsageMeter } from "./UsageMeter";
 import { Calendar, DollarSign, Music } from "lucide-react";
 
-export async function ClientDashboard({
-  gigsPosted,
-  total,
-}: {
-  gigsPosted: number;
-  total: number;
-}) {
-  //   const { activeGigs, totalSpent } = await getClientStats(userId);
-  console.log(gigsPosted, total);
+interface ClientDashboardProps {
+  gigsPosted?: number; // Make props optional
+  total?: number;
+}
+
+export function ClientDashboard({
+  gigsPosted = 0,
+  total = 0,
+}: ClientDashboardProps) {
   return (
     <div className="space-y-8">
       <UpgradeBanner />
@@ -37,13 +37,13 @@ export async function ClientDashboard({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <RoleStatusCard
           title="Active Gigs"
-          value={20}
+          value={gigsPosted} // Use the prop here
           icon={<Music className="text-purple-400" />}
           trend="up"
         />
         <RoleStatusCard
           title="Total Spent"
-          value={20000}
+          value={total} // Use the prop here
           format="currency"
           icon={<DollarSign className="text-green-400" />}
           trend="steady"
@@ -55,9 +55,6 @@ export async function ClientDashboard({
           trend="down"
         />
       </div>
-
-      {/* Additional sections can be added here */}
-      {/* <UpcomingBookings userId={userId} /> */}
     </div>
   );
 }

@@ -1,17 +1,18 @@
-// ... existing imports
-
 import connectDb from "@/lib/connectDb";
 import User from "@/models/user";
 import { DashboardData } from "@/types/dashboard";
 
 export async function getDashboardData(userId: string): Promise<DashboardData> {
   try {
+    console.log("Connecting to DB...");
     await connectDb();
+    console.log("DB connected");
 
     if (!userId) {
       throw new Error("Unauthorized");
     }
 
+    console.log("Looking for user with clerkId:", userId);
     const user = await User.findOne({ clerkId: userId }).select([
       "isClient",
       "isMusician",
@@ -24,6 +25,8 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
       "tier",
       "nextBillingDate",
     ]);
+
+    console.log("User found:", user);
 
     if (!user) {
       throw new Error("User not found");
@@ -50,7 +53,7 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
       },
     };
   } catch (error) {
-    console.error("Failed to fetch dashboard data:", error);
+    console.error("Full error in getDashboardData:", error);
     throw error;
   }
 }
