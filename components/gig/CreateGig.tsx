@@ -8,8 +8,6 @@ import React, {
   useEffect,
 } from "react";
 import { Button } from "../ui/button";
-// import DatePicker from "react-datepicker";
-// import "react-datepicker/dist/react-datepicker.css";
 import { Box, CircularProgress } from "@mui/material";
 import {
   ArrowDown,
@@ -21,7 +19,6 @@ import {
   InfoIcon,
   Timer,
 } from "lucide-react";
-
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAuth } from "@clerk/nextjs";
 import { toast } from "sonner";
@@ -30,12 +27,11 @@ import { fileupload } from "@/hooks/fileUpload";
 import useStore from "@/app/zustand/useStore";
 import { FaComment } from "react-icons/fa";
 import { days } from "@/data";
-// import useStore from "@/app/zustand/useStore";
-// import { useAuth } from "@clerk/nextjs";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { motion } from "framer-motion";
 import { fonts } from "@/utils";
+
 interface GigInputs {
   title: string;
   description: string;
@@ -54,6 +50,7 @@ interface GigInputs {
   day: string;
   date: string;
 }
+
 interface CustomProps {
   fontColor: string;
   font: string;
@@ -70,13 +67,11 @@ const CreateGig = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [secretpass, setSecretPass] = useState<boolean>(false);
   const [showcustomization, setShowCustomization] = useState<boolean>(false);
-
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [imageUrl, setUrl] = useState<string>("");
   const [fileUrl, setFileUrl] = useState<string>("");
   const { setRefetchData } = useStore();
   const { user } = useCurrentUser(userId || null);
-
   const [gigcustom, setGigCustom] = useState<CustomProps>({
     fontColor: "",
     font: "",
@@ -105,33 +100,26 @@ const CreateGig = () => {
     prefferences: [],
   });
   const [bussinesscat, setBussinessCategory] = useState<bussinesscat>("");
-  // const [errors, setErrors] = useState<string[]>([]);
-  // const [success, setSuccess] = useState<boolean>(false);
   const [showduration, setshowduration] = useState<boolean>(false);
   const [showCategories, setshowCategories] = useState<{
     title: boolean;
     description: boolean;
     business: boolean;
     gtimeline: boolean;
-    gduration: boolean;
     othergig: boolean;
+    gduration: boolean;
   }>({
     title: false,
     description: false,
     business: false,
     gtimeline: false,
-    othergig: false,
+    othergig: true,
     gduration: false,
   });
-
-  console.log(user);
-  // const minDate = new Date("2020-01-01");
-  // const maxDate = new Date("2026-01-01");
-
-  // const handleDate = (date: Date | null) => {
-  //   setSelectedDate(date);
-  // };
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null); // Changed to useState
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [editMessage, setEditMessage] = useState("");
+  const [error, setError] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   const minDate = new Date("2020-01-01");
   const maxDate = new Date("2026-01-01");
@@ -145,15 +133,10 @@ const CreateGig = () => {
       }));
     }
   };
-  const [editMessage, setEditMessage] = useState("");
-  const [error, setError] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
 
-  // handle the image upload to cloudinary
   const handleFileChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const dep = "image";
-      // Check if the file is a video
       const allowedTypes = [
         "image/png",
         "image/jpeg",
@@ -164,18 +147,16 @@ const CreateGig = () => {
       fileupload(
         event,
         (file: string) => {
-          // Ensure the file is a valid string before updating state
           if (file) {
-            setUrl(file); // setUrl expects a string, ensure it's not undefined
+            setUrl(file);
           }
         },
         toast,
         allowedTypes,
         fileUrl,
         (file: string | undefined) => {
-          // Handle fileUrl, only set if it's a valid string (not undefined)
           if (file) {
-            setFileUrl(file); // setFileUrl expects a string, ensure it's not undefined
+            setFileUrl(file);
           }
         },
         setIsUploading,
@@ -183,12 +164,9 @@ const CreateGig = () => {
         user,
         setRefetchData
       );
-      console.log(imageUrl);
     },
     [fileUrl]
   );
-
-  //
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -199,11 +177,11 @@ const CreateGig = () => {
       [name]: value,
     }));
   };
+
   const handleBussinessChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setBussinessCategory(e.target.value);
   };
 
-  // only used when you choose other
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = e.target;
     setUserInfo((prev) => ({
@@ -212,11 +190,9 @@ const CreateGig = () => {
         : prev.prefferences.filter((item) => item !== value),
     }));
   };
-  //
-  // submit your gig
+
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     try {
       setIsLoading(true);
       const res = await fetch(`/api/gigs/create`, {
@@ -248,7 +224,6 @@ const CreateGig = () => {
         }),
       });
       const data = await res.json();
-      console.log(data);
       if (data.gigstatus === "true") {
         setEditMessage(data.message);
         setError(false);
@@ -285,25 +260,25 @@ const CreateGig = () => {
       setIsLoading(false);
     }
   };
+
   useEffect(() => {
     let timer: NodeJS.Timeout;
-
     if (editMessage && isVisible) {
       timer = setTimeout(() => {
         setIsVisible(false);
         setEditMessage("");
-      }, 4500); // Hide after 4.5 seconds
+      }, 4500);
     }
-
     return () => {
       if (timer) clearTimeout(timer);
     };
   }, [editMessage, isVisible]);
+
   return (
-    <div>
+    <div className="relative">
       <form
         onSubmit={onSubmit}
-        className="h-[100vh] bg-gray-900 px-4 py-6 overflow-y-auto w-full" // Ensure overflow-y-auto is here
+        className="min-h-screen bg-gray-900 px-4 py-6 w-full md:max-w-2xl lg:max-w-3xl mx-auto"
       >
         {isVisible && editMessage && (
           <motion.div
@@ -318,11 +293,11 @@ const CreateGig = () => {
               y: 0,
               transition: { duration: 0.9 },
             }}
-            className="absolute top-10 p-4 rounded-md left-0 right-0 h-fit w-[80%] mx-auto z-9999 flex justify-center items-center bg-zinc-800 shadow-md shadow-orange-200 "
+            className="fixed top-10 p-4 rounded-md left-0 right-0 h-fit w-[90%] md:w-[80%] mx-auto z-50 flex justify-center items-center bg-zinc-800 shadow-md shadow-orange-200"
           >
             <span
-              className={`flex justify-center  ${
-                error ? "text-red-300 " : "text-green-300"
+              className={`flex justify-center ${
+                error ? "text-red-300" : "text-green-300"
               }`}
               style={{
                 fontFamily: fonts[20],
@@ -332,19 +307,19 @@ const CreateGig = () => {
             </span>
           </motion.div>
         )}
-        <div className="h-[100vh] overflow-y-auto">
-          <h6 className="text-gray-100 font-sans text-center text-lg font-semibold mb-6">
+        <div className="space-y-6">
+          <h6 className="text-gray-100 font-sans text-center text-lg font-semibold">
             Enter info to create a gig
           </h6>
-          <div className="flex w-full justify-between items-center mb-6">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
             <select
               onChange={handleBussinessChange}
               name="durationfrom"
               value={bussinesscat ? bussinesscat : ""}
-              className="w-[163px] bg-gray-700 text-gray-100 h-[40px] rounded-lg text-[12px] px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+              className="w-full md:w-[200px] bg-gray-700 text-gray-100 h-[40px] rounded-lg text-sm px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
             >
-              <option value="" className="bg-gray-700 ">
-                Who do you want ?
+              <option value="" className="bg-gray-700">
+                Who do you want?
               </option>
               <option value="full">Full Band</option>
               <option value="personal">Individual</option>
@@ -354,9 +329,9 @@ const CreateGig = () => {
             </select>
             <div
               onClick={() => setShowCustomization(true)}
-              className="cursor-pointer"
+              className="cursor-pointer w-full md:w-auto"
             >
-              <h1 className="text-sm text-gray-100 bg-gradient-to-r from-blue-500 to-purple-600 py-2 px-4 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all ml-3">
+              <h1 className="text-sm text-gray-100 bg-gradient-to-r from-blue-500 to-purple-600 py-2 px-4 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all text-center">
                 Customize your Gig Card
               </h1>
             </div>
@@ -464,7 +439,6 @@ const CreateGig = () => {
             </div>
             {showCategories.business && (
               <div className="flex flex-col gap-4 w-full">
-                {" "}
                 <input
                   autoComplete="off"
                   type="text"
@@ -502,8 +476,7 @@ const CreateGig = () => {
               <Timer size="20" className="text-gray-400" />
             </div>
             {showCategories.gtimeline && (
-              <div className="grid grid-cols-2 gap-4 w-full">
-                {" "}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
                 <input
                   autoComplete="off"
                   type="text"
@@ -512,12 +485,12 @@ const CreateGig = () => {
                   onChange={handleInputChange}
                   name="location"
                   value={gigInputs?.location}
-                />{" "}
+                />
                 <select
-                  onChange={handleInputChange} // Use the form's handleInputChange
-                  name="gigtimeline" // Add this name attribute
-                  value={gigInputs.gigtimeline} // Bind to form state
-                  className="w-[150px] bg-gray-300 text-gray-800 h-[40px] rounded-lg text-xs px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  onChange={handleInputChange}
+                  name="gigtimeline"
+                  value={gigInputs.gigtimeline}
+                  className="w-full bg-gray-300 text-gray-800 h-[40px] rounded-lg text-xs px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value=""> Gig Timeline </option>
                   <option value="once">
@@ -527,7 +500,7 @@ const CreateGig = () => {
                   <option value="other">Other...</option>
                 </select>
                 {gigInputs?.gigtimeline === "other" && (
-                  <div className="w-full flex justify-center items-center">
+                  <div className="w-full flex justify-center items-center sm:col-span-2">
                     <input
                       autoComplete="off"
                       type="text"
@@ -541,21 +514,8 @@ const CreateGig = () => {
                     />
                   </div>
                 )}
-                {/* {gigTimeline === "other" && (
-                  <select
-                    className="w-1/3 p-2 rounded-md bg-gray-300 text-gray-800 border-none focus:ring-0 text-[10px]"
-                    value={gigInputs?.day}
-                    onChange={handleInputChange}
-                  >
-                    {daysOfWeek.map((i) => (
-                      <option key={i} value={i.toString()}>
-                        {i}
-                      </option>
-                    ))}
-                  </select>
-                )} */}
                 <select
-                  className="w-[150px] p-2 rounded-md bg-gray-300 text-gray-800 border-none focus:ring-0 text-[10px]"
+                  className="w-full p-2 rounded-md bg-gray-300 text-gray-800 border-none focus:ring-0 text-xs"
                   value={gigInputs?.day}
                   onChange={handleInputChange}
                   name="day"
@@ -565,7 +525,7 @@ const CreateGig = () => {
                       {i?.name}
                     </option>
                   ))}
-                </select>{" "}
+                </select>
                 {gigInputs?.gigtimeline === "once" && (
                   <DatePicker
                     selected={selectedDate}
@@ -627,7 +587,7 @@ const CreateGig = () => {
             {!showCategories?.othergig && (
               <>
                 {bussinesscat === "other" && (
-                  <div className="grid grid-cols-3 gap-1 bg-gray-300 p-4 rounded-lg px-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 bg-gray-300 p-4 rounded-lg">
                     {[
                       "vocalist",
                       "piano",
@@ -654,7 +614,7 @@ const CreateGig = () => {
                       </div>
                     ))}
                   </div>
-                )}{" "}
+                )}
               </>
             )}
             {showduration ? (
@@ -666,13 +626,13 @@ const CreateGig = () => {
                   &times;
                 </div>
                 <Box className="space-y-4">
-                  <div className="flex items-center gap-4">
+                  <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
                     <h6 className="text-gray-100 text-sm w-[50px]">From:</h6>
                     <input
                       autoComplete="off"
                       type="text"
                       placeholder="Time (e.g., 10 means 10:00)"
-                      className="w-[120px] bg-gray-200 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full sm:w-[120px] bg-gray-200 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       onChange={handleInputChange}
                       name="start"
                       value={gigInputs?.start}
@@ -681,19 +641,19 @@ const CreateGig = () => {
                       onChange={handleInputChange}
                       name="durationfrom"
                       value={gigInputs?.durationfrom}
-                      className="w-[60px] bg-gray-200 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full sm:w-[60px] bg-gray-200 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="pm">PM</option>
                       <option value="am">AM</option>
                     </select>
                   </div>
-                  <div className="flex items-center gap-4">
+                  <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
                     <h6 className="text-gray-100 text-sm w-[50px]">To:</h6>
                     <input
                       autoComplete="off"
                       type="text"
                       placeholder="Time (e.g., 10 means 10:00)"
-                      className="w-[120px] bg-gray-200 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full sm:w-[120px] bg-gray-200 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       onChange={handleInputChange}
                       name="end"
                       value={gigInputs?.end}
@@ -702,7 +662,7 @@ const CreateGig = () => {
                       onChange={handleInputChange}
                       name="durationto"
                       value={gigInputs?.durationto}
-                      className="w-[60px] bg-gray-300 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full sm:w-[60px] bg-gray-300 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="pm">PM</option>
                       <option value="am">AM</option>
@@ -723,7 +683,7 @@ const CreateGig = () => {
               <Button
                 variant="destructive"
                 type="submit"
-                className="w-[60%] h-[40px] text-sm font-semibold bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transition-all"
+                className="w-full sm:w-[60%] h-[40px] text-sm font-semibold bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transition-all"
                 disabled={isLoading}
               >
                 {!isLoading ? (

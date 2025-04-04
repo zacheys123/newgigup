@@ -50,8 +50,9 @@ const Authenticate = () => {
                         setMainloader(false);
                         if (!user?._id) {
                           router.push(`/roles/${userId}`);
+                        } else {
+                          router.push("/");
                         }
-                        router.push("/");
                       }, 5000)
                     );
                   }, 4000)
