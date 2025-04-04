@@ -37,7 +37,12 @@ const Actions = () => {
     ) {
       if (user?.isMusician || user?.isClient) {
         setStatus("registered");
-        router.push("/dashboard");
+        if (user?.firstLogin === true) {
+          router.push("/dashboard");
+        }
+      } else {
+        router.push("/");
+
         return;
       }
     }

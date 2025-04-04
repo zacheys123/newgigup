@@ -69,6 +69,7 @@ export interface UserProps {
   vocalistGenre: string;
   musicianhandles: { platform: string; handle: string }[]; // Changed to array
   musiciangenres: string[];
+  firstLogin: boolean;
 }
 export interface Users {
   users: UserProps[]; // Optional}

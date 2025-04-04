@@ -43,7 +43,7 @@ export default function Dashboard() {
     fetchData();
   }, [userId, isLoaded, router]);
 
-  console.log(data?.user?.isMusician);
+  console.log(data?.user?.firstLogin);
 
   if (!isLoaded || loading) {
     return (
@@ -87,7 +87,7 @@ export default function Dashboard() {
         </div>
       )} */}
 
-      {data?.user?.firstLogin === false && <OnboardingModal />}
+      {data && data?.user?.firstLogin && <OnboardingModal />}
     </>
   );
 }

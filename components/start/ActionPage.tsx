@@ -37,7 +37,6 @@ type RoleSteps = {
   dj: string[];
   mc: string[];
   vocalist: string[];
-  client: string[];
   default: string[];
 };
 
@@ -92,15 +91,13 @@ const ActionPage = () => {
     if (!experience) errors.push("Experience is required");
     if (roleType === "dj" && (!djGenre || !djEquipment))
       errors.push("DjGenre or Equipment is required");
-    if (
-      roleType === "vocalist" &&
-      (!vocalistGenre || !experience || !talentbio)
-    )
-      errors.push("Genre or Experience and bio is required");
+    if (roleType === "vocalist" && !vocalistGenre)
+      errors.push("Genre is required");
+    if (roleType === "vocalist" && !experience)
+      errors.push(" Experience  is required");
+    if (roleType === "vocalist" && !talentbio) errors.push(" bio is required");
     if (roleType === "mc" && (!mcType || !mcLanguages))
       errors.push("MCType or Languages is required");
-    if (roleType === "client" && !organization)
-      errors.push("  Organization is required");
     if (talentbio.length > 200)
       errors.push("bio is too long (max 200 characters)");
     return errors;
@@ -115,14 +112,14 @@ const ActionPage = () => {
     mcLanguages,
     talentbio,
     vocalistGenre,
-    organization,
   ]);
 
   const validateClientFields = useCallback(() => {
     const errors: string[] = [];
     if (!city) errors.push("City is required");
+    if (!organization) errors.push("  Organization is required");
     return errors;
-  }, [city]);
+  }, [city, organization]);
 
   const registerUser = useCallback(
     async (isMusician: boolean) => {
@@ -170,7 +167,7 @@ const ActionPage = () => {
               monthlyGigsBooked: 0,
               earnings: 0,
               totalSpent: 0,
-              firstLogin: false,
+              firstLogin: true,
               organization,
             }),
           }),
@@ -257,16 +254,18 @@ const ActionPage = () => {
     [myuser]
   );
   console.log(roleType);
+  console.log(vocalistGenre);
+  console.log(experience);
+  console.log(talentbio);
   const [currentStep, setCurrentStep] = useState(0);
 
   // More Information Modal starts here
   const renderMoreInfoModal = () => {
     const roleSteps: RoleSteps = {
-      instrumentalist: ["city", "instrument", "experience"],
-      dj: ["city", "genre", "equipment", "experience"],
-      mc: ["city", "type", "languages", "experience"],
-      vocalist: ["city", "vocalistgenre", "experience"],
-      client: ["city", "organization"],
+      instrumentalist: ["city", "instrument", "experience", "talentbio"],
+      dj: ["city", "genre", "equipment", "experience", "talentbio"],
+      mc: ["city", "type", "languages", "experience", "talentbio"],
+      vocalist: ["city", "vocalistgenre", "experience", "talentbio"],
       default: ["city", "talentbio"],
     };
 
@@ -305,15 +304,13 @@ const ActionPage = () => {
             )}
             {roles.client && (
               <>
-                {steps[currentStep] === "organization" && (
-                  <input
-                    type="text"
-                    placeholder="Your City"
-                    value={organization}
-                    onChange={(e) => setOrganization(e.target.value)}
-                    className="w-full p-2 rounded bg-gray-700 text-[12px] text-white"
-                  />
-                )}
+                <input
+                  type="text"
+                  placeholder="Your City"
+                  value={organization}
+                  onChange={(e) => setOrganization(e.target.value)}
+                  className="w-full p-2 rounded bg-gray-700 text-[12px] text-white"
+                />
               </>
             )}
             {/* Role Type Selection */}
@@ -381,11 +378,11 @@ const ActionPage = () => {
                 className="w-full p-2 rounded bg-gray-700 text-[12px] text-white"
               >
                 <option value="">Select Genre</option>
-                <option value="hiphop">Jazz</option>
-                <option value="electronic">Neo Soul</option>
-                <option value="reggae">Mugithi</option>
+                <option value="jazz">Jazz</option>
+                <option value="neosoul">Neo Soul</option>
+                <option value="Mugithi">Mugithi</option>
                 <option value="afrobeats">Afrobeats</option>
-                <option value="openformat">Mix</option>
+                <option value="mix">Mix</option>
               </select>
             )}
 

@@ -2,12 +2,16 @@
 
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAuth } from "@clerk/nextjs";
+import { CircularProgress } from "@mui/material";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { LoadingGame } from "./LoadingGame";
 
 export function OnboardingModal() {
   const router = useRouter();
   const { userId } = useAuth();
   const { user } = useCurrentUser(userId || null);
+  const [loading, setLoading] = useState(false);
 
   // Determine the role based on isClient and isMusician booleans
   const isMusician = user?.isMusician || false;
@@ -27,13 +31,19 @@ export function OnboardingModal() {
   };
 
   const markOnboardingComplete = async () => {
-    await fetch("/api/user/onboarding", { method: "POST" });
-    router.refresh();
+    setLoading(true);
+    try {
+      await fetch("/api/user/onboarding", { method: "POST" });
+      router.refresh();
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
     <>
-      {user.firstLogin && (
+      {loading && <LoadingGame isLoading={loading} />}
+      {user?.firstLogin && !loading && (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center">
           <div className="bg-gray-800 rounded-xl p-6 max-w-md">
             <h2 className="text-xl font-bold text-orange-400 mb-4">
@@ -55,7 +65,14 @@ export function OnboardingModal() {
               onClick={markOnboardingComplete}
               className="w-full py-2 bg-orange-600 rounded-lg hover:bg-orange-700"
             >
-              Get Started
+              {loading ? (
+                <CircularProgress
+                  size={24}
+                  className="animate-spin text-white"
+                />
+              ) : (
+                "Get Started"
+              )}
             </button>
           </div>
         </div>
