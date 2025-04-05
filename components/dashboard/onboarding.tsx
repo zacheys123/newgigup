@@ -32,9 +32,11 @@ export function OnboardingModal() {
   const markOnboardingComplete = async () => {
     setLoading(true);
     try {
+      setTimeout(() => {
+        setLoading(false);
+        router.refresh();
+      }, 60000);
       await fetch("/api/user/onboarding", { method: "POST" });
-      router.refresh();
-      setLoading(false);
     } catch (error) {
       console.error(error);
       setLoading(false);
