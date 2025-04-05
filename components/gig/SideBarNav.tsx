@@ -19,7 +19,7 @@ import Image from "next/image";
 const SidebarNav = () => {
   const { userId } = useAuth();
   const pathname = usePathname();
-  const { user } = useCurrentUser(userId || "");
+  const { user } = useCurrentUser();
 
   const signOut = async () => {
     // get all cookies and remove

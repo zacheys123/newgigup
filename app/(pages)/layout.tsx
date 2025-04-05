@@ -2,7 +2,8 @@
 // import { useState } from "react";
 import MobileSheet from "@/components/pages/MobileSheet";
 import PagesNav from "@/components/pages/PagesNav";
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
+import { useEffect, useMemo } from "react";
 import { Toaster } from "sonner";
 // import { Box } from "@mui/material";
 // import { HiMenuAlt3 } from "react-icons/hi";
@@ -17,6 +18,43 @@ export default function GigLayout({
   //   setIsVisible(vis);
   // };
 
+  const { user } = useUser();
+  const transformedUser = useMemo(() => {
+    if (!user) return null;
+    return {
+      firstName: user.firstName ?? undefined,
+      lastName: user.lastName ?? undefined,
+      imageUrl: user.imageUrl ?? undefined,
+      username: user.username ?? undefined,
+      emailAddresses: user.emailAddresses,
+      phoneNumbers: user.phoneNumbers,
+    };
+  }, [user]);
+  useEffect(() => {
+    if (!user) return;
+
+    if (user) {
+      // Transform the user data as needed
+
+      // Send to your backend API
+      fetch("/api/user/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ transformedUser }),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            console.error("Failed to register user");
+          }
+          return response.json();
+        })
+        .catch((error) => {
+          console.error("Error registering user:", error);
+        });
+    }
+  }, [user]); // This effect runs when the user object changes
   return (
     <div className="inset-0 backdrop-blur-xl  bg-black  h-screen w-full overflow-hidden">
       {/* Subtle Fixed Action Button */}
