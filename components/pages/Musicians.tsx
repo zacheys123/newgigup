@@ -2,16 +2,14 @@
 import { useAllUsers } from "@/hooks/useAllUsers";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { UserProps } from "@/types/userinterfaces";
-import { useAuth } from "@clerk/nextjs";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React from "react";
 
 const Musicians = ({ _id }: UserProps) => {
-  const { userId } = useAuth();
   const { users: allusers, loading } = useAllUsers();
-  const { user } = useCurrentUser(userId || null);
+  const { user } = useCurrentUser();
   const router = useRouter();
   const NotCurrentUserOrClientIsmusucian = allusers?.users?.filter(
     (myuser: UserProps) =>

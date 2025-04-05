@@ -8,14 +8,13 @@ import { useAllGigs } from "@/hooks/useAllGigs";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { GigProps } from "@/types/giginterface";
 import { searchfunc } from "@/utils/index";
-import { useAuth } from "@clerk/nextjs";
+
 import { motion } from "framer-motion";
 import React, { useState } from "react";
 
 const BookedGigs = () => {
-  const { userId } = useAuth();
   const { loading, gigs } = useAllGigs();
-  const { user } = useCurrentUser(userId || null);
+  const { user } = useCurrentUser();
   const [typeOfGig, setTypeOfGig] = useState<string>("");
   const [category, setCategory] = useState<string>("all");
   const [location, setLocation] = useState<string>(() =>

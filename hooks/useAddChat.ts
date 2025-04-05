@@ -1,14 +1,13 @@
 import { UserProps } from "@/types/userinterfaces";
 import { useAllUsers } from "./useAllUsers";
 import { useCurrentUser } from "./useCurrentUser";
-import { useAuth } from "@clerk/nextjs";
+
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export const useAddChat = (chats: []) => {
-  const { userId } = useAuth();
   const { users } = useAllUsers();
-  const { user: myuser } = useCurrentUser(userId || null);
+  const { user: myuser } = useCurrentUser();
   const [searchAddChat, setSearchAddChat] = useState(""); // State for search query
   const [isAddingChat, setIsAddingChat] = useState(false);
   const router = useRouter();

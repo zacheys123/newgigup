@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import AvatarComponent from "./Avatar";
 import FollowButton from "./FollowButton";
 import { UserProps } from "@/types/userinterfaces";
-import { CgProfile } from "react-icons/cg";
+import { FiUser, FiMail, FiAtSign } from "react-icons/fi";
 
 const MainUser = ({
   _id,
@@ -20,64 +20,115 @@ const MainUser = ({
 }: UserProps) => {
   const router = useRouter();
 
+  const handleClick = () => {
+    if (isMusician) {
+      router.push(`/search/${username}`);
+    } else if (isClient) {
+      router.push(`/client/search/${username}`);
+    }
+  };
+  console.log(organization);
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.4, delay: 0.2 }}
-      className={`ml-10 mt-6 w-[320px] rounded-xl p-4 cursor-pointer transition duration-300 shadow-lg mb-4
+      onClick={handleClick}
+      whileHover={{ y: -4, scale: 1.015 }}
+      whileTap={{ scale: 0.97 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      className={`
+        relative overflow-hidden rounded-2xl p-5 cursor-pointer backdrop-blur-md border border-white/10 transition-all duration-300
         ${
           isMusician
-            ? "bg-gradient-to-r from-amber-800 to-amber-600 hover:from-amber-700 hover:to-amber-500"
-            : isClient
-            ? "bg-gradient-to-r from-gray-800 to-gray-600 hover:from-gray-700 hover:to-gray-500"
-            : "bg-neutral-800 hover:bg-neutral-700"
+            ? "bg-gradient-to-br from-amber-900/20 to-yellow-700/10 hover:shadow-amber-500/20"
+            : "bg-gradient-to-br from-slate-800/20 to-slate-700/10 hover:shadow-slate-500/10"
         }
       `}
     >
-      <div className="flex gap-4 items-center">
-        <div
-          className="flex-1 flex items-center gap-2"
-          onClick={() => {
-            if (isMusician) {
-              router.push(`/search/${username}`);
-            } else if (isClient) {
-              router.push(`/client/search/${username}`);
-            } else {
-              return;
-            }
-          }}
-        >
-          <AvatarComponent
-            picture={picture || ""}
-            posts="rounded-full w-[40px] h-[40px] border-2 border-white"
-            firstname={firstname || ""}
-          />
-          <div className="flex flex-col justify-center">
-            <div className="flex items-center gap-2 text-[14px] font-semibold text-white">
-              {firstname} {lastname}
-            </div>
+      {/* Avatar + Basic Info */}
+      <div className="flex items-center gap-4">
+        <AvatarComponent
+          picture={picture || ""}
+          posts="rounded-full w-14 h-14 border border-white/20 shadow-md"
+          firstname={firstname ? firstname : ""}
+        />
+        <div className="flex-1 min-w-0">
+          <h3 className="text-base font-medium text-white truncate">
+            {firstname} {lastname}
+          </h3>
+          <div className="flex items-center gap-2 text-xs text-gray-400 mt-0.5 truncate">
             {isClient ? (
-              <div className="text-[12px] text-gray-200">
-                {organization || firstname}
-              </div>
-            ) : isMusician ? (
-              <div className="text-[12px] text-gray-300">{email}</div>
+              <>
+                <FiUser className="text-xs" />
+                <span>{organization || `${firstname}'s Org`}</span>
+                <span>{organization ? `${organization}` : ""}</span>
+              </>
             ) : (
-              <div className="text-[12px] text-gray-300">{email}</div>
+              <>
+                <FiMail className="text-xs" />
+                <span>{email}</span>
+              </>
             )}
           </div>
         </div>
-
-        <div className="flex flex-col gap-1 items-center">
-          {isClient && (
-            <div className="flex justify-center mb-1">
-              <CgProfile className="text-white text-lg" />
-            </div>
-          )}
-          {_id && <FollowButton _id={_id} followers={followers} />}
-        </div>
       </div>
+
+      {/* Username & Follow */}
+      <div className="flex items-center justify-between text-xs text-gray-400 mt-4 px-3 py-1.5 rounded-lg border border-white/5 bg-white/5">
+        <div className="flex items-center gap-1.5">
+          <FiAtSign className="text-xs" />
+          <span className="font-mono">@{username}</span>
+        </div>
+        {_id && (
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <FollowButton _id={_id} followers={followers} />
+          </motion.div>
+        )}
+      </div>
+
+      {/* Stats for Musicians */}
+      {isMusician && (
+        <div className="grid grid-cols-2 gap-2.5 mt-3">
+          {/* Gigs */}
+          <div className="bg-white/5 border border-white/10 rounded-lg p-2 backdrop-blur-sm group hover:bg-amber-900/20 transition-all duration-200">
+            <div className="flex flex-col items-center justify-center">
+              <span className="text-amber-300 font-semibold text-base group-hover:text-amber-200 transition-colors">
+                24
+              </span>
+              <span className="text-[11px] text-gray-400 group-hover:text-amber-100/80 mt-0.5 transition-colors">
+                Gigs
+              </span>
+            </div>
+          </div>
+
+          {/* Rating */}
+          <div className="bg-white/5 border border-white/10 rounded-lg p-2 backdrop-blur-sm group hover:bg-amber-900/20 transition-all duration-200">
+            <div className="flex flex-col items-center justify-center">
+              <div className="flex items-baseline gap-1">
+                <span className="text-amber-300 font-semibold text-base group-hover:text-amber-200 transition-colors">
+                  4.8
+                </span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-3 w-3 text-amber-400 -mb-0.5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+              </div>
+              <span className="text-[11px] text-gray-400 group-hover:text-amber-100/80 mt-0.5 transition-colors">
+                Rating
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+      {isClient && (
+        <div className="flex h-[19px] my-6">
+          <div className="h-full">
+            <h1 className="text-[12px] text-gray-200">{organization}</h1>
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 };

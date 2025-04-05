@@ -3,7 +3,6 @@ import { MessageProps } from "@/types/chatinterfaces";
 import useStore from "../zustand/useStore";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { useAuth } from "@clerk/nextjs";
 import { io, Socket } from "socket.io-client";
 
 interface SocketContextType {
@@ -15,8 +14,7 @@ const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL;
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const { userId } = useAuth();
-  const { user } = useCurrentUser(userId || null);
+  const { user } = useCurrentUser();
   const { setOnlineUsers, addMessage } = useStore();
   const [socket, setSocket] = useState<Socket | null>(null);
 

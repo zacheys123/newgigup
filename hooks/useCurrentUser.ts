@@ -198,26 +198,37 @@
 
 //   return { loading, user, setUser, setReviews, reviews };
 // }
-"use client";
+// useCurrentUser.ts
 import useStore from "@/app/zustand/useStore";
 import { Review } from "@/types/userinterfaces";
 import { useMemo, useState } from "react";
 import useSWR from "swr";
-
+import { useUser } from "@clerk/nextjs";
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-export function useCurrentUser(userId: string | null) {
+// interface UseCurrentUserReturn {
+//   user: UserProps; // Replace with your User type
+//   loading: boolean;
+//   reviews: Review[];
+//   mutateUser: () => void;
+//   setReviews: (reviews: Review[]) => void;
+//   error?: Error;
+// }
+
+export function useCurrentUser() {
+  const { user: clerkUser } = useUser();
   const urldata = useMemo(
-    () => userId && `/api/user/getuser/${userId}`,
-    [userId]
+    () => (clerkUser?.id ? `/api/user/getuser/${clerkUser?.id}` : ""),
+    [clerkUser?.id]
   );
-  const { setCurrentUser } = useStore();
-  const [reviews, setReviews] = useState<Review[]>();
+  const setCurrentUser = useStore((state) => state.setCurrentUser);
+  const [reviews, setReviews] = useState<Review[]>([]);
+
   const { data, error, mutate } = useSWR(urldata, fetcher, {
     onSuccess: (userdata) => {
       if (userdata?.user) {
         setCurrentUser(userdata.user);
-        setReviews(userdata.user.myReviews || []); // Default to empty array if `myReviews` is not available
+        setReviews(userdata.user.myReviews || []);
       }
     },
   });
@@ -226,7 +237,8 @@ export function useCurrentUser(userId: string | null) {
     user: data?.user,
     loading: !error && !data,
     reviews,
-    mutateUser: mutate, // expose the mutate function
+    mutateUser: mutate,
     setReviews,
+    error,
   };
 }

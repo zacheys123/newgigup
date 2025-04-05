@@ -462,6 +462,7 @@ const Gigheader = ({
       },
     },
   };
+  console.log(myuser);
 
   const activeFilter =
     "bg-gradient-to-br from-cyan-400 to-blue-600 text-white shadow-lg shadow-cyan-500/30";

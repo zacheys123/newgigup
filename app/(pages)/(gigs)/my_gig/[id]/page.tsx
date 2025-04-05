@@ -10,16 +10,14 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { GigProps } from "@/types/giginterface";
 import { fonts } from "@/utils";
 import { searchfunc } from "@/utils/index";
-import { useAuth } from "@clerk/nextjs";
 import { CircularProgress } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
 const MyGigs = () => {
-  const { userId } = useAuth();
   const { loading, gigs, mutateGigs } = useAllGigs();
-  const { user } = useCurrentUser(userId || null);
+  const { user } = useCurrentUser();
   const [typeOfGig, setTypeOfGig] = useState<string>("");
   const [category, setCategory] = useState<string>("all");
   const [location, setLocation] = useState<string>(() =>

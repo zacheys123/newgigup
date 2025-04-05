@@ -2,7 +2,6 @@
 
 import useStore from "@/app/zustand/useStore";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { useAuth } from "@clerk/nextjs";
 import {
   CalendarIcon,
   CreditCardIcon,
@@ -15,8 +14,7 @@ import Link from "next/link";
 import { MdDashboard } from "react-icons/md";
 
 export function Sidebar() {
-  const { userId } = useAuth();
-  const { user } = useCurrentUser(userId || null);
+  const { user } = useCurrentUser();
   const { subscriptiondata: data } = useStore();
   const musicianLinks = [
     {
@@ -91,7 +89,7 @@ export function Sidebar() {
             {data?.subscription?.isPro ? "PRO" : "FREE"}
           </span>
           <span className="text-xs text-gray-400">
-            {user?.IsMusician ? "Artist" : "Client"}
+            {user?.isMusician ? "Artist" : "Client"}
           </span>
         </div>
       </div>

@@ -20,7 +20,6 @@ import {
   Timer,
 } from "lucide-react";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { useAuth } from "@clerk/nextjs";
 import { toast } from "sonner";
 import GigCustomization from "./GigCustomization";
 import { fileupload } from "@/hooks/fileUpload";
@@ -63,7 +62,6 @@ interface UserInfo {
 type bussinesscat = string | null;
 
 const CreateGig = () => {
-  const { userId } = useAuth();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [secretpass, setSecretPass] = useState<boolean>(false);
   const [showcustomization, setShowCustomization] = useState<boolean>(false);
@@ -71,7 +69,7 @@ const CreateGig = () => {
   const [imageUrl, setUrl] = useState<string>("");
   const [fileUrl, setFileUrl] = useState<string>("");
   const { setRefetchData } = useStore();
-  const { user } = useCurrentUser(userId || null);
+  const { user } = useCurrentUser();
   const [gigcustom, setGigCustom] = useState<CustomProps>({
     fontColor: "",
     font: "",

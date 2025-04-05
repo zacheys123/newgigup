@@ -6,7 +6,6 @@ import ChatHeader from "./ChatHeader";
 import ChatInput from "./ChatInput";
 import useStore from "@/app/zustand/useStore";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { useAuth } from "@clerk/nextjs";
 import useSocket from "@/hooks/useSocket";
 
 interface ChatProps {
@@ -18,11 +17,11 @@ interface ChatProps {
 
 const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose, onOpenX }) => {
   const [chatId, setChatId] = useState<string | null>(null);
-  const { userId } = useAuth();
+
   const [loading, setLoading] = useState(true);
   const [newMessage, setNewMessage] = useState("");
   const { sendMessage, addMessage, onlineUsers } = useStore();
-  const { user: myuserd } = useCurrentUser(userId || null);
+  const { user: myuserd } = useCurrentUser();
   const { socket } = useSocket();
 
   useEffect(() => {

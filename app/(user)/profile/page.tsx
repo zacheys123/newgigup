@@ -7,11 +7,9 @@ import Musicians from "@/components/pages/Musicians";
 // import MoreInfoPage from "@/components/userprofile/MoreInfoPage";
 import RouteProfile from "@/components/userprofile/RouteProfile";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { useAuth } from "@clerk/nextjs";
 
 const ProfilePage = () => {
-  const { userId } = useAuth();
-  const { user } = useCurrentUser(userId || null);
+  const { user } = useCurrentUser();
   // const allUsers = await getAllUsers(user?.user?._id);
 
   console.log(user);

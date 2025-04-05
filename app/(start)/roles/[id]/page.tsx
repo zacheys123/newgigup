@@ -9,7 +9,7 @@ import React, { useEffect, useState } from "react";
 const Actions = () => {
   const router = useRouter();
   const { isLoaded: isAuthLoaded, userId } = useAuth();
-  const { user, loading } = useCurrentUser(userId || "");
+  const { user, loading } = useCurrentUser();
   const [status, setStatus] = useState<
     "loading" | "unregistered" | "registered"
   >("loading");

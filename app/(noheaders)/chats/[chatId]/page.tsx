@@ -9,7 +9,6 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import useSocket from "@/hooks/useSocket";
 import { MessageProps } from "@/types/chatinterfaces";
 import { Review, UserProps, VideoProps } from "@/types/userinterfaces";
-import { useAuth } from "@clerk/nextjs";
 import moment from "moment";
 import Image from "next/image";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
@@ -19,7 +18,6 @@ import { v4 as uuidv4 } from "uuid"; // Install uuid: npm install uuid
 
 const ChatPage = () => {
   const params = useParams();
-  const { userId } = useAuth();
   const searchParams = useSearchParams();
   const router = useRouter();
   const chatId = params.chatId as string;
@@ -31,7 +29,7 @@ const ChatPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false); // For dropdown menu
   const [isSearchOpen, setIsSearchOpen] = useState(false); // For search bar
   const [isTyping, setIsTyping] = useState(false); // For typing indicator
-  const { user } = useCurrentUser(userId || null);
+  const { user } = useCurrentUser();
   const [searchquery, setSearch] = useState<string>("");
   const {
     messages,

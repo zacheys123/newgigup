@@ -18,7 +18,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export function MobileNav() {
   const { userId } = useAuth();
-  const { user } = useCurrentUser(userId || null);
+  const { user } = useCurrentUser();
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);

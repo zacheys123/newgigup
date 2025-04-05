@@ -4,10 +4,9 @@ import SearchComponent from "@/components/pages/SearchComponent";
 
 const SearchPage = async () => {
   return (
-    <div className=" w-[100vw] h-[100%] bg-slate-900 pb-[60px] overflow-y-hidden">
+    <div className=" min-h-screen bg-gradient-to-br from-gray-900 to-black pb-[60px] overflow-hidden">
       <FormData />
       <SearchComponent />
-
       <OverlaySearch />
     </div>
   );

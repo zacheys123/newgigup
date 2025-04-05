@@ -1,13 +1,12 @@
 "use client";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { Review } from "@/types/userinterfaces";
-import { useAuth } from "@clerk/nextjs";
+
 import React from "react";
 import MainReview from "./myreviews/MainReview";
 
 const ReviewComponent = () => {
-  const { userId } = useAuth();
-  const { reviews } = useCurrentUser(userId || null);
+  const { reviews } = useCurrentUser();
   // const { reviews } = useStore();
 
   return (

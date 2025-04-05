@@ -8,7 +8,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 
 const BillingComponent = () => {
   const { userId } = useAuth();
-  const { user } = useCurrentUser(userId || null);
+  const { user } = useCurrentUser();
   const { subscription } = useSubscription(userId as string);
   console.log(user);
   const isPro = subscription?.isPro ?? false;

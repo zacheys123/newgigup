@@ -13,7 +13,7 @@ const ViewGigDetails = () => {
   const { id } = useParams();
   console.log(id);
   const { loading } = useGetGigs(id as string | null);
-  const { user } = useCurrentUser(userId || null);
+  const { user } = useCurrentUser();
   const router = useRouter();
   const { currentgig } = useStore();
 

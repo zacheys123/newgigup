@@ -29,7 +29,7 @@ import { useAllUsers } from "@/hooks/useAllUsers";
 const MobileSheet = () => {
   const { userId } = useAuth();
   const pathname = usePathname();
-  const { user } = useCurrentUser(userId || null);
+  const { user } = useCurrentUser();
   const { users } = useAllUsers();
   console.log(users);
   return (

@@ -25,7 +25,7 @@ const RouteProfile = () => {
   const [imageUrl, setUrl] = useState<string>("");
   const [fileUrl, setFileUrl] = useState<string>("");
 
-  const { user } = useCurrentUser(userId || null);
+  const { user } = useCurrentUser();
   const { setRefetchData } = useStore();
   // const {
   //   setShowFriendData,

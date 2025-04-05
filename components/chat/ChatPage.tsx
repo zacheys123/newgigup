@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import useStore from "@/app/zustand/useStore";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { MessageProps } from "@/types/chatinterfaces";
-import { useAuth } from "@clerk/nextjs";
+
 import { CircularProgress } from "@mui/material";
 import moment from "moment";
 import useSocket from "@/hooks/useSocket";
@@ -22,8 +22,8 @@ const reactionOptions = ["👍", "😀", "😂", "🔥", "😢", "🎉", "😨",
 
 const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
   const { messages, fetchMessages, updateMessageReaction } = useStore();
-  const { userId } = useAuth();
-  const { user } = useCurrentUser(userId || null);
+
+  const { user } = useCurrentUser();
   const [loading, setLoading] = useState<boolean>(true);
   const [reactionPopup, setReactionPopup] = useState<string>("");
   const [

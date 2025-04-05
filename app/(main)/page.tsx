@@ -19,7 +19,7 @@ import { SaveAll } from "lucide-react";
 export default function Home() {
   const { isLoaded, userId } = useAuth();
 
-  const { user } = useCurrentUser(userId || null);
+  const { user } = useCurrentUser();
 
   const [showVideo, setShowVideo] = useState(false);
   const [isClientSide, setIsClientSide] = useState(false);

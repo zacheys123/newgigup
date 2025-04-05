@@ -3,7 +3,6 @@ import useStore from "@/app/zustand/useStore";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { Review, UserProps } from "@/types/userinterfaces";
 import { fonts } from "@/utils";
-import { useAuth } from "@clerk/nextjs";
 import { User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -15,10 +14,9 @@ interface ProfileModalProps {
 }
 const RefferenceModal: React.FC<ProfileModalProps> = ({ user, getReviews }) => {
   const router = useRouter();
-  const { userId } = useAuth();
   const { setRefferenceModalOpen, setReviewModalOpen, setIsProfileModalOpen } =
     useStore();
-  const { user: myuser } = useCurrentUser(userId || null);
+  const { user: myuser } = useCurrentUser();
   return (
     <div className="bg-neutral-900 w-full max-w-md rounded-t-lg p-6 relative slide-up min-h-[340px] rounded-tl-[50px] rounded-tr-[50px] pt-12">
       {/* {[...Array(3)].map((i, index) => (

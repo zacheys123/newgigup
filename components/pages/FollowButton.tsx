@@ -3,7 +3,6 @@ import { IoMdAdd } from "react-icons/io";
 import { useRouter } from "next/navigation";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import useStore from "@/app/zustand/useStore";
-import { useAuth } from "@clerk/nextjs";
 import { FetchResponse } from "@/types/userinterfaces";
 
 // The FollowButton component that supports optimistic UI updates
@@ -14,8 +13,7 @@ const FollowButton = ({
   _id: string;
   followers: string[];
 }) => {
-  const { userId } = useAuth();
-  const { user } = useCurrentUser(userId || null);
+  const { user } = useCurrentUser();
   const { setFollow, follow } = useStore();
   const router = useRouter();
 

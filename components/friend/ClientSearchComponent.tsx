@@ -26,7 +26,7 @@ const ClientSearchComponent = () => {
   const [friend, setFriend] = useState<UserProps>();
   const [loading, setLoading] = useState<boolean>(false);
   const [refetch, setRefetch] = useState<boolean>(false);
-  const { user } = useCurrentUser(userId || null);
+  const { user } = useCurrentUser();
   const router = useRouter();
 
   useEffect(() => {
@@ -97,7 +97,7 @@ const ClientSearchComponent = () => {
   }, [username, refetch]);
 
   const [optimisticFollow, setOptimisticFollow] = useState<boolean>(
-    friend?.followers?.includes(user?._id || "") ?? false
+    friend?.followers?.includes(user?._id) ?? false
   );
 
   console.log(friend?.picture);

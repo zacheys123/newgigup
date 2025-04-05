@@ -1,7 +1,6 @@
 "use client";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { VideoProps } from "@/types/userinterfaces";
-import { useAuth } from "@clerk/nextjs";
 import { CircularProgress } from "@mui/material";
 import { motion } from "framer-motion";
 import { ArrowBigLeftIcon } from "lucide-react";
@@ -16,7 +15,7 @@ interface UpdateResponse {
 }
 const AllVideosPage = () => {
   const { userid, name } = useParams();
-  const { userId } = useAuth();
+
   //   const { userId } = useAuth();
   const [friendvideos, setFriendVideos] = useState<VideoProps[]>();
   const [loading, setLoading] = useState<boolean>(false);
@@ -24,7 +23,7 @@ const AllVideosPage = () => {
   const [refetch, setRefetch] = useState<boolean>(false);
   const [videoactions, setVideoActions] = useState<boolean>(false);
   const [editVideo, setEditVideo] = useState<boolean>(false);
-  const { user } = useCurrentUser(userId || null);
+  const { user } = useCurrentUser();
   const [currentVideo, setCurrentVideo] = useState<string | null>("");
   const [currentV, setCurrentV] = useState<string | null>("");
 

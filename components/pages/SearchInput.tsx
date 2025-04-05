@@ -1,7 +1,6 @@
 "use client";
 import React, { useCallback } from "react";
 import { debounce } from "lodash";
-
 import useStore from "@/app/zustand/useStore";
 import { searchFunc } from "@/utils";
 import { useAllUsers } from "@/hooks/useAllUsers";
@@ -9,8 +8,9 @@ import { useAllUsers } from "@/hooks/useAllUsers";
 const SearchInput = () => {
   const { searchQuery, setSearchQuery } = useStore();
   const { users } = useAllUsers();
+
   const handleInputChange = useCallback(
-    debounce((value: string) => setSearchQuery(value), 100), // 300ms debounce
+    debounce((value: string) => setSearchQuery(value), 100),
     []
   );
 
@@ -19,7 +19,7 @@ const SearchInput = () => {
       autoComplete="off"
       onChange={(ev) => handleInputChange(ev.target.value)}
       value={searchQuery}
-      className="w-[70%] mx-1  bg-inherit text-neutral-300  font-bold focus-within:ring-0 z-50 outline-none placeholder-gray-400 p-3 -0 text-[13px] my-6"
+      className="w-full bg-transparent text-gray-200 placeholder-gray-500 focus:outline-none text-sm md:text-base font-medium tracking-wide"
       id="search"
       type="text"
       data-autofocus
@@ -30,4 +30,4 @@ const SearchInput = () => {
   );
 };
 
-export default SearchInput;
+export default SearchInput; // Fixed: Using default export

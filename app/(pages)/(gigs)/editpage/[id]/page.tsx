@@ -23,7 +23,6 @@ import {
 } from "lucide-react";
 
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { useAuth } from "@clerk/nextjs";
 import { toast } from "sonner";
 import { fileupload } from "@/hooks/fileUpload";
 import useStore from "@/app/zustand/useStore";
@@ -70,7 +69,6 @@ type bussinesscat = string | null;
 
 const EditPage = () => {
   const { id } = useParams();
-  const { userId } = useAuth();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [secretpass, setSecretPass] = useState<boolean>(false);
   const [showcustomization, setShowCustomization] = useState<boolean>(false);
@@ -80,7 +78,7 @@ const EditPage = () => {
   const [imageUrl, setUrl] = useState<string>("");
   const [fileUrl, setFileUrl] = useState<string>("");
   const { setRefetchData, currentgig } = useStore();
-  const { user } = useCurrentUser(userId || null);
+  const { user } = useCurrentUser();
   const {} = useGetGigs(id as string | null);
 
   const [showCategories, setshowCategories] = useState<{

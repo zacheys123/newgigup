@@ -7,7 +7,6 @@ import { Input } from "../ui/input";
 import { BsArrowLeftShort } from "react-icons/bs";
 // import { useRouter } from "next/navigation";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { useAuth } from "@clerk/nextjs";
 import { Button } from "../ui/button";
 import { CircularProgress } from "@mui/material";
 import { FetchResponse } from "@/types/giginterface";
@@ -17,8 +16,8 @@ import useStore from "@/app/zustand/useStore";
 
 const Videos = () => {
   const [addvideo, setAddVideo] = useState<boolean>();
-  const { userId } = useAuth();
-  const { user } = useCurrentUser(userId || null);
+
+  const { user } = useCurrentUser();
   const [fileUrl, setFileUrl] = useState<string>("");
   const [videoUrl, setVideoUrl] = useState<string | null>("");
   const [loading, setLoading] = useState<boolean>(false);

@@ -4,7 +4,6 @@ import { useAllGigs } from "@/hooks/useAllGigs";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { GigProps } from "@/types/giginterface";
 import { Review } from "@/types/userinterfaces";
-import { useAuth } from "@clerk/nextjs";
 import { Box, Divider } from "@mui/material";
 import { Edit, Trash2Icon } from "lucide-react";
 import moment from "moment";
@@ -14,8 +13,8 @@ import { FaStar } from "react-icons/fa";
 
 const MainReview = ({ _id, gigId, comment, rating, createdAt }: Review) => {
   const { gigs, loading } = useAllGigs();
-  const { userId } = useAuth();
-  const { reviews, setReviews, mutateUser } = useCurrentUser(userId || null);
+
+  const { reviews, setReviews, mutateUser } = useCurrentUser();
   //   const [currentgig] = useStore();
   const gig = gigs?.find((gig: GigProps) => gig._id === gigId);
   const router = useRouter();

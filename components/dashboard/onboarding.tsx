@@ -1,7 +1,6 @@
 "use client";
 
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { useAuth } from "@clerk/nextjs";
 import { CircularProgress } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -9,8 +8,8 @@ import { LoadingGame } from "./LoadingGame";
 
 export function OnboardingModal() {
   const router = useRouter();
-  const { userId } = useAuth();
-  const { user } = useCurrentUser(userId || null);
+
+  const { user } = useCurrentUser();
   const [loading, setLoading] = useState(false);
 
   // Determine the role based on isClient and isMusician booleans

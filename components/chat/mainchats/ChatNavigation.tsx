@@ -18,7 +18,7 @@ const ChatNavigation = () => {
   const { userId } = useAuth();
   const { isOpen, setIsOpen } = useStore();
   const [isDragging, setIsDragging] = useState(false);
-  const { user } = useCurrentUser(userId || null);
+  const { user } = useCurrentUser();
   const [position, setPosition] = useState({
     x: window.innerWidth - 100,
     y: window.innerHeight / 1.4,

@@ -3,7 +3,7 @@
 import { CircularProgress } from "@mui/material";
 import React, { useEffect, useState, useRef, useMemo } from "react";
 import { Input } from "@/components/ui/input";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import useStore from "@/app/zustand/useStore";
 import { toast } from "sonner";
@@ -42,15 +42,15 @@ interface UpdateResponse {
 
 const CurrentUserProfile = () => {
   // Authentication and user data
-  const { userId } = useAuth();
+
   const { user: userdata } = useUser();
-  const { user, mutateUser } = useCurrentUser(userId || null);
+  const { user, mutateUser } = useCurrentUser();
   const { setRefetchData } = useStore();
   const [showFollowersModal, setShowFollowersModal] = useState(false);
   const [showFollowingModal, setShowFollowingModal] = useState(false);
   const [modalData, setModalData] = useState<{
     title: string;
-    users: { name: string; email: string }[];
+    users: { name: string; email?: string }[];
   }>({ title: "", users: [] });
   // User profile state
   const [loading, setLoading] = useState<boolean>(false);
@@ -278,6 +278,7 @@ const CurrentUserProfile = () => {
   //     user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
   //     user.email.toLowerCase().includes(searchTerm.toLowerCase())
   // );
+  console.log(user);
 
   if (!user) {
     return (
@@ -361,31 +362,67 @@ const CurrentUserProfile = () => {
               label: "Followers",
               value: user?.followers?.length || 0,
               onClick: () => {
+                // Check if followers are populated or just IDs
+                const followerUsers = Array.isArray(user?.followers)
+                  ? user.followers.map((follower: UserProps) => {
+                      // If follower is already populated (UserProps)
+                      if (
+                        typeof follower !== "string" &&
+                        "firstname" in follower
+                      ) {
+                        return {
+                          name: `${follower.firstname || ""} ${
+                            follower.lastname || ""
+                          }`.trim(),
+                          email: follower.email,
+                        };
+                      }
+                      // If it's just an ID string
+                      return {
+                        name: "Loading...",
+                        email: undefined,
+                      };
+                    })
+                  : [];
+
                 setModalData({
                   title: "Followers",
-                  users:
-                    user?.followers?.map((f: UserProps) => ({
-                      name: f.firstname + " " + f.lastname,
-                      email: f.email,
-                    })) || [],
+                  users: followerUsers,
                 });
-                setShowFollowingModal(true);
-                setShowFollowersModal(false);
+                setShowFollowersModal(true);
               },
             },
             {
               label: "Following",
               value: user?.followings?.length || 0,
               onClick: () => {
+                // Check if followings are populated or just IDs
+                const followingUsers = Array.isArray(user?.followings)
+                  ? user.followings.map((following: UserProps) => {
+                      // If following is already populated (UserProps)
+                      if (
+                        typeof following !== "string" &&
+                        "firstname" in following
+                      ) {
+                        return {
+                          name: `${following.firstname || ""} ${
+                            following.lastname || ""
+                          }`.trim(),
+                          email: following.email,
+                        };
+                      }
+                      // If it's just an ID string
+                      return {
+                        name: "Loading...",
+                        email: undefined,
+                      };
+                    })
+                  : [];
+
                 setModalData({
                   title: "Following",
-                  users:
-                    user?.followings?.map((f: UserProps) => ({
-                      name: f.firstname + " " + f.lastname,
-                      email: f.email,
-                    })) || [],
+                  users: followingUsers,
                 });
-                setShowFollowersModal(false);
                 setShowFollowingModal(true);
               },
             },
@@ -1014,9 +1051,8 @@ const UserListModal = ({
   isOpen: boolean;
   onClose: () => void;
   title: string;
-  users: { name: string; email: string }[];
+  users: { name: string; email?: string }[];
 }) => {
-  console.log(users);
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title}>
       <div className="max-h-[60vh] overflow-y-auto">
@@ -1036,8 +1072,12 @@ const UserListModal = ({
                     <User size={16} className="text-neutral-400" />
                   </div>
                   <div>
-                    <p className="text-white font-medium">{user.name}</p>
-                    <p className="text-neutral-400 text-sm">{user.email}</p>
+                    <p className="text-white font-medium">
+                      {user.name || "Unknown User"}
+                    </p>
+                    {user.email && (
+                      <p className="text-neutral-400 text-sm">{user.email}</p>
+                    )}
                   </div>
                 </div>
               </li>

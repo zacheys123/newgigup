@@ -11,7 +11,7 @@ import { MdEmail } from "react-icons/md";
 const Nav = () => {
   const { userId } = useAuth();
   const router = useRouter();
-  const { user } = useCurrentUser(userId || null);
+  const { user } = useCurrentUser();
 
   return (
     <nav className="sticky top-0 w-full bg-neutral-900 text-white shadow-md py-4 px-6 flex items-center justify-between  shadow-slate-700 ">

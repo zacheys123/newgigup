@@ -2,7 +2,6 @@
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { ChatProps, MessageProps } from "@/types/chatinterfaces";
 import { UserProps } from "@/types/userinterfaces";
-import { useAuth } from "@clerk/nextjs";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import useSWR, { mutate } from "swr";
@@ -17,8 +16,7 @@ import { ChatSkeleton } from "./ChatSkeleton";
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const AllChats = () => {
-  const { userId } = useAuth();
-  const { user: myuser } = useCurrentUser(userId || null);
+  const { user: myuser } = useCurrentUser();
 
   const router = useRouter();
   const loggedInUserId = myuser?._id;

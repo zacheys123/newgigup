@@ -1,7 +1,6 @@
 "use client";
 import React, { useCallback, useEffect, useState, useMemo } from "react";
 import { toast } from "sonner";
-import { useAuth, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 // import BallLoader from "../loaders/BallLoader";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
@@ -10,6 +9,7 @@ import { experiences, instruments } from "@/data";
 import { MusicIcon, UsersIcon } from "lucide-react";
 import { HiSwitchHorizontal } from "react-icons/hi";
 import { IoArrowBack } from "react-icons/io5";
+import { useUser } from "@clerk/nextjs";
 
 // interface UserEmail {
 //   emailAddress: string;
@@ -46,12 +46,12 @@ type RoleType = keyof Omit<RoleSteps, "default">; // 'instrumentalist' | 'dj' | 
 
 const ActionPage = () => {
   const { user, isSignedIn } = useUser();
-  const { userId } = useAuth();
+
   const router = useRouter();
   const [musicianload, setMusicianLoad] = useState(false);
   const [clientload, setClientLoad] = useState(false);
   const [userload, setUserload] = useState(false);
-  const { user: myuser } = useCurrentUser(userId || null);
+  const { user: myuser } = useCurrentUser();
   const [showMoreInfo, setMoreInfo] = useState(false);
   const [city, setCity] = useState("");
   const [instrument, setInstrument] = useState("");

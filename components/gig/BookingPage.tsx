@@ -18,7 +18,7 @@ const BookingPage = () => {
   const { currentgig } = useStore();
   const { userId } = useAuth();
   const { loading, forgetBookings } = useForgetBookings();
-  const { user } = useCurrentUser(userId || null);
+  const { user } = useCurrentUser();
   const router = useRouter();
   const { socket } = useSocket();
   const forget = () =>

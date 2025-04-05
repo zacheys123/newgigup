@@ -5,7 +5,6 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useGetVideos } from "@/hooks/useGetVideos";
 import { GigProps } from "@/types/giginterface";
 import { Review } from "@/types/userinterfaces";
-import { useAuth } from "@clerk/nextjs";
 import { Box, Divider } from "@mui/material";
 import { Video } from "lucide-react";
 import moment from "moment";
@@ -22,9 +21,8 @@ const AllReview = ({
 
   w,
 }: Review & { w: string }) => {
-  const { userId } = useAuth();
   const { gigs, loading } = useAllGigs();
-  const { user } = useCurrentUser(userId || null);
+  const { user } = useCurrentUser();
   //   const [currentgig] = useStore();
   const gig = gigs?.find((gig: GigProps) => gig._id === gigId);
   const router = useRouter();

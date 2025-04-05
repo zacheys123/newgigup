@@ -25,7 +25,7 @@ const PrePendingComponent = () => {
   const { id } = useParams();
   const { loading } = useGetGigs(id as string);
   const { currentgig, setRefetchGig } = useStore();
-  const { user } = useCurrentUser(userId || null);
+  const { user } = useCurrentUser();
   const router = useRouter();
   const { bookloading, bookgig } = useBookMusician();
   const [selectedUser, setSelectedUser] = useState<string | null>(null);

@@ -27,7 +27,7 @@ const FriendsComponent = () => {
   const [friend, setFriend] = useState<UserProps>();
   const [loading, setLoading] = useState<boolean>(false);
   const [refetch, setRefetch] = useState<boolean>(false);
-  const { user } = useCurrentUser(userId || null);
+  const { user } = useCurrentUser();
   const router = useRouter();
 
   useEffect(() => {

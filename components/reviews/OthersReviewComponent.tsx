@@ -1,13 +1,11 @@
 "use client";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { Review } from "@/types/userinterfaces";
-import { useAuth } from "@clerk/nextjs";
 import React from "react";
 import AllReview from "./allreviews/AllReview";
 
 const OthersReviewComponent = () => {
-  const { userId } = useAuth();
-  const { user } = useCurrentUser(userId || null);
+  const { user } = useCurrentUser();
   console.log(user?._id);
   return (
     <div className="text-gray-300 h-full py-2 bg-neutral-900">
