@@ -221,15 +221,7 @@ export const searchFunc = (users: UserProps[], searchQuery: string) => {
 // ];
 
 // Function to handle the follow action
-export const handleFollow = async (
-  _id: string,
-  user: UserProps,
-  router: {
-    push: (url: string) => void;
-    replace: (url: string) => void;
-    refresh: () => void;
-  }
-) => {
+export const handleFollow = async (_id: string, user: UserProps) => {
   // Optimistically set follow status
 
   const res = await fetch(`/api/user/follower/${_id}`, {
@@ -242,22 +234,13 @@ export const handleFollow = async (
 
   if (res.ok) {
     // Refresh the page or update the followers in the UI
-    router.refresh();
   } else {
     throw new Error("Failed to follow");
   }
 };
 
 // Function to handle unfollow action
-export const handleUnfollow = async (
-  _id: string,
-  user: UserProps,
-  router: {
-    push: (url: string) => void;
-    replace: (url: string) => void;
-    refresh: () => void;
-  }
-) => {
+export const handleUnfollow = async (_id: string, user: UserProps) => {
   // Optimistically set unfollow status
 
   const res = await fetch(`/api/user/unfollower/${_id}`, {
@@ -270,7 +253,6 @@ export const handleUnfollow = async (
 
   if (res.ok) {
     // Refresh the page or update the followers in the UI
-    router.refresh();
   } else {
     throw new Error("Failed to unfollow");
   }

@@ -3,6 +3,7 @@ import { Toaster } from "sonner";
 import Nav from "../../components/Nav";
 import { useUser } from "@clerk/nextjs";
 import { useEffect, useMemo } from "react";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 const MainLayout = ({
   contact,
@@ -11,6 +12,7 @@ const MainLayout = ({
   children: React.ReactNode;
   contact: React.ReactNode;
 }>) => {
+  const { user: myuser } = useCurrentUser();
   const { user } = useUser();
   const transformedUser = useMemo(() => {
     if (!user) return null;
@@ -24,9 +26,13 @@ const MainLayout = ({
     };
   }, [user]);
   useEffect(() => {
-    if (!user) return;
+    if (!user || !myuser) return;
 
-    if (user) {
+    // Transform the user data as needed
+    if (
+      myuser?.isMusician === true ||
+      (myuser?.isClient === true && myuser?.city && myuser?.talentbio)
+    ) {
       // Transform the user data as needed
 
       // Send to your backend API

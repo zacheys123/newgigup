@@ -2,6 +2,7 @@
 // import { useState } from "react";
 import MobileSheet from "@/components/pages/MobileSheet";
 import PagesNav from "@/components/pages/PagesNav";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { UserButton, useUser } from "@clerk/nextjs";
 import { useEffect, useMemo } from "react";
 import { Toaster } from "sonner";
@@ -19,6 +20,7 @@ export default function GigLayout({
   // };
 
   const { user } = useUser();
+  const { user: myuser } = useCurrentUser();
   const transformedUser = useMemo(() => {
     if (!user) return null;
     return {
@@ -31,11 +33,13 @@ export default function GigLayout({
     };
   }, [user]);
   useEffect(() => {
-    if (!user) return;
+    if (!user || !myuser) return;
 
-    if (user) {
-      // Transform the user data as needed
-
+    // Transform the user data as needed
+    if (
+      myuser?.isMusician === true ||
+      (myuser?.isClient === true && myuser?.city && myuser?.talentbio)
+    ) {
       // Send to your backend API
       fetch("/api/user/register", {
         method: "POST",

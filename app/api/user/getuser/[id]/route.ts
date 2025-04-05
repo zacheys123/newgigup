@@ -25,13 +25,11 @@ export async function GET(req: NextRequest) {
       ],
     };
 
-    console.log("my query", query);
-
     const user = (await User.findOne(query).populate({
       path: "refferences followers followings",
       model: User,
     })) as IUser | null;
-    console.log("user data", user);
+
     return NextResponse.json({
       user,
     });
