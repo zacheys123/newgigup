@@ -1,7 +1,7 @@
 "use client";
 import BallLoader from "@/components/loaders/BallLoader";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { useAuth, useUser } from "@clerk/nextjs";
+
 import Image from "next/image";
 // import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -19,9 +19,8 @@ interface UpdateResponse {
   };
 }
 const ClientProfile = () => {
-  const { userId } = useAuth();
   const { user } = useUser();
-  const { user: myuser } = useCurrentUser(userId || "");
+  const { user: myuser } = useCurrentUser();
   const { setRefetchData } = useStore();
   const [loading, setLoading] = useState<boolean>(false);
   // State for form inputs
