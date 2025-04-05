@@ -207,7 +207,10 @@ import useSWR from "swr";
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export function useCurrentUser(userId: string | null) {
-  const urldata = useMemo(() => `/api/user/getuser/${userId}`, [userId]);
+  const urldata = useMemo(
+    () => userId && `/api/user/getuser/${userId}`,
+    [userId]
+  );
   const { setCurrentUser } = useStore();
   const [reviews, setReviews] = useState<Review[]>();
   const { data, error, mutate } = useSWR(urldata, fetcher, {

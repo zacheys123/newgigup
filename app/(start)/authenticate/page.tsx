@@ -48,8 +48,8 @@ const Authenticate = () => {
                       setTimeout(() => {
                         // toast.success("Successfully logged in, Welcome!");
                         setMainloader(false);
-                        if (userId) {
-                          if (!user?._id) {
+                        if (userId && userId !== null) {
+                          if (user?._id) {
                             router.push(`/roles/${userId}`);
                           } else {
                             router.push("/");
