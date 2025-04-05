@@ -48,10 +48,12 @@ const Authenticate = () => {
                       setTimeout(() => {
                         // toast.success("Successfully logged in, Welcome!");
                         setMainloader(false);
-                        if (!user?._id) {
-                          router.push(`/roles/${userId}`);
-                        } else {
-                          router.push("/");
+                        if (userId) {
+                          if (!user?._id) {
+                            router.push(`/roles/${userId}`);
+                          } else {
+                            router.push("/");
+                          }
                         }
                       }, 5000)
                     );
