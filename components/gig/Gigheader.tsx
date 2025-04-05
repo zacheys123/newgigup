@@ -520,7 +520,7 @@ const Gigheader = ({
               <>
                 <option value="all">All Locations</option>
                 {dataCounties.map((d, idx) => (
-                  <option key={idx} value={d}>
+                  <option key={idx} value={d.toLowerCase()}>
                     {d}
                   </option>
                 ))}

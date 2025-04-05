@@ -55,6 +55,7 @@ const BookedGigs = () => {
           setCategory={setCategory}
           location={location}
           setLocation={setLocation}
+          myuser={user}
         />
       </div>
       {/* Scrollable Gigs List */}

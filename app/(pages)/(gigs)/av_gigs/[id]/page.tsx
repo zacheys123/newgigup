@@ -26,7 +26,7 @@ const PublishedGigs = () => {
       });
     }
     if (user?.city) {
-      setLocation(user.city);
+      setLocation(user.city.toLowerCase());
     }
   }, [user, mutateUser]);
   const filteredGigs = useMemo(() => {

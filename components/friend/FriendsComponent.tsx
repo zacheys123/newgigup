@@ -1,7 +1,7 @@
 "use client";
 import { UserProps } from "@/types/userinterfaces";
 import { useParams, useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Logo from "../Logo";
 import { useAuth, UserButton } from "@clerk/nextjs";
 import { IoCheckmarkDone } from "react-icons/io5";
@@ -12,7 +12,7 @@ import { Box } from "@mui/material";
 import { BsChatDots } from "react-icons/bs";
 import { MdRateReview } from "react-icons/md";
 import { ArrowLeftIcon, Music, Video } from "lucide-react";
-import useStore from "@/app/zustand/useStore";
+import useSWR, { mutate } from "swr";
 import {
   handleFollow,
   handleFollowing,
@@ -20,91 +20,109 @@ import {
   handleUnFollowingCurrent,
 } from "@/utils";
 import { motion } from "framer-motion";
+
+interface ApiResponse {
+  user: UserProps;
+}
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
 const FriendsComponent = () => {
   const { userId } = useAuth();
   const { username } = useParams();
-  const { follow, setFollow } = useStore();
-  const [friend, setFriend] = useState<UserProps>();
-  const [loading, setLoading] = useState<boolean>(false);
-  const [refetch, setRefetch] = useState<boolean>(false);
   const { user } = useCurrentUser();
   const router = useRouter();
 
-  useEffect(() => {
-    if (!username) {
-      // Guard: Do not run the effect if `id` is undefined or null
-      return;
-    }
-    let isMounted = true;
+  // Fetch friend data with SWR
+  const {
+    data: response,
+    error,
+    isLoading,
+  } = useSWR<ApiResponse>(`/api/user/getuser/${username}`, fetcher, {
+    revalidateOnFocus: false,
+    shouldRetryOnError: false,
+  });
 
-    async function getFriend() {
-      // fetch friend data from an API endpoint
-      try {
-        const response = await fetch(`/api/user/getuser/${username}`);
-        const friendData: UserProps = await response.json();
-        console.log(friendData);
-        if (isMounted) {
-          setFriend(friendData);
-        }
-        return friendData;
-      } catch (error: unknown) {
-        console.error("Error fetching friend data:", error);
-        // handle the error appropriately, e.g., redirect to a 404 page or show an error message to the user
-        alert("Error fetching friend data");
-        if (isMounted) {
-          setFriend({
-            clerkId: "",
-            firstname: "",
-            lastname: "",
-            experience: "",
-            instrument: "",
-            username: "",
-            followers: [],
-            followings: [],
-            allreviews: [],
-            myreviews: [],
-            isClient: false,
-            isMusician: false,
-            videosProfile: [],
-            organization: "",
-            handles: "",
-            bio: "",
-            genre: "",
-            refferences: [],
+  // Extract the user data from the response
+  const friend = response?.user;
 
-            roleType: "",
-            djGenre: "",
-            djEquipment: "",
-            mcType: "",
-            mcLanguage: "",
-            talentbio: "",
-            vocalistGenre: "",
-            musicianhandles: [{ platform: "", handle: "" }],
-            musiciangenres: [],
-            firstLogin: true,
-            onboardingComplete: false,
-          });
-        }
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    }
-
-    // Cleanup function to avoid setting state after component unmounts
-
-    getFriend();
-    return () => {
-      isMounted = false;
-    };
-  }, [username, refetch]);
-
-  const [optimisticFollow, setOptimisticFollow] = useState<boolean>(
-    friend?.followers?.includes(user?._id || "") ?? false
+  // Optimistic follow state
+  const [isFollowing, setIsFollowing] = useState<boolean>(
+    friend?.followers?.includes(user?._id || "") || false
   );
 
-  console.log(friend?.picture);
-  const isFollowing = friend?.followers.includes(user?._id || "");
-  if (loading) {
+  const handleFollowClick = async () => {
+    if (!friend?._id || !user?._id) return;
+
+    try {
+      // Optimistic update
+      setIsFollowing(true);
+      mutate(
+        `/api/user/getuser/${username}`,
+        {
+          ...friend,
+          followers: [...(friend.followers || []), user._id],
+        },
+        false
+      );
+
+      // Actual API calls
+      await handleFollow(friend._id, user, router);
+      await handleFollowing(friend._id, user);
+
+      // Revalidate to get fresh data
+      mutate(`/api/user/getuser/${username}`);
+    } catch (error) {
+      // Rollback on error
+      setIsFollowing(false);
+      mutate(
+        `/api/user/getuser/${username}`,
+        {
+          ...friend,
+          followers: friend?.followers?.filter((id) => id !== user?._id) || [],
+        },
+        false
+      );
+      console.error("Error following:", error);
+    }
+  };
+
+  const handleUnfollowClick = async () => {
+    if (!friend?._id || !user?._id) return;
+
+    try {
+      // Optimistic update
+      setIsFollowing(false);
+      mutate(
+        `/api/user/getuser/${username}`,
+        {
+          ...friend,
+          followers: friend?.followers?.filter((id) => id !== user._id) || [],
+        },
+        false
+      );
+
+      // Actual API calls
+      await handleUnfollow(friend._id, user, router);
+      await handleUnFollowingCurrent(friend._id, user);
+
+      // Revalidate to get fresh data
+      mutate(`/api/user/getuser/${username}`);
+    } catch (error) {
+      // Rollback on error
+      setIsFollowing(true);
+      mutate(
+        `/api/user/getuser/${username}`,
+        {
+          ...friend,
+          followers: [...(friend.followers || []), user._id],
+        },
+        false
+      );
+      console.error("Error unfollowing:", error);
+    }
+  };
+
+  if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen text-gray-300 backdrop-blur-sm bg-neutral-700/50 flex-col gap-4 ">
         <motion.div
@@ -118,83 +136,49 @@ const FriendsComponent = () => {
       </div>
     );
   }
+
+  if (error || !friend) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <p>Error loading user data</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="overflow-y-auto h-[95%] w-[90%] mx-auto  shadow-md shadow-orange-300 flex flex-col gap-2">
+    <div className="overflow-y-auto h-[95%] w-[90%] mx-auto shadow-md shadow-orange-300 flex flex-col gap-2">
       {/* Fixed Gigheader */}
       <div className="sticky top-0 z-10 shadow-md flex justify-between p-2">
         <Logo />
         <UserButton />
       </div>
-      <div className="h-[180px] bg-neutral-800 flex items-center px-2 justify-around  rounded-bl-3xl rounded-br-3xl">
-        {/* {friend?.picture && friend?.picture !== null ? (
-          <Image
-            className="w-[100px] h-[100px] rounded-full object-cover bg-slate-400"
-            src={friend.picture}
-            alt="Profile Pic"
-            width={100}
-            height={100}
-          />
-        ) : ( */}
-        <div className="w-[100px] h-[100px] rounded-full  bg-neutral-300 flex justify-center items-center">
+
+      <div className="h-[180px] bg-neutral-800 flex items-center px-2 justify-around rounded-bl-3xl rounded-br-3xl">
+        <div className="w-[100px] h-[100px] rounded-full bg-neutral-300 flex justify-center items-center">
           <span className="text-5xl">{friend?.firstname?.split("")[0]}</span>
           <span className="text-3xl">{friend?.lastname?.split("")[0]}</span>
         </div>
+
         <div className="w-[60px] h-[60px] flex flex-col flex-1 mx-2 mt-[100px]">
           <span className="flex gap-1">
-            <span className=" text-sm text-gray-400">{friend?.firstname}</span>
-            <span className=" text-sm text-gray-400">{friend?.lastname}</span>
+            <span className="text-sm text-gray-400">{friend?.firstname}</span>
+            <span className="text-sm text-gray-400">{friend?.lastname}</span>
           </span>
-          <span className="text-[11px] text-gray-400">
-            {/* {friend?.experience} years of experience in {friend?.instrument}
-             */}
-            {friend?.email}
-          </span>
+          <span className="text-[11px] text-gray-400">{friend?.email}</span>
         </div>
 
-        <div className=" flex justify-center items-center">
-          {(friend && !follow && isFollowing) || optimisticFollow ? (
+        <div className="flex justify-center items-center">
+          {isFollowing ? (
             <Button
-              className="min-w-[50px] h-[30px] text-white  text-[11px] bg-transparent border-2 border-gray-300 "
-              onClick={() => {
-                if (friend?._id) {
-                  // Ensure _id is defined
-                  try {
-                    handleUnfollow(friend?._id, user, router);
-                    handleUnFollowingCurrent(friend?._id, user);
-                    setRefetch((prev) => !prev);
-                    setOptimisticFollow(false);
-                    setFollow(false); // Update global state as well
-                  } catch (error) {
-                    setOptimisticFollow(true);
-                    setFollow(true); // Update global state as well
-                    console.error("Error following:", error);
-                  }
-                } else {
-                  console.log("No friend Id");
-                }
-              }}
+              className="min-w-[50px] h-[30px] text-white text-[11px] bg-transparent border-2 border-gray-300"
+              onClick={handleUnfollowClick}
             >
               following <IoCheckmarkDone />
             </Button>
           ) : (
             <Button
-              className="min-w-[50px] h-[30px] text-white  text-[11px] bg-blue-600 hover:bg-blue-700"
-              onClick={() => {
-                if (friend?._id) {
-                  // Ensure _id is defined
-                  try {
-                    handleFollow(friend?._id, user, router);
-                    handleFollowing(friend?._id, user);
-                    setRefetch((prev) => !prev);
-                    setOptimisticFollow(true);
-                    setFollow(true); // Update global state as well
-                  } catch (error) {
-                    setOptimisticFollow(false);
-                    setFollow(!follow); // Update global state as well
-                    console.error("Error following:", error);
-                  }
-                }
-              }}
+              className="min-w-[50px] h-[30px] text-white text-[11px] bg-blue-600 hover:bg-blue-700"
+              onClick={handleFollowClick}
             >
               Follow <MdAdd />
             </Button>

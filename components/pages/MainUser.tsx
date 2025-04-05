@@ -5,6 +5,10 @@ import AvatarComponent from "./Avatar";
 import FollowButton from "./FollowButton";
 import { UserProps } from "@/types/userinterfaces";
 import { FiUser, FiMail, FiAtSign } from "react-icons/fi";
+import { useAllGigs } from "@/hooks/useAllGigs";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useEffect, useState } from "react";
+import { GigProps } from "@/types/giginterface";
 
 const MainUser = ({
   _id,
@@ -19,6 +23,8 @@ const MainUser = ({
   organization,
 }: UserProps) => {
   const router = useRouter();
+  const { loading: gigsLoading, gigs } = useAllGigs();
+  const { user, loading: userLoading } = useCurrentUser();
 
   const handleClick = () => {
     if (isMusician) {
@@ -27,7 +33,56 @@ const MainUser = ({
       router.push(`/client/search/${username}`);
     }
   };
-  console.log(organization);
+
+  const [musicianGigCount, setMusicianGigCount] = useState<number>(0);
+  const [rating, setRating] = useState<number>(0);
+
+  const calculateRating = (
+    reviews: { rating: number }[],
+    gigCount: number
+  ): number => {
+    if (!reviews || reviews.length === 0) return 0;
+
+    const avgReviewRating =
+      reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+    const experienceFactor = Math.log10(gigCount + 0.5) * 1.0;
+    const finalRating = Math.min(
+      5,
+      avgReviewRating * 0.7 + experienceFactor * 0.3
+    );
+
+    return Math.round(finalRating * 10) / 10;
+  };
+
+  useEffect(() => {
+    if (gigsLoading || userLoading || !user?._id || !gigs) return;
+
+    const bookedGigs = gigs.filter(
+      (gig: GigProps) => gig?.bookedBy?._id === user?._id
+    ).length;
+
+    setMusicianGigCount(bookedGigs);
+    console.log(bookedGigs);
+    if (user?.isMusician) {
+      setRating(calculateRating(user?.allreviews || [], bookedGigs));
+    }
+  }, [
+    user?._id,
+    user?.isMusician,
+    gigs,
+    user?.allreviews,
+    userLoading,
+    gigsLoading,
+  ]);
+
+  if (userLoading) {
+    return (
+      <div className="rounded-2xl p-5 bg-gray-800/20 border border-white/10">
+        Loading user data...
+      </div>
+    );
+  }
+
   return (
     <motion.div
       onClick={handleClick}
@@ -91,10 +146,16 @@ const MainUser = ({
           <div className="bg-white/5 border border-white/10 rounded-lg p-2 backdrop-blur-sm group hover:bg-amber-900/20 transition-all duration-200">
             <div className="flex flex-col items-center justify-center">
               <span className="text-amber-300 font-semibold text-base group-hover:text-amber-200 transition-colors">
-                24
+                {gigsLoading ? (
+                  <span className="text-amber-300 text-[10px]">
+                    Processing...
+                  </span>
+                ) : (
+                  musicianGigCount
+                )}
               </span>
               <span className="text-[11px] text-gray-400 group-hover:text-amber-100/80 mt-0.5 transition-colors">
-                Gigs
+                Gigs Booked
               </span>
             </div>
           </div>
@@ -104,7 +165,7 @@ const MainUser = ({
             <div className="flex flex-col items-center justify-center">
               <div className="flex items-baseline gap-1">
                 <span className="text-amber-300 font-semibold text-base group-hover:text-amber-200 transition-colors">
-                  4.8
+                  {rating.toFixed(1)}
                 </span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
