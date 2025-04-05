@@ -6,17 +6,40 @@ import { useAllGigs } from "@/hooks/useAllGigs";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { GigProps } from "@/types/giginterface";
 import { searchfunc } from "@/utils/index";
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 const PublishedGigs = () => {
-  const { loading, gigs } = useAllGigs();
-  const { user } = useCurrentUser();
+  const { loading: gigsLoading, gigs } = useAllGigs();
+  const { user, loading: userLoading, mutateUser } = useCurrentUser();
   const [typeOfGig, setTypeOfGig] = useState<string>("");
   const [category, setCategory] = useState<string>("all");
   const [location, setLocation] = useState<string>(() =>
     user?.city ? user?.city : "all"
   );
+  let gigQuery;
   console.log(gigs);
+  useEffect(() => {
+    if (!user) {
+      mutateUser().catch((error) => {
+        console.error("Failed to mutate user:", error);
+        // Consider adding toast notification here
+      });
+    }
+    if (user?.city) {
+      setLocation(user.city);
+    }
+  }, [user, mutateUser]);
+  const filteredGigs = useMemo(() => {
+    return (
+      searchfunc(gigs, typeOfGig, category, gigQuery, location)?.filter(
+        (gig: GigProps) =>
+          gig?.postedBy?._id !== user?._id && gig?.isTaken === false
+      ) || []
+    );
+  }, [gigs, typeOfGig, category, location, gigQuery, user?._id]);
+
+  const isLoading = gigsLoading || userLoading;
+  console.log(filteredGigs);
   return (
     <div className="flex flex-col h-[calc(100vh-100px)] w-[90%] mx-auto my-2 shadow-md shadow-orange-300">
       {/* Fixed Header */}
@@ -28,29 +51,30 @@ const PublishedGigs = () => {
           setCategory={setCategory}
           location={location}
           setLocation={setLocation}
+          myuser={user}
         />
       </div>
       {/* Scrollable Gigs List */}
       <div className="h-[85%] overflow-y-scroll bg-gray-900">
-        {searchfunc(gigs, typeOfGig, category, null, location)?.length ===
-          0 && (
-          <h1 className="text-white text-center font-bold py-5">
-            No gigs found
-          </h1>
+        {filteredGigs.length === 0 && !isLoading && (
+          <div className="flex flex-col items-center justify-center py-12">
+            <h1 className="text-white text-xl font-bold mb-4">No gigs found</h1>
+            <p className="text-gray-400 max-w-md text-center">
+              Try adjusting your filters or check back later for new
+              opportunities
+            </p>
+          </div>
         )}
-        {!loading ? (
+        {!isLoading ? (
           <div className="space-y-3 p-2 pb-[74px] pt-3">
-            {searchfunc(gigs, typeOfGig, category, null, location)
-              ?.filter(
-                (gig: GigProps) =>
-                  gig?.postedBy?._id !== user?._id && gig?.isTaken === false
-              )
-              ?.map((gig: GigProps) => (
-                <AllGigsComponent key={gig?._id} gig={gig} />
-              ))}
+            {filteredGigs.map((gig: GigProps) => (
+              <AllGigsComponent key={gig?._id} gig={gig} />
+            ))}
           </div>
         ) : (
-          <LoadingSpinner />
+          <div className="flex justify-center items-center h-full w-full">
+            <LoadingSpinner />
+          </div>
         )}
       </div>
     </div>

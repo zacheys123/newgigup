@@ -15,7 +15,7 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 const PagesNav = () => {
   const { userId } = useAuth();
   const pathname = usePathname();
-  const { user } = useCurrentUser(userId || "");
+  const { user } = useCurrentUser();
 
   const linkStyles = (isActive: boolean) =>
     isActive
