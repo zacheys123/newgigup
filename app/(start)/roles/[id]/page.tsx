@@ -26,7 +26,7 @@ const Actions = () => {
     }
 
     // User exists but no MongoDB record
-    if (!user) {
+    if (!user && loading) {
       setStatus("unregistered");
       return;
     }

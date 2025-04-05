@@ -49,7 +49,7 @@ const Authenticate = () => {
                         // toast.success("Successfully logged in, Welcome!");
                         setMainloader(false);
                         if (userId && userId !== null) {
-                          if (!user?._id) {
+                          if (user && !user?._id) {
                             router.push(`/roles/${userId}`);
                           } else {
                             router.push("/");

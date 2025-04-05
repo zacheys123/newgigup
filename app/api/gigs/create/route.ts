@@ -25,6 +25,11 @@ type Info = {
   otherTimeline: string;
   gigtimeline: string;
   day: string;
+  mcType: string;
+  mcLanguages: string;
+  djGenre: string;
+  djEquipment: string;
+  vocalistGenre: string[];
 };
 
 export async function POST(req: NextRequest) {
@@ -49,12 +54,18 @@ export async function POST(req: NextRequest) {
     otherTimeline,
     gigtimeline,
     day,
+    mcType,
+    mcLanguages,
+    djGenre,
+    djEquipment,
+    vocalistGenre,
   }: Info = await req.json();
 
-  console.log(gigtimeline);
-  console.log(fontColor);
-  console.log(backgroundColor);
-  console.log(logo);
+  console.log(mcType);
+  console.log(djGenre);
+  console.log(mcLanguages);
+  console.log(djEquipment);
+  console.log(vocalistGenre);
 
   if (!logo) {
     return NextResponse.json({
@@ -129,6 +140,27 @@ export async function POST(req: NextRequest) {
       message: "Day is required",
     });
   }
+  if (
+    (bussinesscat === "vocalist" && vocalistGenre?.length === 0) ||
+    vocalistGenre === undefined
+  ) {
+    return NextResponse.json({
+      gigstatus: "false",
+      message: "Vocalist Genre is required",
+    });
+  }
+  if ((bussinesscat === "mc" && mcType === "") || mcLanguages === "") {
+    return NextResponse.json({
+      gigstatus: "false",
+      message: "Emcee data is required",
+    });
+  }
+  if ((bussinesscat === "dj" && djGenre === "") || djEquipment === "") {
+    return NextResponse.json({
+      gigstatus: "false",
+      message: "DJ data is required",
+    });
+  }
 
   const { userId } = getAuth(req);
   if (!userId) {
@@ -182,6 +214,11 @@ export async function POST(req: NextRequest) {
       otherTimeline,
       gigtimeline,
       day,
+      mcType,
+      mcLanguages,
+      djGenre,
+      djEquipment,
+      vocalistGenre,
     });
 
     return NextResponse.json({

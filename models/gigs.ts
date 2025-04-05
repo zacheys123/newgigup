@@ -67,6 +67,19 @@ const gigSchema = new mongoose.Schema(
     day: {
       type: String,
     },
+    mcType: {
+      type: String,
+    },
+    mcLanguages: {
+      type: String,
+    },
+    djGenre: {
+      type: String,
+    },
+    djEquipment: {
+      type: String,
+    },
+    vocalistGenre: { type: [String], default: [] },
   },
   { timestamps: true }
 );
