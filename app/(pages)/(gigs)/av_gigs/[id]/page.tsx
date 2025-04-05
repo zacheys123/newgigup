@@ -60,8 +60,7 @@ const PublishedGigs = () => {
           <div className="flex flex-col items-center justify-center py-12">
             <h1 className="text-white text-xl font-bold mb-4">No gigs found</h1>
             <p className="text-gray-400 max-w-md text-center">
-              Try adjusting your filters or check back later for new
-              opportunities
+              Try adjusting your filters or check back later for new posted gigs
             </p>
           </div>
         )}

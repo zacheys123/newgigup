@@ -212,8 +212,7 @@ const MyGigs = () => {
                 No gigs found
               </h1>
               <p className="text-gray-400 max-w-md text-center">
-                Try adjusting your filters or check back later for new
-                opportunities
+                Try adjusting your filters to view different gigs
               </p>
             </div>
           )}
