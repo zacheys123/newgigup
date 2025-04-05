@@ -1,7 +1,7 @@
 "use client";
 import BallLoader from "@/components/loaders/BallLoader";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-
+import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
 // import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
