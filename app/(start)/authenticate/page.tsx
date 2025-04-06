@@ -47,10 +47,9 @@ const Authenticate = () => {
                     // router.push("/");
                     timeoutRefs.current.push(
                       setTimeout(() => {
-                        // toast.success("Successfully logged in, Welcome!");
                         setMainloader(false);
                         if (isSignedIn) {
-                          if (!myuser?._id) {
+                          if (myuser?._id) {
                             router.push(`/roles/${user?.id}`);
                           } else {
                             router.push("/");
@@ -67,7 +66,6 @@ const Authenticate = () => {
       }, 5000)
     );
   }, []);
-
   const timeoutRefs = useRef<NodeJS.Timeout[]>([]); // Timeout references for clearing
 
   // Cleanup timeouts on unmount
