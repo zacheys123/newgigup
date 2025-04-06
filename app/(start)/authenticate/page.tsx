@@ -49,8 +49,8 @@ const Authenticate = () => {
                       setTimeout(() => {
                         // toast.success("Successfully logged in, Welcome!");
                         setMainloader(false);
-                        if (isSignedIn && isSignedIn) {
-                          if (myuser && !myuser?._id) {
+                        if (isSignedIn) {
+                          if (!myuser?._id) {
                             router.push(`/roles/${user?.id}`);
                           } else {
                             router.push("/");
