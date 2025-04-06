@@ -142,7 +142,7 @@ const ClientSearchComponent = () => {
                 if (friend?._id) {
                   // Ensure _id is defined
                   try {
-                    handleUnfollow(friend?._id, user, router);
+                    handleUnfollow(friend?._id, user);
                     handleUnFollowingCurrent(friend?._id, user);
                     setRefetch((prev) => !prev);
                     setOptimisticFollow(false);
@@ -166,7 +166,7 @@ const ClientSearchComponent = () => {
                 if (friend?._id) {
                   // Ensure _id is defined
                   try {
-                    handleFollow(friend?._id, user, router);
+                    handleFollow(friend?._id, user);
                     handleFollowing(friend?._id, user);
                     setRefetch((prev) => !prev);
                     setOptimisticFollow(true);
