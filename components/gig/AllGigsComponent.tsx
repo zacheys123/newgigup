@@ -12,11 +12,13 @@ import { useAuth } from "@clerk/nextjs";
 // import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import { useVideos } from "@/hooks/useVideos";
-import { motion } from "framer-motion";
 import { useSocketContext } from "@/app/Context/socket";
 import { useBookGig } from "@/hooks/useBookGig";
 import { isCreatorIsCurrentUserAndTaken } from "@/constants";
 import { Video } from "lucide-react";
+import { motion } from "framer-motion";
+import { Trash2, X } from "lucide-react";
+import { Input } from "../ui/input";
 
 // import { useCurrentUser } from "@/hooks/useCurrentUser";
 interface FetchResponse {
@@ -36,7 +38,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
 
   const {
     currentUser,
-
+    currentgig,
     setShowModal,
     setRefetchGig,
     setIsDescriptionModal,
@@ -50,6 +52,8 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
   } = useStore();
 
   const [bookCount, setBookCount] = useState(gig.bookCount.length || 0);
+  const [currviewCount, setCurrviewCount] = useState(0);
+  const [isDeleteModal, setIsDeleteModal] = useState(false);
 
   const { bookGig, bookLoading } = useBookGig();
   const myId = currentUser?._id;
@@ -57,6 +61,19 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
   // conditionsl styling
   const handleModal = async (gig: GigProps) => {
     try {
+      if (gig?.postedBy?._id === myId) {
+        if (currviewCount > 3) {
+          setIsDeleteModal(true);
+          setCurrentGig(gig);
+          return;
+        }
+        toast.error("You cannot view your own gig");
+
+        setCurrviewCount((prev) => prev + 1);
+        setIsDeleteModal(true);
+        setCurrentGig(gig);
+        return;
+      }
       const res = await fetch(`/api/gigs/addview/${gig?._id}`, {
         method: "PUT",
         headers: {
@@ -150,7 +167,12 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
   return (
     <>
       {isDescriptionModal && <GigDescription />}
-
+      {isDeleteModal && (
+        <DeleteModal
+          setIsDeleteModal={setIsDeleteModal}
+          currentGig={currentgig}
+        />
+      )}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -388,3 +410,176 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
 };
 
 export default AllGigsComponent;
+
+const DeleteModal = ({
+  setIsDeleteModal,
+  currentGig,
+}: {
+  setIsDeleteModal: (showDeleteModal: boolean) => void;
+  currentGig: GigProps;
+}) => {
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [confirm, setConfirm] = useState("");
+
+  const checkSecret = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setConfirm(e.target.value);
+  };
+  const handleDelete = async (ev: React.FormEvent<HTMLFormElement>) => {
+    ev.preventDefault();
+    if (!confirm) {
+      setError("Please enter the secret");
+      return;
+    }
+    if (confirm.toLowerCase() !== currentGig.secret.toLowerCase()) {
+      setError("Invalid Secret");
+    } else {
+      try {
+        setDeleting(false);
+        const data = await fetch(`/api/gigs/delete-gig/${currentGig?._id}`, {
+          method: "DELETE",
+        });
+        const d = await data.json();
+        if (!data.ok) {
+          toast.success(d.message);
+          setShowConfirm(true);
+          setIsDeleteModal(true);
+          throw new Error("Failed to delete gig");
+        }
+        setDeleting(true);
+        setConfirm("");
+        toast.success(d.message);
+        setShowConfirm(false);
+        setIsDeleteModal(false);
+        setSuccess(d.message ? d.message : "Gig deleted successfully");
+
+        // You might want to add a success toast/message here
+      } catch (error) {
+        console.error(error);
+        setIsDeleteModal(false);
+        setError("Failed to delete gig");
+        setDeleting(false);
+        // You might want to add an error toast/message here
+      }
+    }
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 overflow-y-auto"
+    >
+      <div className="flex min-h-screen items-center justify-center p-4 text-center">
+        {/* Backdrop */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 bg-black/50 transition-opacity"
+          onClick={() => setIsDeleteModal(false)}
+        />
+        {!showConfirm ? (
+          <motion.div
+            initial={{ scale: 0.95, y: 20 }}
+            animate={{ scale: 1, y: 0 }}
+            className="relative w-[85%] max-w-md transform overflow-hidden rounded-lg bg-white p-6 text-left align-middle shadow-xl transition-all"
+          >
+            {/* Close button */}
+            <button
+              onClick={() => setIsDeleteModal(false)}
+              className="absolute right-4 top-4 rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-500"
+            >
+              <X size={20} />
+            </button>
+
+            {/* Modal content */}
+            <div className="flex flex-col items-center">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+                <Trash2 className="h-6 w-6 text-red-600" />
+              </div>
+
+              <h3 className="mt-3 text-lg font-medium leading-6 text-gray-900">
+                Delete Gig
+              </h3>
+
+              <div className="mt-2">
+                <p className="text-center text-sm text-gray-500">
+                  Are you sure you want to delete{" "}
+                  <span className="font-medium">
+                    {currentGig?.title || "this gig"}
+                  </span>
+                  ? This action cannot be undone.
+                </p>
+              </div>
+
+              <div className="mt-6 flex w-full justify-end space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setIsDeleteModal(false)}
+                  className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setShowConfirm(true)}
+                  className="rounded-md border border-transparent bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        ) : (
+          <>
+            {/* Delete Confirmation */}
+            <motion.div
+              initial={{ scale: 0.95, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              className="relative w-[85%] max-w-md transform overflow-hidden rounded-lg bg-white p-6 text-left align-middle shadow-xl transition-all"
+            >
+              {" "}
+              <div className="mt-2">
+                <p className="text-center text-sm text-gray-500">
+                  To delete the{" "}
+                  <span className="font-medium">
+                    {currentGig?.title || "this gig"}
+                  </span>
+                  ? enter your gig secret.
+                </p>
+              </div>
+              <form onSubmit={handleDelete}>
+                <Input
+                  type="text"
+                  value={confirm}
+                  placeholder="Gig Secret"
+                  className="mt-3 block w-full px-4 py-2 text-sm text-gray-700 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  onChange={(e) => checkSecret(e)}
+                />{" "}
+                {error && (
+                  <span className="mt-2 text-red-500 text-xs">{error}</span>
+                )}
+                {success && (
+                  <span className="mt-2 text-green-500 text-xs">{success}</span>
+                )}
+                <div className="mt-6 flex w-full justify-center space-x-3">
+                  <button
+                    type="submit"
+                    className="rounded-md border border-transparent bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    disabled={confirm.length === 0 ? true : false}
+                  >
+                    {!deleting ? "Confirm" : "Deleting...."}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </>
+        )}
+      </div>
+    </motion.div>
+  );
+};

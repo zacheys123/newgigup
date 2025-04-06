@@ -33,7 +33,7 @@ const DetailValue = styled(Typography)(({ theme }) => ({
   paddingLeft: theme.spacing(2),
 }));
 
-const GigDescription = () => {
+const GigDescription = ({}) => {
   const { setIsDescriptionModal, currentgig } = useStore();
   console.log(currentgig);
   return (
