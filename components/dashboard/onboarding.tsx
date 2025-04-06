@@ -35,6 +35,7 @@ export function OnboardingModal() {
       setTimeout(() => {
         setLoading(false);
         router.refresh();
+        router.replace("/dashboard/billing");
       }, 60000);
       await fetch("/api/user/onboarding", { method: "POST" });
     } catch (error) {

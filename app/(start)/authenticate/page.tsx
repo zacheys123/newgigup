@@ -2,7 +2,7 @@
 import AllDirections from "@/components/loaders/AllDirections";
 import Title from "@/components/loaders/Title";
 
-import { useAuth } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import { CircularProgress } from "@mui/material";
 import { useRouter } from "next/navigation";
 import "@/components/loaders/word.css";
@@ -16,8 +16,9 @@ const Authenticate = () => {
   const [fourthloader, setforthloader] = useState<boolean>(false);
   const [mainloader, setMainloader] = useState<boolean>(false);
   const router = useRouter();
-  const { currentUser: user } = useStore();
-  const { isLoaded, userId } = useAuth();
+  const { currentUser: myuser } = useStore();
+  const { user, isSignedIn } = useUser();
+  const { isLoaded } = useAuth();
   const LoadingPage = useCallback(() => {
     setfirstloader(true);
 
@@ -48,9 +49,9 @@ const Authenticate = () => {
                       setTimeout(() => {
                         // toast.success("Successfully logged in, Welcome!");
                         setMainloader(false);
-                        if (userId && userId !== null) {
-                          if (user && !user?._id) {
-                            router.push(`/roles/${userId}`);
+                        if (isSignedIn && isSignedIn) {
+                          if (myuser && !myuser?._id) {
+                            router.push(`/roles/${user?.id}`);
                           } else {
                             router.push("/");
                           }
@@ -92,7 +93,7 @@ const Authenticate = () => {
       </div>
     );
   }
-  if (!userId) {
+  if (!isSignedIn) {
     return (
       <div className="flex h-[100vh] flex-col items-center justify-center">
         <h3>User signup failed,no User logged in</h3>

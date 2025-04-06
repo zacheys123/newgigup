@@ -100,6 +100,11 @@ export const initialState = {
     otherTimeline: "",
     gigtimeline: "",
     day: "",
+    mcType: "",
+    mcLanguages: "",
+    djGenre: "",
+    djEquipment: "",
+    vocalistGenre: [],
   },
 
   searchQuery: "",

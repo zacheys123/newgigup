@@ -140,26 +140,30 @@ export async function POST(req: NextRequest) {
       message: "Day is required",
     });
   }
-  if (
-    (bussinesscat === "vocalist" && vocalistGenre?.length === 0) ||
-    vocalistGenre === undefined
-  ) {
-    return NextResponse.json({
-      gigstatus: "false",
-      message: "Vocalist Genre is required",
-    });
+  if (bussinesscat === "vocalist") {
+    if (vocalistGenre?.length === 0 || vocalistGenre === undefined) {
+      return NextResponse.json({
+        gigstatus: "false",
+        message: "Vocalist Genre is required",
+      });
+    }
   }
-  if ((bussinesscat === "mc" && mcType === "") || mcLanguages === "") {
-    return NextResponse.json({
-      gigstatus: "false",
-      message: "Emcee data is required",
-    });
+
+  if (bussinesscat === "mc") {
+    if (mcType === "" || mcLanguages === "") {
+      return NextResponse.json({
+        gigstatus: "false",
+        message: "Emcee data is required",
+      });
+    }
   }
-  if ((bussinesscat === "dj" && djGenre === "") || djEquipment === "") {
-    return NextResponse.json({
-      gigstatus: "false",
-      message: "DJ data is required",
-    });
+  if (bussinesscat === "dj") {
+    if (djGenre === "" || djEquipment === "") {
+      return NextResponse.json({
+        gigstatus: "false",
+        message: "DJ data is required",
+      });
+    }
   }
 
   const { userId } = getAuth(req);

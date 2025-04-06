@@ -1875,10 +1875,16 @@ const CreateGig = () => {
                       {gigInputs.mcLanguages && (
                         <div className="flex flex-col gap-1">
                           <div className="flex gap-2">
-                            <span className="text-neutral-400">Languages:</span>
+                            <span className="text-neutral-400 text-sm">
+                              Languages:
+                            </span>
                             <div className="flex flex-wrap gap-1">
                               {gigInputs.mcLanguages.split(",").map((lang) => (
-                                <Badge key={lang} variant="outline">
+                                <Badge
+                                  key={lang}
+                                  variant="outline"
+                                  className="text-sm"
+                                >
                                   {lang.trim()}
                                 </Badge>
                               ))}
@@ -1894,8 +1900,10 @@ const CreateGig = () => {
                       {gigInputs.djGenre && (
                         <div className="flex flex-col gap-1">
                           <div className="flex gap-2">
-                            <span className="text-neutral-400">DJ Genre:</span>
-                            <span className="text-white">
+                            <span className="text-neutral-400 text-sm">
+                              DJ Genre:
+                            </span>
+                            <span className="text-white text-sm">
                               {gigInputs.djGenre}
                             </span>
                           </div>
@@ -1909,10 +1917,10 @@ const CreateGig = () => {
                       {gigInputs.djEquipment && (
                         <div className="flex flex-col gap-1">
                           <div className="flex gap-2">
-                            <span className="text-neutral-400">
+                            <span className="text-neutral-400 text-sm">
                               DJ Equipment:
                             </span>
-                            <span className="text-white">
+                            <span className="text-white text-sm">
                               {gigInputs.djEquipment}
                             </span>
                           </div>
@@ -2560,6 +2568,7 @@ const TalentModal = ({
                 value={localData.mcType || ""}
                 onChange={(value) => handleFieldChange("mcType", value)}
                 className={localErrors.mcType ? "border-red-500" : ""}
+                placeholder="Wedding/Co-orporate/Birthdays/Eventss"
               />
               {localErrors.mcType && (
                 <p className="text-red-500 text-xs">{localErrors.mcType}</p>

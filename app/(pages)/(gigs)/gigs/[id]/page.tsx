@@ -70,7 +70,7 @@ const GigsPage = () => {
             ))}
           </div>
         ) : (
-          <div className="flex justify-center items-center h-full w-full">
+          <div className="flex justify-center items-center h-full w-full mt-[90px]">
             <Clockwise />
           </div>
         )}

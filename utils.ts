@@ -461,6 +461,7 @@ export const dataCounties = [
   "Kajiado",
   "Kericho",
   "Naivasha",
+  "Eldoret",
   "Lamu",
   "Nyeri",
   "Nakuru",

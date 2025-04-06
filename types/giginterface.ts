@@ -34,6 +34,11 @@ export interface GigProps {
   otherTimeline: string;
   gigtimeline: string;
   day: string;
+  mcType: string;
+  mcLanguages: string;
+  djGenre: string;
+  djEquipment: string;
+  vocalistGenre: string[];
 }
 
 export interface Gigs {

@@ -33,8 +33,8 @@ const Actions = () => {
     console.log(user);
     // User has completed registration
     if (
-      typeof user.isMusician === "boolean" &&
-      typeof user.isClient === "boolean"
+      typeof user?.isMusician === "boolean" &&
+      typeof user?.isClient === "boolean"
     ) {
       if (user?.isMusician || user?.isClient) {
         setStatus("registered");

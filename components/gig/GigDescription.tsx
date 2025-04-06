@@ -257,7 +257,7 @@ const GigDescription = ({}) => {
           {currentgig?.bussinesscat === "mc" && (
             <Box sx={{ mb: 3 }}>
               <Chip
-                label="Requirements"
+                label="Mc Requirements"
                 sx={{
                   mb: 2,
                   fontWeight: 600,
@@ -276,13 +276,43 @@ const GigDescription = ({}) => {
                 <Typography variant="body2" className="text-gray-500 ">
                   An Mc required(Master of Ceremony)
                 </Typography>
+                <Typography variant="body2" className="text-gray-500 ">
+                  Mc for:{" "}
+                  <span className="text-[14px] text-cyan-400 text-center my-3">
+                    {currentgig?.mcType} Event
+                  </span>{" "}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  className="text-gray-500 flex flex-col "
+                >
+                  <span className="text-[14px] text-zinc-700 text-center my-3">{`Mc should be fluent in:`}</span>
+
+                  <span>
+                    {currentgig?.mcLanguages.split(",").map((d) => {
+                      return (
+                        <ul
+                          style={{
+                            margin: 0,
+                            paddingLeft: "20px",
+                            listStyleType: "disc",
+                          }}
+                          className="text-[14px] text-orange-800 flex flex-col gap-2"
+                          key={d}
+                        >
+                          <li>{d}</li>
+                        </ul>
+                      );
+                    })}
+                  </span>
+                </Typography>
               </Box>
             </Box>
           )}{" "}
           {currentgig?.bussinesscat === "dj" && (
             <Box sx={{ mb: 3 }}>
               <Chip
-                label="Requirements"
+                label="Dj Requirements"
                 sx={{
                   mb: 2,
                   fontWeight: 600,
@@ -298,8 +328,37 @@ const GigDescription = ({}) => {
                   padding: 2,
                 }}
               >
-                <Typography variant="body2" className="text-gray-500 ">
-                  A Dj needed
+                <h5 className="text-gray-500 text-[13px] ">A Dj needed</h5>
+                <h5 className="text-gray-500 text-[13px] ">
+                  Preffered Gear:
+                  <span className="text-rose-500 animate-bounce">
+                    {" "}
+                    {currentgig?.djEquipment}
+                  </span>
+                </h5>{" "}
+                <Typography
+                  variant="body2"
+                  className="text-gray-500 flex flex-col "
+                >
+                  <span className="text-[14px] text-zinc-700 text-center my-3">{`We're looking for a Dj good in:`}</span>
+
+                  <span>
+                    {currentgig?.djGenre.split(",").map((d) => {
+                      return (
+                        <ul
+                          style={{
+                            margin: 0,
+                            paddingLeft: "20px",
+                            listStyleType: "disc",
+                          }}
+                          className="text-[14px] text-amber-900 flex flex-col gap-2"
+                          key={d}
+                        >
+                          <li>{d}</li>
+                        </ul>
+                      );
+                    })}
+                  </span>
                 </Typography>
               </Box>
             </Box>
@@ -340,6 +399,46 @@ const GigDescription = ({}) => {
                 </Box>
               </Box>
             )}
+          {currentgig?.bussinesscat === "vocalist" && (
+            <Box sx={{ mb: 3 }}>
+              <Chip
+                label="Vocalist Selection"
+                sx={{
+                  mb: 2,
+                  fontWeight: 600,
+                  backgroundColor: "info.dark",
+                  color: "background.paper",
+                }}
+              />
+              <Box
+                sx={{
+                  backgroundColor: "background.paper",
+                  borderRadius: 2,
+                  boxShadow: 1,
+                  padding: 2,
+                }}
+              >
+                <span className="text-sm text-neutral-500">
+                  Vocalist Needed
+                </span>
+                <ul style={{ margin: 0, paddingLeft: "20px" }}>
+                  <span className="text-amber-700 text-[11px]">
+                    They should ne able to do:
+                  </span>
+                  {[...new Set(currentgig.vocalistGenre)].map((band, idx) => (
+                    <li key={idx}>
+                      <Typography
+                        variant="body2"
+                        className="text-rose-500 animate-bounce"
+                      >
+                        {band}
+                      </Typography>
+                    </li>
+                  ))}
+                </ul>
+              </Box>
+            </Box>
+          )}
           {currentgig?.gigtimeline === "once" && (
             <Box className="my-6">
               <Chip
