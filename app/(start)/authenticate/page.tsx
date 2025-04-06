@@ -50,6 +50,7 @@ const Authenticate = () => {
                         setMainloader(false);
                         if (isSignedIn) {
                           if (myuser?._id) {
+                            console.log(myuser);
                             router.push(`/roles/${user?.id}`);
                           } else {
                             router.push("/");
@@ -91,6 +92,7 @@ const Authenticate = () => {
       </div>
     );
   }
+
   if (!isSignedIn) {
     return (
       <div className="flex h-[100vh] flex-col items-center justify-center">
