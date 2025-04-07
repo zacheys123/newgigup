@@ -105,6 +105,8 @@ export const initialState = {
     djGenre: "",
     djEquipment: "",
     vocalistGenre: [],
+    pricerange: "",
+    currency: "",
   },
 
   searchQuery: "",

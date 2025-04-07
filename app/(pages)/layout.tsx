@@ -4,6 +4,8 @@ import MobileSheet from "@/components/pages/MobileSheet";
 import PagesNav from "@/components/pages/PagesNav";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { UserButton, useUser } from "@clerk/nextjs";
+import { User } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { Toaster } from "sonner";
 // import { Box } from "@mui/material";
@@ -61,6 +63,7 @@ export default function GigLayout({
         });
     }
   }, [user]); // This effect runs when the user object changes
+  const router = useRouter();
   return (
     <div className="inset-0 backdrop-blur-xl  bg-black  h-screen w-full overflow-hidden">
       {/* Subtle Fixed Action Button */}
@@ -84,8 +87,23 @@ export default function GigLayout({
         }`} */}
 
       <div className="flex items-center justify-between mt-4 mx-6 bg-inherit">
-        <MobileSheet />
-        <UserButton />
+        {" "}
+        {user ? (
+          <>
+            <MobileSheet />
+
+            <UserButton />
+          </>
+        ) : (
+          <div className="w-full justify-center">
+            <div
+              className="rounded-full w-7 h-7  bg-neutral-400 p-1 flex justify-center items-center"
+              onClick={() => router.push("/")}
+            >
+              <User />
+            </div>
+          </div>
+        )}
       </div>
 
       <Toaster

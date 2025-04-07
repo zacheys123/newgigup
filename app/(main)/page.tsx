@@ -16,6 +16,8 @@ import { colors, fonts } from "@/utils";
 
 import { SaveAll } from "lucide-react";
 
+import FloatingNotesLoader from "@/components/loaders/FloatingNotes";
+
 export default function Home() {
   const { isLoaded, userId } = useAuth();
 
@@ -57,6 +59,15 @@ export default function Home() {
       : `/roles/${userId}`;
   };
 
+  if (!user?.user?.firstname) {
+    return (
+      <div className="h-full backdrop-blur-0 bg-black/90 flex justify-center items-center">
+        <div className="">
+          <FloatingNotesLoader />
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="bg-gray-950 text-white font-sans h-screen overflow-y-scroll snap-mandatory snap-y scroll-smooth">
       {/* Hero Section */}

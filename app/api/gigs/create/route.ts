@@ -65,11 +65,9 @@ export async function POST(req: NextRequest) {
     currency,
   }: Info = await req.json();
 
-  console.log(mcType);
-  console.log(djGenre);
-  console.log(mcLanguages);
-  console.log(djEquipment);
-  console.log(vocalistGenre);
+  console.log(price);
+  console.log(pricerange);
+  console.log(currency);
 
   if (!logo) {
     return NextResponse.json({
