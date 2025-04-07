@@ -49,11 +49,9 @@ const Authenticate = () => {
                       setTimeout(() => {
                         setMainloader(false);
                         if (isSignedIn) {
-                          if (!myuser?.user?._id) {
-                            console.log(myuser);
+                          if (myuser && !myuser?.user?._id) {
                             router.push(`/roles/${user?.id}`);
                           } else {
-                            console.log(myuser);
                             router.push("/");
                           }
                         }
