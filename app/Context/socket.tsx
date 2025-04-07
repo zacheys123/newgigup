@@ -49,7 +49,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     if (socket?.connected && user) {
-      socket.emit("addNewUsers", user._id);
+      socket.emit("addNewUsers", user?.user._id);
       socket.on("getOnlineUsers", (res) => {
         setOnlineUsers(res);
         console.log(res);
@@ -86,7 +86,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
         addMessage(message);
 
         // If the message is for the logged-in user, update the unread count
-        if (message.receiver === user?._id) {
+        if (message.receiver === user?.user?._id) {
           updateUnreadCount(message.chatId as string, true); // Increment unread count
         }
       } else {
@@ -99,7 +99,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
     return () => {
       socket.off("getMessage", handleIncomingMessage);
     };
-  }, [socket, addMessage, user?._id]);
+  }, [socket, addMessage, user?.user?._id]);
 
   return (
     <SocketContext.Provider value={{ socket }}>
