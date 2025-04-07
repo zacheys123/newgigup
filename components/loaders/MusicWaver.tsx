@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 
 const MusicWaveLoader = () => {
   return (
-    <div className="h-screen flex flex-col items-center justify-center bg-gray-950">
+    <div className="h-screen flex flex-col items-center justify-center ">
       <div className="flex items-end space-x-1 h-16">
         {[1, 2, 3, 4, 5, 4, 3, 2, 1].map((height, i) => (
           <motion.div

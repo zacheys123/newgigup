@@ -1,10 +1,10 @@
 "use client";
-import useStore from "@/app/zustand/useStore";
 import AcceptPage from "@/components/gig/AcceptPage";
 import BookingPage from "@/components/gig/BookingPage";
 import { Button } from "@/components/ui/button";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useGetGigs } from "@/hooks/useGetGig";
+import { UserProps } from "@/types/userinterfaces";
 import { useAuth } from "@clerk/nextjs";
 import { useParams, useRouter } from "next/navigation";
 import { TfiReload } from "react-icons/tfi";
@@ -12,12 +12,11 @@ const ViewGigDetails = () => {
   const { userId } = useAuth();
   const { id } = useParams();
   console.log(id);
-  const { loading } = useGetGigs(id as string | null);
+  const { currentGig, loading } = useGetGigs(id as string | null);
   const { user } = useCurrentUser();
   const router = useRouter();
-  const { currentgig } = useStore();
 
-  console.log(currentgig);
+  console.log(currentGig);
   if (loading) {
     return (
       <div className="h-[85%] w-full flex justify-center items-center animate-pulse">
@@ -33,7 +32,7 @@ const ViewGigDetails = () => {
       </div>
     );
   }
-  if (currentgig?.bookCount == null || currentgig?.postedBy == null) {
+  if (currentGig?.bookCount == null || currentGig?.postedBy == null) {
     return (
       <div className="h-[84%] w-full flex p-2  flex-col justify-center items-center">
         <h4 className="text-gray-400 mb-2">No Gig Info found, try later </h4>
@@ -55,13 +54,13 @@ const ViewGigDetails = () => {
   }
   return (
     <>
-      {currentgig?.bookCount?.some(
-        (myuser) => myuser._id === user?.user?._id
-      ) && <BookingPage />}
+      {currentGig?.bookCount?.some(
+        (myuser: UserProps) => myuser._id === user?.user?._id
+      ) && <BookingPage currentGig={currentGig} />}
 
-      {currentgig?.postedBy?._id &&
-        currentgig?.postedBy?._id.includes(user?.user?._id as string) && (
-          <AcceptPage {...currentgig} />
+      {currentGig?.postedBy?._id &&
+        currentGig?.postedBy?._id.includes(user?.user?._id as string) && (
+          <AcceptPage {...currentGig} />
         )}
     </>
   );

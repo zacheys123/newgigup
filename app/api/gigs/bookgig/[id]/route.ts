@@ -18,6 +18,7 @@ export async function PUT(req: NextRequest) {
   if (!userId) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
+  console.log(userid);
   try {
     await connectDb();
     // Find the event and ensure it's not already booked
@@ -25,6 +26,13 @@ export async function PUT(req: NextRequest) {
       path: "postedBy",
       model: User,
     });
+
+    if (!userid || userid === undefined) {
+      return NextResponse.json({
+        gigstatus: "false",
+        message: "Invalid request,try again later ",
+      });
+    }
 
     if (
       newGig?.bookCount.length > 3 ||

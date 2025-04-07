@@ -56,7 +56,7 @@ const AcceptPage = ({
   };
 
   useEffect(() => {
-    if (bookCount?.length < 1 && isTaken === false) {
+    if (bookCount?.length === 0 && isTaken === false) {
       return;
     }
     if (bookCount?.length === 0 && isTaken === true) {

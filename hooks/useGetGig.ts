@@ -136,7 +136,7 @@ export function useGetGigs(id: string | null) {
   });
 
   return {
-    // gigs: data,
+    currentGig: data,
     loading: !error && !data,
     // error,
     // mutateGigs: mutate, // expose the mutate function

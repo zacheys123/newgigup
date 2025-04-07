@@ -1,4 +1,3 @@
-import useStore from "@/app/zustand/useStore";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useForgetBookings } from "@/hooks/useForgetBooking";
 import { useAuth } from "@clerk/nextjs";
@@ -13,9 +12,14 @@ import { UserProps } from "@/types/userinterfaces";
 import { ChatBubbleOvalLeftIcon } from "@heroicons/react/24/solid";
 import useSocket from "@/hooks/useSocket";
 import { toast } from "sonner";
+import { GigProps } from "@/types/giginterface";
+import MusicWaveLoader from "../loaders/MusicWaver";
 
-const BookingPage = () => {
-  const { currentgig } = useStore();
+interface BookingProps {
+  currentGig: GigProps;
+}
+const BookingPage = ({ currentGig }: BookingProps) => {
+  const currentgig = currentGig;
   const { userId } = useAuth();
   const { loading, forgetBookings } = useForgetBookings();
   const { user } = useCurrentUser();
@@ -24,6 +28,7 @@ const BookingPage = () => {
   const forget = () =>
     forgetBookings(user?.user?._id as string, currentgig, userId as string);
   console.log(currentgig?.bookCount);
+  console.log(currentgig);
   useEffect(() => {
     if (currentgig?.isTaken === true) {
       router.push(`/gigs/${userId}`);
@@ -100,8 +105,16 @@ const BookingPage = () => {
     }
   }, [socket, currentgig, userId, router]);
 
+  if (!currentgig?.title || !user?.user?.firstname) {
+    return (
+      <div className="h-full w-full flex justify-center items-center">
+        <MusicWaveLoader />
+      </div>
+    );
+  }
+
   return (
-    <div className="h-[83%] w-full overflow-y-auto relative bg-gradient-to-b from-gray-900 to-gray-800 p-6">
+    <div className="h-full w-full overflow-y-scroll relative bg-gradient-to-b from-gray-900 pb-[100px] to-gray-800 p-6">
       {!showX && (
         <div className="absolute w-[40px] h-[40px] flex justify-center items-center right-5 top-[460px] opacity-85 rounded-md shadow-lg shadow-slate-700 bg-gray-700 hover:bg-gray-600 transition-all animate-pulse  z-50 hover:animate-none  group">
           {!loading ? (
@@ -226,7 +239,7 @@ const BookingPage = () => {
       </div>
 
       {/* More Info Card */}
-      <div className="min-h-[160px] w-[90%] mx-auto p-6 bg-gray-700 shadow-lg rounded-lg mb-6 animate-slide-in border-l-4 border-purple-400">
+      <div className="min-h-[160px] w-[90%] mx-auto p-6 mb-[150px] bg-gray-700 shadow-lg rounded-lg  animate-slide-in border-l-4 border-purple-400">
         <h4 className="text-gray-300 text-sm font-semibold uppercase tracking-widest mb-4">
           More Info
         </h4>

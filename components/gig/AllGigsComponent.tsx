@@ -19,6 +19,7 @@ import { Video } from "lucide-react";
 import { motion } from "framer-motion";
 import { Trash2, X } from "lucide-react";
 import { Input } from "../ui/input";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 // import { useCurrentUser } from "@/hooks/useCurrentUser";
 interface FetchResponse {
@@ -35,9 +36,8 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
 
   const { socket } = useSocketContext();
   const { gigs } = useAllGigs() || { gigs: [] }; // Default to empty array if null or undefined
-
+  const { user } = useCurrentUser();
   const {
-    currentUser,
     currentgig,
     setShowModal,
     setRefetchGig,
@@ -56,7 +56,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
   const [isDeleteModal, setIsDeleteModal] = useState(false);
 
   const { bookGig, bookLoading } = useBookGig();
-  const myId = currentUser?._id;
+  const myId = user?.user?._id;
   const router = useRouter();
   // conditionsl styling
   const handleModal = async (gig: GigProps) => {
@@ -79,7 +79,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userid: currentUser?._id }),
+        body: JSON.stringify({ userid: user?.user?._id }),
       });
       const data: FetchResponse = await res.json();
       setIsDescriptionModal(true);
@@ -137,6 +137,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
     isGigCreator && !hasBookedGig && bookCount > 0 && gig?.isTaken === false;
   const isCurrentWhoBooked = hasBookedGig && !isGigCreator;
 
+  console.log(myId);
   const canEditGig =
     gig?.postedBy?._id &&
     isGigCreator &&
@@ -178,6 +179,8 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
       socket.off("updateBookCount", handleUpdateBookCount);
     };
   }, [gig._id, socket]);
+
+  console.log(gig);
 
   return (
     <>
@@ -376,7 +379,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
               gig?.postedBy?._id !== myId &&
               !hasBookedGig &&
               gig?.bookCount.length < 4 &&
-              currentUser?.isClient === false &&
+              user?.user?.isClient === false &&
               gig?.isTaken === false && (
                 <ButtonComponent
                   variant="secondary"

@@ -59,7 +59,7 @@ export default function Home() {
       : `/roles/${userId}`;
   };
 
-  if (!user?.user?.firstname) {
+  if (!user?.user?.firstname && userId) {
     return (
       <div className="h-full backdrop-blur-0 bg-black/90 flex justify-center items-center">
         <div className="">

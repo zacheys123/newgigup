@@ -1,5 +1,6 @@
 "use client";
 import BallLoader from "@/components/loaders/BallLoader";
+import FloatingNotesLoader from "@/components/loaders/FloatingNotes";
 import ActionPage from "@/components/start/ActionPage";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAuth } from "@clerk/nextjs";
@@ -82,6 +83,15 @@ const Actions = () => {
   }
 
   // Default fallback (should redirect in useEffect)
+  if (!user?.user?.firstname && userId) {
+    return (
+      <div className="h-full backdrop-blur-0 bg-black/90 flex justify-center items-center">
+        <div className="">
+          <FloatingNotesLoader />
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="h-full w-full bg-black">
       <span className="flex flex-col items-center">
