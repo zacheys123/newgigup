@@ -55,7 +55,16 @@ const Actions = () => {
     setStatus("unregistered");
   }, [isAuthLoaded, loading, user, userId, router]);
 
-  // Loading state
+  if (!user) {
+    return (
+      <div className="h-full w-full bg-black">
+        <span className="flex flex-col items-center justify-center">
+          Loading...
+        </span>
+      </div>
+    );
+  }
+
   if (status === "loading" || !isAuthLoaded || loading) {
     return (
       <div className="h-full w-full bg-black">

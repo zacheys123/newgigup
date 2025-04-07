@@ -183,13 +183,13 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // const { userId } = getAuth(req);
-  // if (!userId) {
-  //   return NextResponse.json(
-  //     { message: "Unauthorized", id: userId },
-  //     { status: 401 }
-  //   );
-  // }
+  const { userId } = getAuth(req);
+  if (!userId) {
+    return NextResponse.json(
+      { message: "Unauthorized", gigstatus: "false" },
+      { status: 401 }
+    );
+  }
   try {
     await connectDb();
     const existingSecret = await Gigs.findOne({

@@ -1735,7 +1735,7 @@ const CreateGig = () => {
         setFieldErrors({});
       }
       if (data.gigstatus === "false") {
-        setEditMessage(data.message);
+        setEditMessage(data.message + " try again later");
         setError(true);
         setIsVisible(true);
       }
@@ -2189,10 +2189,10 @@ const CreateGig = () => {
                       <option value="0">Select price magnitude</option>
                       <option value="hundreds">Hundreds (00)</option>
                       <option value="thousands">Thousands (000)</option>
-                      <option value="tens-of-thousands">
+                      <option value="tensofthousands">
                         Tens of thousands (0000)
                       </option>
-                      <option value="hundreds-of-thousands">
+                      <option value="hundredsofthousands">
                         Hundreds of thousands (00000)
                       </option>
                       <option value="millions">Millions (000000)</option>

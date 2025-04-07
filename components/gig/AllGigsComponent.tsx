@@ -130,6 +130,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
     testfilteredvids?.length < 4;
   // user?.videos.length < 4;
 
+  // helper variables
   const isGigCreator = gig?.postedBy?._id === myId;
   const hasBookedGig = gig?.bookCount?.some((i) => i?._id === myId);
   const isCurrentWhoCreatedGig =
@@ -141,6 +142,20 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
     isGigCreator &&
     bookCount === 0 &&
     gig?.isTaken === false;
+
+  const showPriceRangeAndCurrency =
+    gig?.pricerange === "thousands"
+      ? `${gig?.price},000 ${gig?.currency} `
+      : gig?.pricerange === "hundreds"
+      ? `${gig?.price},00 ${gig?.currency} `
+      : gig?.pricerange === "tensofthousands"
+      ? `${gig?.price}0000 ${gig?.currency} `
+      : gig?.pricerange === "hundredsofthousands"
+      ? `${gig?.price},00000 ${gig?.currency} `
+      : `${gig?.price} ${gig?.currency} `;
+
+  console.log(gig);
+  //
 
   useEffect(() => {
     if (!socket) return;
@@ -226,7 +241,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                     d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                {gig?.price}
+                {showPriceRangeAndCurrency}
               </span>
             </div>
           </div>

@@ -280,6 +280,15 @@ const ActionPage = () => {
     const handleNext = () => setCurrentStep((prev) => prev + 1);
     const handleBack = () => setCurrentStep((prev) => prev - 1);
 
+    if (!myuser) {
+      return (
+        <div className="h-full w-full bg-black">
+          <span className="flex flex-col items-center justify-center">
+            Loading...
+          </span>
+        </div>
+      );
+    }
     return (
       <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
         <div className="bg-gray-800 rounded-lg max-w-md w-full p-6">
