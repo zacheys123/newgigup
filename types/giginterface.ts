@@ -39,6 +39,8 @@ export interface GigProps {
   djGenre: string;
   djEquipment: string;
   vocalistGenre: string[];
+  pricerange: string;
+  currency: string;
 }
 
 export interface Gigs {

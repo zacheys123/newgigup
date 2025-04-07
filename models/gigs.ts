@@ -79,6 +79,12 @@ const gigSchema = new mongoose.Schema(
     djEquipment: {
       type: String,
     },
+    pricerange: {
+      type: String,
+    },
+    currency: {
+      type: String,
+    },
     vocalistGenre: { type: [String], default: [] },
   },
   { timestamps: true }

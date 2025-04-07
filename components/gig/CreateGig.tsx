@@ -1319,6 +1319,8 @@ interface GigInputs {
   djGenre?: string;
   djEquipment?: string;
   vocalistGenre?: string[];
+  pricerange: string;
+  currency: string;
 }
 
 interface TalentModalProps {
@@ -1401,6 +1403,8 @@ const CreateGig = () => {
     gigtimeline: "",
     day: "",
     date: "",
+    pricerange: "",
+    currency: "KES",
   });
   const [userinfo, setUserInfo] = useState<UserInfo>({
     prefferences: [],
@@ -1695,9 +1699,12 @@ const CreateGig = () => {
           djGenre: gigInputs.djGenre,
           djEquipment: gigInputs.djEquipment,
           vocalistGenre: gigInputs.vocalistGenre,
+          pricerange: gigInputs.pricerange,
+          currency: gigInputs.currency,
         }),
       });
       const data = await res.json();
+      console.log(data);
       if (data.gigstatus === "true") {
         setEditMessage(data.message);
         setError(false);
@@ -1720,6 +1727,8 @@ const CreateGig = () => {
           gigtimeline: "",
           day: "",
           date: "",
+          pricerange: "",
+          currency: "",
         });
         setUserInfo({ prefferences: [] });
         setBussinessCategory(null);
@@ -1737,7 +1746,7 @@ const CreateGig = () => {
       setIsLoading(false);
     }
   };
-
+  console.log(typeof gigInputs.price);
   // Effects
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -2113,22 +2122,111 @@ const CreateGig = () => {
                     </p>
                   )}
                 </div>
-                <div className="flex flex-col gap-1">
-                  <input
-                    autoComplete="off"
-                    type="text"
-                    placeholder="Enter expected price range"
-                    className={`w-full bg-gray-300 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                      fieldErrors.price ? "border border-red-500" : ""
-                    }`}
-                    onChange={handleInputChange}
-                    name="price"
-                    value={gigInputs?.price}
-                  />
-                  {fieldErrors.price && (
-                    <p className="text-red-500 text-xs">{fieldErrors.price}</p>
-                  )}
+
+                <div className="flex flex-col sm:flex-row items-center gap-3 w-full">
+                  {/* Currency Selector */}
+                  <div className="w-full sm:w-[120px]">
+                    <select
+                      onChange={(e) => {
+                        setGigs((prev) => ({
+                          ...prev,
+                          currency: e.target.value,
+                        }));
+                      }}
+                      value={gigInputs.currency || "USD"}
+                      className={`w-full bg-gray-300 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                        fieldErrors.price ? "border border-red-500" : ""
+                      }`}
+                    >
+                      <option value="USD">USD ($)</option>
+                      <option value="EUR">EUR (€)</option>
+                      <option value="GBP">GBP (£)</option>
+                      <option value="KES">KES (KSh)</option>
+                      <option value="NGN">NGN (₦)</option>
+                    </select>
+                  </div>
+
+                  {/* Price Input */}
+                  <div className="w-full sm:w-[40%]">
+                    <div className="relative">
+                      <input
+                        autoComplete="off"
+                        type="number"
+                        placeholder={`Enter price in ${
+                          gigInputs.currency || "USD"
+                        }`}
+                        className={`w-full bg-gray-300 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                          fieldErrors.price ? "border border-red-500" : ""
+                        }`}
+                        onChange={handleInputChange}
+                        name="price"
+                        value={gigInputs?.price}
+                        min="0"
+                      />
+                      {gigInputs?.price && (
+                        <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 text-xs">
+                          {gigInputs.currency === "USD" && "$"}
+                          {gigInputs.currency === "EUR" && "€"}
+                          {gigInputs.currency === "GBP" && "£"}
+                          {gigInputs.currency === "KES" && "KSh"}
+                          {gigInputs.currency === "NGN" && "₦"}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Price Range Selector */}
+                  <div className="w-full sm:w-[40%]">
+                    <select
+                      autoComplete="off"
+                      className={`w-full bg-gray-300 text-gray-800 text-sm rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                        fieldErrors.price ? "border border-red-500" : ""
+                      }`}
+                      onChange={handleInputChange}
+                      name="pricerange"
+                      value={gigInputs?.pricerange}
+                    >
+                      <option value="0">Select price magnitude</option>
+                      <option value="hundreds">Hundreds (00)</option>
+                      <option value="thousands">Thousands (000)</option>
+                      <option value="tens-of-thousands">
+                        Tens of thousands (0000)
+                      </option>
+                      <option value="hundreds-of-thousands">
+                        Hundreds of thousands (00000)
+                      </option>
+                      <option value="millions">Millions (000000)</option>
+                    </select>
+                  </div>
                 </div>
+
+                {/* Price Preview */}
+                {(gigInputs?.price || gigInputs?.pricerange !== "0") && (
+                  <div className="text-xs text-gray-400 mt-1 pl-2">
+                    {gigInputs?.price && gigInputs?.pricerange !== "0" ? (
+                      <span>
+                        {gigInputs.currency === "USD" && "$"}
+                        {gigInputs.currency === "EUR" && "€"}
+                        {gigInputs.currency === "GBP" && "£"}
+                        {gigInputs.currency === "KES" && "KSh"}
+                        {gigInputs.currency === "NGN" && "₦"}
+                        {gigInputs.price} - {gigInputs.pricerange}
+                      </span>
+                    ) : gigInputs?.price ? (
+                      <span>
+                        Fixed price:
+                        {gigInputs.currency === "USD" && "$"}
+                        {gigInputs.currency === "EUR" && "€"}
+                        {gigInputs.currency === "GBP" && "£"}
+                        {gigInputs.currency === "KES" && "KSh"}
+                        {gigInputs.currency === "NGN" && "₦"}
+                        {gigInputs.price}
+                      </span>
+                    ) : (
+                      <span>Price magnitude: {gigInputs.pricerange}</span>
+                    )}
+                  </div>
+                )}
               </div>
             )}
 

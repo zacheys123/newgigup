@@ -30,6 +30,8 @@ type Info = {
   djGenre: string;
   djEquipment: string;
   vocalistGenre: string[];
+  pricerange: string;
+  currency: string;
 };
 
 export async function POST(req: NextRequest) {
@@ -59,6 +61,8 @@ export async function POST(req: NextRequest) {
     djGenre,
     djEquipment,
     vocalistGenre,
+    pricerange,
+    currency,
   }: Info = await req.json();
 
   console.log(mcType);
@@ -109,6 +113,18 @@ export async function POST(req: NextRequest) {
       message: "To date is required",
     });
   }
+  if (!currency) {
+    return NextResponse.json({
+      gigstatus: "false",
+      message: "Currency is required",
+    });
+  }
+  if (!pricerange) {
+    return NextResponse.json({
+      gigstatus: "false",
+      message: "Price Range is required",
+    });
+  }
 
   if (!from) {
     return NextResponse.json({
@@ -122,6 +138,7 @@ export async function POST(req: NextRequest) {
       message: "Business category is required",
     });
   }
+
   if (!secret) {
     return NextResponse.json({
       gigstatus: "false",
@@ -166,10 +183,13 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const { userId } = getAuth(req);
-  if (!userId) {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-  }
+  // const { userId } = getAuth(req);
+  // if (!userId) {
+  //   return NextResponse.json(
+  //     { message: "Unauthorized", id: userId },
+  //     { status: 401 }
+  //   );
+  // }
   try {
     await connectDb();
     const existingSecret = await Gigs.findOne({
@@ -223,6 +243,8 @@ export async function POST(req: NextRequest) {
       djGenre,
       djEquipment,
       vocalistGenre,
+      pricerange,
+      currency,
     });
 
     return NextResponse.json({
