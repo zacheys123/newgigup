@@ -22,19 +22,21 @@ const BookingPage = () => {
   const router = useRouter();
   const { socket } = useSocket();
   const forget = () =>
-    forgetBookings(user?._id as string, currentgig, userId as string);
+    forgetBookings(user?.user?._id as string, currentgig, userId as string);
   console.log(currentgig?.bookCount);
   useEffect(() => {
     if (currentgig?.isTaken === true) {
       router.push(`/gigs/${userId}`);
     }
     if (
-      currentgig?.bookCount?.some((myuser) => myuser._id === user?._id) &&
+      currentgig?.bookCount?.some((myuser) => myuser._id === user?.user?._id) &&
       currentgig?.isTaken === false
     ) {
       return;
     }
-    if (currentgig?.bookCount?.some((myuser) => myuser._id !== user?._id)) {
+    if (
+      currentgig?.bookCount?.some((myuser) => myuser._id !== user?.user?._id)
+    ) {
     }
   }, [currentgig?.isTaken, currentgig?.isPending]);
   const postedByUser = currentgig?.postedBy;
@@ -85,7 +87,7 @@ const BookingPage = () => {
 
       socket.on("updateGigStatus", ({ gigId, isTaken }) => {
         // Refresh the page if the gig is taken
-        if (isTaken && gigId && currentgig?.bookedBy !== user?._id) {
+        if (isTaken && gigId && currentgig?.bookedBy !== user?.user?._id) {
           router.push(`/gigs/${userId}`);
         }
       });
@@ -270,7 +272,7 @@ const BookingPage = () => {
           <Modal
             onClose={() => setModal(null)}
             modal={modal}
-            user={user}
+            user={user?.user}
             onOpenX={handleOpenX}
           />
         </div>

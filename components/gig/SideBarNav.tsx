@@ -39,7 +39,7 @@ const SidebarNav = () => {
 
   const links = [];
 
-  if (user?.isMusician) {
+  if (user?.user?.isMusician) {
     links.push({
       href: `/gigs/${userId}`,
       Icon: FaHome,
@@ -57,7 +57,7 @@ const SidebarNav = () => {
     });
   }
 
-  if (user?.isClient) {
+  if (user?.user?.isClient) {
     links.push({
       href: `/gigs/${userId}`,
       Icon: FaHome,
@@ -119,9 +119,9 @@ const SidebarNav = () => {
       <div className="mt-auto pt-4 border-t border-gray-700">
         {/* User Profile Card */}
         <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-4">
-          {user?.imageUrl ? (
+          {user?.user?.picture ? (
             <Image
-              src={user.imageUrl}
+              src={user?.user.picture}
               alt="Profile"
               width={40}
               height={40}
@@ -134,10 +134,10 @@ const SidebarNav = () => {
           )}
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-white truncate">
-              {user?.firstName} {user?.lastName}
+              {user?.user?.firstname} {user?.user?.lastname}
             </p>
             <p className="text-xs text-gray-400 truncate">
-              {user?.isMusician ? "Musician" : "Client"}
+              {user?.user?.isMusician ? "Musician" : "Client"}
             </p>
           </div>
         </div>

@@ -55,12 +55,12 @@ const ViewGigDetails = () => {
   }
   return (
     <>
-      {currentgig?.bookCount?.some((myuser) => myuser._id === user?._id) && (
-        <BookingPage />
-      )}
+      {currentgig?.bookCount?.some(
+        (myuser) => myuser._id === user?.user?._id
+      ) && <BookingPage />}
 
       {currentgig?.postedBy?._id &&
-        currentgig?.postedBy?._id.includes(user?._id as string) && (
+        currentgig?.postedBy?._id.includes(user?.user?._id as string) && (
           <AcceptPage {...currentgig} />
         )}
     </>

@@ -106,7 +106,7 @@ const ChatPage = () => {
     if (!newMessage.trim() || !chatId) return;
 
     const newMsg = {
-      sender: user,
+      sender: user?.user,
       receiver: otherUserId as string,
       content: newMessage,
       chatId,
@@ -181,7 +181,7 @@ const ChatPage = () => {
       await fetch(`/api/chat/clearmessages?chatId=${chatId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user?._id }), // Pass the current user's ID
+        body: JSON.stringify({ userId: user?.user?._id }), // Pass the current user's ID
       });
       fetchMessages(chatId); // Refetch messages to update the UI
       console.log("Chat cleared");

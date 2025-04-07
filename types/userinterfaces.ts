@@ -48,8 +48,8 @@ export interface UserProps {
   phone?: string;
   verification?: string;
   username: string; // Required, unique, and lowercase
-  followers: string[]; // Array of User IDs
-  followings: string[]; // Array of User IDs
+  followers: string[] | UserProps[];
+  followings: string[] | UserProps[];
   allreviews: Review[];
   myreviews: Review[];
   isMusician: boolean;

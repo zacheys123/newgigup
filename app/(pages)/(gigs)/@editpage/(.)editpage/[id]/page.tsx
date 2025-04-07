@@ -192,7 +192,7 @@ const EditPage = () => {
         },
         setIsUploading,
         dep,
-        user,
+        user?.user,
         setRefetchData
       );
       console.log(imageUrl);
@@ -260,7 +260,7 @@ const EditPage = () => {
           date: newdate,
           to: `${gigInputs.end}${gigInputs.durationto}`,
           from: `${gigInputs.start}${gigInputs.durationfrom}`,
-          postedBy: user?._id,
+          postedBy: user?.user?._id,
           bussinesscat: bussinesscat,
           font: gigcustom.font,
           fontColor: gigcustom.fontColor,

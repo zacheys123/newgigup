@@ -91,9 +91,9 @@ export function MobileNav() {
   ];
 
   const roleLinks =
-    user?.isMusician && user?.firstLogin === false
+    user?.user?.isMusician && user?.user?.firstLogin === false
       ? musicianLinks
-      : user?.isClient && user?.firstLogin === false
+      : user?.user?.isClient && user?.user?.firstLogin === false
       ? clientLinks
       : [];
 

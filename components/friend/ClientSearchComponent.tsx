@@ -96,13 +96,29 @@ const ClientSearchComponent = () => {
     };
   }, [username, refetch]);
 
-  const [optimisticFollow, setOptimisticFollow] = useState<boolean>(
-    friend?.followers?.includes(user?._id) ?? false
-  );
+  const [optimisticFollow, setOptimisticFollow] = useState<boolean>(() => {
+    const userId = user?.user?._id;
+    if (!userId || !friend?.followers) return false;
+
+    // Handle both string and UserProps cases
+    return friend.followers.some((follower) =>
+      typeof follower === "string"
+        ? follower === userId
+        : follower._id === userId
+    );
+  });
 
   console.log(friend?.picture);
-  const isFollowing =
-    friend?.followers && friend?.followers.includes(user?._id || "");
+  const isFollowing = (() => {
+    const userId = user?.user?._id;
+    if (!userId || !friend?.followers) return false;
+
+    return friend.followers.some((follower) =>
+      typeof follower === "string"
+        ? follower === userId
+        : follower._id === userId
+    );
+  })();
   if (loading) return <div>loading....</div>;
   return (
     <div className="overflow-y-auto h-[95%] w-[90%] mx-auto  shadow-md shadow-orange-300 flex flex-col gap-2">
@@ -142,8 +158,8 @@ const ClientSearchComponent = () => {
                 if (friend?._id) {
                   // Ensure _id is defined
                   try {
-                    handleUnfollow(friend?._id, user);
-                    handleUnFollowingCurrent(friend?._id, user);
+                    handleUnfollow(friend?._id, user?.user);
+                    handleUnFollowingCurrent(friend?._id, user?.user);
                     setRefetch((prev) => !prev);
                     setOptimisticFollow(false);
                     setFollow(false); // Update global state as well
@@ -166,8 +182,8 @@ const ClientSearchComponent = () => {
                 if (friend?._id) {
                   // Ensure _id is defined
                   try {
-                    handleFollow(friend?._id, user);
-                    handleFollowing(friend?._id, user);
+                    handleFollow(friend?._id, user?.user);
+                    handleFollowing(friend?._id, user?.user);
                     setRefetch((prev) => !prev);
                     setOptimisticFollow(true);
                     setFollow(true); // Update global state as well
@@ -201,7 +217,7 @@ const ClientSearchComponent = () => {
           style={{ color: "pink" }}
           onClick={() =>
             router.push(
-              `/search/allvideos/${friend?._id}/*${user?.firstname}${user?.lastname}`
+              `/search/allvideos/${friend?._id}/*${user?.user?.firstname}${user?.user?.lastname}`
             )
           }
         />

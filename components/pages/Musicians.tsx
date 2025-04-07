@@ -16,13 +16,14 @@ const Musicians = ({ _id }: UserProps) => {
       myuser?._id !== _id &&
       myuser?.instrument &&
       myuser?.isClient === false &&
-      myuser?.isMusician === true
-    // myuser?.roleType === "instrumentalist"
+      myuser?.isMusician === true &&
+      myuser?.roleType === "instrumentalist"
   );
   const CurrentMusicianAroundWhereIam = allusers?.users?.filter(
     (myuser: UserProps) =>
-      myuser?.city === user?.city && myuser?.instrument === user?.instrument
-    // myuser?.roleType === "instrumentalist"
+      myuser?.city === user?.user?.city &&
+      myuser?.instrument === user?.user?.instrument &&
+      myuser?.roleType === "instrumentalist"
   );
   // const randomUser =
   //   NotCurrentUserOrClientIsmusucian[

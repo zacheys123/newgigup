@@ -30,7 +30,7 @@ const Nav = () => {
               <MdEmail size="21" />
               <span className="hidden md:inline">Gigs</span>
             </Link>
-            {user?.firstname && (
+            {user?.user?.firstname && (
               <>
                 <Link
                   href={"/profile"}

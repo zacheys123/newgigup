@@ -236,7 +236,7 @@ const PrePendingComponent = () => {
                   <button
                     onClick={() => handleBookUser(myuser._id || "")}
                     className={`px-4 py-2 text-xs sm:text-sm rounded-lg font-semibold transition-all ${
-                      selectedUser === user._id
+                      selectedUser === user?.user._id
                         ? "bg-orange-300 text-gray-300 cursor-not-allowed"
                         : "bg-amber-600 hover:bg-blue-500 text-white"
                     }`}
@@ -268,7 +268,7 @@ const PrePendingComponent = () => {
           <Modal
             onClose={() => setModal(null)}
             modal={modal}
-            user={user}
+            user={user?.user}
             onOpenX={handleOpenX}
           />
         </div>

@@ -41,13 +41,20 @@ const FriendsComponent = () => {
   });
 
   const friend = response?.user;
-  const [isFollowing, setIsFollowing] = useState<boolean>(
-    friend?.followers?.includes(user?._id || "") || false
-  );
+  const [isFollowing, setIsFollowing] = useState<boolean>(() => {
+    const userId = user?.user?._id;
+    if (!userId || !friend?.followers) return false;
+
+    return friend.followers.some((follower) =>
+      typeof follower === "string"
+        ? follower === userId
+        : follower._id === userId
+    );
+  });
   const [isMutating, setIsMutating] = useState(false);
 
   const handleFollowClick = async () => {
-    if (!friend?._id || !user?._id || isMutating) return;
+    if (!friend?._id || !user?.user?._id || isMutating) return;
     setIsMutating(true);
 
     try {
@@ -55,7 +62,7 @@ const FriendsComponent = () => {
         ...response,
         user: {
           ...friend,
-          followers: [...(friend.followers || []), user._id],
+          followers: [...(friend.followers || []), user?.user._id],
         },
       };
 
@@ -63,8 +70,8 @@ const FriendsComponent = () => {
       setIsFollowing(true);
 
       await Promise.all([
-        handleFollow(friend._id, user),
-        handleFollowing(friend._id, user),
+        handleFollow(friend._id, user?.user),
+        handleFollowing(friend._id, user?.user),
       ]);
 
       mutate(`/api/user/getuser/${username}`);
@@ -78,7 +85,7 @@ const FriendsComponent = () => {
   };
 
   const handleUnfollowClick = async () => {
-    if (!friend?._id || !user?._id || isMutating) return;
+    if (!friend?._id || !user?.user?._id || isMutating) return;
     setIsMutating(true);
 
     try {
@@ -86,7 +93,8 @@ const FriendsComponent = () => {
         ...response,
         user: {
           ...friend,
-          followers: friend?.followers?.filter((id) => id !== user._id) || [],
+          followers:
+            friend?.followers?.filter((id) => id !== user?.user._id) || [],
         },
       };
 
@@ -94,8 +102,8 @@ const FriendsComponent = () => {
       setIsFollowing(false);
 
       await Promise.all([
-        handleUnfollow(friend._id, user),
-        handleUnFollowingCurrent(friend._id, user),
+        handleUnfollow(friend._id, user?.user),
+        handleUnFollowingCurrent(friend._id, user?.user),
       ]);
 
       mutate(`/api/user/getuser/${username}`);
@@ -197,7 +205,7 @@ const FriendsComponent = () => {
           {/* Glassmorphism Content Sections */}
           <div className="space-y-6 mt-8">
             {/* Navigation Bar */}
-            {(user?.isMusician || user?.isClient) && (
+            {(user?.user?.isMusician || user?.user?.isClient) && (
               <div className="bg-white/5 backdrop-blur-md p-4 rounded-xl shadow-lg border border-white/10 flex justify-around items-center">
                 <ArrowLeftIcon
                   size={22}
@@ -222,7 +230,7 @@ const FriendsComponent = () => {
                     )
                   }
                 />
-                {!user?.isMusician && user?.isClient && (
+                {!user?.user?.isMusician && user?.user?.isClient && (
                   <MdRateReview
                     size={22}
                     className="text-gray-300 hover:text-white cursor-pointer transition-colors"

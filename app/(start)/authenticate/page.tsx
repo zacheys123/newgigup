@@ -7,7 +7,7 @@ import { CircularProgress } from "@mui/material";
 import { useRouter } from "next/navigation";
 import "@/components/loaders/word.css";
 import React, { useCallback, useEffect, useState, useRef } from "react";
-import useStore from "@/app/zustand/useStore";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 const Authenticate = () => {
   const [firstloader, setfirstloader] = useState<boolean>(false);
@@ -16,7 +16,7 @@ const Authenticate = () => {
   const [fourthloader, setforthloader] = useState<boolean>(false);
   const [mainloader, setMainloader] = useState<boolean>(false);
   const router = useRouter();
-  const { currentUser: myuser } = useStore();
+  const { user: myuser } = useCurrentUser();
   const { user, isSignedIn } = useUser();
   const { isLoaded } = useAuth();
   const LoadingPage = useCallback(() => {
@@ -49,10 +49,11 @@ const Authenticate = () => {
                       setTimeout(() => {
                         setMainloader(false);
                         if (isSignedIn) {
-                          if (myuser?._id) {
+                          if (!myuser?.user?._id) {
                             console.log(myuser);
                             router.push(`/roles/${user?.id}`);
                           } else {
+                            console.log(myuser);
                             router.push("/");
                           }
                         }
@@ -67,8 +68,8 @@ const Authenticate = () => {
       }, 5000)
     );
   }, []);
-  const timeoutRefs = useRef<NodeJS.Timeout[]>([]); // Timeout references for clearing
 
+  const timeoutRefs = useRef<NodeJS.Timeout[]>([]); // Timeout references for clearing
   // Cleanup timeouts on unmount
   useEffect(() => {
     return () => {

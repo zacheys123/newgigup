@@ -44,7 +44,7 @@ const CurrentUserProfile = () => {
   // Authentication and user data
 
   const { user: userdata } = useUser();
-  const { user, mutateUser } = useCurrentUser();
+  const { user } = useCurrentUser();
   const { setRefetchData } = useStore();
   const [showFollowersModal, setShowFollowersModal] = useState(false);
   const [showFollowingModal, setShowFollowingModal] = useState(false);
@@ -135,26 +135,26 @@ const CurrentUserProfile = () => {
       setLastname(userdata?.lastName || "");
       setUsername(userdata?.username || "");
       setEmail(userdata?.emailAddresses[0].emailAddress || "");
-      setCity(user?.city || "");
-      setExperience(user?.experience || "");
-      setInstrument(user?.instrument || "");
-      setYear(user?.year || "");
-      setMonth(user?.month || "");
-      setAge(user?.date || "");
-      setAddress(user?.address || "");
-      setVideos(user?.videosProfile || []);
-      setPhone(user?.phone || "");
-      setOrganization(user?.organization || "");
-      setHandles(user?.musicianhandles || []);
-      setGenre(user?.musiciangenres || []);
-      setDjGenre(user?.djGenre || "");
-      setDjEquipment(user?.djEquipment || "");
-      setMcType(user?.mcType || "");
-      setMcLanguages(user?.mcLanguage || "");
-      setTalentbio(user?.talentbio || "");
-      setIsMusician(user?.isMusician || false);
-      setIsClient(user?.isClient || false);
-      setClientHandles(user?.handles);
+      setCity(user?.user?.city || "");
+      setExperience(user?.user?.experience || "");
+      setInstrument(user?.user?.instrument || "");
+      setYear(user?.user?.year || "");
+      setMonth(user?.user?.month || "");
+      setAge(user?.user?.date || "");
+      setAddress(user?.user?.address || "");
+      setVideos(user?.user?.videosProfile || []);
+      setPhone(user?.user?.phone || "");
+      setOrganization(user?.user?.organization || "");
+      setHandles(user?.user?.musicianhandles || []);
+      setGenre(user?.user?.musiciangenres || []);
+      setDjGenre(user?.user?.djGenre || "");
+      setDjEquipment(user?.user?.djEquipment || "");
+      setMcType(user?.user?.mcType || "");
+      setMcLanguages(user?.user?.mcLanguage || "");
+      setTalentbio(user?.user?.talentbio || "");
+      setIsMusician(user?.user?.isMusician || false);
+      setIsClient(user?.user?.isClient || false);
+      setClientHandles(user?.user?.handles);
     }
   }, [
     user,
@@ -162,9 +162,22 @@ const CurrentUserProfile = () => {
     userdata?.lastName,
     emailAddresses,
     userdata?.username,
+    userdata?.emailAddresses,
   ]);
+  console.log(user);
+
   const { gigs } = useAllGigs();
-  const myGigs = gigs?.filter((gig) => gig?.bookCount.includes(user?._id));
+  console.log(gigs[0]?.bookCount);
+  const myGigs = gigs?.filter((gig) => {
+    const userId = user?.user?._id;
+    if (!userId || !gig?.bookCount) return false;
+
+    // If bookCount contains UserProps objects
+    return gig.bookCount.some((bookUser: UserProps) => bookUser._id === userId);
+
+    // OR if bookCount contains just IDs (strings)
+    // return gig.bookCount.includes(userId);
+  });
   // Handle profile update
   const handleUpdate = async () => {
     const datainfo = {
@@ -196,7 +209,7 @@ const CurrentUserProfile = () => {
     if (user) {
       try {
         setLoading(true);
-        const res = await fetch(`/api/user/update/${user._id}`, {
+        const res = await fetch(`/api/user/update/${user?.user?._id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(datainfo),
@@ -215,9 +228,9 @@ const CurrentUserProfile = () => {
           }
           toast.success(resData.message);
           setRefetchData(true);
-          mutateUser();
+          // mutateUser();
         } else {
-          mutateUser();
+          // mutateUser();
           toast.error(resData.message);
         }
       } catch (error: unknown) {
@@ -298,9 +311,9 @@ const CurrentUserProfile = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <div className="flex items-center gap-4 mb-4 md:mb-0">
             <div className="relative">
-              {user?.picture ? (
+              {user?.user?.picture ? (
                 <Image
-                  src={user.picture}
+                  src={user.user?.picture}
                   alt="Profile"
                   className="w-20 h-20 rounded-full object-cover border-2 border-rose-600"
                   width={20}
@@ -358,78 +371,49 @@ const CurrentUserProfile = () => {
         {/* Stats Overview */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[
+            // In the stats overview section, update the onClick handlers to:
+
             {
               label: "Followers",
-              value: user?.followers?.length || 0,
+              value: user?.user?.followers?.length || 0,
               onClick: () => {
-                // Check if followers are populated or just IDs
-                const followerUsers = Array.isArray(user?.followers)
-                  ? user.followers.map((follower: UserProps) => {
-                      // If follower is already populated (UserProps)
-                      if (
-                        typeof follower !== "string" &&
-                        "firstname" in follower
-                      ) {
-                        return {
-                          name: `${follower.firstname || ""} ${
-                            follower.lastname || ""
-                          }`.trim(),
-                          email: follower.email,
-                        };
-                      }
-                      // If it's just an ID string
-                      return {
-                        name: "Loading...",
-                        email: undefined,
-                      };
-                    })
-                  : [];
-
+                // If followers are just IDs (strings), we can't show names/emails
                 setModalData({
                   title: "Followers",
-                  users: followerUsers,
+                  users:
+                    user?.user?.followers?.map((id) => ({
+                      name: "User ID: " + id,
+                      email: undefined,
+                    })) || [],
                 });
                 setShowFollowersModal(true);
               },
             },
             {
               label: "Following",
-              value: user?.followings?.length || 0,
+              value: user?.user?.followings?.length || 0,
               onClick: () => {
-                // Check if followings are populated or just IDs
-                const followingUsers = Array.isArray(user?.followings)
-                  ? user.followings.map((following: UserProps) => {
-                      // If following is already populated (UserProps)
-                      if (
-                        typeof following !== "string" &&
-                        "firstname" in following
-                      ) {
-                        return {
-                          name: `${following.firstname || ""} ${
-                            following.lastname || ""
-                          }`.trim(),
-                          email: following.email,
-                        };
-                      }
-                      // If it's just an ID string
-                      return {
-                        name: "Loading...",
-                        email: undefined,
-                      };
-                    })
-                  : [];
-
+                // If followings are just IDs (strings), we can't show names/emails
                 setModalData({
                   title: "Following",
-                  users: followingUsers,
+                  users:
+                    user?.user?.followings?.map((id) => ({
+                      name: "User ID: " + id,
+                      email: undefined,
+                    })) || [],
                 });
                 setShowFollowingModal(true);
               },
             },
-            { label: "Reviews", value: user?.allreviews?.length || 0 },
+            { label: "Reviews", value: user?.user?.allreviews?.length || 0 },
 
-            ...(!user?.isClient
-              ? [{ label: "Videos", value: user?.videosProfile?.length || 0 }]
+            ...(!user?.user?.isClient
+              ? [
+                  {
+                    label: "Videos",
+                    value: user?.user?.videosProfile?.length || 0,
+                  },
+                ]
               : []),
           ].map((stat, index) => (
             <div
@@ -488,7 +472,7 @@ const CurrentUserProfile = () => {
                 }
               >
                 <VideoProfileComponent
-                  user={user}
+                  user={user?.user}
                   setVideoUrl={setVideoUrl}
                   videos={videos}
                   showUpload={showUpload}

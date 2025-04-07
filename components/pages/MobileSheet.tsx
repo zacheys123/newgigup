@@ -70,7 +70,7 @@ const MobileSheet = () => {
           </SheetDescription>
         </Link>
         <Link
-          href={`/allreviews/${user?._id}/*${user?.firstname}${user?.lastname}`}
+          href={`/allreviews/${user?.user?._id}/*${user?.user?.firstname}${user?.user?.lastname}`}
           className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 hover:text-white rounded-md transition-all"
         >
           <BookA size="20" className="text-white" />
@@ -100,7 +100,7 @@ const MobileSheet = () => {
         </Link>
 
         <Link
-          href={`/reviews/${user?._id}/*${user?.firstname}${user?.lastname}`}
+          href={`/reviews/${user?.user?._id}/*${user?.user?.firstname}${user?.user?.lastname}`}
           className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 hover:text-white rounded-md transition-all"
         >
           <BookCopy size="20" className="text-white" />
@@ -118,9 +118,9 @@ const MobileSheet = () => {
             My Chats
           </SheetDescription>
         </Link>
-        {user?.isMusician && !user?.isClient && (
+        {user?.user?.isMusician && !user?.user?.isClient && (
           <Link
-            href={`/search/allvideos/${user?._id}/*${user?.firstname}/${user?.lastname}`}
+            href={`/search/allvideos/${user?.user?._id}/*${user?.user?.firstname}/${user?.user?.lastname}`}
             className="flex flex-row items-center gap-4 min-w-[100%] px-4 py-2 text-white hover:bg-teal-600 hover:text-white rounded-md transition-all"
           >
             <VideoIcon size="20" className="text-white" />

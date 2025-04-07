@@ -125,7 +125,9 @@ const AllVideosPage = () => {
           onClick={() => router.back()}
         />
         <h1 className="text-white text-2xl font-extrabold">
-          {user?._id === userid ? "All My Videos" : `${name?.slice(1)} Videos`}
+          {user?.user?._id === userid
+            ? "All My Videos"
+            : `${name?.slice(1)} Videos`}
         </h1>
       </div>
       {!friendvideos && (
@@ -154,7 +156,7 @@ const AllVideosPage = () => {
                 </span>{" "}
                 {video.title}
               </h3>
-              {user?._id === userid && (
+              {user?.user?._id === userid && (
                 <BsThreeDotsVertical
                   className="cursor-pointer hover:text-amber-500 text-neutral-400"
                   size={22}

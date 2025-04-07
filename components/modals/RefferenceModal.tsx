@@ -45,9 +45,9 @@ const RefferenceModal: React.FC<ProfileModalProps> = ({ user, getReviews }) => {
       <p className="text-neutral-400 mb-3">
         Contact a list of {user?.username} former clients
       </p>
-      {myuser?._id &&
+      {myuser?.user?._id &&
         user?.refferences
-          ?.filter(({ _id }: UserProps) => _id !== myuser?._id)
+          ?.filter(({ _id }: UserProps) => _id !== myuser?.user?._id)
           ?.map(
             ({ _id, firstname, lastname, myreviews, username }: UserProps) => {
               return (

@@ -3,7 +3,7 @@ import { IoMdAdd } from "react-icons/io";
 import { useRouter } from "next/navigation";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import useStore from "@/app/zustand/useStore";
-import { FetchResponse } from "@/types/userinterfaces";
+import { FetchResponse, UserProps } from "@/types/userinterfaces";
 
 // The FollowButton component that supports optimistic UI updates
 const FollowButton = ({
@@ -11,16 +11,23 @@ const FollowButton = ({
   followers,
 }: {
   _id: string;
-  followers: string[];
+  followers: string[] | UserProps[];
 }) => {
   const { user } = useCurrentUser();
   const { setFollow, follow } = useStore();
   const router = useRouter();
 
   // Local state to handle the optimistic update
-  const [optimisticFollow, setOptimisticFollow] = useState<boolean>(
-    followers.includes(user?._id || "")
-  );
+  const [optimisticFollow, setOptimisticFollow] = useState<boolean>(() => {
+    const userId = user?.user?._id;
+    if (!userId || !followers) return false;
+
+    return followers.some((follower) =>
+      typeof follower === "string"
+        ? follower === userId
+        : follower._id === userId
+    );
+  });
   console.log(optimisticFollow);
   // Function to handle the follow action
   const handleFollow = async () => {
@@ -34,7 +41,7 @@ const FollowButton = ({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ follower: user?._id }),
+        body: JSON.stringify({ follower: user?.user?._id }),
       });
 
       if (res.ok) {
@@ -63,7 +70,7 @@ const FollowButton = ({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ follower: user?._id }),
+        body: JSON.stringify({ follower: user?.user?._id }),
       });
 
       if (res.ok) {
@@ -88,7 +95,7 @@ const FollowButton = ({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ following: user?._id }),
+        body: JSON.stringify({ following: user?.user?._id }),
       });
       const followingData: FetchResponse = await res.json();
       console.log(followingData);
@@ -103,7 +110,7 @@ const FollowButton = ({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ following: user?._id }),
+        body: JSON.stringify({ following: user?.user?._id }),
       });
       const followingData: FetchResponse = await res.json();
       console.log(followingData);
@@ -118,9 +125,18 @@ const FollowButton = ({
   useEffect(() => {
     console.log("Initial optimisticFollow:", optimisticFollow);
     console.log("Followers array:", followers);
-    console.log("Current User ID:", user?._id);
+    console.log("Current User ID:", user?.user?._id);
   }, [optimisticFollow, followers, user]);
-  const isFollowing = followers.includes(user?._id || "");
+  const isFollowing = (() => {
+    const userId = user?.user?._id;
+    if (!userId || !followers) return false;
+
+    return followers.some((follower) =>
+      typeof follower === "string"
+        ? follower === userId
+        : follower._id === userId
+    );
+  })();
   return (
     <div>
       {/* Conditional rendering based on optimistic follow state */}{" "}

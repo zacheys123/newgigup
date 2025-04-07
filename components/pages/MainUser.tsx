@@ -55,22 +55,22 @@ const MainUser = ({
   };
 
   useEffect(() => {
-    if (gigsLoading || userLoading || !user?._id || !gigs) return;
+    if (gigsLoading || userLoading || !user?.user?._id || !gigs) return;
 
     const bookedGigs = gigs.filter(
-      (gig: GigProps) => gig?.bookedBy?._id === user?._id
+      (gig: GigProps) => gig?.bookedBy?._id === user?.user?._id
     ).length;
 
     setMusicianGigCount(bookedGigs);
     console.log(bookedGigs);
-    if (user?.isMusician) {
-      setRating(calculateRating(user?.allreviews || [], bookedGigs));
+    if (user?.user?.isMusician) {
+      setRating(calculateRating(user?.user?.allreviews || [], bookedGigs));
     }
   }, [
-    user?._id,
-    user?.isMusician,
+    user?.user?._id,
+    user?.user?.isMusician,
     gigs,
-    user?.allreviews,
+    user?.user?.allreviews,
     userLoading,
     gigsLoading,
   ]);

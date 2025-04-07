@@ -60,7 +60,7 @@ const Videos = () => {
     console.log("description from front End", videos.title);
     console.log("media from front End", videos.description);
     console.log("postedBy from front End", gig?.bookedBy?._id);
-    console.log("Logged In user from front End", user?._id);
+    console.log("Logged In user from front End", user?.user?._id);
 
     if (videoUrl) {
       try {
@@ -113,7 +113,7 @@ const Videos = () => {
         },
         setLoading,
         dep,
-        user,
+        user?.user,
         setRefetchData
       );
     },

@@ -33,12 +33,15 @@ const Actions = () => {
     console.log(user);
     // User has completed registration
     if (
-      typeof user?.isMusician === "boolean" &&
-      typeof user?.isClient === "boolean"
+      typeof user?.user?.isMusician === "boolean" &&
+      typeof user?.user?.isClient === "boolean"
     ) {
-      if (user?.isMusician || user?.isClient) {
+      if (user?.user?.isMusician || user?.user?.isClient) {
         setStatus("registered");
-        if (user?.firstLogin === true && user?.onboardingComplete === false) {
+        if (
+          user?.user?.firstLogin === true &&
+          user?.user?.onboardingComplete === false
+        ) {
           router.push("/dashboard");
         }
       } else {

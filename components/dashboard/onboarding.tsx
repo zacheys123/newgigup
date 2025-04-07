@@ -13,8 +13,8 @@ export function OnboardingModal() {
   const [loading, setLoading] = useState(false);
 
   // Determine the role based on isClient and isMusician booleans
-  const isMusician = user?.isMusician || false;
-  const isClient = user?.isClient || false;
+  const isMusician = user?.user?.isMusician || false;
+  const isClient = user?.user?.isClient || false;
 
   const steps = {
     musician: [
@@ -47,8 +47,8 @@ export function OnboardingModal() {
   return (
     <>
       {loading && <LoadingGame isLoading={loading} />}
-      {user?.firstLogin === true &&
-        user?.onboardingComplete === false &&
+      {user?.user?.firstLogin === true &&
+        user?.user?.onboardingComplete === false &&
         !loading && (
           <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center">
             <div className="bg-gray-800 rounded-xl p-6 max-w-md">

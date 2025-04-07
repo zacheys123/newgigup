@@ -155,7 +155,8 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
               <div
                 key={msg._id || msg.tempId || uuidv4()}
                 className={`flex items-end relative ${
-                  msg.sender?._id === user?._id || msg.tempId === user?._id // Ensure compatibility with different message structures
+                  msg.sender?._id === user?.user?._id ||
+                  msg.tempId === user?.user?._id // Ensure compatibility with different message structures
                     ? "justify-end"
                     : "justify-start"
                 }`}
@@ -171,7 +172,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
                   )}
                 <div
                   className={`relative max-w-xs md:max-w-sm px-4 py-3 text-sm md:text-base rounded-2xl shadow-xl transition-all duration-300 transform my-3 ${
-                    msg.sender?._id === user?._id
+                    msg.sender?._id === user?.user?._id
                       ? "bg-gradient-to-bl from-green-900 via-gray-600 to-blue-700 text-white rounded-br-md self-end"
                       : "bg-gradient-to-r from-amber-900 via-zinc-600  to-amber-400 text-white rounded-bl-md self-start"
                   }`}
@@ -198,7 +199,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
                         )
                       }
                     >
-                      {msg?.reactions && msg?.sender?._id !== user?._id
+                      {msg?.reactions && msg?.sender?._id !== user?.user?._id
                         ? msg?.reactions
                         : messageReactions[msg._id || ""] ||
                           (msg.reactions ?? [])[0] ||

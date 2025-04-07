@@ -17,11 +17,11 @@ import { toast } from "sonner";
 
 const MyGigs = () => {
   const { loading: gigsLoading, gigs, mutateGigs } = useAllGigs();
-  const { user, loading: userLoading, mutateUser } = useCurrentUser();
+  const { user, loading: userLoading } = useCurrentUser();
   const [typeOfGig, setTypeOfGig] = useState<string>("");
   const [category, setCategory] = useState<string>("all");
   const [location, setLocation] = useState<string>(() =>
-    user?.city ? user?.city : "all"
+    user?.user?.city ? user?.user?.city : "all"
   );
   let gigQuery;
   const router = useRouter();
@@ -87,24 +87,24 @@ const MyGigs = () => {
     }
   };
   useEffect(() => {
-    if (!user) {
-      mutateUser().catch((error) => {
-        console.error("Failed to mutate user:", error);
-        // Consider adding toast notification here
-      });
-    }
+    // if (!user) {
+    //   mutateUser().catch((error) => {
+    //     console.error("Failed to mutate user:", error);
+    //     // Consider adding toast notification here
+    //   });
+    // }
 
-    if (user?.city) {
-      setLocation(user.city);
+    if (user?.user?.city) {
+      setLocation(user?.user.city);
     }
-  }, [user, mutateUser]);
+  }, [user]);
   const filteredGigs = useMemo(() => {
     return (
       searchfunc(gigs, typeOfGig, category, gigQuery, location)?.filter(
-        (gig: GigProps) => gig?.postedBy?._id === user?._id
+        (gig: GigProps) => gig?.postedBy?._id === user?.user?._id
       ) || []
     );
-  }, [gigs, typeOfGig, category, location, gigQuery, user?._id]);
+  }, [gigs, typeOfGig, category, location, gigQuery, user?.user?._id]);
 
   const isLoading = gigsLoading || userLoading;
   console.log(user);
@@ -202,7 +202,7 @@ const MyGigs = () => {
             setCategory={setCategory}
             location={location}
             setLocation={setLocation}
-            myuser={user}
+            myuser={user?.user}
           />
         </div>
         <div className="h-[85%] overflow-y-scroll bg-gray-900">

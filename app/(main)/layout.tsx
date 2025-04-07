@@ -30,8 +30,10 @@ const MainLayout = ({
 
     // Transform the user data as needed
     if (
-      myuser?.isMusician === true ||
-      (myuser?.isClient === true && myuser?.city && myuser?.talentbio)
+      myuser?.user?.isMusician === true ||
+      (myuser?.user?.isClient === true &&
+        myuser?.user?.city &&
+        myuser?.user?.talentbio)
     ) {
       // Transform the user data as needed
 

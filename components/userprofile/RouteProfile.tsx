@@ -68,7 +68,7 @@ const RouteProfile = () => {
         },
         setIsUploading,
         dep,
-        user,
+        user?.user,
         setRefetchData
       );
     },
@@ -82,7 +82,7 @@ const RouteProfile = () => {
     }
     try {
       // update user picture in the database
-      await fetch(`/api/user/updateImage/${user?._id}`, {
+      await fetch(`/api/user/updateImage/${user?.user?._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -130,12 +130,16 @@ const RouteProfile = () => {
                 &times;
               </span>{" "}
             </div>
-            {user && user?.picture && (
+            {user && user?.user?.picture && (
               <Image
                 priority
-                src={user?.picture}
+                src={user?.user?.picture}
                 className="object-cover w-[680px] h-[680px] rounded-xl"
-                alt={user?.firstname ? user?.firstname.split("")[0] : ""}
+                alt={
+                  user?.user?.firstname
+                    ? user?.user?.firstname.split("")[0]
+                    : ""
+                }
                 width={200}
                 height={200}
                 onClick={() => handleModal()}
@@ -165,18 +169,20 @@ const RouteProfile = () => {
               </label>{" "}
             </>
           )}
-          {user?.picture && (
+          {user?.user?.picture && (
             <Image
               priority
               src={
-                !fileUrl && !user?.picture
+                !fileUrl && !user?.user?.picture
                   ? ""
                   : fileUrl
                   ? fileUrl
-                  : user?.picture
+                  : user?.user?.picture
               }
               className="object-cover w-[200px] h-[200px] rounded-full"
-              alt={user?.firstname ? user.firstname.split("")[0] : ""}
+              alt={
+                user?.user?.firstname ? user?.user.firstname.split("")[0] : ""
+              }
               width={200}
               height={200}
               onClick={() => handleModal()}
@@ -207,7 +213,7 @@ const RouteProfile = () => {
         </div>
         <div className="flex items-center gap-2">
           <h3 className="text-xl text-white">
-            {user?.firstname} {user?.lastname}
+            {user?.user?.firstname} {user?.user?.lastname}
           </h3>
           <Pencil
             color="white"
@@ -215,7 +221,7 @@ const RouteProfile = () => {
             onClick={() => router.push(`/profile/${userId}/user`)}
           />
         </div>
-        <p className="text-sm text-gray-400">{user?.email}</p>
+        <p className="text-sm text-gray-400">{user?.user?.email}</p>
       </div>
     </>
   );

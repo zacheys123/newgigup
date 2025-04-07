@@ -139,19 +139,19 @@ const ChatNavigation = () => {
                 <FaUser className="h-4 w-4 text-yellow-400" />
               </Link>
               <Link
-                href={`/reviews/${user?._id}/*${user?.firstname}${user?.lastname}`}
+                href={`/reviews/${user?.user?._id}/*${user?.user?.firstname}${user?.user?.lastname}`}
                 className="flex items-center space-x-2 p-3 rounded-lg hover:bg-gray-700 transition-all duration-200 cursor-pointer bg-gradient-to-br from-[#e9edf0] via-[#154958] to-[#0c6dc9]"
               >
                 <FaComments className="h-4 w-4 text-amber-500" />
               </Link>
               <Link
-                href={`/allreviews/${user?._id}/*${user?.firstname}${user?.lastname}`}
+                href={`/allreviews/${user?.user?._id}/*${user?.user?.firstname}${user?.user?.lastname}`}
                 className="flex items-center space-x-2 p-3 rounded-lg hover:bg-gray-700 transition-all duration-200 cursor-pointer bg-gradient-to-br from-[#e9edf0] via-[#154958] to-[#0c6dc9]"
               >
                 <FaStar className="h-4 w-4 text-fuchsia-400" />
               </Link>
               <Link
-                href={`/search/allvideos/${user?._id}/*${user?.firstname}/${user?.lastname}`}
+                href={`/search/allvideos/${user?.user?._id}/*${user?.user?.firstname}/${user?.user?.lastname}`}
                 className="flex items-center space-x-2 p-3 rounded-lg hover:bg-gray-700 transition-all duration-200 cursor-pointer bg-gradient-to-br from-[#e9edf0] via-[#154958] to-[#0c6dc9]"
               >
                 <FaVideo className="h-4 w-4 text-green-2300" />

@@ -6,12 +6,12 @@ import AllReview from "./allreviews/AllReview";
 
 const OthersReviewComponent = () => {
   const { user } = useCurrentUser();
-  console.log(user?._id);
+  console.log(user?.user?._id);
   return (
     <div className="text-gray-300 h-full py-2 bg-neutral-900">
-      {user?.allreviews?.length > 0 ? (
+      {user?.user?.allreviews?.length > 0 ? (
         <>
-          {user?.allreviews?.map((review: Review) => (
+          {user?.user?.allreviews?.map((review: Review) => (
             <AllReview key={review?._id} {...review} w="240px" />
           ))}
         </>

@@ -1558,7 +1558,7 @@ const CreateGig = () => {
         },
         setIsUploading,
         dep,
-        user,
+        user?.user,
         setRefetchData
       );
     },
@@ -1681,7 +1681,7 @@ const CreateGig = () => {
           date: gigInputs?.date,
           to: `${gigInputs.end}${gigInputs.durationto}`,
           from: `${gigInputs.start}${gigInputs.durationfrom}`,
-          postedBy: user?._id,
+          postedBy: user?.user?._id,
           bussinesscat: bussinesscat,
           font: gigcustom.font,
           fontColor: gigcustom.fontColor,

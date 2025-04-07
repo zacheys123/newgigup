@@ -26,12 +26,12 @@ const ClientProfile = () => {
   // State for form inputs
   const [formData, setFormData] = useState({
     fullName:
-      myuser?.firstname && myuser?.lastname
-        ? `${myuser?.firstname} ${myuser?.lastname}`
+      myuser?.user?.firstname && myuser?.user?.lastname
+        ? `${myuser?.user?.firstname} ${myuser?.user?.lastname}`
         : "",
-    username: myuser?.username || "",
-    location: myuser?.city || "",
-    bio: myuser?.bio || "",
+    username: myuser?.user?.username || "",
+    location: myuser?.user?.city || "",
+    bio: myuser?.user?.bio || "",
     handles: "",
     organization: "",
     picture: user?.imageUrl,
@@ -41,14 +41,16 @@ const ClientProfile = () => {
     if (myuser) {
       setFormData({
         fullName:
-          myuser?.firstname && myuser?.lastname
-            ? `${myuser?.firstname} ${myuser?.lastname}`
+          myuser?.user?.firstname && myuser?.user?.lastname
+            ? `${myuser?.user?.firstname} ${myuser?.user?.lastname}`
             : "",
-        username: myuser?.username || "",
-        location: myuser?.city || "",
-        bio: myuser?.bio ? myuser?.bio : myuser?.talentbio || "",
-        handles: myuser?.handles || "",
-        organization: myuser?.organization || "",
+        username: myuser?.user?.username || "",
+        location: myuser?.user?.city || "",
+        bio: myuser?.user?.bio
+          ? myuser?.user?.bio
+          : myuser?.user?.talentbio || "",
+        handles: myuser?.user?.handles || "",
+        organization: myuser?.user?.organization || "",
         picture: user?.imageUrl,
       });
     }
@@ -89,7 +91,7 @@ const ClientProfile = () => {
     setLoading(true);
     try {
       const { data }: UpdateResponse = await axios.put(
-        `/api/user/client/${myuser?._id}`,
+        `/api/user/client/${myuser?.user?._id}`,
         formData
       );
       console.log(data);
@@ -102,7 +104,11 @@ const ClientProfile = () => {
     }
   };
 
-  if (!myuser?.firstname || !myuser?.lastname || !myuser?.username) {
+  if (
+    !myuser?.user?.firstname ||
+    !myuser?.user?.lastname ||
+    !myuser?.user?.username
+  ) {
     return (
       <div className="flex justify-center items-center min-h-screen text-gray-300 backdrop-blur-sm bg-neutral-700/50 flex-col gap-4 ">
         <motion.div
@@ -127,9 +133,9 @@ const ClientProfile = () => {
       >
         {/* Profile Header */}
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 border-b border-neutral-700 pb-4">
-          {user && myuser?.picture && (
+          {user && myuser?.user?.picture && (
             <Image
-              src={myuser.picture || "/default-avatar.png"}
+              src={myuser.user?.picture || "/default-avatar.png"}
               alt="Profile"
               className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-2 border-neutral-500"
               width={128}

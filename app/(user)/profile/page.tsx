@@ -10,7 +10,7 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 const ProfilePage = () => {
   const { user } = useCurrentUser();
-  // const allUsers = await getAllUsers(user?.user?._id);
+  // const allUsers = await getAllUsers(user?.user?.user?.user?._id);
 
   console.log(user);
   return (
@@ -19,7 +19,7 @@ const ProfilePage = () => {
         Profile Landing Page
         <br />
         <span className="text-sm text-gray-400">
-          Welcome, {user?.firstname}!
+          Welcome, {user?.user?.firstname}!
         </span>
       </div>
       <RouteProfile />
@@ -31,7 +31,7 @@ const ProfilePage = () => {
         <Divider />
         <SideBar user={user} allUsers={allUsers} />{" "}
       </div> */}
-      <Musicians {...user} />
+      <Musicians {...user?.user} />
     </div>
   );
 };

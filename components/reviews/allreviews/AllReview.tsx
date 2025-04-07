@@ -88,8 +88,8 @@ const AllReview = ({
                 <p className="text-amber-600 text-[12px]">
                   {gig ? gig.title : "No title"}
                 </p>{" "}
-                {postedBy !== user?._id &&
-                  gig?.bookedBy?._id !== user?._id &&
+                {postedBy !== user?.user?._id &&
+                  gig?.bookedBy?._id !== user?.user?._id &&
                   video?.length !== 0 && (
                     <div
                       className="flex gap-2 items-center justify-around "

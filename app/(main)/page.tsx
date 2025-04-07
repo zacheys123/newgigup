@@ -42,12 +42,17 @@ export default function Home() {
     );
   }
 
+  console.log(user);
   const getDynamicHref = () => {
-    if (!userId || !user?.firstname || (!user?.isClient && !user?.isMusician))
+    if (
+      !userId ||
+      !user?.user?.firstname ||
+      (!user?.user?.isClient && !user?.user?.isMusician)
+    )
       return `/roles/${userId}`;
-    return user?.isClient
+    return user?.user?.isClient
       ? `/create/${userId}`
-      : user?.isMusician
+      : user?.user?.isMusician
       ? `/gigs/${userId}`
       : `/roles/${userId}`;
   };
@@ -182,7 +187,7 @@ export default function Home() {
             )}
           </div>
         </div>{" "}
-        {user?.firstname && (
+        {user?.user?.firstname && (
           <Link
             className="absolute bottom-5 mt-6 px-6 py-1  text-gray-100 text-sm font-semibold rounded-xl  rounded-bl-xl roundedt-l-xl shadow-lg hover:bg-yellow-400 transition animate-bounce flex items-center"
             style={{ fontFamily: fonts[24], backgroundColor: colors[15] }}

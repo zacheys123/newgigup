@@ -19,7 +19,7 @@ const AllChats = () => {
   const { user: myuser } = useCurrentUser();
 
   const router = useRouter();
-  const loggedInUserId = myuser?._id;
+  const loggedInUserId = myuser?.user?._id;
   console.log(myuser);
 
   // Filter chats based on the search query

@@ -246,7 +246,7 @@ const ActionPage = () => {
 
   const handleRoleSelection = useCallback(
     (isMusician: boolean) => {
-      if (myuser?.isMusician || myuser?.isClient) {
+      if (myuser?.user?.isMusician || myuser?.user?.isClient) {
         setMoreInfo(true);
         return;
       }
@@ -545,7 +545,7 @@ const ActionPage = () => {
               description:
                 "Create gigs and book top-tier musicians, DJs, and performers",
               buttonText: "Join as Client",
-              disabled: !!myuser?.isClient,
+              disabled: !!myuser?.user?.isClient,
               onClick: () => handleRoleSelection(false),
             },
             {
@@ -556,7 +556,7 @@ const ActionPage = () => {
                 "Showcase your talent and connect with premium opportunities",
               buttonText: "Join as Talent",
               onClick: () => handleRoleSelection(true),
-              disabled: !!myuser?.isMusician,
+              disabled: !!myuser?.user?.isMusician,
             },
             {
               role: "both",

@@ -18,7 +18,7 @@ const BillingComponent = () => {
       {
         name: "Free Tier",
         price: "$0",
-        features: user?.isMusician
+        features: user?.user?.isMusician
           ? [
               "Apply to 5 gigs/month",
               "Basic profile visibility",
@@ -26,7 +26,7 @@ const BillingComponent = () => {
               "Performance analytics",
               "7 days of access",
             ]
-          : user?.isClient
+          : user?.user?.isClient
           ? [
               "Post 3 gigs/month",
               "Browse musician profiles",
@@ -40,12 +40,12 @@ const BillingComponent = () => {
       },
       {
         name: "Pro Tier",
-        price: user?.isMusician
+        price: user?.user?.isMusician
           ? "$15/month"
-          : user?.isClient
+          : user?.user?.isClient
           ? "$20/month"
           : "",
-        features: user?.isMusician
+        features: user?.user?.isMusician
           ? [
               "Unlimited gig applications",
               "Featured profile in search",
@@ -54,7 +54,7 @@ const BillingComponent = () => {
               "Direct booking options",
               "Unlimited messaging",
             ]
-          : user?.isClient
+          : user?.user?.isClient
           ? [
               "Unlimited gig postings",
               "Featured listing placement",
@@ -69,7 +69,7 @@ const BillingComponent = () => {
         current: isPro,
       },
     ];
-  }, [user?.isMusician, user?.isClient, isPro]);
+  }, [user?.user?.isMusician, user?.user?.isClient, isPro]);
   return (
     <div className="flex flex-col space-y-8">
       <div className="hidden md:grid grid-cols-1 gap-4 md:gap-6 md:grid-cols-2">

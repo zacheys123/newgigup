@@ -30,7 +30,7 @@ const PagesNav = () => {
 
   const links = [];
 
-  if (user?.isMusician) {
+  if (user?.user?.isMusician) {
     links.push({
       href: `/gigs/${userId}`,
       Icon: FaHome,
@@ -54,7 +54,7 @@ const PagesNav = () => {
     });
   }
 
-  if (user?.isClient) {
+  if (user?.user?.isClient) {
     links.push({
       href: `/gigs/${userId}`,
       Icon: FaHome,

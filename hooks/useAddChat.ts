@@ -11,8 +11,8 @@ export const useAddChat = (chats: []) => {
   const [searchAddChat, setSearchAddChat] = useState(""); // State for search query
   const [isAddingChat, setIsAddingChat] = useState(false);
   const router = useRouter();
-  const loggedInUserId = myuser?._id;
-  console.log(myuser?.refferences);
+  const loggedInUserId = myuser?.user?._id;
+  console.log(myuser?.user?.refferences);
   const filteredUsers = users?.users?.filter((user: UserProps) => {
     if (!myuser) return false; // Ensure the current user exists
 
@@ -24,7 +24,7 @@ export const useAddChat = (chats: []) => {
       chat?.users.some((u) => u._id === user._id)
     );
 
-    if (myuser?.isClient) {
+    if (myuser?.user?.isClient) {
       // Show all musicians and users in references of any musician
       return (
         user.isMusician ||
@@ -32,10 +32,7 @@ export const useAddChat = (chats: []) => {
       );
     }
     return (
-      isUserInChat &&
-      user?.isMusician &&
-      user?.roleType === "instrumentalist" &&
-      myuser?.followers?.includes(user?._id as string)
+      isUserInChat && user?.isMusician && user?.roleType === "instrumentalist"
     );
   });
 

@@ -26,12 +26,12 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose, onOpenX }) => {
 
   useEffect(() => {
     const fetchChat = async () => {
-      if (!myuserd?._id || !modal.user?._id) return;
+      if (!myuserd?.user?._id || !modal.user?._id) return;
 
       setLoading(true);
       try {
         const res = await fetch(
-          `/api/chat/fetchchat?user1=${myuserd._id}&user2=${modal.user._id}`
+          `/api/chat/fetchchat?user1=${myuserd.user?._id}&user2=${modal.user._id}`
         );
         const data = await res.json();
 
@@ -43,7 +43,9 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose, onOpenX }) => {
           const newChatRes = await fetch(`/api/chat/createchat`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ users: [myuserd._id, modal.user._id] }),
+            body: JSON.stringify({
+              users: [myuserd.user?._id, modal.user._id],
+            }),
           });
 
           const newChatData = await newChatRes.json();
@@ -59,7 +61,7 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose, onOpenX }) => {
     };
 
     fetchChat();
-  }, [myuserd._id, modal.user, chatId]);
+  }, [myuserd?.user?._id, modal.user, chatId]);
 
   const send = async (e: React.FormEvent) => {
     if (!socket) return;
@@ -92,12 +94,15 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose, onOpenX }) => {
   const handleTyping = () => {
     if (!socket) return;
 
-    socket.emit("typing", { senderId: myuserd._id, receiverId: chatId });
+    socket.emit("typing", { senderId: myuserd?.user?._id, receiverId: chatId });
 
     if (typingTimeout) clearTimeout(typingTimeout);
 
     typingTimeout = setTimeout(() => {
-      socket.emit("stopTyping", { senderId: myuserd._id, receiverId: chatId });
+      socket.emit("stopTyping", {
+        senderId: myuserd?.user?._id,
+        receiverId: chatId,
+      });
     }, 3000);
   };
 
@@ -118,7 +123,7 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose, onOpenX }) => {
       <ChatHeader
         onClose={onClose}
         modal={modal}
-        user={myuserd}
+        user={myuserd?.user}
         onOpenX={onOpenX}
       />
 

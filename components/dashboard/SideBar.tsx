@@ -89,15 +89,15 @@ export function Sidebar() {
             {data?.subscription?.isPro ? "PRO" : "FREE"}
           </span>
           <span className="text-xs text-gray-400">
-            {user?.isMusician ? "Artist" : "Client"}
+            {user?.user?.isMusician ? "Artist" : "Client"}
           </span>
         </div>
       </div>
 
       <nav className="space-y-2">
-        {(user?.isMusician
+        {(user?.user?.isMusician
           ? musicianLinks
-          : user?.isClient
+          : user?.user?.isClient
           ? clientLinks
           : []
         ).map((link) => (
