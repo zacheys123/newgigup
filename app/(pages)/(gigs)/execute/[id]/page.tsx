@@ -17,7 +17,8 @@ const ViewGigDetails = () => {
   const router = useRouter();
 
   console.log(currentGig);
-  if (loading) {
+  console.log("my user data", user);
+  if (loading && !user?.user?.firstname) {
     return (
       <div className="h-[85%] w-full flex justify-center items-center animate-pulse">
         <div>
@@ -47,7 +48,6 @@ const ViewGigDetails = () => {
             Reload page
             <TfiReload />
           </Button>
-          m
         </div>
       </div>
     );
@@ -58,7 +58,8 @@ const ViewGigDetails = () => {
         (myuser: UserProps) => myuser._id === user?.user?._id
       ) && <BookingPage currentGig={currentGig} />}
 
-      {currentGig?.postedBy?._id &&
+      {user?.user?.firstname &&
+        currentGig?.postedBy?._id &&
         currentGig?.postedBy?._id.includes(user?.user?._id as string) && (
           <AcceptPage {...currentGig} />
         )}

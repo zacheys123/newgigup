@@ -133,6 +133,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
   // helper variables
   const isGigCreator = gig?.postedBy?._id === myId;
   const hasBookedGig = gig?.bookCount?.some((i) => i?._id === myId);
+  console.log(isGigCreator);
   const isCurrentWhoCreatedGig =
     isGigCreator && !hasBookedGig && bookCount > 0 && gig?.isTaken === false;
   const isCurrentWhoBooked = hasBookedGig && !isGigCreator;
