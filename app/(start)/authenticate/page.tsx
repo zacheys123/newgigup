@@ -48,7 +48,7 @@ const Authenticate = () => {
                     timeoutRefs.current.push(
                       setTimeout(() => {
                         setMainloader(false);
-                        if (isSignedIn) {
+                        if (isLoaded) {
                           if (myuser && !myuser?.user?._id) {
                             router.push(`/roles/${user?.id}`);
                           } else {

@@ -16,40 +16,7 @@ export function useCurrentUser() {
   const [reviews, setReviews] = useState<Review[]>();
 
   const userId = clerkUser?.id;
-  const [user, setUser] = useState<UserResponse>({
-    user: {
-      clerkId: "",
-      firstname: "",
-      lastname: "",
-      experience: "",
-      instrument: "",
-      username: "",
-      followers: [],
-      followings: [],
-      allreviews: [],
-      myreviews: [],
-      isMusician: false,
-      isClient: false,
-      videosProfile: [],
-      organization: "",
-      bio: "",
-      handles: "",
-      genre: "",
-      refferences: [],
-      roleType: "",
-      djGenre: "",
-      djEquipment: "",
-      mcType: "",
-      mcLanguage: "",
-      talentbio: "",
-      vocalistGenre: "",
-      musicianhandles: [{ platform: "", handle: "" }],
-      musiciangenres: [],
-      firstLogin: true,
-      onboardingComplete: false,
-      lastActive: new Date(),
-    },
-  });
+  const [user, setUser] = useState<UserResponse>();
 
   // Memoize the URL to prevent unnecessary re-renders
 
