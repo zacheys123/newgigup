@@ -19,7 +19,9 @@ const Actions = () => {
   useEffect(() => {
     // Only proceed when auth and user data are loaded
     if (!isAuthLoaded || loading) return;
-
+    if (user) {
+      router.push("/");
+    }
     // No user logged in (shouldn't happen due to middleware)
     if (!userId) {
       router.push("/sign-in");
@@ -76,14 +78,8 @@ const Actions = () => {
       </div>
     );
   }
-
-  // Show registration page if user needs to complete profile
-  if (status === "unregistered") {
-    return <ActionPage />;
-  }
-
   // Default fallback (should redirect in useEffect)
-  if (!user?.user?.firstname && userId) {
+  if (!user?.user?.firstname) {
     return (
       <div className="h-full backdrop-blur-0 bg-black/90 flex justify-center items-center">
         <div className="">
@@ -92,6 +88,11 @@ const Actions = () => {
       </div>
     );
   }
+  // Show registration page if user needs to complete profile
+  if (status === "unregistered") {
+    return <ActionPage />;
+  }
+
   return (
     <div className="h-full w-full bg-black">
       <span className="flex flex-col items-center">
