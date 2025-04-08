@@ -18,6 +18,7 @@ import { create } from "zustand"; // Import SetState
 
 const useStore = create<StoreState>((set) => ({
   ...initialState,
+
   setData: (data: DashboardData) => set(() => ({ subscriptiondata: data })),
   setLoadingPostId: (data: string) => set(() => ({ loadingPostId: data })),
   setIsDescriptionModal: (data: boolean) =>

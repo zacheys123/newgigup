@@ -81,6 +81,7 @@ const ClientSearchComponent = () => {
             musicianhandles: [{ platform: "", handle: "" }],
             firstLogin: true,
             onboardingComplete: false,
+            lastActive: new Date(),
           });
         }
       } finally {

@@ -17,6 +17,14 @@ export async function PUT(req: NextRequest) {
     await connectDb();
     const gig = await Gigs.findOne({ _id: id });
 
+    if (gig?.isTaken === true) {
+      await gig.updateOne({
+        $set: {
+          isTaken: false,
+        },
+        $pull: { bookCount: musicianId },
+      });
+    }
     await gig.updateOne({
       $pull: { bookCount: musicianId },
     });

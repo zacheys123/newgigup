@@ -70,6 +70,7 @@ interface IUser extends Document {
   monthlyGigsBooked: number;
   firstLogin: boolean;
   onboardingComplete: boolean;
+  lastActive: Date;
 }
 
 // Define Mongoose Schema
@@ -157,6 +158,10 @@ const userSchema = new Schema<IUser>(
     earnings: Number,
     firstLogin: { type: Boolean, default: true },
     onboardingComplete: { type: Boolean, default: false },
+    lastActive: {
+      type: Date,
+      default: new Date(),
+    },
   },
   { timestamps: true }
 );

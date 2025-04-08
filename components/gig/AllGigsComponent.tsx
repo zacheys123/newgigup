@@ -146,7 +146,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
 
   const showPriceRangeAndCurrency =
     gig?.pricerange === "thousands"
-      ? `${gig?.price},000 ${gig?.currency} `
+      ? `${gig?.price}k ${gig?.currency} `
       : gig?.pricerange === "hundreds"
       ? `${gig?.price},00 ${gig?.currency} `
       : gig?.pricerange === "tensofthousands"
@@ -375,11 +375,13 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                 title={loadingPostId === gig._id ? "Opening..." : "Edit"}
               />
             )}
-            {gig?.postedBy?._id &&
+            {gig &&
+              user &&
+              gig?.postedBy?._id &&
               gig?.postedBy?._id !== myId &&
               !hasBookedGig &&
               gig?.bookCount.length < 4 &&
-              user?.user?.isClient === false &&
+              user?.user?.isMusician === true &&
               gig?.isTaken === false && (
                 <ButtonComponent
                   variant="secondary"

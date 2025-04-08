@@ -63,6 +63,7 @@ const VideoProfile = () => {
             musiciangenres: [],
             firstLogin: true,
             onboardingComplete: false,
+            lastActive: new Date(),
           });
         }
       } finally {

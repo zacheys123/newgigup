@@ -8,10 +8,12 @@ import moment from "moment";
 import useSocket from "@/hooks/useSocket";
 import { unstable_batchedUpdates } from "react-dom";
 import { v4 as uuidv4 } from "uuid"; // Install uuid: npm install uuid
+import { motion } from "framer-motion";
 
 interface ChatPageProps {
   chatId: string;
   modal: string;
+  otherUserTyping: boolean;
 }
 interface ReactionsProps {
   success: boolean;
@@ -20,16 +22,13 @@ interface ReactionsProps {
 
 const reactionOptions = ["👍", "😀", "😂", "🔥", "😢", "🎉", "😨", "😡"];
 
-const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
+const ChatPage: React.FC<ChatPageProps> = ({ chatId, otherUserTyping }) => {
   const { messages, fetchMessages, updateMessageReaction } = useStore();
 
   const { user } = useCurrentUser();
   const [loading, setLoading] = useState<boolean>(true);
   const [reactionPopup, setReactionPopup] = useState<string>("");
-  const [
-    isTyping,
-    //  setIsTyping
-  ] = useState<boolean>(false);
+
   const [messageReactions, setMessageReactions] = useState<{
     [key: string]: string;
   }>({});
@@ -77,46 +76,23 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
   }, [socket]);
   // Smooth Auto-Scrolling
   useEffect(() => {
-    const scrollToBottom = () => {
-      if (messagesContainerRef.current && lastMessageRef.current) {
-        setTimeout(() => {
-          lastMessageRef.current?.scrollIntoView({
-            behavior: "smooth",
-            block: "end",
-          });
-        }, 100); // Small delay to allow UI to update
-      }
-    };
+    const container = messagesContainerRef.current;
+    if (!container) return;
 
-    scrollToBottom();
-  }, [messages]);
+    // Only scroll if user is near bottom
+    const isNearBottom =
+      container.scrollHeight - container.scrollTop - container.clientHeight <
+      100;
 
-  // // Handle typing status updates
-  // useEffect(() => {
-  //   if (!socket) return;
-  //   socket.on("userTyping", ({}) => {
-  //     setIsTyping(true);
-  //   });
-
-  //   socket.on("userStoppedTyping", ({}) => {
-  //     setIsTyping(false);
-  //   });
-
-  //   return () => {
-  //     socket.off("userTyping");
-  //     socket.off("userStoppedTyping");
-  //   };
-  // }, []);
-  // console.log("Component re-rendered");
-
-  // const [, forceUpdate] = useState(0);
-
-  // useEffect(() => {
-  //   forceUpdate((prev) => prev + 1);
-  // }, [messages]); // ✅ Forces re-render on message update
-  // useEffect(() => {
-  //   console.log("Messages updated:", messages);
-  // }, [messages]);
+    if (isNearBottom) {
+      setTimeout(() => {
+        container.scrollTo({
+          top: container.scrollHeight,
+          behavior: "smooth",
+        });
+      }, 100);
+    }
+  }, [messages, otherUserTyping]);
 
   useEffect(() => {
     fetchMessages(chatId); // Fetch messages when chatId changes
@@ -126,13 +102,13 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
   const chatMessages = (messages ?? []).filter((msg) => msg.chatId === chatId);
   if (loading)
     return (
-      <div className="h-full w-full text-gray-500 flex justify-center items-center">
+      <div className="h-full w-full text-gray-500 flex justify-center items-center ">
         <CircularProgress size="24px" className="animate-spin text-gray-500" />
       </div>
     );
 
   return (
-    <div className="flex-1 flex flex-col p-4   rounded-sm">
+    <div className="flex-1 flex flex-col p-4   rounded-sm relative">
       {messages && messages?.length === 0 && (
         <div className="flex p-2 h-full justify-center items-center bg-inherit">
           <p className="text-md font-semibold text-neutral-500">
@@ -143,7 +119,11 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
 
       <div
         ref={messagesContainerRef}
-        className="h-[430px]  overflow-y-auto scrollbar-thin scrollbar-thumb-gray-900 px-3"
+        className="h-[430px] overflow-y-auto px-3"
+        style={{
+          scrollbarWidth: "none", // Firefox
+          msOverflowStyle: "none", // IE/Edge
+        }}
       >
         {chatMessages
           .filter((msg: MessageProps) => msg.chatId === chatId)
@@ -227,17 +207,81 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId }) => {
           })}
 
         {/* Typing Indicator */}
-        {isTyping && (
+        {/* {isTyping && !otherUserTyping && (
           <div className="flex items-center space-x-1 text-gray-200 bg-neutral-300 rounded-full w-fit px-2">
             <span className="animate-bounce">•</span>
             <span className="animate-bounce delay-100">•</span>
             <span className="animate-bounce delay-200">•</span>
           </div>
         )}
+         */}
+        {otherUserTyping && (
+          <motion.div
+            initial={{ y: 10, opacity: 0, scale: 0.9 }}
+            animate={{
+              y: 0,
+              opacity: 1,
+              scale: 1,
+              transition: {
+                type: "spring",
+                stiffness: 500,
+                damping: 30,
+              },
+            }}
+            exit={{
+              y: 10,
+              opacity: 0,
+              scale: 0.9,
+              transition: { duration: 0.2 },
+            }}
+            className="flex justify-start mb-2"
+          >
+            <div className="relative">
+              {/* Speech bubble tip */}
+              <div className="absolute -left-1 bottom-0 w-3 h-3 bg-gray-700 transform -skew-x-12" />
+
+              {/* Bubble body */}
+              <motion.div
+                className="bg-gradient-to-r from-purple-600 via-cyan-500 to-yellow-500 text-green-500 px-4 py-2 rounded-xl rounded-bl-none shadow-lg"
+                whileHover={{ scale: 1.02 }}
+                transition={{ type: "spring", stiffness: 400 }}
+              >
+                <div className="flex space-x-1.5">
+                  <motion.span
+                    animate={{ y: [0, -4, 0] }}
+                    transition={{ repeat: Infinity, duration: 0.8 }}
+                    className="block w-2 h-2 rounded-full bg-white"
+                  />
+                  <motion.span
+                    animate={{ y: [0, -4, 0] }}
+                    transition={{ repeat: Infinity, duration: 0.8, delay: 0.2 }}
+                    className="block w-2 h-2 rounded-full bg-white"
+                  />
+                  <motion.span
+                    animate={{ y: [0, -4, 0] }}
+                    transition={{ repeat: Infinity, duration: 0.8, delay: 0.4 }}
+                    className="block w-2 h-2 rounded-full bg-white"
+                  />
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+        {/* {otherUserTyping && (
+          <div className="text-xs text-gray-400 italic">typing...</div>
+        )} */}
 
         {/* Auto-scroll reference */}
         <div ref={lastMessageRef} />
       </div>
+      <style jsx>{`
+        .overflow-y-auto::-webkit-scrollbar {
+          display: none;
+          width: 0;
+          height: 0;
+          background: transparent;
+        }
+      `}</style>
     </div>
   );
 };

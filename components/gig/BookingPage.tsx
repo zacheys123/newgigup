@@ -27,7 +27,7 @@ const BookingPage = ({ currentGig }: BookingProps) => {
   const { socket } = useSocket();
   const forget = () =>
     forgetBookings(user?.user?._id as string, currentgig, userId as string);
-  console.log(currentgig?.bookCount);
+
   console.log(currentgig);
   useEffect(() => {
     if (currentgig?.isTaken === true) {

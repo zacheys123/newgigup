@@ -71,6 +71,7 @@ export interface UserProps {
   musiciangenres: string[];
   firstLogin: boolean;
   onboardingComplete: boolean;
+  lastActive: Date;
 }
 export interface Users {
   users: UserProps[]; // Optional}

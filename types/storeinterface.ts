@@ -70,6 +70,7 @@ export const initialState = {
     musiciangenres: [],
     firstLogin: true,
     onboardingComplete: false,
+    lastActive: new Date(),
   },
   currentgig: {
     _id: "",

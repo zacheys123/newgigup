@@ -171,6 +171,7 @@ const ActionPage = () => {
               firstLogin: true,
               organization,
               onboardingComplete: false,
+              lastActive: new Date(),
             }),
           }),
         });

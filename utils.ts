@@ -44,6 +44,7 @@ export const postedBy = {
   musiciangenres: [],
   firstLogin: true,
   onboardingComplete: false,
+  lastActive: new Date(),
 };
 
 export const instruments = [

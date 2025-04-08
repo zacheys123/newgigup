@@ -47,6 +47,7 @@ export function useCurrentUser() {
       musiciangenres: [],
       firstLogin: true,
       onboardingComplete: false,
+      lastActive: new Date(),
     },
   });
 
@@ -109,6 +110,7 @@ export function useCurrentUser() {
           musiciangenres: [],
           firstLogin: true,
           onboardingComplete: false,
+          lastActive: new Date(),
         },
       });
       return;
@@ -160,6 +162,7 @@ export function useCurrentUser() {
                 musiciangenres: [],
                 firstLogin: true,
                 onboardingComplete: false,
+                lastActive: new Date(),
               },
             });
           return;
@@ -205,6 +208,7 @@ export function useCurrentUser() {
               musiciangenres: [],
               firstLogin: true,
               onboardingComplete: false,
+              lastActive: new Date(),
             },
           });
       } finally {
