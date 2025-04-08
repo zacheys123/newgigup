@@ -18,6 +18,7 @@ export function useCurrentUser() {
   const userId = clerkUser?.id;
   const [user, setUser] = useState<UserResponse>({
     user: {
+      _id: "",
       clerkId: "",
       firstname: "",
       lastname: "",
@@ -81,6 +82,7 @@ export function useCurrentUser() {
     if (!userId) {
       setUser({
         user: {
+          _id: "",
           clerkId: "",
           firstname: "",
           lastname: "",
@@ -133,6 +135,7 @@ export function useCurrentUser() {
           if (isMounted)
             setUser({
               user: {
+                _id: "",
                 clerkId: "",
                 firstname: "",
                 lastname: "",
@@ -179,6 +182,7 @@ export function useCurrentUser() {
         if (isMounted)
           setUser({
             user: {
+              _id: "",
               clerkId: "",
               firstname: "",
               lastname: "",
