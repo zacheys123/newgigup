@@ -24,13 +24,13 @@ const ChatHeader = ({ onOpenX, onClose, modal }: ChatHeaderProps) => {
   useEffect(() => {
     const checkOnlineStatus = () => {
       const onlineStatus = onlineUsers.some(
-        (user) => user.userId === modal.user._id
+        (user) => user?.userId === modal?.user?._id
       );
       setIsOnline(onlineStatus);
 
       if (!onlineStatus) {
         // If you have lastSeen data from the server, use that
-        const lastSeen = modal.user.lastActive || new Date();
+        const lastSeen = modal?.user?.lastActive || new Date();
         setLastSeenTime(moment(lastSeen).fromNow());
       }
     };
@@ -39,7 +39,7 @@ const ChatHeader = ({ onOpenX, onClose, modal }: ChatHeaderProps) => {
     // Refresh status every 30 seconds
     const interval = setInterval(checkOnlineStatus, 30000);
     return () => clearInterval(interval);
-  }, [onlineUsers, modal.user._id, modal.user.lastActive]);
+  }, [onlineUsers, modal?.user?._id, modal?.user?.lastActive]);
 
   return (
     <motion.header
@@ -53,10 +53,10 @@ const ChatHeader = ({ onOpenX, onClose, modal }: ChatHeaderProps) => {
           <div className="relative h-10 w-10">
             <Image
               src={
-                modal.user.picture ||
+                modal?.user?.picture ||
                 "../../public/assets/logo/png/logo-color.png"
               }
-              alt={`${modal.user.firstname}'s profile`}
+              alt={`${modal?.user?.firstname}'s profile`}
               width={40}
               height={40}
               className="rounded-full border-2 border-amber-500/30 object-contain"

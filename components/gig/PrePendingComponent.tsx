@@ -176,7 +176,7 @@ const PrePendingComponent = () => {
           {currentgig?.bookCount?.map((myuser: UserProps) => {
             return (
               <motion.div
-                key={myuser._id}
+                key={myuser?._id}
                 className="flex last:mb-30 flex-col sm:flex-row justify-between items-start sm:items-center p-4 bg-gray-700 rounded-lg transition-all shadow-md relative"
                 whileHover={{
                   scale: 1.02,
@@ -234,9 +234,9 @@ const PrePendingComponent = () => {
                 </div>
                 <div className="flex items-center space-x-3 sm:space-x-4 mt-3 sm:mt-0">
                   <button
-                    onClick={() => handleBookUser(myuser._id || "")}
+                    onClick={() => handleBookUser(myuser?._id || "")}
                     className={`px-4 py-2 text-xs sm:text-sm rounded-lg font-semibold transition-all ${
-                      selectedUser === user?.user._id
+                      selectedUser === user?.user?._id
                         ? "bg-orange-300 text-gray-300 cursor-not-allowed"
                         : "bg-amber-600 hover:bg-blue-500 text-white"
                     }`}

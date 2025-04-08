@@ -94,7 +94,7 @@ export const fileupload = async (
 
         console.log(
           "Sending PUT request to:",
-          `/api/user/updateVideo/${user._id}`
+          `/api/user/updateVideo/${user?._id}`
         );
 
         console.log("Sending PUT request with url:", uploadResult.secure_url);
@@ -108,7 +108,7 @@ export const fileupload = async (
 
             console.log(
               "Sending PUT request to:",
-              `/api/user/updateVideo/${user._id}`
+              `/api/user/updateVideo/${user?._id}`
             );
 
             const url = `/api/user/videoprofile/${user?._id}`;

@@ -98,26 +98,26 @@ const ClientSearchComponent = () => {
   }, [username, refetch]);
 
   const [optimisticFollow, setOptimisticFollow] = useState<boolean>(() => {
-    const userId = user?.user?._id;
+    const userId = user && user?.user?._id;
     if (!userId || !friend?.followers) return false;
 
     // Handle both string and UserProps cases
     return friend.followers.some((follower) =>
       typeof follower === "string"
         ? follower === userId
-        : follower._id === userId
+        : follower?._id === userId
     );
   });
 
   console.log(friend?.picture);
   const isFollowing = (() => {
-    const userId = user?.user?._id;
+    const userId = user && user?.user?._id;
     if (!userId || !friend?.followers) return false;
 
     return friend.followers.some((follower) =>
       typeof follower === "string"
         ? follower === userId
-        : follower._id === userId
+        : follower?._id === userId
     );
   })();
   if (loading) return <div>loading....</div>;
@@ -156,7 +156,7 @@ const ClientSearchComponent = () => {
             <Button
               className="min-w-[50px] h-[30px] text-white  text-[11px] bg-transparent border-2 border-gray-300 "
               onClick={() => {
-                if (friend?._id) {
+                if (friend && friend?._id) {
                   // Ensure _id is defined
                   try {
                     handleUnfollow(friend?._id, user?.user);
@@ -180,7 +180,7 @@ const ClientSearchComponent = () => {
             <Button
               className="min-w-[50px] h-[30px] text-white  text-[11px] bg-blue-600 hover:bg-blue-700"
               onClick={() => {
-                if (friend?._id) {
+                if (friend && friend?._id) {
                   // Ensure _id is defined
                   try {
                     handleFollow(friend?._id, user?.user);

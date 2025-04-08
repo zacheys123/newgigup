@@ -93,7 +93,7 @@ const Musicians = ({ _id }: UserProps) => {
               whileInView={{ opacity: 1, y: 0 }}
               whileHover={{ y: -5 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
-              key={myuser._id}
+              key={myuser?._id}
               className="flex flex-col items-center flex-shrink-0 w-28 cursor-pointer group"
               onClick={() => router.push(`/search/${myuser?.username}`)}
             >

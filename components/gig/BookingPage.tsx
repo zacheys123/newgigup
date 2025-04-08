@@ -34,13 +34,15 @@ const BookingPage = ({ currentGig }: BookingProps) => {
       router.push(`/gigs/${userId}`);
     }
     if (
-      currentgig?.bookCount?.some((myuser) => myuser._id === user?.user?._id) &&
+      currentgig?.bookCount?.some(
+        (myuser) => myuser?._id === user?.user?._id
+      ) &&
       currentgig?.isTaken === false
     ) {
       return;
     }
     if (
-      currentgig?.bookCount?.some((myuser) => myuser._id !== user?.user?._id)
+      currentgig?.bookCount?.some((myuser) => myuser?._id !== user?.user?._id)
     ) {
     }
   }, [currentgig?.isTaken, currentgig?.isPending]);

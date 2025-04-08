@@ -173,7 +173,9 @@ const CurrentUserProfile = () => {
     if (!userId || !gig?.bookCount) return false;
 
     // If bookCount contains UserProps objects
-    return gig.bookCount.some((bookUser: UserProps) => bookUser._id === userId);
+    return gig.bookCount.some(
+      (bookUser: UserProps) => bookUser?._id === userId
+    );
 
     // OR if bookCount contains just IDs (strings)
     // return gig.bookCount.includes(userId);

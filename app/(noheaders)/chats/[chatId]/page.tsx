@@ -324,12 +324,12 @@ const ChatPage = () => {
           <div
             key={message._id || message.tempId || uuidv4()}
             className={`mb-4 ${
-              message.sender?._id === otherUserId ? "text-left" : "text-right"
+              message?.sender?._id === otherUserId ? "text-left" : "text-right"
             }`}
           >
             <div
               className={`inline-block p-6 rounded-lg  ${
-                message.sender?._id === otherUserId
+                message?.sender?._id === otherUserId
                   ? "bg-blue-50"
                   : "bg-green-50"
               }`}

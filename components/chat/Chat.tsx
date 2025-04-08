@@ -41,7 +41,7 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose, onOpenX }) => {
       setLoading(true);
       try {
         const res = await fetch(
-          `/api/chat/fetchchat?user1=${myuser?._id}&user2=${modal.user._id}`
+          `/api/chat/fetchchat?user1=${myuser?._id}&user2=${modal?.user?._id}`
         );
         const data = await res.json();
         console.log("[Chat] Fetch response:", data); // Debug
@@ -55,7 +55,7 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose, onOpenX }) => {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              users: [myuser?._id, modal.user._id],
+              users: [myuser?._id, modal?.user?._id],
             }),
           });
 
@@ -74,21 +74,21 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose, onOpenX }) => {
     };
 
     fetchChat();
-  }, [myuser?._id, modal.user, chatId]);
+  }, [myuser?._id, modal?.user, chatId]);
 
   const handleTyping = () => {
     if (!socket) return;
 
     socket.emit("typing", {
-      senderId: myuser._id,
-      receiverId: modal.user._id,
+      senderId: myuser?._id,
+      receiverId: modal?.user?._id,
       chatId: chatId,
     });
 
     const timer = setTimeout(() => {
       socket.emit("stopTyping", {
-        senderId: myuser._id,
-        receiverId: modal.user._id,
+        senderId: myuser?._id,
+        receiverId: modal?.user?._id,
         chatId: chatId,
       });
     }, 3000);
@@ -126,7 +126,7 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose, onOpenX }) => {
       console.log("[Chat] Sending stopTyping event"); // Debug
       socket.emit("stopTyping", {
         senderId: myuser?._id,
-        receiverId: modal.user._id,
+        receiverId: modal?.user?._id,
       });
 
       setNewMessage("");

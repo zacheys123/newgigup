@@ -21,7 +21,7 @@ export const useAddChat = (chats: []) => {
 
     // Exclude users already in the chat list
     const isUserInChat = chats?.some((chat: { users: UserProps[] }) =>
-      chat?.users.some((u) => u._id === user._id)
+      chat?.users.some((u) => u._id === user?._id)
     );
 
     if (myuser?.user?.isClient) {

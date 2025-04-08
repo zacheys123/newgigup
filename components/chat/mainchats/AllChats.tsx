@@ -75,7 +75,7 @@ const AllChats = () => {
       // Handle both cases (users array or sender/receiver)
       if (chat.users) {
         const otherUser = chat.users.find(
-          (user) => user._id !== loggedInUserId
+          (user) => user?._id !== loggedInUserId
         );
         return otherUser?.firstname
           ?.toLowerCase()
@@ -429,7 +429,7 @@ const AllChats = () => {
                   index: number
                 ) => {
                   const otherUser = chat.users.find(
-                    (user) => user._id !== loggedInUserId
+                    (user) => user?._id !== loggedInUserId
                   );
                   const unreadCount = unreadCounts[chat._id] || 0;
 

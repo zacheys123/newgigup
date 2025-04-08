@@ -69,22 +69,22 @@ const ChatModal: React.FC<ProfileModalProps> = ({ user, onClose }) => {
   };
 
   useEffect(() => {
-    if (!user._id || !gigs) return;
+    if (!user?._id || !gigs) return;
 
     const bookedGigs = gigs.filter(
-      (gig: GigProps) => gig?.bookedBy?._id === user._id
+      (gig: GigProps) => gig?.bookedBy?._id === user?._id
     ).length;
     const postedGigs = gigs?.filter(
-      (gig: GigProps) => gig?.postedBy?._id === user._id
+      (gig: GigProps) => gig?.postedBy?._id === user?._id
     ).length;
 
     setMusicianGigCount(bookedGigs);
     setClientGigCount(postedGigs);
 
     if (user.isMusician) {
-      setRating(calculateRating(user.allreviews || [], bookedGigs));
+      setRating(calculateRating(user?.allreviews || [], bookedGigs));
     }
-  }, [user._id, user.isMusician, gigs, user.allreviews]);
+  }, [user?._id, user?.isMusician, gigs, user?.allreviews]);
   return (
     <div className="bg-neutral-800 w-full max-w-md rounded-t-lg p-6 relative slide-up rounded-tl-[50px] rounded-tr-[50px] min-h-[320px] pt-14">
       <div className="w-full flex justify-center items-center flex-col absolute top-1">

@@ -61,7 +61,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
   // Handle online users
   useEffect(() => {
     if (socket?.connected && user) {
-      socket.emit("addNewUsers", user?.user._id);
+      socket.emit("addNewUsers", user?.user?._id);
       socket.on("getOnlineUsers", (res) => {
         setOnlineUsers(res);
         console.log(res);

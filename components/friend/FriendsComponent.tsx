@@ -62,7 +62,7 @@ const FriendsComponent = () => {
         ...response,
         user: {
           ...friend,
-          followers: [...(friend.followers || []), user?.user._id],
+          followers: [...(friend.followers || []), user?.user?._id],
         },
       };
 
@@ -94,7 +94,7 @@ const FriendsComponent = () => {
         user: {
           ...friend,
           followers:
-            friend?.followers?.filter((id) => id !== user?.user._id) || [],
+            friend?.followers?.filter((id) => id !== user?.user?._id) || [],
         },
       };
 

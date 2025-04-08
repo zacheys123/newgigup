@@ -55,7 +55,7 @@ const ViewGigDetails = () => {
   return (
     <>
       {currentGig?.bookCount?.some(
-        (myuser: UserProps) => myuser._id === user?.user?._id
+        (myuser: UserProps) => myuser?._id === user?.user?._id
       ) && <BookingPage currentGig={currentGig} />}
 
       {user?.user?.firstname &&

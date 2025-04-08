@@ -26,7 +26,7 @@ const SearchComponent = () => {
               .filter((user: UserProps) => user.clerkId !== userId)
               .map((user: UserProps, index: number) => (
                 <motion.div
-                  key={user._id}
+                  key={user?._id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: index * 0.05 }}
