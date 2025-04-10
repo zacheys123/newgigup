@@ -50,7 +50,12 @@ const CurrentUserProfile = () => {
   const [showFollowingModal, setShowFollowingModal] = useState(false);
   const [modalData, setModalData] = useState<{
     title: string;
-    users: { name: string; email?: string }[];
+    users: {
+      name: string;
+      email?: string;
+      picture: string;
+      lastname: string;
+    }[];
   }>({ title: "", users: [] });
   // User profile state
   const [loading, setLoading] = useState<boolean>(false);
@@ -293,7 +298,7 @@ const CurrentUserProfile = () => {
   //     user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
   //     user.email.toLowerCase().includes(searchTerm.toLowerCase())
   // );
-  console.log(user);
+  console.log(modalData);
 
   if (!user) {
     return (
@@ -384,8 +389,10 @@ const CurrentUserProfile = () => {
                   title: "Followers",
                   users:
                     user?.user?.followers?.map((id: UserProps) => ({
-                      name: "User ID: " + id.firstname,
-                      email: undefined,
+                      name: id.firstname,
+                      email: id?.email,
+                      picture: id?.picture,
+                      lastname: user?.lastname,
                     })) || [],
                 });
                 setShowFollowersModal(true);
@@ -400,8 +407,10 @@ const CurrentUserProfile = () => {
                   title: "Following",
                   users:
                     user?.user?.followings?.map((id: UserProps) => ({
-                      name: "User ID: " + id?.firstname,
-                      email: undefined,
+                      name: id?.firstname,
+                      email: id?.email,
+                      picture: id?.picture,
+                      lastname: user?.lastname,
                     })) || [],
                 });
                 setShowFollowingModal(true);
@@ -1037,7 +1046,7 @@ const UserListModal = ({
   isOpen: boolean;
   onClose: () => void;
   title: string;
-  users: { name: string; email?: string }[];
+  users: { name: string; email?: string; picture: string; lastname: string }[];
 }) => {
   console.log(users);
   return (
@@ -1056,11 +1065,21 @@ const UserListModal = ({
               >
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-neutral-700 flex items-center justify-center">
-                    <User size={16} className="text-neutral-400" />
+                    {user?.picture ? (
+                      <Image
+                        src={user?.picture}
+                        alt={user?.name[0]}
+                        height={25}
+                        width={25}
+                        className="object-cover rounded-full"
+                      />
+                    ) : (
+                      <User size={16} className="text-neutral-400" />
+                    )}
                   </div>
                   <div>
                     <p className="text-white font-medium">
-                      {user.name || "Unknown User"}
+                      {user.name || "Unknown User"} {user?.lastname}
                     </p>
                     {user.email && (
                       <p className="text-neutral-400 text-sm">{user.email}</p>
