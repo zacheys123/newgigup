@@ -383,8 +383,8 @@ const CurrentUserProfile = () => {
                 setModalData({
                   title: "Followers",
                   users:
-                    user?.user?.followers?.map((id) => ({
-                      name: "User ID: " + id,
+                    user?.user?.followers?.map((id: UserProps) => ({
+                      name: "User ID: " + id.firstname,
                       email: undefined,
                     })) || [],
                 });
@@ -399,8 +399,8 @@ const CurrentUserProfile = () => {
                 setModalData({
                   title: "Following",
                   users:
-                    user?.user?.followings?.map((id) => ({
-                      name: "User ID: " + id,
+                    user?.user?.followings?.map((id: UserProps) => ({
+                      name: "User ID: " + id?.firstname,
                       email: undefined,
                     })) || [],
                 });
@@ -1039,6 +1039,7 @@ const UserListModal = ({
   title: string;
   users: { name: string; email?: string }[];
 }) => {
+  console.log(users);
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title}>
       <div className="max-h-[60vh] overflow-y-auto">

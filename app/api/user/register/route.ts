@@ -97,6 +97,7 @@ export async function POST(req: NextRequest) {
       },
       { upsert: true, new: true }
     );
+
     return NextResponse.json({
       success: true,
       redirectUrl: "/dashboard", // Force dashboard redirect

@@ -16,14 +16,14 @@ export async function GET(request: NextRequest) {
     }
 
     const userdata = await User.findOne({ clerkId: clerkId });
-
+    console.log("tier", userdata);
     if (!userdata) {
       return NextResponse.json(
         { error: "Userdata not found" },
         { status: 404 }
       );
     }
-    console.log("tier", userdata?.tier);
+    console.log("tier", userdata);
     return NextResponse.json({
       user: {
         isClient: userdata.isClient,
