@@ -64,6 +64,9 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
           revalidate: false,
         }
       );
+      setTimeout(() => {
+        setShowConfirmModal(false);
+      }, 3000);
     } catch (error) {
       console.error("Error updating subscription:", error);
     } finally {
