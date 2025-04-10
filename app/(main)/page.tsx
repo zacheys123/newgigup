@@ -44,7 +44,6 @@ export default function Home() {
     );
   }
 
-  console.log(user);
   const getDynamicHref = () => {
     if (
       !userId ||
