@@ -25,7 +25,7 @@ const Actions = () => {
     }
 
     // Case 2: We have a userId but no user record in MongoDB
-    if (!user) {
+    if (!user?.user?.firstname) {
       setStatus("unregistered");
       return;
     }
@@ -34,7 +34,8 @@ const Actions = () => {
     if (
       user?.user &&
       (user.user?.isMusician === undefined ||
-        user?.user?.isClient === undefined)
+        user?.user?.isClient === undefined ||
+        (user?.user?.isMusician === false && user?.user?.isClient === false))
     ) {
       setStatus("unregistered");
       return;
