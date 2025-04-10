@@ -32,8 +32,9 @@ const Actions = () => {
 
     // Case 3: User exists but hasn't completed registration (missing roles)
     if (
-      user.user &&
-      (user.user.isMusician === undefined || user.user.isClient === undefined)
+      user?.user &&
+      (user.user?.isMusician === undefined ||
+        user?.user?.isClient === undefined)
     ) {
       setStatus("unregistered");
       return;
@@ -41,13 +42,13 @@ const Actions = () => {
 
     // Case 4: User has completed registration
     if (
-      typeof user.user?.isMusician === "boolean" &&
-      typeof user.user?.isClient === "boolean"
+      typeof user?.user?.isMusician === "boolean" &&
+      typeof user?.user?.isClient === "boolean"
     ) {
       setStatus("registered");
 
       // Handle first login onboarding
-      if (user.user?.firstLogin && !user.user?.onboardingComplete) {
+      if (user?.user?.firstLogin && !user?.user?.onboardingComplete) {
         router.push("/dashboard");
       } else {
         router.push("/");

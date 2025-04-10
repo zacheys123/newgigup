@@ -10,23 +10,12 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const clerkId = searchParams.get("clerkId");
 
+    console.log(clerkId);
     if (!clerkId) {
       return NextResponse.json({ error: "User ID required" }, { status: 400 });
     }
 
-    const userdata = await User.findOne({ clerkId }).select([
-      "isClient",
-      "isMusician",
-      "firstLogin",
-      "clerkId",
-      "earnings",
-      "monthlyGigsBooked",
-      "monthlyGigsPosted",
-      "totalSpent",
-      "tier",
-      "nextBillingDate",
-      "onboardingComplete",
-    ]);
+    const userdata = await User.findOne({ clerkId: clerkId });
 
     if (!userdata) {
       return NextResponse.json(
