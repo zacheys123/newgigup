@@ -419,7 +419,7 @@ import {
 import { LuGuitar } from "react-icons/lu";
 import { UserProps } from "@/types/userinterfaces";
 
-interface HeaderProps {
+interface BaseHeaderProps {
   typeOfGig: string;
   setTypeOfGig: (typeOfGig: string) => void;
   category: string;
@@ -428,7 +428,16 @@ interface HeaderProps {
   location: string;
   setLocation: (location: string) => void;
   myuser?: UserProps;
+  scheduler?: string;
+  setScheduler?: (location: string) => void;
 }
+
+interface SchedulerProps {
+  scheduler: string;
+  setScheduler: (location: string) => void;
+}
+
+type HeaderProps = BaseHeaderProps & Partial<SchedulerProps>;
 const Gigheader = ({
   typeOfGig,
   setTypeOfGig,
@@ -438,6 +447,8 @@ const Gigheader = ({
   setLocation,
   gigQuery,
   myuser,
+  scheduler,
+  setScheduler,
 }: HeaderProps) => {
   const container = {
     hidden: { opacity: 0 },
@@ -509,24 +520,42 @@ const Gigheader = ({
           variants={item}
         >
           <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-blue-600/10 rounded-lg blur opacity-0 hover:opacity-30 transition-opacity duration-500"></div>
-          <select
-            className="relative w-full h-11 bg-gray-900/60 text-gray-300 pl-4 pr-10 rounded-lg text-sm font-medium cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-500/50 border border-gray-800 hover:border-gray-700 transition-all"
-            value={location || myuser?.city || "all"} // Fallback to "all" if nothing is set
-            onChange={(ev) => setLocation(ev.target.value)}
-          >
-            {!myuser?.city ? (
-              <option>Loading locations...</option>
-            ) : (
-              <>
-                <option value="all">All Locations</option>
-                {dataCounties.map((d, idx) => (
-                  <option key={idx} value={d.toLowerCase()}>
-                    {d}
-                  </option>
-                ))}
-              </>
-            )}
-          </select>
+
+          <div className="flex items-center  gap-1 w-[100%]">
+            <select
+              className="relative w-[55%] h-11 bg-gray-900/60 text-gray-300 pl-4 pr-10 rounded-lg text-sm font-medium cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-500/50 border border-gray-800 hover:border-gray-700 transition-all"
+              value={location || myuser?.city || "all"} // Fallback to "all" if nothing is set
+              onChange={(ev) => setLocation(ev.target.value)}
+            >
+              {!myuser?.city ? (
+                <option>Loading locations...</option>
+              ) : (
+                <>
+                  <option value="all">All Locations</option>
+                  {dataCounties.map((d, idx) => (
+                    <option key={idx} value={d.toLowerCase()}>
+                      {d}
+                    </option>
+                  ))}
+                </>
+              )}
+            </select>
+            <select
+              className="relative w-[40%] h-11 bg-gray-900/60 text-gray-300 pl-4 pr-10 rounded-lg text-sm font-medium cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-500/50 border border-gray-800 hover:border-gray-700 transition-all"
+              value={scheduler ? scheduler : "all"}
+              onChange={(ev) => setScheduler && setScheduler(ev.target.value)} // Added null check
+            >
+              {!myuser ? (
+                <option className="text-[11px]">loading...</option>
+              ) : (
+                <>
+                  <option value="all">All Gigs</option>
+                  <option value={"pending"}>Pending Gigs</option>
+                  <option value={"notPending"}>Available Gigs</option>
+                </>
+              )}
+            </select>
+          </div>
           <div className="absolute right-3 pointer-events-none text-gray-500">
             <svg
               width="16"

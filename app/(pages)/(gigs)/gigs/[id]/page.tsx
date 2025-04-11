@@ -16,6 +16,7 @@ const GigsPage = () => {
   const [typeOfGig, setTypeOfGig] = useState<string>("");
   const [category, setCategory] = useState<string>("all");
   const [location, setLocation] = useState<string>("all");
+
   let gigQuery;
   useEffect(() => {
     // if (!user) {
@@ -33,7 +34,7 @@ const GigsPage = () => {
   const filteredGigs = useMemo(() => {
     return (
       searchfunc(gigs, typeOfGig, category, gigQuery, location)?.filter(
-        (gig: GigProps) => gig?.isTaken === false
+        (gig: GigProps) => gig?.isTaken === false && gig?.isPending === false
       ) || []
     );
   }, [gigs, typeOfGig, category, location, gigQuery]);

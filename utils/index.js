@@ -192,10 +192,26 @@ function gigme(query, data, sorted) {
   //   return sorted;
   // }
 }
-export const searchfunc = (data, searchquery, category, gigQuery, location) => {
+export const searchfunc = (
+  data,
+  searchquery,
+  category,
+  gigQuery,
+  location,
+  scheduler
+) => {
   let sortedData = data;
 
   sortedData = sortedData?.filter((gig) => {
+    if (scheduler === "pending") {
+      return gig?.isPending === true;
+    }
+    if (scheduler === "notPending") {
+      return gig?.isPending === false;
+    }
+    if (scheduler === "all") {
+      return true;
+    }
     if (searchquery) {
       gigQuery = gigme(searchquery, gig, sortedData);
       console.log(gigQuery);

@@ -347,7 +347,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                 />
               </div>
             )}{" "}
-            {isCurrentWhoCreatedGig && gig?.isPending === true && (
+            {isCurrentWhoCreatedGig && gig?.isPending === false && (
               <div className="w-full h-full relative">
                 <span className="w6 h-6">
                   <span className="absolute right-0 -top-1 bg-yellow-800 text-white rounded-full text-[8px] w-4 h-4 flex justify-center items-center ">

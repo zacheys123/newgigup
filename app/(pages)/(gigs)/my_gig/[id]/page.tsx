@@ -23,6 +23,7 @@ const MyGigs = () => {
   const [location, setLocation] = useState<string>(() =>
     user?.user?.city ? user?.user?.city : "all"
   );
+  const [scheduler, setScheduler] = useState<string>("pending");
   let gigQuery;
   const router = useRouter();
   const [secret, setSecret] = useState<string>("");
@@ -100,14 +101,27 @@ const MyGigs = () => {
   }, [user]);
   const filteredGigs = useMemo(() => {
     return (
-      searchfunc(gigs, typeOfGig, category, gigQuery, location)?.filter(
-        (gig: GigProps) => gig?.postedBy?._id === user?.user?._id
-      ) || []
+      searchfunc(
+        gigs,
+        typeOfGig,
+        category,
+        gigQuery,
+        location,
+        scheduler
+      )?.filter((gig: GigProps) => gig?.postedBy?._id === user?.user?._id) || []
     );
-  }, [gigs, typeOfGig, category, location, gigQuery, user?.user?._id]);
+  }, [
+    gigs,
+    typeOfGig,
+    category,
+    location,
+    gigQuery,
+    user?.user?._id,
+    scheduler,
+  ]);
 
   const isLoading = gigsLoading || userLoading;
-  console.log(user);
+  console.log(scheduler);
   return (
     <>
       {confirmEdit && (
@@ -203,6 +217,8 @@ const MyGigs = () => {
             location={location}
             setLocation={setLocation}
             myuser={user?.user}
+            scheduler={scheduler}
+            setScheduler={setScheduler}
           />
         </div>
         <div className="h-[85%] overflow-y-scroll bg-gray-900">

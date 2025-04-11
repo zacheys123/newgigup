@@ -39,7 +39,7 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
         isMusician: user.isMusician,
         firstLogin: user.firstLogin,
         clerkId: user.clerkId,
-        earnings: user?.earnings,
+        userearnings: user?.earnings,
         gigsBooked: user?.monthlyGigsBooked,
         gigsPosted: user?.monthlyGigsPosted,
         total: user?.totalSpent,
