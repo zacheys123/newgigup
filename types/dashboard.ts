@@ -4,7 +4,7 @@ export type UserData = {
   firstLogin: boolean;
   clerkId: string;
   gigsBooked?: number; // Add this
-  earnings?: number; // Add this
+  userearnings: number; // Add this
   gigsPosted: number; // Add this
   total: number;
   onboardingComplete: boolean;

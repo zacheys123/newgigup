@@ -24,16 +24,14 @@ export default function GigLayout({ children, editpage }: GigLayoutProps) {
       <SidebarNav />
       <div className="flex-1 flex flex-col md:ml-[150px] lg:ml-[200px] w-full transition-all duration-300">
         {editpage}
-        <main className="flex-1 overflow-auto w-full pb-20">
+        <main className="h-[80%] overflow-auto w-full relative pb-24">
           {" "}
-          {/* Increased padding-bottom */}
+          {/* Even more padding */}
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
             {children}
           </div>
         </main>
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-50">
-          <PagesNav />
-        </div>
+        <PagesNav />
       </div>
     </div>
   );

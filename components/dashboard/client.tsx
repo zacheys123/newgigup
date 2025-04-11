@@ -1,8 +1,12 @@
+"use client";
+import { useAllGigs } from "@/hooks/useAllGigs";
 import GigChart from "./GigChart";
 import { RoleStatusCard } from "./RoleStatusCard";
 import { UpgradeBanner } from "./UpgradBanner";
 import { UsageMeter } from "./UsageMeter";
 import { Calendar, DollarSign, Music } from "lucide-react";
+import { useAuth } from "@clerk/nextjs";
+import { GigProps } from "@/types/giginterface";
 
 interface ClientDashboardProps {
   gigsPosted?: number;
@@ -13,6 +17,13 @@ export function ClientDashboard({
   gigsPosted = 0,
   total = 0,
 }: ClientDashboardProps) {
+  const { userId } = useAuth();
+  const { gigs, loading } = useAllGigs();
+  console.log(gigs);
+  const gigsBookedAndCompleted = gigs?.filter((f: GigProps) => {
+    return f?.postedBy?.clerkId === userId && f.isTaken === true;
+  }).length;
+
   return (
     <div className="space-y-8 p-4 md:p-6 lg:p-8">
       <UpgradeBanner />
@@ -49,16 +60,31 @@ export function ClientDashboard({
 
       {/* Cards with Hover Effects */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        <RoleStatusCard
-          title="Active Gigs"
-          value={gigsPosted}
-          icon={
-            <div className="p-3 rounded-full bg-purple-500/10 backdrop-blur-sm">
-              <Music className="text-purple-400" size={20} />
-            </div>
-          }
-          trend="up"
-        />
+        {!loading && (
+          <>
+            {" "}
+            <RoleStatusCard
+              title="Gigs Posted this Month"
+              value={gigsPosted}
+              icon={
+                <div className="p-3 rounded-full bg-purple-500/10 backdrop-blur-sm">
+                  <Music className="text-purple-400" size={20} />
+                </div>
+              }
+              trend="up"
+            />
+            <RoleStatusCard
+              title="Gigs Booked and Completed"
+              value={gigsBookedAndCompleted}
+              icon={
+                <div className="p-3 rounded-full bg-purple-500/10 backdrop-blur-sm">
+                  <Music className="text-purple-400" size={20} />
+                </div>
+              }
+              trend="up"
+            />
+          </>
+        )}
         <RoleStatusCard
           title="Total Spent"
           value={total}

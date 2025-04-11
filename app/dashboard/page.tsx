@@ -73,7 +73,7 @@ export default function Dashboard() {
       {data?.user?.isMusician === true ? (
         <MusicianDashboard
           gigsBooked={data?.user?.gigsBooked ?? 0}
-          earnings={data?.user?.earnings ?? 0}
+          earnings={data?.user?.userearnings ?? 0}
         />
       ) : data?.user?.isClient === true ? (
         <ClientDashboard
