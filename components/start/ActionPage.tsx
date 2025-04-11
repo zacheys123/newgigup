@@ -96,9 +96,10 @@ const ActionPage = () => {
       errors.push("Genre is required");
     if (roleType === "vocalist" && !experience)
       errors.push(" Experience  is required");
-    if (roleType === "vocalist" && !talentbio) errors.push(" bio is required");
+
     if (roleType === "mc" && (!mcType || !mcLanguages))
       errors.push("MCType or Languages is required");
+    if (!talentbio) errors.push("bio is required");
     if (talentbio.length > 200)
       errors.push("bio is too long (max 200 characters)");
     return errors;

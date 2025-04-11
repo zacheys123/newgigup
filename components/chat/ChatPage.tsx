@@ -110,7 +110,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId, otherUserTyping }) => {
   return (
     <div className="flex-1 flex flex-col p-4   rounded-sm relative">
       {messages && messages?.length === 0 && (
-        <div className="flex p-2 h-full justify-center items-center bg-inherit">
+        <div className="flex p-2 h-[70%] justify-center items-center bg-inherit">
           <p className="text-md font-semibold text-neutral-500">
             Send a message to start a chat.
           </p>
@@ -272,7 +272,6 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId, otherUserTyping }) => {
         )} */}
 
         {/* Auto-scroll reference */}
-        <div ref={lastMessageRef} />
       </div>
       <style jsx>{`
         .overflow-y-auto::-webkit-scrollbar {

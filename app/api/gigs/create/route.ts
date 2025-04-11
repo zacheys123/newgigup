@@ -1,5 +1,6 @@
 import connectDb from "@/lib/connectDb";
 import Gigs from "@/models/gigs";
+import User from "@/models/user";
 import { getAuth } from "@clerk/nextjs/server";
 
 import { NextRequest, NextResponse } from "next/server";
@@ -245,6 +246,9 @@ export async function POST(req: NextRequest) {
       currency,
     });
 
+    await User.findByIdAndUpdate(postedBy, {
+      $inc: { monthlyGigsPosted: 1 }, // This will increment the field by 1
+    });
     return NextResponse.json({
       gigstatus: "true",
       message: "Created Gig successfully",

@@ -249,11 +249,17 @@ export function MobileNav() {
             <div className="relative">
               <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="relative flex items-center justify-center w-14 h-14 rounded-full bg-primary text-white shadow-lg hover:bg-primary/90 transition-all z-10"
+                className="relative flex items-center justify-center w-14 h-14 rounded-full bg-amber-800 text-white shadow-lg hover:bg-amber-600/70 transition-all z-10"
               >
                 <motion.div
-                  animate={{ rotate: isOpen ? 45 : 0 }}
-                  transition={{ duration: 0.3 }}
+                  animate={{
+                    rotate: isOpen ? 450 : 0,
+                    transition: { duration: 0.8, delay: 0.6 },
+                  }}
+                  exit={{
+                    rotate: isOpen ? 0 : 450,
+                    transition: { duration: 0.3, delay: 0 },
+                  }}
                 >
                   <PlusIcon className="w-6 h-6" />
                 </motion.div>

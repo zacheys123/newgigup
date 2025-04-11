@@ -152,6 +152,8 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose, onOpenX }) => {
   }
 
   console.log("[Chat] Rendering chat UI"); // Debug
+
+  // In your Chat component, update the return section like this:
   return (
     <section className="w-full max-w-lg sm:max-w-xl h-[550px] -mt-5 flex flex-col border border-gray-600/50 rounded-2xl shadow-2xl bg-neutral-900/50 overflow-hidden">
       <ChatHeader
@@ -161,25 +163,29 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose, onOpenX }) => {
         onOpenX={onOpenX}
       />
 
-      <div className="flex-1 p-4 ">
-        <ChatPage
-          chatId={chatId}
-          modal={modal?.user?._id as string}
-          otherUserTyping={otherUserTyping}
-        />{" "}
-      </div>
+      {/* Main chat area - make this flex-1 to take available space */}
+      <div className="flex-1 overflow-hidden flex flex-col">
+        <div className="flex-1 overflow-y-auto p-4">
+          <ChatPage
+            chatId={chatId}
+            modal={modal?.user?._id as string}
+            otherUserTyping={otherUserTyping}
+          />
+        </div>
 
-      <div className="w-full p-4">
-        <ChatInput
-          newMessage={newMessage}
-          setNewMessage={setNewMessage}
-          sendMessage={send}
-          handleTyping={handleTyping}
-        />
-        <div className="flex justify-center w-full mt-2">
-          <small className="text-center text-muted-foreground text-xs py-2 text-neutral-500">
-            Powered By: gigMeUp
-          </small>
+        {/* Input area - fixed height */}
+        <div className="w-full p-4 pt-0">
+          <ChatInput
+            newMessage={newMessage}
+            setNewMessage={setNewMessage}
+            sendMessage={send}
+            handleTyping={handleTyping}
+          />
+          <div className="flex justify-center w-full mt-2">
+            <small className="text-center text-muted-foreground text-xs py-2 text-neutral-500">
+              Powered By: gigMeUp
+            </small>
+          </div>
         </div>
       </div>
     </section>

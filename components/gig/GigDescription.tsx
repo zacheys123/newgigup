@@ -36,6 +36,16 @@ const DetailValue = styled(Typography)(({ theme }) => ({
 const GigDescription = ({}) => {
   const { setIsDescriptionModal, currentgig } = useStore();
   console.log(currentgig);
+  const showPriceRangeAndCurrency =
+    currentgig?.pricerange === "thousands"
+      ? `${currentgig?.price}k ${currentgig?.currency} `
+      : currentgig?.pricerange === "hundreds"
+      ? `${currentgig?.price},00 ${currentgig?.currency} `
+      : currentgig?.pricerange === "tensofthousands"
+      ? `${currentgig?.price}0000 ${currentgig?.currency} `
+      : currentgig?.pricerange === "hundredsofthousands"
+      ? `${currentgig?.price},00000 ${currentgig?.currency} `
+      : `${currentgig?.price} ${currentgig?.currency} `;
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50 backdrop-blur-sm -mt-[140px]">
       <motion.div
@@ -122,7 +132,7 @@ const GigDescription = ({}) => {
               <DetailItem>
                 <DetailLabel variant="body2">Pay</DetailLabel>
                 <DetailValue variant="body2" sx={{ fontWeight: 500 }}>
-                  {currentgig?.price}
+                  {showPriceRangeAndCurrency}
                 </DetailValue>
               </DetailItem>
             </Box>
