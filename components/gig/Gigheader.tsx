@@ -470,7 +470,7 @@ const Gigheader = ({
 
   return (
     <motion.div
-      className="flex flex-col gap-5 -mt-10 p-5 bg-gray-950 rounded-3xl shadow-2xl border border-gray-800/60"
+      className="flex flex-col gap-5 -mt-8 p-5 bg-gray-950 rounded-3xl shadow-2xl border border-gray-800/60"
       initial="hidden"
       animate="show"
       variants={container}
