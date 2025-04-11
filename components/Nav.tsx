@@ -41,7 +41,7 @@ const Nav = () => {
                 </Link>
 
                 <Link
-                  href="/gigme/about"
+                  href="/about"
                   className="flex items-center gap-2 p-3 rounded-full transition-all hover:bg-neutral-700 hover:scale-105"
                 >
                   <MessageCircleQuestion size="21" />
