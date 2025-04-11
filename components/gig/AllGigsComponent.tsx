@@ -347,6 +347,28 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                 />
               </div>
             )}{" "}
+            {isCurrentWhoCreatedGig && gig?.isPending === true && (
+              <div className="w-full h-full relative">
+                <span className="w6 h-6">
+                  <span className="absolute right-0 -top-1 bg-yellow-800 text-white rounded-full text-[8px] w-4 h-4 flex justify-center items-center ">
+                    {bookCount}
+                  </span>
+                </span>
+                <ButtonComponent
+                  variant="secondary"
+                  classname="!bg-indigo-600/90 hover:!bg-indigo-500 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
+                  onclick={() => {
+                    setLoadingPostId(gig?._id as string);
+                    setTimeout(() => {
+                      handleBookedUsers(gig?._id as string);
+                      setLoadingPostId("");
+                    }, 2000);
+                  }}
+                  disabled={loadingPostId.length > 0}
+                  title={loadingPostId === gig._id ? "Creating..." : "Post"}
+                />
+              </div>
+            )}{" "}
             {isCurrentWhoBooked && (
               <ButtonComponent
                 variant="secondary"

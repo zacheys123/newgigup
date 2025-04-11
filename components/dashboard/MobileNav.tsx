@@ -66,7 +66,7 @@ export function MobileNav() {
     },
     {
       name: "Gigs",
-      href: "/dashboard/gigs",
+      href: "/gigs/" + userId,
       icon: <CalendarIcon className="w-5 h-5" />,
     },
     {
