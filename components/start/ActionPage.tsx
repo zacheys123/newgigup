@@ -214,13 +214,25 @@ const ActionPage = () => {
       const success = await registerUser(true);
       if (success) {
         setMoreInfo(false);
-        toast.success("Registration successful!");
+        toast.success(
+          `${
+            roleType === "instrumentalist"
+              ? "Successfully Registered as an Instrumentalist"
+              : roleType === "dj"
+              ? "Successfully Registered as a Dj"
+              : roleType === "mc"
+              ? "Successfully Registered as a EMcee"
+              : roleType === "vocalist"
+              ? "Successfully Registered as a Vocalist"
+              : ""
+          }`
+        );
         router.push("/dashboard"); // Unified dashboard redirect
       }
     } finally {
       setMusicianLoad(false);
     }
-  }, [registerUser, router]);
+  }, [registerUser, router, roleType]);
   const connectAsClient = useCallback(async () => {
     setClientLoad(true);
     try {
@@ -457,6 +469,7 @@ const ActionPage = () => {
                 onChange={(e) => setTalentbio(e.target.value)}
                 rows={3}
                 className="w-full p-2 rounded bg-gray-700 text-[12px] text-white"
+                name="talentbio"
               />
             )}
           </div>

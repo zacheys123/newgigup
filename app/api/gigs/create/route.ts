@@ -66,8 +66,8 @@ export async function POST(req: NextRequest) {
     currency,
   }: Info = await req.json();
 
-  console.log(price);
-  console.log(pricerange);
+  console.log(otherTimeline);
+  console.log(day);
   console.log(currency);
 
   if (!logo) {
@@ -150,11 +150,13 @@ export async function POST(req: NextRequest) {
       message: "Gig timeline is required",
     });
   }
-  if ((!day && gigtimeline === "weekly") || gigtimeline === "other") {
-    return NextResponse.json({
-      gigstatus: "false",
-      message: "Day is required",
-    });
+  if (!day) {
+    if (gigtimeline === "weekly" || gigtimeline === "other") {
+      return NextResponse.json({
+        gigstatus: "false",
+        message: "Day is required",
+      });
+    }
   }
   if (bussinesscat === "vocalist") {
     if (vocalistGenre?.length === 0 || vocalistGenre === undefined) {
