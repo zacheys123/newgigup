@@ -6,11 +6,15 @@ const Modal = ({
   isOpen,
   onClose,
   title,
+  description,
+  width,
   children,
 }: {
   isOpen: boolean;
   onClose?: () => void;
   title: string;
+  width?: string;
+  description?: string;
   children: React.ReactNode;
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
@@ -47,7 +51,9 @@ const Modal = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+          className={`  ${
+            width && "w-[width]"
+          } fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm`}
           onClick={handleOutsideClick}
         >
           {/* Overlay with subtle gradient */}
@@ -59,11 +65,18 @@ const Modal = ({
             animate={{ y: 0, scale: 1 }}
             exit={{ y: 20, opacity: 0 }}
             transition={{ type: "spring", damping: 25, stiffness: 500 }}
-            className="relative w-full max-w-md rounded-xl bg-neutral-900 border border-neutral-700/50 shadow-2xl overflow-hidden"
+            className={`relative ${
+              width ? "w-[width]" : " w-full"
+            } max-w-md rounded-xl bg-neutral-900 border border-neutral-700/50 shadow-2xl overflow-hidden`}
           >
             {/* Header with close button */}
             <div className="flex items-center justify-between p-5 border-b border-neutral-800">
-              <h3 className="text-xl font-semibold text-white">{title}</h3>
+              <div className="flex flex-col gap-2 ">
+                <h3 className="text-xl font-semibold text-white">{title}</h3>
+                <h3 className="gigtitle  text-neutral-400 text-center">
+                  {description}
+                </h3>
+              </div>
               {onClose && (
                 <button
                   onClick={onClose}
@@ -72,9 +85,9 @@ const Modal = ({
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 13 27"
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="2"

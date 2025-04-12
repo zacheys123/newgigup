@@ -33,6 +33,7 @@ type Info = {
   vocalistGenre: string[];
   pricerange: string;
   currency: string;
+  isPending: boolean;
 };
 
 export async function POST(req: NextRequest) {
@@ -64,6 +65,7 @@ export async function POST(req: NextRequest) {
     vocalistGenre,
     pricerange,
     currency,
+    isPending,
   }: Info = await req.json();
 
   console.log(otherTimeline);
@@ -246,6 +248,7 @@ export async function POST(req: NextRequest) {
       vocalistGenre,
       pricerange,
       currency,
+      isPending,
     });
 
     await User.findByIdAndUpdate(postedBy, {

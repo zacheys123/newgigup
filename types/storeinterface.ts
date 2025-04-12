@@ -13,7 +13,7 @@ export const initialState = {
       firstLogin: true,
       clerkId: "",
       gigsBooked: 0, // Add this
-      earnings: 0, // Add this
+      userearnings: 0, // Add this
       gigsPosted: 0,
       total: 0,
       onboardingComplete: false,

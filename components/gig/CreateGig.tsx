@@ -8,7 +8,7 @@ import React, {
   useEffect,
 } from "react";
 import { Button } from "../ui/button";
-import { Box, CircularProgress } from "@mui/material";
+import { Box } from "@mui/material";
 import {
   ArrowDown,
   ArrowDown01Icon,
@@ -45,6 +45,7 @@ import {
   UserInfo,
 } from "./create/types";
 import TalentModal from "./create/TalentModal";
+import SchedulerComponent from "./create/SchedulerComponent";
 
 const CreateGig = () => {
   // State Hooks
@@ -87,6 +88,7 @@ const CreateGig = () => {
   const [userinfo, setUserInfo] = useState<UserInfo>({
     prefferences: [],
   });
+
   const [bussinesscat, setBussinessCategory] = useState<BusinessCategory>(null);
   const [showduration, setshowduration] = useState<boolean>(false);
   const [showCategories, setshowCategories] = useState<CategoryVisibility>({
@@ -103,6 +105,20 @@ const CreateGig = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [show, setShow] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  const [isSchedulerOpen, setisSchedulerOpen] = useState<boolean>(false);
+  const [schedulingProcedure, setSchedulingProcedure] = useState({
+    type: "",
+    date: new Date(),
+  });
+
+  // default to new Date if date is undefined
+  const getSchedulingData = (type: string, date?: Date) => {
+    setSchedulingProcedure({
+      type,
+      date: date ?? new Date(),
+    });
+  };
 
   // Constants
   const minDate = new Date("2020-01-01");
@@ -334,6 +350,7 @@ const CreateGig = () => {
     setShowTalentModal(false);
   };
   console.log("mydata", gigInputs);
+
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -379,6 +396,14 @@ const CreateGig = () => {
           vocalistGenre: gigInputs.vocalistGenre,
           pricerange: gigInputs.pricerange,
           currency: gigInputs.currency,
+          isPending:
+            schedulingProcedure.type === "automatic"
+              ? true
+              : schedulingProcedure.type === "regular"
+              ? true
+              : schedulingProcedure.type === "create"
+              ? false
+              : false,
         }),
       });
       const data = await res.json();
@@ -474,7 +499,6 @@ const CreateGig = () => {
             </span>
           </motion.div>
         )}
-
         {/* Main Form Content */}
         <div className="space-y-6">
           <h6 className="text-gray-100 font-sans text-center text-lg font-semibold">
@@ -1132,19 +1156,22 @@ const CreateGig = () => {
             <div className="w-full flex justify-center mt-6 mb-10">
               <Button
                 variant="destructive"
-                type="submit"
-                className="w-full sm:w-[60%] h-[40px] text-sm font-semibold bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transition-all"
-                disabled={isLoading}
+                type="button"
+                className="w-[60%] mx-auto mt-2 sm:w-[60%] h-[40px] text-sm font-semibold bg-gradient-to-r bg-blue-500  hover:to-purple-700 transition-all"
+                onClick={() => setisSchedulerOpen(true)}
               >
-                {!isLoading ? (
-                  "Create Gig"
-                ) : (
-                  <CircularProgress size="16px" sx={{ color: "white" }} />
-                )}
+                Finish setting up
               </Button>
             </div>
           </div>
-        </div>
+        </div>{" "}
+        <SchedulerComponent
+          onSubmit={onSubmit}
+          getScheduleData={getSchedulingData}
+          isLoading={isLoading}
+          isSchedulerOpen={isSchedulerOpen}
+          setisSchedulerOpen={setisSchedulerOpen}
+        />
       </form>
 
       {/* Modals */}
