@@ -23,6 +23,9 @@ export function ClientDashboard({
   const gigsBookedAndCompleted = gigs?.filter((f: GigProps) => {
     return f?.postedBy?.clerkId === userId && f.isTaken === true;
   }).length;
+  const upcoming = gigs?.filter((f: GigProps) => {
+    return f?.postedBy?.clerkId === userId && f?.isPending === true;
+  }).length;
 
   return (
     <div className="space-y-8 p-4 md:p-6 lg:p-8">
@@ -98,7 +101,7 @@ export function ClientDashboard({
         />
         <RoleStatusCard
           title="Upcoming Events"
-          value={5}
+          value={upcoming}
           icon={
             <div className="p-3 rounded-full bg-blue-500/10 backdrop-blur-sm">
               <Calendar className="text-blue-400" size={20} />

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import useStore from "@/app/zustand/useStore";
 import { Box, Chip, Typography, IconButton } from "@mui/material";
@@ -7,6 +7,28 @@ import { styled } from "@mui/material/styles";
 import moment from "moment";
 import { colors } from "@/utils";
 
+const calculateTimeLeft = (targetDate: Date) => {
+  const now = new Date();
+  const difference = targetDate.getTime() - now.getTime();
+
+  if (difference <= 0) {
+    return {
+      days: 0,
+      hours: 0,
+      minutes: 0,
+      seconds: 0,
+      expired: true,
+    };
+  }
+
+  return {
+    days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+    hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+    minutes: Math.floor((difference / 1000 / 60) % 60),
+    seconds: Math.floor((difference / 1000) % 60),
+    expired: false,
+  };
+};
 const DetailItem = styled(Box)(({ theme }) => ({
   display: "flex",
   justifyContent: "space-between",
@@ -36,6 +58,26 @@ const DetailValue = styled(Typography)(({ theme }) => ({
 const GigDescription = ({}) => {
   const { setIsDescriptionModal, currentgig } = useStore();
   console.log(currentgig);
+  const [timeLeft, setTimeLeft] = useState(() => {
+    // Use gig's creation date plus one month
+    const createdAt = new Date(currentgig.createdAt);
+    const targetDate = new Date(createdAt);
+    targetDate.setMonth(targetDate.getMonth() + 1);
+    return calculateTimeLeft(targetDate);
+  });
+
+  useEffect(() => {
+    const createdAt = new Date(currentgig.createdAt);
+    const targetDate = new Date(createdAt);
+    targetDate.setMonth(targetDate.getMonth() + 1);
+
+    const timer = setInterval(() => {
+      setTimeLeft(calculateTimeLeft(targetDate));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [currentgig?.createdAt]);
+
   const showPriceRangeAndCurrency =
     currentgig?.pricerange === "thousands"
       ? `${currentgig?.price}k ${currentgig?.currency} `
@@ -61,7 +103,8 @@ const GigDescription = ({}) => {
             backgroundColor: "primary.light",
             padding: 2,
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent:
+              currentgig?.isPending === true ? "space-around" : "space-between",
             alignItems: "center",
             borderBottom: "1px solid",
             borderColor: "divider",
@@ -73,6 +116,33 @@ const GigDescription = ({}) => {
           >
             Gig Details
           </Typography>
+          {currentgig?.isPending === true && (
+            <div>
+              {!timeLeft.expired ? (
+                <div className="text-[15px] text-cyan-200 font-bold font-sans mt-1 flex items-center  ">
+                  Coming in: {timeLeft.days}d {timeLeft.hours}h{" "}
+                  {timeLeft.minutes}m {timeLeft.seconds}s
+                </div>
+              ) : (
+                <div className="text-[11px] text-red-400/90 mt-1 flex items-center">
+                  <svg
+                    className="w-3 h-3 mr-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  Gig expired
+                </div>
+              )}
+            </div>
+          )}
           <IconButton
             onClick={() => setIsDescriptionModal(false)}
             sx={{ color: "primary.contrastText" }}

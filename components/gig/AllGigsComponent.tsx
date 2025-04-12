@@ -20,7 +20,6 @@ import { motion } from "framer-motion";
 import { Trash2, X } from "lucide-react";
 import { Input } from "../ui/input";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { Box } from "@mui/material";
 
 // import { useCurrentUser } from "@/hooks/useCurrentUser";
 interface FetchResponse {
@@ -33,49 +32,8 @@ interface AllGigsComponentProps {
 }
 
 // Add this utility function outside your component
-const calculateTimeLeft = (targetDate: Date) => {
-  const now = new Date();
-  const difference = targetDate.getTime() - now.getTime();
-
-  if (difference <= 0) {
-    return {
-      days: 0,
-      hours: 0,
-      minutes: 0,
-      seconds: 0,
-      expired: true,
-    };
-  }
-
-  return {
-    days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-    hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-    minutes: Math.floor((difference / 1000 / 60) % 60),
-    seconds: Math.floor((difference / 1000) % 60),
-    expired: false,
-  };
-};
 
 const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
-  const [timeLeft, setTimeLeft] = useState(() => {
-    // Use gig's creation date plus one month
-    const createdAt = new Date(gig.createdAt);
-    const targetDate = new Date(createdAt);
-    targetDate.setMonth(targetDate.getMonth() + 1);
-    return calculateTimeLeft(targetDate);
-  });
-
-  useEffect(() => {
-    const createdAt = new Date(gig.createdAt);
-    const targetDate = new Date(createdAt);
-    targetDate.setMonth(targetDate.getMonth() + 1);
-
-    const timer = setInterval(() => {
-      setTimeLeft(calculateTimeLeft(targetDate));
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [gig.createdAt]);
   const { userId } = useAuth();
 
   const { socket } = useSocketContext();
@@ -240,7 +198,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="w-full bg-white/5 backdrop-blur-sm rounded-xl p-5 mb-3 border border-white/10 hover:border-white/20 transition-all"
+        className="w-full bg-white/5 backdrop-blur-sm rounded-xl p-3 mb-3 border border-white/10 hover:border-white/20 transition-all"
         style={{
           background:
             gig?.isPending === false
@@ -255,72 +213,48 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
             <h3 className="text-sm font-medium text-white truncate">
               {gig?.title}
             </h3>
-            <Box className="flex justify-between">
-              <div className="flex flex-1  items-center text-xs text-white/70 mt-1 space-x-3">
-                <span className="flex items-center">
-                  <svg
-                    className="w-3 h-3 mr-1"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                  </svg>
-                  {gig?.location}
-                </span>
-                <span className="flex items-center">
-                  <svg
-                    className="w-3 h-3 mr-1"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  {showPriceRangeAndCurrency}
-                </span>
-              </div>{" "}
-              {!timeLeft.expired ? (
-                <div className=" text-[11px] text-amber-300/80 mt-1 flex items-center ">
-                  {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m{" "}
-                  {timeLeft.seconds}s
-                </div>
-              ) : (
-                <div className="text-[11px] text-red-400/90 mt-1 flex items-center">
-                  <svg
-                    className="w-3 h-3 mr-1"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  Gig expired
-                </div>
-              )}
-            </Box>
-          </div>{" "}
+            <div className="flex items-center text-xs text-white/70 mt-1 space-x-3">
+              <span className="flex items-center">
+                <svg
+                  className="w-3 h-3 mr-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+                {gig?.location}
+              </span>
+              <span className="flex items-center">
+                <svg
+                  className="w-3 h-3 mr-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                {showPriceRangeAndCurrency}
+              </span>
+            </div>
+          </div>
+
           {/* Status Badge */}
           <span
             className={`text-[10px] px-2 py-0.5 rounded-full ml-2 ${
