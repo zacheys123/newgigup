@@ -16,7 +16,7 @@ const GigsPage = () => {
   const [typeOfGig, setTypeOfGig] = useState<string>("");
   const [category, setCategory] = useState<string>("all");
   const [location, setLocation] = useState<string>("all");
-
+  const [scheduler, setScheduler] = useState<string>("notPending");
   let gigQuery;
   useEffect(() => {
     // if (!user) {
@@ -33,11 +33,18 @@ const GigsPage = () => {
 
   const filteredGigs = useMemo(() => {
     return (
-      searchfunc(gigs, typeOfGig, category, gigQuery, location)?.filter(
+      searchfunc(
+        gigs,
+        typeOfGig,
+        category,
+        gigQuery,
+        location,
+        scheduler
+      )?.filter(
         (gig: GigProps) => gig?.isTaken === false && gig?.isPending === false
       ) || []
     );
-  }, [gigs, typeOfGig, category, location, gigQuery]);
+  }, [gigs, typeOfGig, category, location, gigQuery, scheduler]);
 
   const isLoading = gigsLoading || userLoading;
   console.log(filteredGigs);
@@ -52,6 +59,8 @@ const GigsPage = () => {
           location={location}
           setLocation={setLocation}
           myuser={user?.user}
+          scheduler={scheduler}
+          setScheduler={setScheduler}
         />
       </div>
 

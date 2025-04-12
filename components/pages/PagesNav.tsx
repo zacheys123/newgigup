@@ -79,7 +79,7 @@ const PagesNav = () => {
   }
 
   return (
-    <nav className=" md:hidden bottom-10 absolute left-0 right-0 z-50 bg-gray-900 border-t border-gray-700 ">
+    <nav className=" md:hidden bottom-13 absolute left-0 right-0 z-50 bg-gray-900 border-t border-gray-700 ">
       <div className="flex justify-around items-center h-16">
         {links.map(({ href, Icon, label, size = 24, extraStyle }, index) => (
           <Link key={index} href={href} className="flex flex-col items-center">

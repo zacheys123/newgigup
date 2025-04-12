@@ -16,6 +16,7 @@ const PublishedGigs = () => {
   const [location, setLocation] = useState<string>(() =>
     user?.user?.city ? user?.user?.city : "all"
   );
+  const [scheduler, setScheduler] = useState<string>("notPending");
   let gigQuery;
   console.log(gigs);
   useEffect(() => {
@@ -31,12 +32,27 @@ const PublishedGigs = () => {
   }, [user]);
   const filteredGigs = useMemo(() => {
     return (
-      searchfunc(gigs, typeOfGig, category, gigQuery, location)?.filter(
+      searchfunc(
+        gigs,
+        typeOfGig,
+        category,
+        gigQuery,
+        location,
+        scheduler
+      )?.filter(
         (gig: GigProps) =>
           gig?.postedBy?._id !== user?.user?._id && gig?.isTaken === false
       ) || []
     );
-  }, [gigs, typeOfGig, category, location, gigQuery, user?.user?._id]);
+  }, [
+    gigs,
+    typeOfGig,
+    category,
+    location,
+    gigQuery,
+    user?.user?._id,
+    scheduler,
+  ]);
 
   const isLoading = gigsLoading || userLoading;
   console.log(filteredGigs);
@@ -52,6 +68,8 @@ const PublishedGigs = () => {
           location={location}
           setLocation={setLocation}
           myuser={user?.user}
+          scheduler={scheduler}
+          setScheduler={setScheduler}
         />
       </div>
       {/* Scrollable Gigs List */}

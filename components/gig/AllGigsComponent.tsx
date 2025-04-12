@@ -198,7 +198,10 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
         transition={{ duration: 0.3 }}
         className="w-full bg-white/5 backdrop-blur-sm rounded-xl p-3 mb-3 border border-white/10 hover:border-white/20 transition-all"
         style={{
-          background: gig?.backgroundColor || "rgba(26,28,35,0.8)",
+          background:
+            gig?.isPending === false
+              ? gig?.backgroundColor || "rgba(26,28,35,0.8)"
+              : "grey",
           color: gig?.fontColor || "#f3f4f6",
         }}
       >
@@ -425,6 +428,16 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                       ? "Processing..."
                       : "Book"
                   }
+                />
+              )}
+            {gig?.isPending === true &&
+              gig?.postedBy?._id !== user?.user?._id && (
+                <ButtonComponent
+                  variant="ghost"
+                  classname="!bg-red-600/90 hover:!bg-purple-500 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
+                  onclick={() => console.log("data")}
+                  title={"Pending"}
+                  disabled={true}
                 />
               )}
             {/* Context Menu */}

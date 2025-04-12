@@ -24,7 +24,7 @@ export default function GigLayout({ children, editpage }: GigLayoutProps) {
       <SidebarNav />
       <div className="flex-1 flex flex-col md:ml-[150px] lg:ml-[200px] w-full transition-all duration-300">
         {editpage}
-        <main className="h-[100%] overflow-auto w-full relative pb-2">
+        <main className="h-[100%] overflow-auto w-full relative ">
           {" "}
           {/* Even more padding */}
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">

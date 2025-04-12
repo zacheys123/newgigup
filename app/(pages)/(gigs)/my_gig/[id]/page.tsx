@@ -23,7 +23,7 @@ const MyGigs = () => {
   const [location, setLocation] = useState<string>(() =>
     user?.user?.city ? user?.user?.city : "all"
   );
-  const [scheduler, setScheduler] = useState<string>("pending");
+  const [scheduler, setScheduler] = useState<string>("notPending");
   let gigQuery;
   const router = useRouter();
   const [secret, setSecret] = useState<string>("");
