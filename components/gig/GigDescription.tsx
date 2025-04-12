@@ -99,11 +99,25 @@ const GigDescription = ({}) => {
         >
           {/* Basic Information Section */}
           <Box sx={{ mb: 3 }}>
-            <Chip
-              label="Basic Information"
-              color="primary"
-              sx={{ mb: 2, fontWeight: 600 }}
-            />
+            <Box className="flex justify-between items-center">
+              <Chip
+                label="Basic Information"
+                color="primary"
+                sx={{ mb: 2, fontWeight: 600 }}
+              />
+              <p className="mb-2">
+                <span className="text-white title">Status :</span>
+                <span
+                  className={`${
+                    currentgig?.isPending === false
+                      ? "text-green-300 title"
+                      : "text-red-500 title"
+                  }`}
+                >
+                  {currentgig?.isPending === false ? "All Good" : "Pending"}
+                </span>
+              </p>
+            </Box>
             <Box
               sx={{
                 backgroundColor: "background.paper",

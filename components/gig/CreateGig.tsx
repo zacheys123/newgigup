@@ -467,10 +467,7 @@ const CreateGig = () => {
   // Component Render
   return (
     <div className="relative h-screen overflow-y-auto">
-      <form
-        onSubmit={onSubmit}
-        className="min-h-screen bg-gray-900 px-4 py-6 pb-20 w-full md:max-w-2xl lg:max-w-3xl mx-auto"
-      >
+      <form className="min-h-screen bg-gray-900 px-4 py-6 pb-20 w-full md:max-w-2xl lg:max-w-3xl mx-auto">
         {/* Success/Error Message */}
         {isVisible && editMessage && (
           <motion.div
