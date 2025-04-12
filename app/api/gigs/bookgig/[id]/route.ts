@@ -63,6 +63,7 @@ export async function PUT(req: NextRequest) {
               bookCount: userid,
               // bookedBy: userid,
             },
+            $inc: {},
           },
           { new: true }
         );

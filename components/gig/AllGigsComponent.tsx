@@ -260,7 +260,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
             className={`text-[10px] px-2 py-0.5 rounded-full ml-2 ${
               gig?.isTaken
                 ? "bg-emerald-900/50 text-emerald-300"
-                : "bg-blue-900/60 text-teal-400"
+                : "bg-blue-900/60 text-cyan-400"
             }`}
           >
             {gig?.isTaken ? "Taken" : "Available"}

@@ -54,7 +54,12 @@ export async function PUT(req: NextRequest) {
       });
       const updatedUser = await User.findByIdAndUpdate(
         musicianId,
-        { $push: { refferences: gig.postedBy?._id } },
+        {
+          $push: {
+            refferences: gig.postedBy?._id,
+          },
+          $inc: { monthlyGigsBooked: 1 }, // This will increment the field by 1
+        },
         { new: true }
       );
 
