@@ -551,18 +551,18 @@ const CreateGig = () => {
         )}
       </AnimatePresence>
 
-      <div className="max-w-4xl mx-auto px-4 py-1">
+      <div className="max-w-4xl mx-auto px-4 py-3 md:py-8">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="mb-10 text-center"
+          className="mb-2 md:mb-10 text-center -mt-4"
         >
           <p className="text-gray-400 font-light">Create Your Gig</p>
         </motion.div>
 
         <motion.form
-          className="space-y-2"
+          className="space-y-2 md:space-y-10"
           initial="hidden"
           animate="visible"
           variants={{
@@ -574,7 +574,10 @@ const CreateGig = () => {
           }}
         >
           {/* Business Type Section */}
-          <motion.div variants={sectionVariants} className="space-y-4">
+          <motion.div
+            variants={sectionVariants}
+            className="space-y-2 md:space-y-4"
+          >
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <div className="w-full">
                 <label className="block text-sm font-medium text-gray-300 mb-1">
@@ -614,7 +617,7 @@ const CreateGig = () => {
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setShowCustomization(true)}
-                className="w-full md:w-auto mt-6 md:mt-0"
+                className="w-full md:w-auto  mt-0"
               >
                 <Button
                   variant="outline"
@@ -743,9 +746,12 @@ const CreateGig = () => {
             <AnimatePresence>
               {showCategories.title && (
                 <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
+                  initial={{ maxHeight: 0, opacity: 0 }}
+                  animate={{
+                    maxHeight: 200, // Enough for title fields
+                    opacity: 1,
+                  }}
+                  exit={{ maxHeight: 0, opacity: 0 }}
                   transition={{ duration: 0.3 }}
                   className="overflow-hidden bg-gray-800/30 rounded-b-lg border border-gray-700/50 border-t-0"
                 >
@@ -829,9 +835,12 @@ const CreateGig = () => {
             <AnimatePresence>
               {showCategories.description && (
                 <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
+                  initial={{ maxHeight: 0, opacity: 0 }}
+                  animate={{
+                    maxHeight: 300, // Larger for textarea
+                    opacity: 1,
+                  }}
+                  exit={{ maxHeight: 0, opacity: 0 }}
                   transition={{ duration: 0.3 }}
                   className="overflow-hidden bg-gray-800/30 rounded-b-lg border border-gray-700/50 border-t-0"
                 >
@@ -888,11 +897,14 @@ const CreateGig = () => {
             <AnimatePresence>
               {showCategories.business && (
                 <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
+                  initial={{ maxHeight: 0, opacity: 0 }}
+                  animate={{
+                    maxHeight: 200, // Largest section
+                    opacity: 1,
+                  }}
+                  exit={{ maxHeight: 0, opacity: 0 }}
                   transition={{ duration: 0.3 }}
-                  className="overflow-hidden bg-gray-800/30 rounded-b-lg border border-gray-700/50 border-t-0"
+                  className="overflow-y-auto bg-gray-800/30 rounded-b-lg border border-gray-700/50 border-t-0"
                 >
                   <div className="p-4 space-y-4">
                     <div>
@@ -1067,10 +1079,13 @@ const CreateGig = () => {
               {showCategories.gtimeline && (
                 <motion.div
                   initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
+                  animate={{
+                    height: 200, // Largest section
+                    opacity: 1,
+                  }}
                   exit={{ height: 0, opacity: 0 }}
                   transition={{ duration: 0.3 }}
-                  className="overflow-hidden bg-gray-800/30 rounded-b-lg border border-gray-700/50 border-t-0"
+                  className="overflow-y-scroll bg-gray-800/30 rounded-b-lg border border-gray-700/50 border-t-0"
                 >
                   <div className="p-4 space-y-4">
                     <div className="flex items-center bg-gray-700/50 rounded-lg border border-gray-600 px-3">
@@ -1248,9 +1263,7 @@ const CreateGig = () => {
                 </div>
               </motion.div>
             ) : (
-              <motion.div
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.99 }}
+              <div
                 onClick={() => setshowduration(true)}
                 className="flex justify-between items-center p-4 bg-gray-800/50 rounded-lg border border-gray-700/50 cursor-pointer hover:bg-gray-700/30 transition-all"
               >
@@ -1259,10 +1272,9 @@ const CreateGig = () => {
                   Add Duration
                 </h3>
                 <ArrowDown01Icon className="text-gray-400" size={18} />
-              </motion.div>
+              </div>
             )}
           </motion.div>
-
           {/* Band Setup Section */}
           {bussinesscat === "other" && (
             <motion.div variants={sectionVariants}>
@@ -1290,7 +1302,7 @@ const CreateGig = () => {
                 {!showCategories.othergig && (
                   <motion.div
                     initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
+                    animate={{ maxHeight: 500, opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.3 }}
                     className="overflow-hidden bg-gray-800/30 rounded-b-lg border border-gray-700/50 border-t-0"
