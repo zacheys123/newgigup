@@ -6,6 +6,7 @@ import { Socket } from "socket.io-client";
 import { DashboardData } from "./dashboard";
 
 export const initialState = {
+  gigs: [], // Initialize gigs array
   subscriptiondata: {
     user: {
       isClient: false,
@@ -133,6 +134,7 @@ interface OnlineUser {
   socketId: string;
 }
 export interface StoreState {
+  gigs: GigProps[];
   subscriptiondata: DashboardData;
   loadingPostId: string;
   confirmEdit: boolean;
@@ -203,4 +205,6 @@ export interface StoreState {
     emoji: string,
     setShowReaction: (response: { success: boolean; message: string }) => void
   ) => void;
+  updateGigStatus: (gigId: string, updates: Partial<GigProps>) => void;
+  setGigs: (gigs: GigProps[]) => void;
 }

@@ -66,6 +66,23 @@ const useStore = create<StoreState>((set) => ({
         [chatId]: (state.unreadCounts[chatId] || 0) + (increment ? 1 : 0),
       },
     })),
+  // In your Zustand store
+
+  // Add gigs to store
+  setGigs: (gigs) => set({ gigs }),
+
+  // Update gig status (works for both local and socket updates)
+  updateGigStatus: (gigId: string, updates: Partial<GigProps>) => {
+    set(
+      (state: StoreState) =>
+        ({
+          ...state,
+          gigs: state.gigs.map((gig) =>
+            gig._id === gigId ? { ...gig, ...updates } : gig
+          ),
+        } as StoreState)
+    ); // Explicitly type the return value
+  },
   addChat: (chat: ChatProps) =>
     set((state: StoreState) => ({
       chats: { ...state.chats, [chat.chatId]: chat },

@@ -1,9 +1,11 @@
 "use client";
+import useStore from "@/app/zustand/useStore";
 import AllGigsComponent from "@/components/gig/AllGigsComponent";
 import Gigheader from "@/components/gig/Gigheader";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { useAllGigs } from "@/hooks/useAllGigs";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import useSocket from "@/hooks/useSocket";
 import { GigProps } from "@/types/giginterface";
 import { searchfunc } from "@/utils/index";
 import React, { useEffect, useMemo, useState } from "react";
@@ -30,6 +32,33 @@ const PublishedGigs = () => {
       setLocation(user?.user?.city.toLowerCase());
     }
   }, [user]);
+  // In PublishedGigs.tsx
+  const { updateGigStatus } = useStore();
+  const { socket } = useSocket();
+
+  // Add this useEffect to listen for socket updates
+  // Socket.io effect
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleGigStatusUpdate = ({
+      gigId,
+      isPending,
+      isTaken,
+    }: {
+      gigId: string;
+      isPending: boolean;
+      isTaken: boolean;
+    }) => {
+      updateGigStatus(gigId, { isPending, isTaken });
+    };
+
+    socket.on("gigStatusUpdated", handleGigStatusUpdate);
+
+    return () => {
+      socket.off("gigStatusUpdated", handleGigStatusUpdate);
+    };
+  }, [socket, updateGigStatus]);
   const filteredGigs = useMemo(() => {
     return (
       searchfunc(
@@ -55,7 +84,7 @@ const PublishedGigs = () => {
   ]);
 
   const isLoading = gigsLoading || userLoading;
-  console.log(filteredGigs);
+
   return (
     <div className="flex flex-col h-[calc(100vh-100px)] w-[90%] mx-auto my-2 shadow-md shadow-orange-300">
       {/* Fixed Header */}
@@ -85,7 +114,10 @@ const PublishedGigs = () => {
         {!isLoading ? (
           <div className="space-y-3 p-2 pb-[74px] pt-3">
             {filteredGigs.map((gig: GigProps) => (
-              <AllGigsComponent key={gig?._id} gig={gig} />
+              <AllGigsComponent
+                key={gig._id}
+                gig={gig} // Pass the merged gig data
+              />
             ))}
           </div>
         ) : (

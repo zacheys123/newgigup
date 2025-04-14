@@ -20,6 +20,7 @@ import { motion } from "framer-motion";
 import { Trash2, X } from "lucide-react";
 import { Input } from "../ui/input";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useScheduleGig } from "@/hooks/useScheduleGig";
 
 // import { useCurrentUser } from "@/hooks/useCurrentUser";
 interface FetchResponse {
@@ -35,7 +36,7 @@ interface AllGigsComponentProps {
 
 const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
   const { userId } = useAuth();
-
+  const { schedulegig, loading } = useScheduleGig();
   const { socket } = useSocketContext();
   const { gigs } = useAllGigs() || { gigs: [] }; // Default to empty array if null or undefined
   const { user } = useCurrentUser();
@@ -69,8 +70,6 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
           setCurrentGig(gig);
           return;
         }
-        toast.error("You cannot view your own gig");
-
         setCurrviewCount((prev) => prev + 1);
         setIsDeleteModal(true);
         setCurrentGig(gig);
@@ -361,12 +360,16 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                   onclick={() => {
                     setLoadingPostId(gig?._id as string);
                     setTimeout(() => {
-                      handleBookedUsers(gig?._id as string);
+                      schedulegig(gig?._id as string, toast);
                       setLoadingPostId("");
                     }, 2000);
                   }}
                   disabled={loadingPostId.length > 0}
-                  title={loadingPostId === gig._id ? "Creating..." : "Post"}
+                  title={
+                    loadingPostId === gig._id && loading
+                      ? "Creating..."
+                      : "Post"
+                  }
                 />
               </div>
             )}{" "}
