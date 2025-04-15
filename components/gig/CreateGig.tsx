@@ -624,7 +624,7 @@ const CreateGig = () => {
                   className="flex p-4 w-[200px] mx-auto items-center gap-2 bg-gradient-to-r from-purple-600/30 to-blue-600/30 border border-purple-500/30 text-white hover:bg-purple-700/40 hover:border-purple-400/50 transition-all"
                 >
                   <span className="text-xs md:text-sm">Customize Gig Card</span>
-                </Button>
+                </div>
               </motion.div>
             </div>
 
