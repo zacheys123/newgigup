@@ -34,6 +34,7 @@ type Info = {
   pricerange: string;
   currency: string;
   isPending: boolean;
+  scheduleDate: Date;
 };
 
 export async function POST(req: NextRequest) {
@@ -66,6 +67,7 @@ export async function POST(req: NextRequest) {
     pricerange,
     currency,
     isPending,
+    scheduleDate,
   }: Info = await req.json();
 
   console.log(otherTimeline);
@@ -249,6 +251,7 @@ export async function POST(req: NextRequest) {
       pricerange,
       currency,
       isPending,
+      scheduleDate,
     });
 
     await User.findByIdAndUpdate(postedBy, {

@@ -83,7 +83,6 @@ const SchedulerComponent = ({
       onClose={() => !isLoading && setisSchedulerOpen(false)} // Prevent closing while loading
       title="Final Step: Delivery Scheduling"
       description="Select how you'd like to schedule your content delivery"
-      width="200px"
     >
       <div className="space-y-4 md:space-y-6 p-2 md:p-4 w-[210px]">
         {/* Loading overlay */}

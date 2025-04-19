@@ -60,8 +60,8 @@ const GigDescription = ({}) => {
   console.log(currentgig);
   const [timeLeft, setTimeLeft] = useState(() => {
     // Use gig's creation date plus one month
-    const createdAt = new Date(currentgig.createdAt);
-    const targetDate = new Date(createdAt);
+
+    const targetDate = new Date(currentgig?.scheduleDate);
     targetDate.setMonth(targetDate.getMonth() + 1);
     return calculateTimeLeft(targetDate);
   });

@@ -86,6 +86,7 @@ const gigSchema = new mongoose.Schema(
       type: String,
     },
     vocalistGenre: { type: [String], default: [] },
+    scheduleDate: { type: Date, default: new Date() },
   },
   { timestamps: true }
 );

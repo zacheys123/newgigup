@@ -109,6 +109,7 @@ export const initialState = {
     vocalistGenre: [],
     pricerange: "",
     currency: "",
+    scheduleDate: new Date(),
   },
 
   searchQuery: "",

@@ -414,6 +414,7 @@ const CreateGig = () => {
               : schedulingProcedure.type === "create"
               ? false
               : false,
+          scheduleDate: schedulingProcedure.date,
         }),
       });
       const data = await res.json();
@@ -562,7 +563,7 @@ const CreateGig = () => {
         </motion.div>
 
         <motion.form
-          className="space-y-2 md:space-y-10"
+          className="space-y-2 md:space-y-10 flex-col"
           initial="hidden"
           animate="visible"
           variants={{
@@ -612,23 +613,10 @@ const CreateGig = () => {
                   </option>
                 </select>
               </div>
-
-              <motion.div
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => setShowCustomization(true)}
-                className="w-full md:w-auto  mt-0"
-              >
-                <Button
-                  variant="outline"
-                  className="flex items-center gap-2 bg-gradient-to-r from-purple-600/30 to-blue-600/30 border border-purple-500/30 text-white hover:bg-purple-700/40 hover:border-purple-400/50 transition-all"
-                >
-                  <span className="text-xs md:text-sm">Customize Gig Card</span>
-                </Button>
-              </motion.div>
             </div>
 
             {/* Talent Preview */}
+
             {!show &&
               (gigInputs.mcType ||
                 gigInputs.djGenre ||
@@ -636,7 +624,7 @@ const CreateGig = () => {
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50"
+                  className="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50 relative"
                 >
                   <div className="flex justify-between items-center mb-3">
                     <div className="flex items-center gap-2">
@@ -721,10 +709,37 @@ const CreateGig = () => {
                       </div>
                     )}
                   </div>
+                  <span
+                    className="text-white text-[16px] absolute right-3 top-1 cursor-pointer"
+                    onClick={() => setShow(true)}
+                  >
+                    &times;
+                  </span>
                 </motion.div>
               )}
           </motion.div>
-
+          <motion.div
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full md:w-auto  mt-0 flex justify-between items-center"
+          >
+            <Button
+              type="button"
+              variant="outline"
+              className="flex items-center gap-2 bg-gradient-to-r from-purple-600/30 to-blue-600/30 border border-purple-500/30 text-white hover:bg-purple-700/40 hover:border-purple-400/50 transition-all"
+              onClick={() => setShowCustomization(true)}
+            >
+              <span className="text-xs md:text-sm">Customize Gig Card</span>
+            </Button>
+            {show && (
+              <div
+                className="p-2 h-[20px] text-neutral-400 text-[11px] bg-gray-200 w-fit flex justify-center items-center rounded-xl cursor-pointer"
+                onClick={() => setShow(false)}
+              >
+                Show Data
+              </div>
+            )}
+          </motion.div>
           {/* Title Section */}
           <motion.div variants={sectionVariants}>
             <div

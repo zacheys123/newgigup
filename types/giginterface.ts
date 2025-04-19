@@ -41,6 +41,7 @@ export interface GigProps {
   vocalistGenre: string[];
   pricerange: string;
   currency: string;
+  scheduleDate: Date;
 }
 
 export interface Gigs {

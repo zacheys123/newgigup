@@ -11,11 +11,14 @@ import {
 import { FaHome } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { BsCart4 } from "react-icons/bs";
+import { useAllGigs } from "@/hooks/useAllGigs";
 
 const PagesNav = () => {
   const { userId } = useAuth();
   const pathname = usePathname();
   const { user } = useCurrentUser();
+  const { gigs } = useAllGigs();
 
   const linkStyles = (isActive: boolean) =>
     isActive
@@ -52,6 +55,13 @@ const PagesNav = () => {
       size: 24,
       extraStyle: "",
     });
+    links.push({
+      href: `/pending/${userId}`,
+      Icon: BsCart4,
+      label: "Pending",
+      size: 24,
+      extraStyle: "",
+    });
   }
 
   if (user?.user?.isClient) {
@@ -70,7 +80,7 @@ const PagesNav = () => {
       extraStyle: "text-purple-500",
     });
     links.push({
-      href: `/my_gig/${userId}`,
+      href: `/my_gig/${user?._id}`,
       Icon: MdOutlinePersonalInjury,
       label: "My Gigs",
       size: 24,
@@ -78,6 +88,10 @@ const PagesNav = () => {
     });
   }
 
+  const pendingGigsCount =
+    gigs?.filter((gig) =>
+      gig?.bookCount?.some((bookedUser) => bookedUser?._id === user?._id)
+    )?.length || 0;
   return (
     <nav className=" md:hidden bottom-12 -mt-1.5 absolute left-0 right-0 z-50 bg-gray-900 border-t border-gray-700 ">
       <div className="flex justify-around items-center h-16">
@@ -88,10 +102,15 @@ const PagesNav = () => {
               initial="initial"
               whileHover="hover"
               whileTap="tap"
-              className={`flex flex-col items-center p-2 ${linkStyles(
+              className={`flex flex-col items-center p-2 relative ${linkStyles(
                 pathname === href
               )} ${extraStyle || ""}`}
             >
+              {label === "Pending" && pendingGigsCount > 0 && (
+                <span className="text-red-400 absolute bg-white h-4 w-4 font=bold flex justify-center items-center rounded-full text-[13px] right-2 to-1">
+                  {pendingGigsCount === 0 ? "" : pendingGigsCount}
+                </span>
+              )}
               <Icon size={size} />
               <span className="text-xs mt-1">{label}</span>
             </motion.div>

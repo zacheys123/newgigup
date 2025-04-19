@@ -51,9 +51,8 @@ const Modal = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className={`  ${
-            width && "w-[width]"
-          } fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm`}
+          className={`   w-full
+           fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm`}
           onClick={handleOutsideClick}
         >
           {/* Overlay with subtle gradient */}
