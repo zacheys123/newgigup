@@ -613,6 +613,23 @@ const CreateGig = () => {
                   </option>
                 </select>
               </div>
+<<<<<<< HEAD
+=======
+
+              <motion.div
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setShowCustomization(true)}
+                className="w-full md:w-auto  mt-0"
+              >
+                <div
+                  
+                  className="flex p-4 w-[200px] mx-auto items-center gap-2 bg-gradient-to-r from-purple-600/30 to-blue-600/30 border border-purple-500/30 text-white hover:bg-purple-700/40 hover:border-purple-400/50 transition-all"
+                >
+                  <span className="text-xs md:text-sm">Customize Gig Card</span>
+                </div>
+              </motion.div>
+>>>>>>> 21493a3ef72c07a2ba5b6c3b9146f1c675c4e31a
             </div>
 
             {/* Talent Preview */}
