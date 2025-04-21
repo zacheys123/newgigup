@@ -119,8 +119,8 @@ const GigDescription = ({}) => {
             <div>
               {!timeLeft.expired ? (
                 <div className="text-[15px] text-cyan-200 font-bold font-sans mt-1 flex items-center  ">
-                  Coming in: {timeLeft.days}d {timeLeft.hours}h{" "}
-                  {timeLeft.minutes}m {timeLeft.seconds}s
+                  {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m{" "}
+                  {timeLeft.seconds}s
                 </div>
               ) : (
                 <div className="text-[11px] text-red-400/90 mt-1 flex items-center">
@@ -556,6 +556,9 @@ const GigDescription = ({}) => {
                   className="text-black flex flex-col gap-3"
                 >
                   <strong style={{ color: "#ff5252" }}>
+                    <span className="font-bold text-[13px]">
+                      Happening on!!!
+                    </span>{" "}
                     {moment(currentgig?.date).format("MMMM Do YYYY")}
                   </strong>
                   <strong

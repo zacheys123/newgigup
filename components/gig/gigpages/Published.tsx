@@ -18,7 +18,7 @@ const Published = () => {
   const [location, setLocation] = useState<string>(() =>
     user?.user?.city ? user?.user?.city : "all"
   );
-  const [scheduler, setScheduler] = useState<string>("notPending");
+  const [scheduler, setScheduler] = useState<string>("all");
   let gigQuery;
   console.log(gigs);
   useEffect(() => {
