@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
     scheduleDate,
   }: Info = await req.json();
 
-  console.log(otherTimeline);
+  console.log(scheduleDate);
   console.log(day);
   console.log(currency);
 

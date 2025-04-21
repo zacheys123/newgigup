@@ -563,7 +563,7 @@ const CreateGig = () => {
         </motion.div>
 
         <motion.form
-          className="space-y-2 md:space-y-10 flex-col"
+          className="space-y-5 md:space-y-10 flex-col"
           initial="hidden"
           animate="visible"
           variants={{
@@ -721,10 +721,10 @@ const CreateGig = () => {
           <motion.div
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => setShowCustomization(true)}
             className="w-full md:w-auto  mt-0 flex justify-between item"
           >
             <Button
+              onClick={() => setShowCustomization(true)}
               type="button"
               variant="outline"
               className="flex items-center gap-2 bg-gradient-to-r from-purple-600/30 to-blue-600/30 border border-purple-500/30 text-white hover:bg-purple-700/40 hover:border-purple-400/50 transition-all"
@@ -914,7 +914,7 @@ const CreateGig = () => {
                 <motion.div
                   initial={{ maxHeight: 0, opacity: 0 }}
                   animate={{
-                    maxHeight: 200, // Largest section
+                    maxHeight: 240, // Largest section
                     opacity: 1,
                   }}
                   exit={{ maxHeight: 0, opacity: 0 }}

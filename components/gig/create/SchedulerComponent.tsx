@@ -52,7 +52,7 @@ const SchedulerComponent = ({
       activeBg: "bg-blue-100",
       button:
         "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700",
-      text: "text-yellow-800",
+      text: "text-yellow-500",
       icon: "text-blue-500",
     },
     regular: {
@@ -84,7 +84,7 @@ const SchedulerComponent = ({
       title="Final Step: Delivery Scheduling"
       description="Select how you'd like to schedule your content delivery"
     >
-      <div className="space-y-4 md:space-y-6 p-2 md:p-4 w-[210px]">
+      <div className="space-y-4 md:space-y-6 p-2 md:p-4 w-full">
         {/* Loading overlay */}
         {isLoading && (
           <div className="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center z-10 rounded-xl">

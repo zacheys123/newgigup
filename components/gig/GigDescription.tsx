@@ -70,7 +70,6 @@ const GigDescription = ({}) => {
     const createdAt = new Date(currentgig.createdAt);
     const targetDate = new Date(createdAt);
     targetDate.setMonth(targetDate.getMonth() + 1);
-
     const timer = setInterval(() => {
       setTimeLeft(calculateTimeLeft(targetDate));
     }, 1000);
@@ -89,7 +88,7 @@ const GigDescription = ({}) => {
       ? `${currentgig?.price},00000 ${currentgig?.currency} `
       : `${currentgig?.price} ${currentgig?.currency} `;
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50 backdrop-blur-sm -mt-[140px]">
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50 backdrop-blur-sm -mt-[100px]">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
