@@ -116,7 +116,7 @@ const BookingPage = ({ currentGig }: BookingProps) => {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh)] w-full overflow-y-auto bg-gradient-to-b from-gray-900 to-gray-800">
+    <div className="flex flex-col h-[calc(100vh)-100px] w-full py-1 my-1 overflow-y-auto bg-gradient-to-b from-gray-900 to-gray-800">
       {/* Add this wrapper div with specific height calculation */}
       <div className="flex-1 overflow-y-auto pb-[20px]">
         {!showX && (

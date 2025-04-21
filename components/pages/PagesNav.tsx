@@ -25,7 +25,6 @@ const PagesNav = () => {
   const [isOpen, setIsOpen] = useState(false);
   const controls = useAnimation();
   const navRef = useRef<HTMLDivElement>(null);
-  const dragHandleRef = useRef<HTMLDivElement>(null);
 
   const linkStyles = (isActive: boolean) =>
     isActive
@@ -97,8 +96,9 @@ const PagesNav = () => {
 
   const pendingGigsCount =
     gigs?.filter((gig) =>
-      gig?.bookCount?.some((bookedUser) => bookedUser?._id === user?._id)
+      gig?.bookCount?.some((bookedUser) => bookedUser?.clerkId === userId)
     )?.length || 0;
+  console.log(pendingGigsCount);
 
   const handleDragEnd = (
     event: MouseEvent | TouchEvent | PointerEvent,
@@ -107,79 +107,72 @@ const PagesNav = () => {
     const threshold = 50;
     const velocityThreshold = 500;
 
-    // If dragged left beyond threshold or fast swipe left
+    // Close if swiped left quickly or past threshold
     if (info.offset.x < -threshold || info.velocity.x < -velocityThreshold) {
-      closeNav();
+      controls.start({ x: "100%" });
+      setIsOpen(false);
     }
-    // If dragged right beyond threshold or fast swipe right
+    // Open if swiped right quickly or past threshold
     else if (info.offset.x > threshold || info.velocity.x > velocityThreshold) {
-      openNav();
+      controls.start({ x: 0 });
+      setIsOpen(true);
     }
-    // If not enough movement, return to current state
+    // Return to current state if not enough movement
     else {
       controls.start({ x: isOpen ? 0 : "100%" });
     }
   };
 
-  const openNav = () => {
-    controls.start({
-      x: 0,
-      transition: { type: "spring", stiffness: 300, damping: 30 },
-    });
-    setIsOpen(true);
-    document.body.style.overflow = "hidden";
-  };
-
-  const closeNav = () => {
-    controls.start({
-      x: "100%",
-      transition: { type: "spring", stiffness: 300, damping: 30 },
-    });
-    setIsOpen(false);
-    document.body.style.overflow = "auto";
-  };
-
-  const toggleNav = () => {
-    if (isOpen) {
-      closeNav();
-    } else {
-      openNav();
-    }
-  };
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        navRef.current &&
-        !navRef.current.contains(event.target as Node) &&
-        dragHandleRef.current &&
-        !dragHandleRef.current.contains(event.target as Node)
-      ) {
-        closeNav();
+      if (navRef.current && !navRef.current.contains(event.target as Node)) {
+        controls.start({
+          x: "100%",
+          transition: { type: "spring", stiffness: 300, damping: 30 },
+        });
+        setIsOpen(false);
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.body.style.overflow = "hidden";
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.body.style.overflow = "auto";
+    }
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
       document.body.style.overflow = "auto";
     };
-  }, []);
+  }, [isOpen, controls]);
+
+  const toggleNav = () => {
+    if (isOpen) {
+      controls.start({
+        x: "100%",
+        transition: { type: "spring", stiffness: 300, damping: 30 },
+      });
+    } else {
+      controls.start({
+        x: 0,
+        transition: { type: "spring", stiffness: 300, damping: 30 },
+      });
+    }
+    setIsOpen(!isOpen);
+  };
 
   return (
     <>
-      {/* Drag Handle */}
+      {/* Modern Drag Handle */}
       <motion.div
-        ref={dragHandleRef}
-        className=" fixed right-0 top-1/2 -translate-y-1/2 z-50 bg-gray-800 p-3 rounded-l-lg cursor-grab active:cursor-grabbing md:hidden shadow-lg border-l border-y border-gray-700"
+        className="fixed right-0 top-1/2 -translate-y-1/2 z-50 bg-gray-800 p-3 rounded-l-lg cursor-grab active:cursor-grabbing md:hidden shadow-lg border-l border-y border-gray-700"
         drag="x"
         dragConstraints={{ left: 0, right: 0 }}
-        dragElastic={0.05}
+        dragElastic={0.1}
         onDragEnd={handleDragEnd}
-        onClick={(e) => {
-          e.stopPropagation();
-          toggleNav();
-        }}
+        onClick={toggleNav}
         whileHover={{ backgroundColor: "rgba(31, 41, 55, 0.9)" }}
         whileTap={{
           scale: 0.95,
@@ -203,16 +196,16 @@ const PagesNav = () => {
         </motion.div>
       </motion.div>
 
-      {/* Navigation Panel */}
+      {/* Modern Navigation Panel */}
       <motion.nav
         ref={navRef}
         className="fixed right-0 top-0 h-full w-72 bg-gray-900 border-l border-gray-700 z-40 md:hidden shadow-2xl"
         initial={{ x: "100%" }}
         animate={controls}
-        style={{ x: "100%" }} // Initial position off-screen
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
       >
         <div className="h-full flex flex-col">
+          {/* Header */}
           <div className="p-4 border-b border-gray-700 flex justify-between items-center bg-gray-800">
             <h2 className="text-xl font-bold text-white">Menu</h2>
             <button
@@ -223,6 +216,7 @@ const PagesNav = () => {
             </button>
           </div>
 
+          {/* Navigation Links */}
           <div className="flex-1 overflow-y-auto p-4 space-y-2">
             {links.map(
               ({ href, Icon, label, size = 20, extraStyle }, index) => (
@@ -235,11 +229,14 @@ const PagesNav = () => {
                     className={`flex items-center p-3 relative rounded-lg transition-all ${linkStyles(
                       pathname === href
                     )} ${extraStyle || ""}`}
-                    onClick={() => closeNav()}
+                    onClick={() => {
+                      controls.start({ x: "100%" });
+                      setIsOpen(false);
+                    }}
                   >
                     <div className="relative">
                       <Icon size={size} className="mr-3" />
-                      {label === "Pending" && pendingGigsCount > 0 && (
+                      {gigs?.length > 0 && label === "Pending" && (
                         <span className="absolute -right-2 -top-2 bg-red-500 text-white text-xs font-bold h-5 w-5 rounded-full flex items-center justify-center">
                           {pendingGigsCount}
                         </span>
@@ -252,19 +249,21 @@ const PagesNav = () => {
             )}
           </div>
 
+          {/* Footer */}
           <div className="p-4 border-t border-gray-700 text-center text-gray-400 text-sm">
             {user?.user?.username || "User"}
           </div>
         </div>
       </motion.nav>
 
-      {/* Overlay */}
+      {/* Modern Overlay */}
       {isOpen && (
         <motion.div
           className="fixed inset-0 bg-black bg-opacity-60 z-30 md:hidden backdrop-blur-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          onClick={closeNav}
+          exit={{ opacity: 0 }}
+          onClick={toggleNav}
           transition={{ duration: 0.2 }}
         />
       )}

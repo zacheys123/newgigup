@@ -262,11 +262,13 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                 : "bg-blue-900/60 text-cyan-400"
             }`}
           >
-            {gig?.isTaken
-              ? "Taken"
-              : gig?.isPending
-              ? "Coming Soon"
-              : "Available"}
+            {gig?.isTaken ? (
+              "Taken"
+            ) : gig?.isPending ? (
+              <span className="text-yellow-300">Coming Soon</span>
+            ) : (
+              <span className="text-green-300 space-x-2">Available</span>
+            )}
           </span>
         </div>
 
