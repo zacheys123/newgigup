@@ -14,7 +14,7 @@ const PendingGigs = () => {
   );
 
   return (
-    <div className="h-full W-[90%] mx-auto">
+    <div className="h-full W-[100%] mx-auto">
       <div className="text-white">
         {pendingGigs?.map((gig) => (
           <div key={gig?._id}>

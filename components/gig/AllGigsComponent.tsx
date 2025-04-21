@@ -197,7 +197,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="w-full bg-white/5 backdrop-blur-sm rounded-xl p-3 mb-3 border border-white/10 hover:border-white/20 transition-all"
+        className="w-[90%] mx-auto bg-white/5 backdrop-blur-sm rounded-xl p-3 mb-3 border border-white/10 hover:border-white/20 transition-all"
         style={{
           background:
             gig?.isPending === false

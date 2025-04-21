@@ -86,7 +86,7 @@ const Published = () => {
   const isLoading = gigsLoading || userLoading;
 
   return (
-    <div className="flex flex-col h-[calc(100vh-100px)] w-[90%] mx-auto my-2 shadow-md shadow-orange-300">
+    <div className="flex flex-col h-[calc(100vh-100px)] w-[100%] mx-auto my-2 shadow-md shadow-orange-300">
       {/* Fixed Header */}
       <div className="sticky top-0 z-10 bg-gray-900 shadow-md">
         <Gigheader

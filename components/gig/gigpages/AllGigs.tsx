@@ -49,7 +49,7 @@ const AllGigs = () => {
   const isLoading = gigsLoading || userLoading;
   console.log(filteredGigs);
   return (
-    <div className="flex flex-col h-full w-[90%] mx-auto md:w-full my-2 md:shadow-lg md:shadow-orange-300/20 md:rounded-xl md:overflow-hidden">
+    <div className="flex flex-col h-full w-[100%] mx-auto md:w-full my-2 md:shadow-lg md:shadow-orange-300/20 md:rounded-xl md:overflow-hidden">
       <div className="sticky top-0 z-10 bg-gray-900 shadow-md md:shadow-lg md:rounded-t-xl">
         <Gigheader
           typeOfGig={typeOfGig}

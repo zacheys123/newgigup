@@ -1,7 +1,7 @@
 "use client";
 
 import { CircularProgress } from "@mui/material";
-import React, { useEffect, useState, useRef, useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
@@ -24,16 +24,20 @@ import { UserProps, VideoProfileProps } from "@/types/userinterfaces";
 import VideoProfileComponent from "../user/VideoProfileComponent";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import Link from "next/link";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 import CountUp from "react-countup";
 import useSocket from "@/hooks/useSocket";
 import { useAllGigs } from "@/hooks/useAllGigs";
+import UserListModal from "../gig/create/UserList";
+import ModalActions from "../gig/create/ModalActions";
+import Modal from "../gig/create/Modal";
+import ToggleSwitch from "../gig/create/ToggleSwitch";
+import SelectInput from "../gig/create/SelectInput";
 
 interface UpdateResponse {
   updateStatus: boolean;
@@ -889,231 +893,6 @@ const TextInput = ({
       placeholder={placeholder}
       disabled={disabled}
     />
-  </div>
-);
-
-const SelectInput = ({
-  label,
-  value,
-  onChange,
-  options,
-  className = "",
-}: {
-  label?: string;
-  value: string;
-  onChange: (value: string) => void;
-  options: { value: string; label: string }[];
-  className?: string;
-}) => (
-  <div className={className}>
-    {label && <Label className="text-neutral-400 text-[12px]">{label}</Label>}
-    <select
-      className={`appearance-none w-full p-2 rounded-md bg-neutral-800 text-gray-300 border-neutral-700 focus:ring-0 text-sm mt-1 ${className}`}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-    >
-      {options.map((option) => (
-        <option key={option.value} value={option.value}>
-          {option.label}
-        </option>
-      ))}
-    </select>
-  </div>
-);
-
-const ToggleSwitch = ({
-  label,
-  checked,
-  onChange,
-}: {
-  label: string;
-  checked: boolean;
-  onChange: () => void;
-}) => (
-  <div className="flex items-center justify-between">
-    <Label className="text-neutral-400">{label}</Label>
-    <Switch
-      checked={checked}
-      onCheckedChange={onChange}
-      className="data-[state=checked]:bg-rose-600"
-    />
-  </div>
-);
-
-const Modal = ({
-  isOpen,
-  onClose,
-  title,
-  children,
-}: {
-  isOpen: boolean;
-  onClose?: () => void;
-  title: string;
-  children: React.ReactNode;
-}) => {
-  const modalRef = useRef<HTMLDivElement>(null);
-
-  // Close modal on ESC key
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && onClose) onClose();
-    };
-
-    if (isOpen) {
-      document.addEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "hidden"; // Prevent scrolling
-    }
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "auto";
-    };
-  }, [isOpen, onClose]);
-
-  // Close modal when clicking outside
-  const handleOutsideClick = (e: React.MouseEvent) => {
-    if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
-      onClose?.();
-    }
-  };
-
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
-          onClick={handleOutsideClick}
-        >
-          {/* Overlay with subtle gradient */}
-          <div className="fixed inset-0 bg-gradient-to-br from-black/80 to-purple-900/20" />
-
-          <motion.div
-            ref={modalRef}
-            initial={{ y: 20, scale: 0.98 }}
-            animate={{ y: 0, scale: 1 }}
-            exit={{ y: 20, opacity: 0 }}
-            transition={{ type: "spring", damping: 25, stiffness: 500 }}
-            className="relative w-full max-w-md rounded-xl bg-neutral-900 border border-neutral-700/50 shadow-2xl overflow-hidden"
-          >
-            {/* Header with close button */}
-            <div className="flex items-center justify-between p-5 border-b border-neutral-800">
-              <h3 className="text-xl font-semibold text-white">{title}</h3>
-              {onClose && (
-                <button
-                  onClick={onClose}
-                  className="p-1 rounded-full hover:bg-neutral-800 transition-colors text-neutral-400 hover:text-white"
-                  aria-label="Close modal"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <line x1="18" y1="6" x2="6" y2="18" />
-                    <line x1="6" y1="6" x2="18" y2="18" />
-                  </svg>
-                </button>
-              )}
-            </div>
-
-            {/* Content */}
-            <div className="p-5 text-neutral-300">{children}</div>
-
-            {/* Subtle glow effect */}
-            <div className="absolute inset-0 pointer-events-none border border-transparent group-hover:border-purple-500/30 transition-all duration-500 rounded-xl" />
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-};
-const UserListModal = ({
-  isOpen,
-  onClose,
-  title,
-  users,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  title: string;
-  users: { name: string; email?: string; picture: string; lastname: string }[];
-}) => {
-  console.log(users);
-  return (
-    <Modal isOpen={isOpen} onClose={onClose} title={title}>
-      <div className="max-h-[60vh] overflow-y-auto">
-        {users.length === 0 ? (
-          <p className="text-neutral-400 text-center py-4">
-            No {title.toLowerCase()} found
-          </p>
-        ) : (
-          <ul className="divide-y divide-neutral-700">
-            {users.map((user, index) => (
-              <li
-                key={index}
-                className="py-3 px-2 hover:bg-neutral-800/50 rounded"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-neutral-700 flex items-center justify-center">
-                    {user?.picture ? (
-                      <Image
-                        src={user?.picture}
-                        alt={user?.name[0]}
-                        height={25}
-                        width={25}
-                        className="object-cover rounded-full"
-                      />
-                    ) : (
-                      <User size={16} className="text-neutral-400" />
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-white font-medium">
-                      {user.name || "Unknown User"} {user?.lastname}
-                    </p>
-                    {user.email && (
-                      <p className="text-neutral-400 text-sm">{user.email}</p>
-                    )}
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-    </Modal>
-  );
-};
-const ModalActions = ({
-  onCancel,
-  onConfirm,
-  confirmText = "Confirm",
-}: {
-  onCancel: () => void;
-  onConfirm: () => void;
-  confirmText?: string;
-}) => (
-  <div className="flex justify-end gap-2 mt-6">
-    <Button
-      variant="outline"
-      className="text-black border-neutral-600"
-      onClick={onCancel}
-    >
-      Cancel
-    </Button>
-    <Button className="bg-rose-600 hover:bg-rose-700" onClick={onConfirm}>
-      {confirmText}
-    </Button>
   </div>
 );
 
