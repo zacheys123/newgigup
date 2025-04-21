@@ -212,7 +212,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
             <h3 className="text-sm font-medium text-white truncate">
               {gig?.title}
             </h3>
-            <div className="flex items-center text-xs text-white/70 mt-1 space-x-3">
+            <div className="flex items-center text-xs text-white/70 mt-1 space-x-3 line-clamp-1">
               <span className="flex items-center">
                 <svg
                   className="w-3 h-3 mr-1"
@@ -233,7 +233,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                     d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                   />
                 </svg>
-                {gig?.location}
+                <span className="line-clamp-1">{gig?.location}</span>
               </span>
               <span className="flex items-center">
                 <svg
@@ -265,7 +265,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
             {gig?.isTaken
               ? "Taken"
               : gig?.isPending
-              ? "Not Available"
+              ? "Coming Soon"
               : "Available"}
           </span>
         </div>
