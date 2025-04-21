@@ -17,7 +17,7 @@ const Musicians = ({ _id }: UserProps) => {
       myuser?.instrument &&
       myuser?.isClient === false &&
       myuser?.isMusician === true &&
-      user?.roleType === "instrumentalist" ? myuser?."instrumentalist" : user?.roleType === "dj" ? myuser?.roleType==="dj" : user?.roleType === "mc" ? myuser?.roleType==="mc": user?.roleType === "vocalist" ? 
+      user?.roleType === "instrumentalist" ? myuser?.roleType==="instrumentalist" : user?.roleType === "dj" ? myuser?.roleType==="dj" : user?.roleType === "mc" ? myuser?.roleType==="mc": user?.roleType === "vocalist" ? 
       myuser?.roleType==="vocalist":false
   );
   const CurrentMusicianAroundWhereIam = allusers?.users?.filter(
