@@ -32,7 +32,7 @@ const Musicians = ({ _id }: UserProps) => {
 
   if (loading) {
     return (
-      <div className="mt-21 w-full max-w-6xl mx-auto px-4">
+      <div className="mt-16 w-full max-w-6xl mx-auto px-4">
         <div className="flex items-center justify-between mb-6">
           <div>
             <div className="h-7 w-48 bg-neutral-800 rounded-md mb-2"></div>
