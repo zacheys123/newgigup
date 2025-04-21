@@ -262,7 +262,11 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                 : "bg-blue-900/60 text-cyan-400"
             }`}
           >
-            {gig?.isTaken ? "Taken" : "Available"}
+            {gig?.isTaken
+              ? "Taken"
+              : gig?.isPending
+              ? "Not Available"
+              : "Available"}
           </span>
         </div>
 

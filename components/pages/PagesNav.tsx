@@ -188,7 +188,7 @@ const PagesNav = () => {
         animate={{
           backgroundColor: isOpen
             ? "rgba(17, 24, 39, 1)"
-            : "rgba(31, 41, 55, 1)",
+            : "rgba(131, 41, 55, 1)",
         }}
       >
         <motion.div
