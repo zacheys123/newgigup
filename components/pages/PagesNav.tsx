@@ -8,6 +8,7 @@ import {
   MdEmojiEvents,
   MdComment,
   MdClose,
+  MdMenu,
 } from "react-icons/md";
 import { FaHome } from "react-icons/fa";
 import { motion, useAnimation, PanInfo } from "framer-motion";
@@ -176,16 +177,7 @@ const PagesNav = () => {
           {isOpen ? (
             <MdClose className="text-white text-xl" />
           ) : (
-            <motion.div
-              className="fixed right-0 top-1/2 -translate-y-1/2 z-50 bg-gray-800 p-2 rounded-l-lg cursor-grab active:cursor-grabbing md:hidden"
-              drag="x"
-              dragConstraints={{ left: 0, right: 0 }}
-              onDragEnd={handleDragEnd}
-              onClick={toggleNav}
-              whileTap={{ scale: 0.95 }}
-            >
-              <div className="w-2 h-10 bg-gray-500 rounded-full"></div>
-            </motion.div>
+            <MdMenu className="text-white text-xl" />
           )}
         </motion.div>
       </motion.div>

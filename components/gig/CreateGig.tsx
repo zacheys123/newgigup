@@ -563,7 +563,7 @@ const CreateGig = () => {
         </motion.div>
 
         <motion.form
-          className="space-y-5 md:space-y-10 flex-col"
+          className="space-y-2 md:space-y-10 flex-col"
           initial="hidden"
           animate="visible"
           variants={{
