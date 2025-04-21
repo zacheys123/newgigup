@@ -22,29 +22,25 @@ const SchedulerComponent = ({
   setisSchedulerOpen,
 }: SubmitProps) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [scheduleLoad, setScheduleLoad] = useState<boolean>(false);
   const [activeOption, setActiveOption] = useState<
     "automatic" | "regular" | "create" | null
   >(null);
 
   const handleSubmit = (type: "automatic" | "regular" | "create") => {
     if (isLoading) return; // Prevent submission while loading
-    setScheduleLoad(true);
-    setTimeout(() => {
-      const e = {
-        preventDefault: () => {},
-      } as FormEvent<HTMLFormElement>;
 
-      if (type === "automatic" && selectedDate) {
-        getScheduleData("automatic", selectedDate);
-      } else {
-        getScheduleData(type);
-      }
+    const e = {
+      preventDefault: () => {},
+    } as FormEvent<HTMLFormElement>;
 
-      onSubmit(e);
-      setisSchedulerOpen(false);
-      setScheduleLoad(false);
-    }, 3000);
+    if (type === "automatic" && selectedDate) {
+      getScheduleData("automatic", selectedDate);
+    } else {
+      getScheduleData(type);
+    }
+
+    onSubmit(e);
+    setisSchedulerOpen(false);
   };
 
   // Color configurations for each scheduler type
@@ -172,7 +168,7 @@ const SchedulerComponent = ({
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
               }`}
             >
-              {isLoading && scheduleLoad === false ? (
+              {isLoading ? (
                 <>
                   <svg
                     className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"

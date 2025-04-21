@@ -25,16 +25,17 @@ const PagesNav = () => {
   const [isOpen, setIsOpen] = useState(false);
   const controls = useAnimation();
   const navRef = useRef<HTMLDivElement>(null);
+  const dragHandleRef = useRef<HTMLDivElement>(null);
 
   const linkStyles = (isActive: boolean) =>
     isActive
-      ? "text-amber-300 hover:text-yellow-500"
-      : "text-gray-300 hover:text-yellow-400";
+      ? "bg-gray-800 text-amber-300"
+      : "text-gray-300 hover:bg-gray-800 hover:text-white";
 
   const linkAnimation = {
-    initial: { scale: 1, opacity: 0.8 },
-    hover: { scale: 1.2, opacity: 1 },
-    tap: { scale: 0.95, opacity: 0.9 },
+    initial: { scale: 1, opacity: 0.9 },
+    hover: { scale: 1.02, opacity: 1 },
+    tap: { scale: 0.98, opacity: 0.9 },
   };
 
   const links = [];
@@ -44,28 +45,28 @@ const PagesNav = () => {
       href: `/gigs/${userId}`,
       Icon: FaHome,
       label: "Home",
-      size: 24,
+      size: 20,
       extraStyle: "",
     });
     links.push({
       href: `/av_gigs/${userId}`,
       Icon: MdComment,
       label: "Gigs",
-      size: 24,
+      size: 20,
       extraStyle: "",
     });
     links.push({
       href: `/bookedgigs/${userId}`,
       Icon: MdEmojiEvents,
       label: "Booked",
-      size: 24,
+      size: 20,
       extraStyle: "",
     });
     links.push({
       href: `/pending/${userId}`,
       Icon: BsCart4,
       label: "Pending",
-      size: 24,
+      size: 20,
       extraStyle: "",
     });
   }
@@ -75,21 +76,21 @@ const PagesNav = () => {
       href: `/gigs/${userId}`,
       Icon: FaHome,
       label: "Home",
-      size: 24,
+      size: 20,
       extraStyle: "",
     });
     links.push({
       href: `/create/${userId}`,
       Icon: IoIosAddCircle,
       label: "Create",
-      size: 28,
-      extraStyle: "text-purple-500",
+      size: 22,
+      extraStyle: "text-purple-400",
     });
     links.push({
       href: `/my_gig/${user?._id}`,
       Icon: MdOutlinePersonalInjury,
       label: "My Gigs",
-      size: 24,
+      size: 20,
       extraStyle: "",
     });
   }
@@ -99,66 +100,86 @@ const PagesNav = () => {
       gig?.bookCount?.some((bookedUser) => bookedUser?._id === user?._id)
     )?.length || 0;
 
-  // Handle drag end
   const handleDragEnd = (
     event: MouseEvent | TouchEvent | PointerEvent,
     info: PanInfo
   ) => {
     const threshold = 50;
-    if (info.offset.x < -threshold) {
-      // Swiped left (close)
-      controls.start({ x: "100%" });
-      setIsOpen(false);
-    } else if (info.offset.x > threshold) {
-      // Swiped right (open)
-      controls.start({ x: 0 });
-      setIsOpen(true);
-    } else {
-      // Return to original position
+    const velocityThreshold = 500;
+
+    // If dragged left beyond threshold or fast swipe left
+    if (info.offset.x < -threshold || info.velocity.x < -velocityThreshold) {
+      closeNav();
+    }
+    // If dragged right beyond threshold or fast swipe right
+    else if (info.offset.x > threshold || info.velocity.x > velocityThreshold) {
+      openNav();
+    }
+    // If not enough movement, return to current state
+    else {
       controls.start({ x: isOpen ? 0 : "100%" });
     }
   };
 
-  // Handle click outside
+  const openNav = () => {
+    controls.start({
+      x: 0,
+      transition: { type: "spring", stiffness: 300, damping: 30 },
+    });
+    setIsOpen(true);
+    document.body.style.overflow = "hidden";
+  };
+
+  const closeNav = () => {
+    controls.start({
+      x: "100%",
+      transition: { type: "spring", stiffness: 300, damping: 30 },
+    });
+    setIsOpen(false);
+    document.body.style.overflow = "auto";
+  };
+
+  const toggleNav = () => {
+    if (isOpen) {
+      closeNav();
+    } else {
+      openNav();
+    }
+  };
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (navRef.current && !navRef.current.contains(event.target as Node)) {
-        controls.start({ x: "100%" });
-        setIsOpen(false);
+      if (
+        navRef.current &&
+        !navRef.current.contains(event.target as Node) &&
+        dragHandleRef.current &&
+        !dragHandleRef.current.contains(event.target as Node)
+      ) {
+        closeNav();
       }
     };
 
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
-
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      document.body.style.overflow = "auto";
     };
-  }, [isOpen, controls]);
-
-  // Toggle nav visibility
-  const toggleNav = () => {
-    if (isOpen) {
-      controls.start({ x: "100%", y: "50%" });
-    } else {
-      controls.start({ x: 0, y: 0 });
-    }
-    setIsOpen(!isOpen);
-  };
+  }, []);
 
   return (
     <>
-      {/* Handle for dragging */}
+      {/* Drag Handle */}
       <motion.div
+        ref={dragHandleRef}
         className="fixed right-0 top-1/2 -translate-y-1/2 z-50 bg-gray-800 p-3 rounded-l-lg cursor-grab active:cursor-grabbing md:hidden shadow-lg border-l border-y border-gray-700"
         drag="x"
         dragConstraints={{ left: 0, right: 0 }}
-        dragElastic={0.1}
+        dragElastic={0.05}
         onDragEnd={handleDragEnd}
-        onClick={toggleNav}
+        onClick={(e) => {
+          e.stopPropagation();
+          toggleNav();
+        }}
         whileHover={{ backgroundColor: "rgba(31, 41, 55, 0.9)" }}
         whileTap={{
           scale: 0.95,
@@ -167,7 +188,7 @@ const PagesNav = () => {
         animate={{
           backgroundColor: isOpen
             ? "rgba(17, 24, 39, 1)"
-            : "rgba(131, 41, 55, 1)",
+            : "rgba(31, 41, 55, 1)",
         }}
       >
         <motion.div
@@ -182,54 +203,69 @@ const PagesNav = () => {
         </motion.div>
       </motion.div>
 
-      {/* Navigation panel */}
+      {/* Navigation Panel */}
       <motion.nav
         ref={navRef}
-        className="fixed right-0 top-0 h-full w-64 bg-gray-900 border-l border-gray-700 z-40 md:hidden"
+        className="fixed right-0 top-0 h-full w-72 bg-gray-900 border-l border-gray-700 z-40 md:hidden shadow-2xl"
         initial={{ x: "100%" }}
         animate={controls}
+        style={{ x: "100%" }} // Initial position off-screen
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
       >
-        <div className="flex flex-col justify-start items-center h-full pt-20 space-y-8">
-          {links.map(({ href, Icon, label, size = 24, extraStyle }, index) => (
-            <Link key={index} href={href} className="w-full px-6">
-              <motion.div
-                variants={linkAnimation}
-                initial="initial"
-                whileHover="hover"
-                whileTap="tap"
-                className={`flex items-center p-4 relative rounded-lg ${linkStyles(
-                  pathname === href
-                )} ${extraStyle || ""}`}
-                onClick={() => {
-                  controls.start({ x: "100%" });
-                  setIsOpen(false);
-                }}
-              >
-                {label === "Pending" && pendingGigsCount > 0 && (
-                  <span className="absolute -right-2 -top-2 bg-red-500 text-white text-xs font-bold h-5 w-5 rounded-full flex items-center justify-center">
-                    {pendingGigsCount}
-                  </span>
-                )}
-                <Icon size={size} className="mr-4" />
-                <span className="text-lg">{label}</span>
-              </motion.div>
-            </Link>
-          ))}
+        <div className="h-full flex flex-col">
+          <div className="p-4 border-b border-gray-700 flex justify-between items-center bg-gray-800">
+            <h2 className="text-xl font-bold text-white">Menu</h2>
+            <button
+              onClick={toggleNav}
+              className="p-2 rounded-full hover:bg-gray-700 transition-colors"
+            >
+              <MdClose className="text-white text-lg" />
+            </button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-4 space-y-2">
+            {links.map(
+              ({ href, Icon, label, size = 20, extraStyle }, index) => (
+                <Link key={index} href={href} className="block">
+                  <motion.div
+                    variants={linkAnimation}
+                    initial="initial"
+                    whileHover="hover"
+                    whileTap="tap"
+                    className={`flex items-center p-3 relative rounded-lg transition-all ${linkStyles(
+                      pathname === href
+                    )} ${extraStyle || ""}`}
+                    onClick={() => closeNav()}
+                  >
+                    <div className="relative">
+                      <Icon size={size} className="mr-3" />
+                      {label === "Pending" && pendingGigsCount > 0 && (
+                        <span className="absolute -right-2 -top-2 bg-red-500 text-white text-xs font-bold h-5 w-5 rounded-full flex items-center justify-center">
+                          {pendingGigsCount}
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-base">{label}</span>
+                  </motion.div>
+                </Link>
+              )
+            )}
+          </div>
+
+          <div className="p-4 border-t border-gray-700 text-center text-gray-400 text-sm">
+            {user?.user?.username || "User"}
+          </div>
         </div>
       </motion.nav>
 
-      {/* Overlay when nav is open */}
+      {/* Overlay */}
       {isOpen && (
         <motion.div
-          className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
+          className="fixed inset-0 bg-black bg-opacity-60 z-30 md:hidden backdrop-blur-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={() => {
-            controls.start({ x: "100%" });
-            setIsOpen(false);
-          }}
+          onClick={closeNav}
+          transition={{ duration: 0.2 }}
         />
       )}
     </>
