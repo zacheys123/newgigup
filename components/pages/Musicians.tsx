@@ -72,7 +72,7 @@ const Musicians = ({ _id }: UserProps) => {
   }
 
   return (
-    <div className="mt-16 w-full max-w-6xl mx-auto px-4">
+    <div className="mt-7 w-full max-w-6xl mx-auto px-4">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-neutral-100 text-xl font-bold">
           Musicians Near You
