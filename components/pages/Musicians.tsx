@@ -17,7 +17,8 @@ const Musicians = ({ _id }: UserProps) => {
       myuser?.instrument &&
       myuser?.isClient === false &&
       myuser?.isMusician === true &&
-      myuser?.roleType === "instrumentalist"
+      user?.roleType === "instrumentalist" ? myuser?.roleType==="instrumentalist" : user?.roleType === "dj" ? myuser?.roleType==="dj" : user?.roleType === "mc" ? myuser?.roleType==="mc": user?.roleType === "vocalist" ? 
+      myuser?.roleType==="vocalist":false
   );
   const CurrentMusicianAroundWhereIam = allusers?.users?.filter(
     (myuser: UserProps) =>
@@ -72,7 +73,11 @@ const Musicians = ({ _id }: UserProps) => {
   }
 
   return (
+<<<<<<< HEAD
     <div className="mt-7 w-full max-w-6xl mx-auto px-4">
+=======
+    <div className="mt-11 w-full max-w-6xl mx-auto px-4">
+>>>>>>> aed385a19b5cf2cf7a8fe669b824b899128ca97b
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-neutral-100 text-xl font-bold">
           Musicians Near You
