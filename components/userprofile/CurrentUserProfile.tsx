@@ -38,6 +38,8 @@ import ModalActions from "../gig/create/ModalActions";
 import Modal from "../gig/create/Modal";
 import ToggleSwitch from "../gig/create/ToggleSwitch";
 import SelectInput from "../gig/create/SelectInput";
+import TextInput from "../gig/create/TextInput";
+import SectionContainer from "../gig/create/SectionContainer";
 
 interface UpdateResponse {
   updateStatus: boolean;
@@ -55,10 +57,11 @@ const CurrentUserProfile = () => {
   const [modalData, setModalData] = useState<{
     title: string;
     users: {
-      name: string;
+      firstname: string;
       email?: string;
       picture: string;
       lastname: string;
+      city: string;
     }[];
   }>({ title: "", users: [] });
   // User profile state
@@ -356,7 +359,7 @@ const CurrentUserProfile = () => {
                       : "outline"
                   }
                 >
-                  {isMusician ? "Musician" : isClient ? "Listener" : ""}
+                  {isMusician ? "Musician" : isClient ? "Client" : ""}
                 </Badge>
                 {isClient && <Badge variant="primary">Client</Badge>}
               </div>
@@ -845,55 +848,5 @@ const CurrentUserProfile = () => {
 };
 
 // Reusable Components
-const SectionContainer = ({
-  icon,
-  title,
-  children,
-  action,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  children: React.ReactNode;
-  action?: React.ReactNode;
-}) => (
-  <div className="bg-neutral-800/50 rounded-lg p-4">
-    <div className="flex justify-between items-center mb-4">
-      <h2 className="text-lg font-bold text-white flex items-center gap-2">
-        {icon} {title}
-      </h2>
-      {action}
-    </div>
-    {children}
-  </div>
-);
-
-const TextInput = ({
-  label,
-  value,
-  onChange,
-  placeholder = "",
-  disabled = false,
-  className = "",
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  placeholder?: string;
-  disabled?: boolean;
-  className?: string;
-}) => (
-  <div className={className}>
-    <Label className="text-neutral-400 text-[12px]">{label}</Label>
-    <Input
-      className={`bg-neutral-800 border-neutral-700 text-white mt-1 text-[12px] ${
-        disabled ? "opacity-70" : ""
-      }`}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      placeholder={placeholder}
-      disabled={disabled}
-    />
-  </div>
-);
 
 export default CurrentUserProfile;

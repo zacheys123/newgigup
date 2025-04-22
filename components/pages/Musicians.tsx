@@ -5,32 +5,107 @@ import { UserProps } from "@/types/userinterfaces";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useState } from "react";
+import UserListModal from "../gig/create/UserList";
 
 const Musicians = ({ _id }: UserProps) => {
   const { users: allusers, loading } = useAllUsers();
   const { user } = useCurrentUser();
   const router = useRouter();
-  const NotCurrentUserOrClientIsmusucian = allusers?.users?.filter(
-    (myuser: UserProps) =>
-      myuser?._id !== _id &&
-      myuser?.instrument &&
-      myuser?.isClient === false &&
-      myuser?.isMusician === true &&
-      user?.roleType === "instrumentalist" ? myuser?.roleType==="instrumentalist" : user?.roleType === "dj" ? myuser?.roleType==="dj" : user?.roleType === "mc" ? myuser?.roleType==="mc": user?.roleType === "vocalist" ? 
-      myuser?.roleType==="vocalist":false
+
+  const NotCurrentUserAndNotClientIsMusician = allusers?.users?.filter(
+    (myuser: UserProps) => {
+      // Early return if user is not available
+      if (!user) return false;
+
+      // Basic filtering
+      if (
+        myuser?._id === _id ||
+        !myuser?.instrument ||
+        myuser?.isClient === true ||
+        myuser?.isMusician !== true
+      ) {
+        return false;
+      }
+
+      // Role-based filtering
+      switch (user?.user?.roleType) {
+        case "instrumentalist":
+          return myuser.roleType === "instrumentalist";
+        case "dj":
+          return myuser.roleType === "dj";
+        case "mc":
+          return myuser.roleType === "mc";
+        case "vocalist":
+          return myuser.roleType === "vocalist";
+        default:
+          return false;
+      }
+    }
   );
+
+  const normalizeString = (str?: string) =>
+    str
+      ?.trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "") || "";
+
+  // console.log("Current user city:", user?.user?.city);
+  // console.log("Current user instrument:", user?.user?.instrument);
+  // console.log(
+  //   "All musicians:",
+  //   allusers?.users?.map((u: UserProps) => ({
+  //     name: `${u.firstname} ${u.lastname}`,
+  //     city: u.city,
+  //     instrument: u.instrument,
+
+  //     isMusician: u.isMusician,
+  //   }))
+  // );
   const CurrentMusicianAroundWhereIam = allusers?.users?.filter(
-    (myuser: UserProps) =>
-      myuser?.city === user?.user?.city &&
-      myuser?.instrument === user?.user?.instrument &&
-      myuser?.roleType === "instrumentalist"
+    (myuser: UserProps) => {
+      if (!myuser?.isMusician) return false;
+
+      const currentCity = normalizeString(user?.user?.city);
+      const currentInstrument = normalizeString(user?.user?.instrument);
+      const targetCity = normalizeString(myuser.city);
+      const targetInstrument = normalizeString(myuser.instrument);
+
+      // Match when both city and instrument exist in both users
+      if (currentCity && currentInstrument) {
+        return targetCity === currentCity;
+      }
+
+      // Fallback: match just city if instrument missing
+      if (currentCity && !currentInstrument) {
+        return targetCity === currentCity;
+      }
+
+      // Fallback: match just instrument if city missing
+      if (!currentCity && currentInstrument) {
+        return targetInstrument === currentInstrument;
+      }
+
+      return false;
+    }
   );
+
   // const randomUser =
   //   NotCurrentUserOrClientIsmusucian[
   //     Math.floor(Math.random() * NotCurrentUserOrClientIsmusucian.length)
   //   ];
-
+  const [showNearby, setShowNearByModal] = useState(false);
+  const [modalData, setModalData] = useState<{
+    title: string;
+    users: {
+      firstname: string;
+      email?: string;
+      picture: string;
+      lastname: string;
+      city: string;
+    }[];
+  }>({ title: "", users: [] });
   if (loading) {
     return (
       <div className="mt-21 w-full max-w-6xl mx-auto px-4">
@@ -73,11 +148,7 @@ const Musicians = ({ _id }: UserProps) => {
   }
 
   return (
-<<<<<<< HEAD
-    <div className="mt-7 w-full max-w-6xl mx-auto px-4">
-=======
     <div className="mt-11 w-full max-w-6xl mx-auto px-4">
->>>>>>> aed385a19b5cf2cf7a8fe669b824b899128ca97b
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-neutral-100 text-xl font-bold">
           Musicians Near You
@@ -85,14 +156,32 @@ const Musicians = ({ _id }: UserProps) => {
             Connect with local talent
           </span>
         </h2>
-        <span className="text-xs bg-orange-500/30 text-orange-300 px-3 py-1.5 rounded-full font-medium">
-          {CurrentMusicianAroundWhereIam?.length || 0} nearby
-        </span>
+        {[
+          {
+            label: "nearby",
+            value: CurrentMusicianAroundWhereIam?.length || 0,
+            onClick: () => {
+              setModalData({
+                title: "Nearby Musicians",
+                users: CurrentMusicianAroundWhereIam || [],
+              });
+              setShowNearByModal(true);
+            },
+          },
+        ].map((stat) => (
+          <span
+            key={stat?.label}
+            onClick={stat.onClick}
+            className="text-xs bg-orange-500/30 text-orange-300 px-3 py-1.5 rounded-full font-medium"
+          >
+            {stat?.value} {stat?.label}
+          </span>
+        ))}
       </div>
 
       <div className="relative">
         <div className="flex gap-5 pb-6 overflow-x-auto scrollbar-hide">
-          {NotCurrentUserOrClientIsmusucian?.map((myuser: UserProps) => (
+          {NotCurrentUserAndNotClientIsMusician?.map((myuser: UserProps) => (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -145,6 +234,12 @@ const Musicians = ({ _id }: UserProps) => {
           ))}
         </div>
       </div>
+      <UserListModal
+        isOpen={showNearby}
+        onClose={() => setShowNearByModal(false)}
+        title={modalData.title}
+        users={modalData.users}
+      />
     </div>
   );
 };
