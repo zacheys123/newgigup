@@ -231,6 +231,15 @@ const PrePendingComponent = () => {
                       🎻 {myuser.instrument}
                     </p>
                   )}
+                  {myuser.roleType === "dj" && (
+                    <p className="text-sm text-gray-300 italic">🎛 Deejay</p>
+                  )}
+                  {myuser.roleType === "mc" && (
+                    <p className="text-sm text-gray-300 italic">🪕 EMcee</p>
+                  )}{" "}
+                  {myuser.roleType === "voaclist" && (
+                    <p className="text-sm text-gray-300 italic">🎙 Vocalist</p>
+                  )}
                 </div>
                 <div className="flex items-center space-x-3 sm:space-x-4 mt-3 sm:mt-0">
                   <button

@@ -7,29 +7,44 @@ import { useAllGigs } from "@/hooks/useAllGigs";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import useSocket from "@/hooks/useSocket";
 import { GigProps } from "@/types/giginterface";
-import { searchfunc } from "@/utils/index";
+import { filterGigs } from "@/utils";
+
 import React, { useEffect, useMemo, useState } from "react";
 
+const useDebounce = (value: string, delay: number) => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+};
 const Published = () => {
   const { loading: gigsLoading, gigs } = useAllGigs();
   const { user, loading: userLoading } = useCurrentUser();
   const [typeOfGig, setTypeOfGig] = useState<string>("");
+  const debouncedSearch = useDebounce(typeOfGig, 300);
   const [category, setCategory] = useState<string>("all");
-  const [location, setLocation] = useState<string>(() =>
-    user?.user?.city ? user?.user?.city : "all"
-  );
-  const [scheduler, setScheduler] = useState<string>("all");
-  let gigQuery;
-  console.log(gigs);
+  const [location, setLocation] = useState<string>("all");
+  const [scheduler, setScheduler] = useState<string>();
+
   useEffect(() => {
     // if (!user) {
     //   mutateUser().catch((error) => {
     //     console.error("Failed to mutate user:", error);
     //     // Consider adding toast notification here
     //   });
+    // }
 
     if (user?.user?.city) {
-      setLocation(user?.user?.city.toLowerCase());
+      setLocation(user.user?.city);
     }
   }, [user]);
   // In PublishedGigs.tsx
@@ -59,33 +74,27 @@ const Published = () => {
       socket.off("gigStatusUpdated", handleGigStatusUpdate);
     };
   }, [socket, updateGigStatus]);
+
   const filteredGigs = useMemo(() => {
+    const filtered = filterGigs(gigs, {
+      searchQuery: debouncedSearch,
+      category,
+      location,
+      scheduler,
+    });
+
+    // Additional filtering for user-specific conditions
     return (
-      searchfunc(
-        gigs,
-        typeOfGig,
-        category,
-        gigQuery,
-        location,
-        scheduler
-      )?.filter(
+      filtered?.filter(
         (gig: GigProps) =>
-          gig?.postedBy?._id !== user?.user?._id &&
           gig?.isTaken === false &&
+          gig?.isPending === false &&
           !gig?.bookCount?.some(
             (bookedUser) => bookedUser?._id === user?.user?._id
           )
       ) || []
     );
-  }, [
-    gigs,
-    typeOfGig,
-    category,
-    location,
-    gigQuery,
-    user?.user?._id,
-    scheduler,
-  ]);
+  }, [gigs, debouncedSearch, category, location, scheduler, user]);
 
   const isLoading = gigsLoading || userLoading;
 

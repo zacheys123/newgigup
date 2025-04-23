@@ -7,21 +7,37 @@ import ColorLoading from "@/components/loaders/ColorLoading";
 import { useAllGigs } from "@/hooks/useAllGigs";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { GigProps } from "@/types/giginterface";
-import { searchfunc } from "@/utils/index";
+import { filterGigs } from "@/utils";
 
 import { motion } from "framer-motion";
 import React, { useEffect, useMemo, useState } from "react";
 
+const useDebounce = (value: string, delay: number) => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+};
 const Booked = () => {
   const { loading: gigsLoading, gigs } = useAllGigs();
   const { user, loading: userLoading } = useCurrentUser();
   const [typeOfGig, setTypeOfGig] = useState<string>("");
+  const debouncedSearch = useDebounce(typeOfGig, 300);
   const [category, setCategory] = useState<string>("all");
   const [location, setLocation] = useState<string>(() =>
     user?.user?.city ? user?.user?.city : "all"
   );
   const { showVideo } = useStore();
-  let gigQuery;
+
   useEffect(() => {
     // if (!user) {
     //   mutateUser().catch((error) => {
@@ -35,12 +51,24 @@ const Booked = () => {
     }
   }, [user]);
   const filteredGigs = useMemo(() => {
+    const filtered = filterGigs(gigs, {
+      searchQuery: debouncedSearch,
+      category,
+      location,
+    });
+
+    // Additional filtering for user-specific conditions
     return (
-      searchfunc(gigs, typeOfGig, category, gigQuery, location)?.filter(
-        (gig: GigProps) => gig?.bookedBy?._id === user?.user?._id
+      filtered?.filter(
+        (gig: GigProps) =>
+          gig?.isTaken === false &&
+          gig?.isPending === false &&
+          !gig?.bookCount?.some(
+            (bookedUser) => bookedUser?._id === user?.user?._id
+          )
       ) || []
     );
-  }, [gigs, typeOfGig, category, location, gigQuery, user?.user?._id]);
+  }, [gigs, debouncedSearch, category, location, user]);
 
   const isLoading = gigsLoading || userLoading;
   console.log(filteredGigs);
