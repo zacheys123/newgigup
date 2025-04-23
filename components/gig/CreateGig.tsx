@@ -1168,7 +1168,7 @@ const CreateGig = () => {
                       >
                         <input
                           type="text"
-                          placeholder="Describe your custom timeline"
+                          placeholder="Describe your custom timeline info"
                           className="w-full bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-4 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                           onChange={handleInputChange}
                           name="otherTimeline"

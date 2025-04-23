@@ -343,3 +343,22 @@ export const searchFunc = (data, searchquery) => {
   }
   return sortedData;
 };
+export const searchPending = (data, searchquery) => {
+  let sortedData = data;
+  console.log(sortedData);
+  if (searchquery) {
+    sortedData = sortedData?.filter((gig) => {
+      if (
+        gig?.title?.toLowerCase().includes(searchquery) ||
+        gig?.location?.toLowerCase().includes(searchquery) ||
+        // gig?.gigname?.toLowerCase().includes(searchquery) ||
+        gig?.category?.toLowerCase().includes(searchquery) ||
+        gig?.gigtimeline?.toLowerCase().includes(searchquery) ||
+        gig?.price?.toLowerCase().includes(searchquery)
+      ) {
+        return sortedData;
+      }
+    });
+  }
+  return sortedData;
+};
