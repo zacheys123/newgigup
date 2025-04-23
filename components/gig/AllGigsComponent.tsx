@@ -360,11 +360,24 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                 />
               </div>
             )}{" "}
+            {/* // For the "Post" button (Creator scheduling their gig) */}
             {isGigCreator && !hasBookedGig && gig?.isPending === true && (
-              <div className="w-full h-full relative">
+              <div className="relative">
                 <ButtonComponentLoader
                   variant="secondary"
-                  className="!bg-indigo-600/90 hover:!bg-indigo-500 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
+                  className={`
+        bg-gradient-to-r from-indigo-600 to-indigo-500
+        hover:from-indigo-500 hover:to-indigo-400
+        h-8 text-xs font-medium text-white 
+        px-4 py-1.5 rounded-md 
+        transition-all duration-200
+        shadow-sm hover:shadow-md
+        transform hover:scale-[1.02] active:scale-[0.98]
+        focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-opacity-50
+        disabled:opacity-70 disabled:cursor-not-allowed
+        relative overflow-hidden
+        ${loadingPostId !== null && loading ? "cursor-wait" : ""}
+      `}
                   onClick={() => {
                     setLoadingPostId(gig?._id as string);
                     setTimeout(() => {
@@ -374,16 +387,29 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                   }}
                   isLoading={loadingPostId !== null && loading}
                   isCurrentLoading={loadingPostId === gig._id}
-                  loadingText="Creating..."
+                  loadingText="Publishing..."
                 >
-                  Post
+                  Post Gig
                 </ButtonComponentLoader>
               </div>
-            )}{" "}
+            )}
+            {/* // For the "View" button (Booker viewing their booked gig) */}
             {isCurrentWhoBooked && (
               <ButtonComponentLoader
                 variant="secondary"
-                className="!bg-indigo-600/90 hover:!bg-indigo-500 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
+                className={`
+      bg-gradient-to-r from-indigo-600 to-indigo-500
+      hover:from-indigo-500 hover:to-indigo-400
+      h-8 text-xs font-medium text-white 
+      px-4 py-1.5 rounded-md 
+      transition-all duration-200
+      shadow-sm hover:shadow-md
+      transform hover:scale-[1.02] active:scale-[0.98]
+      focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-opacity-50
+      disabled:opacity-70 disabled:cursor-not-allowed
+      relative overflow-hidden
+      ${loadingPostId !== null ? "cursor-wait" : ""}
+    `}
                 onClick={() => {
                   setLoadingPostId(gig?._id || "");
                   setTimeout(() => {
@@ -395,13 +421,25 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                 isCurrentLoading={loadingPostId === gig._id}
                 loadingText="Opening..."
               >
-                View
+                View Gig
               </ButtonComponentLoader>
-            )}{" "}
+            )}
             {canEditGig && (
               <ButtonComponentLoader
                 variant="secondary"
-                className="!bg-white/10 hover:!bg-white/20 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
+                className={`
+      bg-gradient-to-r from-gray-700 to-gray-600
+      hover:from-gray-600 hover:to-gray-500
+      h-8 text-xs font-medium text-white 
+      px-4 py-1.5 rounded-md 
+      transition-all duration-200
+      shadow-sm hover:shadow-md
+      transform hover:scale-[1.02] active:scale-[0.98]
+      focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50
+      disabled:opacity-70 disabled:cursor-not-allowed
+      relative overflow-hidden
+      ${loadingPostId !== null ? "cursor-wait" : ""}
+    `}
                 onClick={() => {
                   setLoadingPostId(gig?._id as string);
                   setTimeout(() => {
@@ -414,7 +452,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                 isCurrentLoading={loadingPostId === gig._id}
                 loadingText="Opening..."
               >
-                Edit
+                Edit Gig
               </ButtonComponentLoader>
             )}
             {gig &&
@@ -426,33 +464,10 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
               user?.user?.isMusician === true &&
               gig?.isTaken === false &&
               gig?.isPending === false && (
-                // <ButtonComponent
-                //   variant="secondary"
-                //   classname="!bg-purple-600/90 hover:!bg-purple-500 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
-                //   onclick={() => {
-                //     setLoadingPostId(gig?._id || "");
-                //     setTimeout(() => {
-                //       bookGig(
-                //         gig,
-                //         myId as string,
-                //         gigs || [],
-                //         userId as string,
-                //         toast,
-                //         setRefetchGig,
-                //         router
-                //       );
-                //       setLoadingPostId("");
-                //     }, 2000);
-                //   }}
-                //   title={
-                //     loadingPostId === gig?._id && !bookLoading
-                //       ? "Processing..."
-                //       : "Book"
-                //   }
-                // />
                 <ButtonComponentLoader
                   className={`
-        bg-purple-300 hover:bg-purple-500 
+        bg-gradient-to-r from-purple-600 to-purple-500
+        hover:from-purple-500 hover:to-purple-400
         h-8 text-xs font-medium text-white 
         px-4 py-1.5 rounded-md 
         transition-all duration-200
