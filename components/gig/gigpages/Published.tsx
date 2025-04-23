@@ -86,12 +86,11 @@ const Published = () => {
     // Additional filtering for user-specific conditions
     return (
       filtered?.filter(
-        (gig: GigProps) =>
-          gig?.isTaken === false &&
-          gig?.isPending === false &&
-          !gig?.bookCount?.some(
-            (bookedUser) => bookedUser?._id === user?.user?._id
-          )
+        (gig: GigProps) => gig?.isTaken === false && gig?.isPending === false
+
+        // !gig?.bookCount?.some(
+        //   (bookedUser) => bookedUser?._id === user?.user?._id
+        // )
       ) || []
     );
   }, [gigs, debouncedSearch, category, location, scheduler, user]);

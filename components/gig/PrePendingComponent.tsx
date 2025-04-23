@@ -48,21 +48,44 @@ const PrePendingComponent = () => {
     setShowX(false); // Reset the showX state
   };
   console.log(showX);
-
+  const [removingId, setRemovingId] = useState<string | null>(null);
   const removeMusicianfrombookCount = async (id: string) => {
+    setRemovingId(id);
     try {
+      // Optimistically update the UI by removing the musician from local state
+      const updatedGig = {
+        ...currentgig,
+        bookCount:
+          currentgig?.bookCount?.filter((musician) => musician._id !== id) ||
+          [],
+      };
+      useStore.setState({ currentgig: updatedGig });
+
+      // Then make the API call
       const req = await fetch(`/api/gigs/remove-musician/${currentgig?._id}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ musicianId: id }),
       });
-      console.log("Musician removed from book count.");
+
       const data: { message: string } = await req.json();
-      console.log(data);
+
+      // If there was an error, revert the UI change
+      if (!req.ok) {
+        useStore.setState({ currentgig });
+        toast.error(data.message || "Failed to remove musician");
+        return;
+      }
+
       setRefetchGig(true);
       toast.success(data.message);
     } catch (error) {
+      // Revert on error
+      useStore.setState({ currentgig });
       console.error(error);
+      toast.error("Failed to remove musician");
+    } finally {
+      setRemovingId(null);
     }
   };
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -151,6 +174,7 @@ const PrePendingComponent = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
+        exit={{ opacity: 0, height: 0 }}
         className="max-w-3xl mx-auto p-6 bg-gray-800 rounded-xl shadow-xl pb-[50px]"
       >
         <h1 className="text-3xl font-extrabold text-gray-100">
@@ -187,8 +211,13 @@ const PrePendingComponent = () => {
                   <p className="text-lg font-semibold text-gray-100">
                     {myuser.firstname} {myuser.lastname}
                     <span
-                      className="absolute right-4 top-1 font-bold"
+                      className={`absolute right-4 top-1 font-bold ${
+                        removingId === myuser?._id
+                          ? "opacity-50 cursor-not-allowed"
+                          : "cursor-pointer"
+                      }`}
                       onClick={() =>
+                        removingId !== myuser?._id &&
                         removeMusicianfrombookCount(myuser?._id || "")
                       }
                     >
