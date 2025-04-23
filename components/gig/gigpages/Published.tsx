@@ -33,7 +33,7 @@ const Published = () => {
   const debouncedSearch = useDebounce(typeOfGig, 300);
   const [category, setCategory] = useState<string>("all");
   const [location, setLocation] = useState<string>("all");
-  const [scheduler, setScheduler] = useState<string>();
+  const [scheduler, setScheduler] = useState<string>("all");
 
   useEffect(() => {
     // if (!user) {
@@ -87,10 +87,6 @@ const Published = () => {
     return (
       filtered?.filter(
         (gig: GigProps) => gig?.isTaken === false && gig?.isPending === false
-
-        // !gig?.bookCount?.some(
-        //   (bookedUser) => bookedUser?._id === user?.user?._id
-        // )
       ) || []
     );
   }, [gigs, debouncedSearch, category, location, scheduler, user]);

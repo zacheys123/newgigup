@@ -9,23 +9,29 @@ interface SearchOptions {
   location?: string;
   scheduler?: "all" | "notPending" | "pending" | string; // Hybrid approach
 }
+function gigme(query: string, gig: GigProps): boolean {
+  const lowerQuery = query.toLowerCase();
 
-function gigme(query: string, data: GigProps, sorted: GigProps[]) {
-  // if (data?.location?.toLowerCase().includes(query.toLowerCase())) {
-  //   return sorted;
-  // } else
-  if (
-    data?.time?.from?.toLowerCase().includes(query.toLowerCase()) ||
-    data?.time?.to?.toLowerCase().includes(query.toLowerCase())
-  ) {
-    return sorted;
-  } else if (data?.title?.toLowerCase().includes(query.toLowerCase())) {
-    return sorted;
-  }
-  // } else if (data?.category?.toLowerCase().includes(query.toLowerCase())) {
-  //   return sorted;
-  // }
+  return (
+    Boolean(
+      gig.time?.from && gig.time.from.toLowerCase().includes(lowerQuery)
+    ) ||
+    Boolean(gig.time?.to && gig.time.to.toLowerCase().includes(lowerQuery)) ||
+    Boolean(gig.title && gig.title.toLowerCase().includes(lowerQuery)) ||
+    Boolean(
+      gig.description && gig.description.toLowerCase().includes(lowerQuery)
+    ) ||
+    Boolean(
+      gig.postedBy?.username &&
+        gig.postedBy.username.toLowerCase().includes(lowerQuery)
+    ) ||
+    Boolean(gig.category && gig.category.toLowerCase().includes(lowerQuery)) ||
+    Boolean(
+      gig.bussinesscat && gig.bussinesscat.toLowerCase().includes(lowerQuery)
+    )
+  );
 }
+
 export const filterGigs = (
   data: GigProps[] = [],
   options: SearchOptions
@@ -34,34 +40,42 @@ export const filterGigs = (
     searchQuery,
     category = "all",
     location = "all",
-    scheduler = "notPending",
+    scheduler = "all",
   } = options;
 
   return data.filter((gig) => {
-    // First handle scheduler filtering
-    if (scheduler === "pending") return gig.isPending === true;
-    if (scheduler === "notPending") return gig.isPending === false;
+    // Handle scheduler filtering
+    if (scheduler !== "all") {
+      if (scheduler === "pending" && !gig.isPending) return false;
+      if (scheduler === "notPending" && gig.isPending) return false;
+    }
 
-    // Then handle search query if present
-    if (searchQuery) {
-      // Assuming gigme is a separate search function
-      return gigme(searchQuery, gig, data);
+    // Handle search query if present
+    if (searchQuery?.trim() && !gigme(searchQuery, gig)) {
+      return false;
     }
 
     // Handle category filtering
-    const categoryMatch =
-      category.toLowerCase() === "all" ||
-      (gig.category && gig.category.toLowerCase() === category.toLowerCase()) ||
-      (gig.bussinesscat &&
-        gig.bussinesscat.toLowerCase() === category.toLowerCase());
+    if (category.toLowerCase() !== "all") {
+      const lowerCategory = category.toLowerCase();
+      if (
+        !gig.category?.toLowerCase().includes(lowerCategory) &&
+        !gig.bussinesscat?.toLowerCase().includes(lowerCategory)
+      ) {
+        return false;
+      }
+    }
 
-    // Handle location filtering
-    const locationMatch =
-      location.toLowerCase() === "all" ||
-      (gig.location &&
-        gig.location.toLowerCase().includes(location.toLowerCase()));
+    if (location.toLowerCase() !== "all") {
+      if (
+        !gig.location ||
+        !gig.location.toLowerCase().includes(location.toLowerCase())
+      ) {
+        return false;
+      }
+    }
 
-    return categoryMatch && locationMatch;
+    return true;
   });
 };
 
