@@ -434,7 +434,7 @@ interface BaseHeaderProps {
 
 interface SchedulerProps {
   scheduler: string;
-  setScheduler: (location: string) => void;
+  setScheduler: (scheduler: string) => void;
 }
 
 type HeaderProps = BaseHeaderProps & Partial<SchedulerProps>;

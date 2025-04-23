@@ -86,6 +86,7 @@ const PendingGigs = () => {
       },
     },
   };
+
   const formatDate = (date?: Date | string) => {
     if (!date) return "Date not specified";
 
@@ -100,6 +101,19 @@ const PendingGigs = () => {
     } catch {
       return "Invalid date";
     }
+  };
+
+  const handleRefresh = () => {
+    // Save the current state to localStorage before reloading
+    if (gigs && gigs.length > 0) {
+      const userPendingGigs = gigs.filter((gig) =>
+        gig?.bookCount?.some((bookedUser) => bookedUser?.clerkId === userId)
+      );
+      localStorage.setItem("pendingGigs", JSON.stringify(userPendingGigs));
+    }
+
+    // Then reload
+    window.location.reload();
   };
   const renderCategorySpecificContent = (gig: GigProps) => {
     switch (gig.bussinesscat?.toLowerCase()) {
@@ -192,18 +206,6 @@ const PendingGigs = () => {
     switch (gig.gigtimeline) {
       case "once":
         return (
-          // <div className="flex items-center gap-2 mt-2">
-          //   <CalendarCheck size={16} className="text-green-400" />
-          //   <span className="text-sm text-green-300">
-          //     One-time event on{" "}
-          //     {gig.date?.toLocaleDateString("en-US", {
-          //       weekday: "long",
-          //       year: "numeric",
-          //       month: "long",
-          //       day: "numeric",
-          //     })}
-          //   </span>
-          // </div>
           <div className="flex items-center gap-2 mt-2">
             <CalendarCheck size={16} className="text-green-400" />
             <span className="text-sm text-green-300">
@@ -232,10 +234,6 @@ const PendingGigs = () => {
     }
   };
 
-  console.log("Raw gigs from API:", gigs);
-  console.log("Local gigs:", localGigs);
-  console.log("Current user ID:", userId);
-  console.log("Filtering gigs:", filteredGigs);
   return (
     <div className="h-full w-full mx-auto px-4 py-6 max-w-7xl">
       {error && (
@@ -270,31 +268,28 @@ const PendingGigs = () => {
         </div>
       </motion.div>
 
-      {!isLoading && filteredGigs?.length === 0 && (
-        <div className="flex h-[calc(100vh-140px)] w-full justify-center items-center">
-          <span className="text-neutral-400 font-mono text-lg">
-            No Pending Gigs Available
-          </span>
-        </div>
-      )}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-white">Your Pending Gigs</h2>
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => {
-            localStorage.removeItem("pendingGigs");
-            window.location.reload();
-          }}
+          onClick={handleRefresh}
           className="px-3 py-1.5 text-sm rounded-full bg-gray-700 text-gray-200 hover:bg-gray-600 transition-all flex items-center gap-2"
         >
           <RefreshCw size={14} />
-          Refresh Data
+          Refresh
         </motion.button>
       </div>
+
       {isLoading ? (
         <div className="flex justify-center items-center h-[calc(100vh-140px)] w-full">
           <ColorLoading />
+        </div>
+      ) : filteredGigs?.length === 0 ? (
+        <div className="flex h-[calc(100vh-140px)] w-full justify-center items-center">
+          <span className="text-neutral-400 font-mono text-lg">
+            No Pending Gigs Available
+          </span>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

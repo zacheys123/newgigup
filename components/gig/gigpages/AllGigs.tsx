@@ -7,17 +7,34 @@ import Clockwise from "@/components/loaders/Clockwise";
 import { useAllGigs } from "@/hooks/useAllGigs";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { GigProps } from "@/types/giginterface";
-import { searchfunc } from "@/utils/index";
+import { filterGigs } from "@/utils";
+
 import { useEffect, useMemo, useState } from "react";
 
+const useDebounce = (value: string, delay: number) => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+};
 const AllGigs = () => {
   const { loading: gigsLoading, gigs } = useAllGigs();
   const { user, loading: userLoading } = useCurrentUser();
   const [typeOfGig, setTypeOfGig] = useState<string>("");
+  const debouncedSearch = useDebounce(typeOfGig, 300);
   const [category, setCategory] = useState<string>("all");
   const [location, setLocation] = useState<string>("all");
-  const [scheduler, setScheduler] = useState<string>("notPending");
-  let gigQuery;
+  const [scheduler, setScheduler] = useState<string>();
+
   useEffect(() => {
     // if (!user) {
     //   mutateUser().catch((error) => {
@@ -32,19 +49,25 @@ const AllGigs = () => {
   }, [user]);
 
   const filteredGigs = useMemo(() => {
+    const filtered = filterGigs(gigs, {
+      searchQuery: debouncedSearch,
+      category,
+      location,
+      scheduler,
+    });
+
+    // Additional filtering for user-specific conditions
     return (
-      searchfunc(
-        gigs,
-        typeOfGig,
-        category,
-        gigQuery,
-        location,
-        scheduler
-      )?.filter(
-        (gig: GigProps) => gig?.isTaken === false && gig?.isPending === false
+      filtered?.filter(
+        (gig: GigProps) =>
+          gig?.isTaken === false &&
+          gig?.isPending === false &&
+          !gig?.bookCount?.some(
+            (bookedUser) => bookedUser?._id === user?.user?._id
+          )
       ) || []
     );
-  }, [gigs, typeOfGig, category, location, gigQuery, scheduler]);
+  }, [gigs, debouncedSearch, category, location, scheduler, user]);
 
   const isLoading = gigsLoading || userLoading;
   console.log(filteredGigs);

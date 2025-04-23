@@ -70,7 +70,11 @@ const Published = () => {
         scheduler
       )?.filter(
         (gig: GigProps) =>
-          gig?.postedBy?._id !== user?.user?._id && gig?.isTaken === false
+          gig?.postedBy?._id !== user?.user?._id &&
+          gig?.isTaken === false &&
+          !gig?.bookCount?.some(
+            (bookedUser) => bookedUser?._id === user?.user?._id
+          )
       ) || []
     );
   }, [

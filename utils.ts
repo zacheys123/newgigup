@@ -1,6 +1,69 @@
 // c/users/admin/appdata/roaming/wondershare/wondersharefilmora/output
 
+import { GigProps } from "./types/giginterface";
 import { FetchResponse, UserProps } from "./types/userinterfaces";
+
+interface SearchOptions {
+  searchQuery?: string;
+  category?: string;
+  location?: string;
+  scheduler?: "all" | "notPending" | "pending" | string; // Hybrid approach
+}
+
+function gigme(query: string, data: GigProps, sorted: GigProps[]) {
+  // if (data?.location?.toLowerCase().includes(query.toLowerCase())) {
+  //   return sorted;
+  // } else
+  if (
+    data?.time?.from?.toLowerCase().includes(query.toLowerCase()) ||
+    data?.time?.to?.toLowerCase().includes(query.toLowerCase())
+  ) {
+    return sorted;
+  } else if (data?.title?.toLowerCase().includes(query.toLowerCase())) {
+    return sorted;
+  }
+  // } else if (data?.category?.toLowerCase().includes(query.toLowerCase())) {
+  //   return sorted;
+  // }
+}
+export const filterGigs = (
+  data: GigProps[] = [],
+  options: SearchOptions
+): GigProps[] => {
+  const {
+    searchQuery,
+    category = "all",
+    location = "all",
+    scheduler = "notPending",
+  } = options;
+
+  return data.filter((gig) => {
+    // First handle scheduler filtering
+    if (scheduler === "pending") return gig.isPending === true;
+    if (scheduler === "notPending") return gig.isPending === false;
+
+    // Then handle search query if present
+    if (searchQuery) {
+      // Assuming gigme is a separate search function
+      return gigme(searchQuery, gig, data);
+    }
+
+    // Handle category filtering
+    const categoryMatch =
+      category.toLowerCase() === "all" ||
+      (gig.category && gig.category.toLowerCase() === category.toLowerCase()) ||
+      (gig.bussinesscat &&
+        gig.bussinesscat.toLowerCase() === category.toLowerCase());
+
+    // Handle location filtering
+    const locationMatch =
+      location.toLowerCase() === "all" ||
+      (gig.location &&
+        gig.location.toLowerCase().includes(location.toLowerCase()));
+
+    return categoryMatch && locationMatch;
+  });
+};
 
 const randomId = Math.floor(Math.random() * 1000000000);
 export const postedBy = {
