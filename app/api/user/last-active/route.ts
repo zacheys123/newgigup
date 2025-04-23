@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function PUT(req: NextRequest) {
   const { userId } = getAuth(req);
   const { searchParams } = new URL(req.url);
-  const id = searchParams.get("chatId");
+  const id = searchParams.get("id");
 
   if (!userId) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });

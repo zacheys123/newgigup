@@ -5,8 +5,11 @@ import { ArrowBigLeftIcon } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
+interface FriendDataProps {
+  user: UserProps;
+}
 const VideoProfile = () => {
-  const [friend, setFriend] = React.useState<UserProps>();
+  const [friend, setFriend] = React.useState<FriendDataProps>();
   const { id } = useParams();
   const { refetchData } = useStore();
   const [loading, setLoading] = useState<boolean>(false);
@@ -22,7 +25,7 @@ const VideoProfile = () => {
       // fetch friend data from an API endpoint
       try {
         const response = await fetch(`/api/user/getuser/${id}`);
-        const friendData: UserProps = await response.json();
+        const friendData: FriendDataProps = await response.json();
         console.log(friendData);
         if (isMounted) {
           setFriend(friendData);
@@ -34,36 +37,39 @@ const VideoProfile = () => {
         alert("Error fetching friend data");
         if (isMounted) {
           setFriend({
-            clerkId: "",
-            firstname: "",
-            lastname: "",
-            experience: "",
-            instrument: "",
-            username: "",
-            followers: [],
-            followings: [],
-            allreviews: [],
-            myreviews: [],
-            isClient: false,
-            isMusician: false,
-            videosProfile: [],
-            organization: "",
-            handles: "",
-            bio: "",
-            genre: "",
-            refferences: [],
-            roleType: "",
-            djGenre: "",
-            djEquipment: "",
-            mcType: "",
-            mcLanguage: "",
-            talentbio: "",
-            vocalistGenre: "",
-            musicianhandles: [{ platform: "", handle: "" }],
-            musiciangenres: [],
-            firstLogin: true,
-            onboardingComplete: false,
-            lastActive: new Date(),
+            user: {
+              clerkId: "",
+              firstname: "",
+              lastname: "",
+              experience: "",
+              instrument: "",
+              username: "",
+              followers: [],
+              followings: [],
+              allreviews: [],
+              myreviews: [],
+              isClient: false,
+              isMusician: false,
+              videosProfile: [],
+              organization: "",
+              handles: "",
+              bio: "",
+              genre: "",
+              refferences: [],
+              roleType: "",
+              djGenre: "",
+              djEquipment: "",
+              mcType: "",
+              mcLanguage: "",
+              talentbio: "",
+              vocalistGenre: "",
+              musicianhandles: [{ platform: "", handle: "" }],
+              musiciangenres: [],
+              firstLogin: true,
+              onboardingComplete: false,
+              lastActive: new Date(),
+              year: "",
+            },
           });
         }
       } finally {
@@ -78,7 +84,7 @@ const VideoProfile = () => {
       isMounted = false;
     };
   }, [id, refetchData]);
-  console.log(friend);
+  console.log(friend?.user);
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -103,7 +109,7 @@ const VideoProfile = () => {
       )}
 
       {friend &&
-        friend?.videosProfile?.map((video: VideoProfileProps) => (
+        friend?.user?.videosProfile?.map((video: VideoProfileProps) => (
           <div
             key={video._id}
             className="flex flex-col gap-4 bg-zinc-900 rounded-lg shadow-md shadow-slate-600 py-6 px-4 mt-2 mb-8 hover:shadow-lg hover:scale-[1.02] transition-transform"

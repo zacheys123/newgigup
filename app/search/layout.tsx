@@ -1,3 +1,4 @@
+import NotificationHandler from "@/components/NotificationHandler";
 import React from "react";
 import { Toaster } from "sonner";
 
@@ -19,6 +20,7 @@ export default function FriendLayout({
           duration: 3000,
         }}
       />
+      <NotificationHandler />
       {chat}
       {reviews}
       {children}

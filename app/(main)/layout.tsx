@@ -4,6 +4,7 @@ import Nav from "../../components/Nav";
 import { useUser } from "@clerk/nextjs";
 import { useEffect, useMemo } from "react";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import NotificationHandler from "@/components/NotificationHandler";
 
 const MainLayout = ({
   contact,
@@ -67,6 +68,7 @@ const MainLayout = ({
         }}
       />
       <Nav />
+      <NotificationHandler />
       {contact}
       {children}
     </div>

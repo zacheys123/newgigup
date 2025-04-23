@@ -1,5 +1,6 @@
 import { MobileNav } from "@/components/dashboard/MobileNav";
 import { Sidebar } from "@/components/dashboard/SideBar";
+import NotificationHandler from "@/components/NotificationHandler";
 
 export default function DashboardLayout({
   children,
@@ -13,7 +14,10 @@ export default function DashboardLayout({
         <Sidebar />
       </div>
 
-      <main className="flex-1 overflow-y-auto  md:pb-0"> {children}</main>
+      <main className="flex-1 overflow-y-auto  md:pb-0">
+        {" "}
+        <NotificationHandler /> {children}
+      </main>
       {/* Mobile navigation */}
       <div className="md:hidden">
         <MobileNav />

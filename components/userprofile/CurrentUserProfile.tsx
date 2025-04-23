@@ -56,13 +56,7 @@ const CurrentUserProfile = () => {
   const [showFollowingModal, setShowFollowingModal] = useState(false);
   const [modalData, setModalData] = useState<{
     title: string;
-    users: {
-      firstname: string;
-      email?: string;
-      picture: string;
-      lastname: string;
-      city: string;
-    }[];
+    users: UserProps[];
   }>({ title: "", users: [] });
   // User profile state
   const [loading, setLoading] = useState<boolean>(false);
@@ -669,6 +663,7 @@ const CurrentUserProfile = () => {
                       type="text"
                       className="w-1/3 bg-neutral-800 border-neutral-700 text-[12px] text-white text-sm"
                       placeholder="Year"
+                      name="year"
                       value={year}
                       onChange={(ev) => setYear(ev.target.value)}
                     />
@@ -834,6 +829,7 @@ const CurrentUserProfile = () => {
         onClose={() => setShowFollowersModal(false)}
         title={modalData.title}
         users={modalData.users}
+        dep="followers"
       />
 
       {/* Following Modal */}
@@ -842,6 +838,7 @@ const CurrentUserProfile = () => {
         onClose={() => setShowFollowingModal(false)}
         title={modalData.title}
         users={modalData.users}
+        dep="following"
       />
     </div>
   );

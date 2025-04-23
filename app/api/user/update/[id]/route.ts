@@ -34,7 +34,7 @@ export async function PUT(req: NextRequest) {
     isClient,
   } = await req.json();
   console.log(isMusician);
-  console.log("client", isClient);
+  console.log("year", year);
   if (isMusician === true && !age) {
     return NextResponse.json({
       updateStatus: false,
@@ -83,7 +83,7 @@ export async function PUT(req: NextRequest) {
             experience: isClient ? "" : experience,
             date: age === isClient ? "" : age,
             month: isClient ? "" : month,
-            year: isClient ? "" : instrument,
+            year: isClient ? "" : year,
             city,
             address,
             phone,

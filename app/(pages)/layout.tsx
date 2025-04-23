@@ -1,4 +1,5 @@
 "use client";
+import NotificationHandler from "@/components/NotificationHandler";
 // import { useState } from "react";
 import MobileSheet from "@/components/pages/MobileSheet";
 import PagesNav from "@/components/pages/PagesNav";
@@ -85,7 +86,6 @@ export default function GigLayout({
         className={`fixed top-0 left-0 right-0 z-40 transition-transform duration-500 ease-in-out ${
           isVisible ? "translate-y-0" : "-translate-y-full"
         }`} */}
-
       <div className="flex items-center justify-between mt-4 mx-6 bg-inherit">
         {" "}
         {user ? (
@@ -105,7 +105,6 @@ export default function GigLayout({
           </div>
         )}
       </div>
-
       <Toaster
         position="top-right"
         toastOptions={{
@@ -127,7 +126,8 @@ export default function GigLayout({
         toastOptions={{
           duration: 3000,
         }}
-      />
+      />{" "}
+      <NotificationHandler />
       {children}
       <PagesNav />
     </div>

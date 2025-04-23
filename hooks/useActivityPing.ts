@@ -13,7 +13,7 @@ const useActivityPing = (isActive = true, id: string | null) => {
     }, 30000); // Ping every 30 seconds
 
     // Initial ping
-    fetch("/api/users/activity", {
+    fetch(`/api/user/last-active?id=${id}`, {
       method: "PUT",
       credentials: "include",
     }).catch(console.error);

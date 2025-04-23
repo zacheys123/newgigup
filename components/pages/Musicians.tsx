@@ -104,6 +104,10 @@ const Musicians = ({ _id }: UserProps) => {
       picture: string;
       lastname: string;
       city: string;
+      _id: string;
+      username: string;
+      followers: UserProps[];
+      followings: UserProps[];
     }[];
   }>({ title: "", users: [] });
   if (loading) {
@@ -239,6 +243,7 @@ const Musicians = ({ _id }: UserProps) => {
         onClose={() => setShowNearByModal(false)}
         title={modalData.title}
         users={modalData.users}
+        dep="musician"
       />
     </div>
   );

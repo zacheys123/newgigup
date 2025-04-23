@@ -1,3 +1,4 @@
+import NotificationHandler from "@/components/NotificationHandler";
 import MobileSheet from "@/components/pages/MobileSheet";
 import { UserButton } from "@clerk/nextjs";
 import { Toaster } from "sonner";
@@ -18,7 +19,8 @@ export default function ProfileLayout({
         toastOptions={{
           duration: 3000,
         }}
-      />
+      />{" "}
+      <NotificationHandler />
       {children}
     </div>
   );

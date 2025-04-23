@@ -4,6 +4,8 @@ import useStore from "../zustand/useStore";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { io, Socket } from "socket.io-client";
+import { AppNotification, useNotifications } from "./NotificationContext";
+import { UserProps } from "@/types/userinterfaces";
 
 interface SocketContextType {
   socket: Socket | null;
@@ -21,7 +23,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
   const { setOnlineUsers, addMessage } = useStore();
   const [socket, setSocket] = useState<Socket | null>(null);
   const [typingUsers, setTypingUsers] = useState<Record<string, boolean>>({});
-
+  const { addNotification } = useNotifications();
   // Typing status management
   const isTyping = (userId: string) => typingUsers[userId] || false;
   const setTypingStatus = (userId: string, isTyping: boolean) => {
@@ -73,18 +75,14 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [socket, setOnlineUsers, user]);
 
-  // Handle incoming messages
+  // utils/typeGuards.ts
+  function isUserProps(obj: UserProps) {
+    return obj && typeof obj === "object" && "_id" in obj && "firstname" in obj;
+  }
   useEffect(() => {
-    if (!socket?.connected) {
-      console.warn("⚠️ Socket is NOT connected.");
-      return;
-    }
-
-    console.log("✅ Listening for incoming messages...");
+    if (!socket?.connected) return;
 
     const handleIncomingMessage = (message: MessageProps) => {
-      console.log("🟢 Received a message from the server:", message);
-
       const { messages, updateUnreadCount } = useStore.getState();
 
       // Check for duplicate messages
@@ -95,14 +93,49 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
       );
 
       if (!isDuplicate) {
-        console.log("🟢 Adding new message to Zustand store.");
         addMessage(message);
 
+        // If the message is for the current user
         if (message.receiver === user?.user?._id) {
           updateUnreadCount(message.chatId as string, true);
+
+          // Create the notification with the exact expected shape
+          // In your SocketProvider component
+          // In your SocketProvider
+          // In your SocketProvider component
+          // In your SocketProvider component
+          const createNotification = (
+            message: MessageProps
+          ): Omit<AppNotification, "id"> => {
+            // Ensure sender is properly typed as UserProps
+            if (!message.sender || !isUserProps(message.sender)) {
+              throw new Error("Invalid sender data - expected UserProps");
+            }
+
+            return {
+              text: `New message from ${message.sender.firstname}`,
+              sender: message.sender, // Now guaranteed to be UserProps
+              receiver: message.receiver || "unknown-receiver",
+              chatId: message.chatId as string,
+              content: message.content,
+              timestamp: new Date(message.createdAt || Date.now()),
+              read: false,
+            };
+          };
+
+          // Usage with error handling
+          try {
+            const notification = createNotification(message);
+            addNotification(notification);
+          } catch (error) {
+            console.error("Failed to create notification:", error);
+            // Handle error appropriately
+          }
+
+          // Usage
+
+          // Usage
         }
-      } else {
-        console.log("🟡 Duplicate message detected, skipping update.");
       }
     };
 

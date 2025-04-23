@@ -19,6 +19,7 @@ import {
   handleUnFollowingCurrent,
 } from "@/utils";
 import { motion } from "framer-motion";
+import CountUp from "react-countup";
 
 interface ApiResponse {
   user: UserProps;
@@ -100,12 +101,10 @@ const FriendsComponent = () => {
 
       mutate(`/api/user/getuser/${username}`, optimisticData, false);
       setIsFollowing(false);
-
       await Promise.all([
         handleUnfollow(friend._id, user?.user),
         handleUnFollowingCurrent(friend._id, user?.user),
       ]);
-
       mutate(`/api/user/getuser/${username}`);
     } catch (error) {
       mutate(`/api/user/getuser/${username}`, response, false);
@@ -115,7 +114,7 @@ const FriendsComponent = () => {
       setIsMutating(false);
     }
   };
-
+  console.log("year", friend?.year);
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen text-gray-300 backdrop-blur-sm bg-neutral-700/50 flex-col gap-4 ">
@@ -153,7 +152,7 @@ const FriendsComponent = () => {
 
       {/* Scrollable Content Area */}
       <div className="flex-1 overflow-y-auto bg-gradient-to-br from-indigo-900/10 via-purple-900/10 to-gray-900/10 backdrop-blur-sm">
-        <div className="max-w-3xl mx-auto mt-8 pb-12 px-4">
+        <div className="max-w-3xl mx-auto -mt-8 pb-12 px-4">
           {/* Profile Section - Kept as requested */}
           <div className="h-[180px] bg-neutral-800/80 backdrop-blur-md flex items-center px-2 justify-around rounded-bl-3xl rounded-br-3xl border border-white/10 shadow-xl">
             <div className="w-[100px] h-[100px] rounded-full bg-neutral-300/90 flex justify-center items-center shadow-lg">
@@ -249,14 +248,14 @@ const FriendsComponent = () => {
               <h4 className="text-lg font-bold text-gray-200 mb-4">Fullname</h4>
               <div className="flex gap-4">
                 <div className="bg-white/10 p-3 rounded-lg flex-1">
-                  <p className="text-sm text-gray-400">First Name</p>
-                  <p className="text-gray-200 font-medium">
+                  <p className="text-sm text-gray-200">First Name</p>
+                  <p className="text-neutral-400 font-medium title my-2">
                     {friend?.firstname || "-"}
                   </p>
                 </div>
                 <div className="bg-white/10 p-3 rounded-lg flex-1">
-                  <p className="text-sm text-gray-400">Last Name</p>
-                  <p className="text-gray-200 font-medium">
+                  <p className="text-sm text-gray-200">Last Name</p>
+                  <p className="text-neutral-400 font-medium title my-2">
                     {friend?.lastname || "-"}
                   </p>
                 </div>
@@ -268,8 +267,8 @@ const FriendsComponent = () => {
                 Contact Info
               </h4>
               <div className="bg-white/10 p-3 rounded-lg">
-                <p className="text-sm text-gray-400">Email</p>
-                <p className="text-gray-200 font-medium">
+                <p className="text-sm text-gray-200">Email</p>
+                <p className="text-neutral-400 font-medium title my-2">
                   {friend?.email || "-"}
                 </p>
               </div>
@@ -281,13 +280,13 @@ const FriendsComponent = () => {
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="bg-white/10 p-3 rounded-lg">
-                  <p className="text-sm text-gray-400">City</p>
-                  <p className="text-gray-200 font-medium">
+                  <p className="text-sm text-gray-200">City</p>
+                  <p className="text-neutral-400 font-medium title my-2">
                     {friend?.city || "-"}
                   </p>
                 </div>
                 <div className="bg-white/10 p-3 rounded-lg">
-                  <p className="text-sm text-gray-400">Address</p>
+                  <p className="text-sm text-gray-200">Address</p>
                   <p className="text-gray-200 font-medium">
                     {friend?.address || "-"}
                   </p>
@@ -297,30 +296,90 @@ const FriendsComponent = () => {
               <div className="flex justify-center gap-6 my-6">
                 <div className="bg-gradient-to-r from-pink-500/20 to-rose-500/20 p-3 rounded-lg text-center min-w-[120px]">
                   <p className="text-sm text-gray-300">Followers</p>
-                  <p className="text-xl font-bold text-white">
-                    {friend?.followers?.length || 0}
-                  </p>
+                  <div className="text-xl font-bold text-white">
+                    <p className="text-white font-bold text-2xl md:text-3xl">
+                      <CountUp
+                        end={friend?.followers?.length || 0}
+                        duration={1.5}
+                        delay={0.2}
+                      />
+                    </p>
+                  </div>
                 </div>
-                <div className="bg-gradient-to-r from-blue-500/20 to-indigo-500/20 p-3 rounded-lg text-center min-w-[120px]">
-                  <p className="text-sm text-gray-300">Following</p>
-                  <p className="text-xl font-bold text-white">
-                    {friend?.followings?.length || 0}
-                  </p>
+                <div className="bg-gradient-to-r from-blue-500/20 to-indigo-500 p-3 rounded-lg text-center min-w-[120px]">
+                  <div className="text-sm text-gray-300">Following</div>
+                  <div className="text-xl font-bold text-white">
+                    <p className="text-white font-bold text-2xl md:text-3xl">
+                      <CountUp
+                        end={friend?.followings?.length || 0}
+                        duration={1.5}
+                        delay={0.2}
+                      />
+                    </p>
+                  </div>
                 </div>
               </div>
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                {friend?.roleType === "instrumentalist" && (
+                  <div className="bg-white/10 p-3 rounded-lg">
+                    <div className="text-sm text-gray-200">Instrument</div>
+                    <div className="text-neutral-400 font-medium title my-2">
+                      {friend?.instrument || "-"}
+                    </div>
+                  </div>
+                )}
+                {friend?.roleType === "dj" && (
+                  <div className="bg-white/10 p-3 rounded-lg">
+                    <div className="text-sm text-gray-200">Proffession</div>
+                    <div className="text-neutral-400 font-medium title my-2">
+                      Deejay
+                    </div>
+                    <div className="text-neutral-400 font-medium title my-2">
+                      {friend?.djGenre === "openformat"
+                        ? "Plays Across all Genres"
+                        : friend?.djGenre || "-"}
+                    </div>
+                    <p className="text-gray-400 font-medium title my-2">
+                      {friend?.djEquipment || "-"}
+                    </p>
+                  </div>
+                )}
+                {friend?.roleType === "mc" && (
+                  <div className="bg-white/10 p-3 rounded-lg">
+                    <div className="text-sm text-gray-200">Proffession</div>
+                    <div className="text-neutral-400 font-medium title my-2">
+                      EMcee
+                    </div>
+                    <div className="text-neutral-400 font-medium title my-2">
+                      {friend?.mcType || "-"}
+                    </div>
+                    <div className="text-neutral-400 font-medium title my-2">
+                      {friend?.mcLanguage || "-"}
+                    </div>
+                  </div>
+                )}
+                {friend?.roleType === "vocalist" && (
+                  <div className="bg-white/10 p-3 rounded-lg">
+                    <div className="text-sm text-gray-200">Proffesion</div>
+                    <div className="text-neutral-400 font-medium title my-2">
+                      Vocalist
+                    </div>
+                    <div className="text-neutral-400 font-medium title my-2">
+                      {friend?.vocalistGenre || "-"}
+                    </div>
+                  </div>
+                )}
                 <div className="bg-white/10 p-3 rounded-lg">
-                  <p className="text-sm text-gray-400">Instrument</p>
-                  <p className="text-gray-200 font-medium">
-                    {friend?.instrument || "-"}
-                  </p>
+                  <div className="text-sm text-gray-200">Experience</div>
+                  <div className="text-neutral-400 font-medium title my-2">
+                    {friend?.experience || "-"}
+                  </div>
                 </div>
                 <div className="bg-white/10 p-3 rounded-lg">
-                  <p className="text-sm text-gray-400">Experience</p>
-                  <p className="text-gray-200 font-medium">
-                    {friend?.experience || "-"}
-                  </p>
+                  <div className="text-sm text-gray-200">Bio</div>
+                  <div className="text-neutral-400 font-medium title my-2">
+                    {friend?.talentbio || "-"}
+                  </div>
                 </div>
               </div>
 
@@ -340,22 +399,22 @@ const FriendsComponent = () => {
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="bg-white/10 p-3 rounded-lg">
-                  <p className="text-sm text-gray-400">Date</p>
-                  <p className="text-gray-200 font-medium">
+                  <p className="text-sm text-gray-200">Date</p>
+                  <div className="text-neutral-400 font-medium title my-2">
                     {friend?.date || "-"}
-                  </p>
+                  </div>
                 </div>
                 <div className="bg-white/10 p-3 rounded-lg">
-                  <p className="text-sm text-gray-400">Month</p>
-                  <p className="text-gray-200 font-medium">
+                  <p className="text-sm text-gray-200">Month</p>
+                  <div className="text-neutral-400 font-medium title my-2">
                     {friend?.month || "-"}
-                  </p>
+                  </div>
                 </div>
                 <div className="bg-white/10 p-3 rounded-lg">
-                  <p className="text-sm text-gray-400">Year</p>
-                  <p className="text-gray-200 font-medium">
+                  <p className="text-sm text-gray-200">Year</p>
+                  <div className="text-neutral-400 font-medium title my-2">
                     {friend?.year || "-"}
-                  </p>
+                  </div>
                 </div>
               </div>
             </div>

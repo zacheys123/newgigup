@@ -1,4 +1,5 @@
 import ChatNavigation from "@/components/chat/mainchats/ChatNavigation";
+import NotificationHandler from "@/components/NotificationHandler";
 import { Toaster } from "sonner";
 
 export default function NoHeadersLayout({
@@ -15,6 +16,7 @@ export default function NoHeadersLayout({
           duration: 3000,
         }}
       />
+      <NotificationHandler />
       {children}
     </div>
   );
