@@ -89,7 +89,7 @@ const Published = () => {
         (gig: GigProps) => gig?.isTaken === false && gig?.isPending === false
       ) || []
     );
-  }, [gigs, debouncedSearch, category, location, scheduler, user]);
+  }, [gigs, debouncedSearch, category, location, scheduler]);
 
   const isLoading = gigsLoading || userLoading;
 
