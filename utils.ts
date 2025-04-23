@@ -65,12 +65,8 @@ export const filterGigs = (
         return false;
       }
     }
-
     if (location.toLowerCase() !== "all") {
-      if (
-        !gig.location ||
-        !gig.location.toLowerCase().includes(location.toLowerCase())
-      ) {
+      if (!gig.location?.toLowerCase().includes(location.toLowerCase())) {
         return false;
       }
     }

@@ -8,6 +8,7 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import useSocket from "@/hooks/useSocket";
 import { GigProps } from "@/types/giginterface";
 import { filterGigs } from "@/utils";
+import { useAuth } from "@clerk/nextjs";
 
 import React, { useEffect, useMemo, useState } from "react";
 
@@ -34,7 +35,7 @@ const Published = () => {
   const [category, setCategory] = useState<string>("all");
   const [location, setLocation] = useState<string>("all");
   const [scheduler, setScheduler] = useState<string>("all");
-
+  const { userId } = useAuth();
   useEffect(() => {
     // if (!user) {
     //   mutateUser().catch((error) => {
@@ -86,10 +87,12 @@ const Published = () => {
     // Additional filtering for user-specific conditions
     return (
       filtered?.filter(
-        (gig: GigProps) => gig?.isTaken === false && gig?.isPending === false
+        (gig: GigProps) =>
+          gig?.isTaken === false &&
+          !gig?.bookCount?.some((bookedUser) => bookedUser?.clerkId === userId)
       ) || []
     );
-  }, [gigs, debouncedSearch, category, location, scheduler]);
+  }, [gigs, debouncedSearch, category, location, scheduler, userId]);
 
   const isLoading = gigsLoading || userLoading;
 

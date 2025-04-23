@@ -60,15 +60,10 @@ const Booked = () => {
     // Additional filtering for user-specific conditions
     return (
       filtered?.filter(
-        (gig: GigProps) =>
-          gig?.isTaken === false &&
-          gig?.isPending === false &&
-          !gig?.bookCount?.some(
-            (bookedUser) => bookedUser?._id === user?.user?._id
-          )
+        (gig: GigProps) => gig?.isTaken === true && gig?.isPending === false
       ) || []
     );
-  }, [gigs, debouncedSearch, category, location, user]);
+  }, [gigs, debouncedSearch, category, location]);
 
   const isLoading = gigsLoading || userLoading;
   console.log(filteredGigs);
