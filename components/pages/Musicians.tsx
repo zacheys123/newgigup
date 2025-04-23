@@ -98,17 +98,7 @@ const Musicians = ({ _id }: UserProps) => {
   const [showNearby, setShowNearByModal] = useState(false);
   const [modalData, setModalData] = useState<{
     title: string;
-    users: {
-      firstname: string;
-      email?: string;
-      picture: string;
-      lastname: string;
-      city: string;
-      _id: string;
-      username: string;
-      followers: UserProps[];
-      followings: UserProps[];
-    }[];
+    users: UserProps[];
   }>({ title: "", users: [] });
   if (loading) {
     return (
