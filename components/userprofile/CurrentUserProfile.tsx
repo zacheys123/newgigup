@@ -21,6 +21,7 @@ import {
   X,
 } from "lucide-react";
 import { UserProps, VideoProfileProps } from "@/types/userinterfaces";
+import { GigProps } from "@/types/gigsinterface";
 import VideoProfileComponent from "../user/VideoProfileComponent";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
@@ -174,7 +175,7 @@ const CurrentUserProfile = () => {
 
   const { gigs } = useAllGigs();
   console.log(gigs[0]?.bookCount);
-  const myGigs = gigs?.filter((gig) => {
+  const myGigs = gigs?.filter((gig:GigProps) => {
     const userId = user?.user?._id;
     if (!userId || !gig?.bookCount) return false;
 
