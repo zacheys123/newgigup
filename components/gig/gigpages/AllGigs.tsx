@@ -29,7 +29,7 @@ const useDebounce = (value: string, delay: number) => {
 };
 const AllGigs = () => {
   const { loading: gigsLoading, gigs } = useAllGigs();
-  const { user, loading: userLoading } = useCurrentUser();
+  const { user } = useCurrentUser();
   const [typeOfGig, setTypeOfGig] = useState<string>("");
   const debouncedSearch = useDebounce(typeOfGig, 300);
   const [category, setCategory] = useState<string>("all");
@@ -37,6 +37,12 @@ const AllGigs = () => {
   const [scheduler, setScheduler] = useState<string>();
   const { userId } = useAuth();
 
+  const normalizeString = (str?: string) =>
+    str
+      ?.trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "") || "";
   useEffect(() => {
     // if (!user) {
     //   mutateUser().catch((error) => {
@@ -45,7 +51,7 @@ const AllGigs = () => {
     //   });
     // }
 
-    if (user?.user?.city) {
+    if (normalizeString(user?.user?.city)) {
       setLocation(user.user?.city);
     }
   }, [user]);
@@ -70,9 +76,9 @@ const AllGigs = () => {
         // )
       ) || []
     );
-  }, [gigs, debouncedSearch, category, location, scheduler, user]);
+  }, [gigs, debouncedSearch, category, location, scheduler, userId]);
 
-  const isLoading = gigsLoading || userLoading;
+  const isLoading = gigsLoading;
   console.log(filteredGigs);
   return (
     <div className="flex flex-col h-full w-[100%] mx-auto md:w-full my-2 md:shadow-lg md:shadow-orange-300/20 md:rounded-xl md:overflow-hidden">
@@ -91,7 +97,7 @@ const AllGigs = () => {
       </div>
 
       <div className="h-[10%] overflow-y-scroll md:bg-gradient-to-b md:from-gray-900 md:to-gray-950">
-        {filteredGigs.length === 0 && !isLoading && (
+        {filteredGigs.length === 0 && (
           <div className="flex flex-col items-center justify-center py-12">
             <h1 className="text-white text-xl font-bold mb-4">No gigs found</h1>
             <p className="text-gray-400 max-w-md text-center">

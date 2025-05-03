@@ -47,9 +47,10 @@ export const filterGigs = (
     // Handle scheduler filtering
     if (scheduler !== "all") {
       if (scheduler === "pending" && !gig.isPending) return false;
-      if (scheduler === "notPending" && gig.isPending) return false;
+      if (scheduler === "notPending") {
+        return gig?.isPending === false && gig?.isTaken === false;
+      }
     }
-
     // Handle search query if present
     if (searchQuery?.trim() && !gigme(searchQuery, gig)) {
       return false;

@@ -171,7 +171,13 @@ const UserListModal = ({
   // };
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title}>
-      <div className="max-h-[60vh] overflow-y-auto">
+      <div
+        className={
+          dep === "musician"
+            ? "max-h-[60vh] overflow-y-auto"
+            : "fixed max-h-[60vh] overflow-y-auto"
+        }
+      >
         {users.length === 0 ? (
           <p className="text-neutral-400 text-center py-4">
             No {title.toLowerCase()} found

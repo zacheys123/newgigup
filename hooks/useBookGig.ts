@@ -1,11 +1,15 @@
-"use cient";
+// src/hooks/useBookGig.ts
+"use client";
 import { FetchResponse, GigProps } from "@/types/giginterface";
 import useSocket from "./useSocket";
 import { useState } from "react";
+import { usePendingGigs } from "@/app/Context/PendinContext";
+
 export function useBookGig() {
   const { socket } = useSocket();
-  // logic for useBookGig hook goes here
   const [bookLoading, setBookloading] = useState(false);
+  const { incrementPendingGigs } = usePendingGigs();
+
   const bookGig = async (
     gig: GigProps,
     myId: string,
@@ -50,19 +54,25 @@ export function useBookGig() {
       if (data.gigstatus === true) {
         toast.success(data.message || "Booked successfully");
         setBookloading(false);
+
+        // Increment pending gigs count
+        // Only increment if this is a new booking
+        if (
+          gig?.bookCount?.some((bookedUser) => bookedUser?.clerkId !== userId)
+        ) {
+          incrementPendingGigs();
+        }
         // Emit Socket.IO event before updating state
         if (socket) {
           socket.emit("gigBooked", {
             gigId: gig?._id,
-            bookCount: (gig?.bookCount?.length || 0) + 1, // Avoid undefined length
+            bookCount: (gig?.bookCount?.length || 0) + 1,
           });
         } else {
           console.warn("Socket connection unavailable");
         }
 
         setRefetchGig(true);
-
-        // Navigate the user if necessary
         router.push(`/execute/${gig?._id}`);
       } else {
         toast.error(data.message || "Error occurred");

@@ -8,22 +8,21 @@ import AlreadyReviewModal from "@/components/modals/AlreadyReviewModall";
 import { useAllGigs } from "@/hooks/useAllGigs";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { GigProps } from "@/types/giginterface";
-import { fonts } from "@/utils";
-import { searchfunc } from "@/utils/index";
+import { filterGigs, fonts } from "@/utils";
 import { CircularProgress } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { useDebounce } from "./Published";
 const MyGigs = () => {
   const { loading: gigsLoading, gigs, mutateGigs } = useAllGigs();
-  const { user, loading: userLoading } = useCurrentUser();
+  const { user } = useCurrentUser();
   const [typeOfGig, setTypeOfGig] = useState<string>("");
   const [category, setCategory] = useState<string>("all");
   const [location, setLocation] = useState<string>(() =>
     user?.user?.city ? user?.user?.city : "all"
   );
   const [scheduler, setScheduler] = useState<string>("notPending");
-  let gigQuery;
   const router = useRouter();
   const [secret, setSecret] = useState<string>("");
   const {
@@ -35,6 +34,7 @@ const MyGigs = () => {
   } = useStore();
   const [loadingSecret, setLoadingSecret] = useState<boolean>(false);
   const [forgotsecret, setForgotSecret] = useState<boolean>(false);
+  const debouncedSearch = useDebounce(typeOfGig, 300);
   console.log(gigs);
   const checkSecret = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,6 +86,12 @@ const MyGigs = () => {
       // ... other cleanup
     }
   };
+  const normalizeString = (str?: string) =>
+    str
+      ?.trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "") || "";
   useEffect(() => {
     // if (!user) {
     //   mutateUser().catch((error) => {
@@ -94,32 +100,49 @@ const MyGigs = () => {
     //   });
     // }
 
-    if (user?.user?.city) {
-      setLocation(user?.user.city);
+    if (normalizeString(user?.user?.city)) {
+      setLocation(user.user?.city);
     }
   }, [user]);
-  const filteredGigs = useMemo(() => {
-    return (
-      searchfunc(
-        gigs,
-        typeOfGig,
-        category,
-        gigQuery,
-        location,
-        scheduler
-      )?.filter((gig: GigProps) => gig?.postedBy?._id === user?.user?._id) || []
-    );
-  }, [
-    gigs,
-    typeOfGig,
-    category,
-    location,
-    gigQuery,
-    user?.user?._id,
-    scheduler,
-  ]);
 
-  const isLoading = gigsLoading || userLoading;
+  const filteredGigs = useMemo(() => {
+    const filtered = filterGigs(gigs, {
+      searchQuery: debouncedSearch,
+      category,
+      location,
+      scheduler,
+    });
+
+    // Additional filtering for user-specific conditions
+    return (
+      filtered?.filter(
+        (gig: GigProps) => gig?.postedBy?._id === user?.user?._id
+      ) || []
+    );
+  }, [gigs, debouncedSearch, category, location, scheduler, user?.user?._id]);
+  // const filteredGigs = useMemo(() => {
+  //   return (
+  //     searchfunc(
+  //       gigs,
+  //       typeOfGig,
+  //       category,
+  //       gigQuery,
+  //       location,
+  //       scheduler,
+  //       user?.user?._id
+  //     )?.filter((gig: GigProps) => gig?.postedBy?._id === user?.user?._id) || []
+  //   );
+  // }, [
+  //   gigs,
+  //   typeOfGig,
+  //   category,
+  //   location,
+  //   gigQuery,
+  //   user?.user?._id,
+  //   scheduler,
+  // ]);
+
+  const isLoading = gigsLoading;
   console.log(scheduler);
   return (
     <>
@@ -221,7 +244,7 @@ const MyGigs = () => {
           />
         </div>
         <div className="h-[85%] overflow-y-scroll bg-gray-900">
-          {filteredGigs.length === 0 && !isLoading && (
+          {filteredGigs.length === 0 && (
             <div className="flex flex-col items-center justify-center py-12">
               <h1 className="text-white text-xl font-bold mb-4">
                 No gigs found

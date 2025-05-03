@@ -26,6 +26,7 @@ export const initialState = {
     },
   },
   loadingPostId: "",
+  loadPostId: "",
   showVideo: false,
   confirmEdit: false,
   selectedReview: {
@@ -138,6 +139,7 @@ export interface StoreState {
   gigs: GigProps[];
   subscriptiondata: DashboardData;
   loadingPostId: string;
+  loadPostId: string;
   confirmEdit: boolean;
   isDescriptionModal: boolean;
   IsProfileModalOpen: boolean;
@@ -168,6 +170,7 @@ export interface StoreState {
   unreadCounts: Record<string, number>; // { chatId: unreadCount }
   setData: (data: DashboardData) => void;
   setLoadingPostId: (data: string) => void;
+  setLoadPostId: (data: string) => void;
   updateUnreadCount: (chatId: string, increment?: boolean) => void;
   setShowUpload: () => void;
   setShowVideo: (data: boolean) => void;

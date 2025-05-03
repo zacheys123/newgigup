@@ -7,6 +7,7 @@ import { Providers } from "./providers";
 import { SocketProvider } from "./Context/socket";
 import { NotificationProvider } from "./Context/NotificationContext";
 import ToastWrapper from "@/components/ToastWrapper";
+import { PendingGigsProvider } from "./Context/PendinContext";
 
 export const metadata: Metadata = {
   title: "Gigup",
@@ -25,10 +26,12 @@ export default function RootLayout({
           <GlobalProvider>
             <NotificationProvider>
               <SocketProvider>
-                <ClerkLoaded>
-                  {children}
-                  <ToastWrapper />
-                </ClerkLoaded>
+                <PendingGigsProvider>
+                  <ClerkLoaded>
+                    {children}
+                    <ToastWrapper />
+                  </ClerkLoaded>
+                </PendingGigsProvider>
               </SocketProvider>
             </NotificationProvider>
           </GlobalProvider>

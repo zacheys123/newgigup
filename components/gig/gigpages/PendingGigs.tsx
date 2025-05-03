@@ -18,6 +18,8 @@ import {
 import { searchPending } from "@/utils/index";
 import { GigProps } from "@/types/giginterface";
 import { useAuth } from "@clerk/nextjs";
+import { useDebounce } from "./Published";
+import { usePendingGigs } from "@/app/Context/PendinContext";
 
 const PendingGigs = () => {
   const { userId } = useAuth();
@@ -25,7 +27,10 @@ const PendingGigs = () => {
   const { loading: gigsLoading, gigs, error } = useAllGigs();
   const [typeOfGig, setTypeOfGig] = useState<string>("");
   const [localGigs, setLocalGigs] = useState<GigProps[]>([]);
+  // 2. WHEN API DATA LOADS: Update localStorage with fresh data
+  const { pendingGigsCount, setPendingGigsCount } = usePendingGigs();
 
+  const debouncedSearch = useDebounce(typeOfGig, 300);
   // 1. FIRST LOAD: Get gigs from localStorage if they exist
   const [isLocalLoading, setIsLocalLoading] = useState(true);
 
@@ -37,21 +42,21 @@ const PendingGigs = () => {
     }
   }, []);
 
-  // 2. WHEN API DATA LOADS: Update localStorage with fresh data
   useEffect(() => {
     if (gigs && gigs.length > 0) {
-      // Filter to only get pending gigs for this user
-      const userPendingGigs = gigs.filter((gig) =>
+      const userPendingGigs = gigs.filter((gig: GigProps) =>
         gig?.bookCount?.some((bookedUser) => bookedUser?.clerkId === userId)
       );
 
-      // Update localStorage
-      localStorage.setItem("pendingGigs", JSON.stringify(userPendingGigs));
+      // Keep context in sync with local state
+      if (userPendingGigs.length !== pendingGigsCount) {
+        setPendingGigsCount(userPendingGigs.length);
+      }
 
-      // Update state
+      localStorage.setItem("pendingGigs", JSON.stringify(userPendingGigs));
       setLocalGigs(userPendingGigs);
     }
-  }, [gigs, userId]); // Only runs when gigs or id changes
+  }, [gigs, userId, pendingGigsCount, setPendingGigsCount]);
 
   // Replace your filteredGigs with:
   const filteredGigs = useMemo(() => {
@@ -61,7 +66,7 @@ const PendingGigs = () => {
 
     // Apply search filter if query exists
     if (typeOfGig) {
-      results = searchPending(results, typeOfGig) || [];
+      results = searchPending(results, debouncedSearch) || [];
     }
 
     // Apply status filters
@@ -70,7 +75,7 @@ const PendingGigs = () => {
     );
 
     return results;
-  }, [typeOfGig, localGigs]);
+  }, [debouncedSearch, localGigs, typeOfGig]);
 
   const isLoading = gigsLoading || !userId || isLocalLoading;
 
@@ -106,7 +111,7 @@ const PendingGigs = () => {
   const handleRefresh = () => {
     // Save the current state to localStorage before reloading
     if (gigs && gigs.length > 0) {
-      const userPendingGigs = gigs.filter((gig) =>
+      const userPendingGigs = gigs.filter((gig: GigProps) =>
         gig?.bookCount?.some((bookedUser) => bookedUser?.clerkId === userId)
       );
       localStorage.setItem("pendingGigs", JSON.stringify(userPendingGigs));
@@ -293,61 +298,73 @@ const PendingGigs = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredGigs?.map((gig: GigProps) => (
-            <motion.div
-              key={gig?._id}
-              variants={item}
-              initial="hidden"
-              animate="show"
-              className="relative bg-gradient-to-br from-gray-800/50 to-gray-900/70 rounded-xl overflow-hidden border border-gray-700/50 hover:border-cyan-400/30 transition-all duration-300 shadow-lg"
-            >
-              <div className="p-5">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="text-xl font-bold text-white mb-1">
-                      {gig.title}
-                    </h3>
-                    <p className="text-sm text-gray-300 line-clamp-2">
-                      {gig.description}
-                    </p>
-                  </div>
-                  <span className="px-3 py-1 text-sm rounded-full bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md">
-                    ${gig.price}
-                  </span>
-                </div>
-
-                <div className="mt-4 space-y-3">
-                  <div className="flex items-center gap-2">
-                    <MapPin size={16} className="text-amber-400" />
-                    <span className="text-sm text-amber-200">
-                      {gig.location}
+          {filteredGigs?.map((gig: GigProps) => {
+            const showPriceRangeAndCurrency =
+              gig?.pricerange === "thousands"
+                ? `${gig?.price}k ${gig?.currency} `
+                : gig?.pricerange === "hundreds"
+                ? `${gig?.price},00 ${gig?.currency} `
+                : gig?.pricerange === "tensofthousands"
+                ? `${gig?.price}0000 ${gig?.currency} `
+                : gig?.pricerange === "hundredsofthousands"
+                ? `${gig?.price},00000 ${gig?.currency} `
+                : `${gig?.price} ${gig?.currency} `;
+            return (
+              <motion.div
+                key={gig?._id}
+                variants={item}
+                initial="hidden"
+                animate="show"
+                className="relative bg-gradient-to-br from-gray-800/50 to-gray-900/70 rounded-xl overflow-hidden border border-gray-700/50 hover:border-cyan-400/30 transition-all duration-300 shadow-lg"
+              >
+                <div className="p-5">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="text-xl font-bold text-white mb-1">
+                        {gig.title}
+                      </h3>
+                      <p className="text-sm text-gray-300 line-clamp-2">
+                        {gig.description}
+                      </p>
+                    </div>
+                    <span className="px-3 py-1 text-xs rounded-full bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md">
+                      {showPriceRangeAndCurrency}
                     </span>
                   </div>
-                  {renderTimelineInfo(gig)}
 
-                  <div className="flex items-center gap-2">
-                    <Clock size={16} className="text-indigo-400" />
-                    <span className="text-sm text-indigo-200">
-                      {gig.time?.from} - {gig.time?.to}
-                    </span>
+                  <div className="mt-4 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <MapPin size={16} className="text-amber-400" />
+                      <span className="text-sm text-amber-200">
+                        {gig.location}
+                      </span>
+                    </div>
+                    {renderTimelineInfo(gig)}
+
+                    <div className="flex items-center gap-2">
+                      <Clock size={16} className="text-indigo-400" />
+                      <span className="text-sm text-indigo-200">
+                        {gig.time?.from} - {gig.time?.to}
+                      </span>
+                    </div>
+                  </div>
+
+                  {renderCategorySpecificContent(gig)}
+
+                  <div className="mt-6 pt-4 border-t border-gray-700/50 flex justify-end">
+                    <motion.button
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() => router.push(`/execute/${gig._id}`)}
+                      className="px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-lg text-sm font-medium shadow-lg hover:shadow-cyan-500/20 transition-all"
+                    >
+                      View Gig
+                    </motion.button>
                   </div>
                 </div>
-
-                {renderCategorySpecificContent(gig)}
-
-                <div className="mt-6 pt-4 border-t border-gray-700/50 flex justify-end">
-                  <motion.button
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
-                    onClick={() => router.push(`/execute/${gig._id}`)}
-                    className="px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-lg text-sm font-medium shadow-lg hover:shadow-cyan-500/20 transition-all"
-                  >
-                    View Gig
-                  </motion.button>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            );
+          })}
         </div>
       )}
     </div>

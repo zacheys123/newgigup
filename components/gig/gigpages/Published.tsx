@@ -12,12 +12,19 @@ import { useAuth } from "@clerk/nextjs";
 
 import React, { useEffect, useMemo, useState } from "react";
 
-const useDebounce = (value: string, delay: number) => {
+const normalizeString = (str?: string) =>
+  str
+    ?.trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") || "";
+
+export const useDebounce = (value: string, delay: number) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      setDebouncedValue(value);
+      setDebouncedValue(normalizeString(value));
     }, delay);
 
     return () => {
@@ -29,13 +36,14 @@ const useDebounce = (value: string, delay: number) => {
 };
 const Published = () => {
   const { loading: gigsLoading, gigs } = useAllGigs();
-  const { user, loading: userLoading } = useCurrentUser();
+  const { user } = useCurrentUser();
   const [typeOfGig, setTypeOfGig] = useState<string>("");
   const debouncedSearch = useDebounce(typeOfGig, 300);
   const [category, setCategory] = useState<string>("all");
   const [location, setLocation] = useState<string>("all");
   const [scheduler, setScheduler] = useState<string>("all");
   const { userId } = useAuth();
+
   useEffect(() => {
     // if (!user) {
     //   mutateUser().catch((error) => {
@@ -44,7 +52,7 @@ const Published = () => {
     //   });
     // }
 
-    if (user?.user?.city) {
+    if (normalizeString(user?.user?.city)) {
       setLocation(user.user?.city);
     }
   }, [user]);
@@ -54,6 +62,7 @@ const Published = () => {
 
   // Add this useEffect to listen for socket updates
   // Socket.io effect
+  console.log(gigs);
   useEffect(() => {
     if (!socket) return;
 
@@ -94,7 +103,7 @@ const Published = () => {
     );
   }, [gigs, debouncedSearch, category, location, scheduler, userId]);
 
-  const isLoading = gigsLoading || userLoading;
+  const isLoading = gigsLoading;
 
   return (
     <div className="flex flex-col h-[calc(100vh-100px)] w-[100%] mx-auto my-2 shadow-md shadow-orange-300">
@@ -114,7 +123,7 @@ const Published = () => {
       </div>
       {/* Scrollable Gigs List */}
       <div className="h-[85%] overflow-y-scroll bg-gray-900">
-        {filteredGigs.length === 0 && !isLoading && (
+        {filteredGigs.length === 0 && (
           <div className="flex flex-col items-center justify-center py-12">
             <h1 className="text-white text-xl font-bold mb-4">No gigs found</h1>
             <p className="text-gray-400 max-w-md text-center">

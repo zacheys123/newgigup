@@ -16,6 +16,7 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { BsCart4 } from "react-icons/bs";
 import { useAllGigs } from "@/hooks/useAllGigs";
 import { useEffect, useRef, useState } from "react";
+import { usePendingGigs } from "@/app/Context/PendinContext";
 
 const PagesNav = () => {
   const { userId } = useAuth();
@@ -24,6 +25,7 @@ const PagesNav = () => {
   const { gigs } = useAllGigs();
   const [isOpen, setIsOpen] = useState(false);
   const controls = useAnimation();
+  const { pendingGigsCount } = usePendingGigs();
   const navRef = useRef<HTMLDivElement>(null);
 
   const linkStyles = (isActive: boolean) =>
@@ -94,11 +96,11 @@ const PagesNav = () => {
     });
   }
 
-  const pendingGigsCount =
-    gigs?.filter((gig) =>
-      gig?.bookCount?.some((bookedUser) => bookedUser?.clerkId === userId)
-    )?.length || 0;
-  console.log(pendingGigsCount);
+  // const pendingGigsCount =
+  //   gigs?.filter((gig: GigProps) =>
+  //     gig?.bookCount?.some((bookedUser) => bookedUser?.clerkId === userId)
+  //   )?.length || 0;
+  // console.log(pendingGigsCount);
 
   const handleDragEnd = (
     event: MouseEvent | TouchEvent | PointerEvent,

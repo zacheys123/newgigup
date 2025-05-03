@@ -24,7 +24,7 @@ const MainUser = ({
 }: UserProps) => {
   const router = useRouter();
   const { loading: gigsLoading, gigs } = useAllGigs();
-  const { user, loading: userLoading } = useCurrentUser();
+  const { user } = useCurrentUser();
 
   const handleClick = () => {
     if (isMusician) {
@@ -55,7 +55,7 @@ const MainUser = ({
   };
 
   useEffect(() => {
-    if (gigsLoading || userLoading || !user?.user?._id || !gigs) return;
+    if (gigsLoading || !user?.user?._id || !gigs) return;
 
     const bookedGigs = gigs.filter(
       (gig: GigProps) => gig?.bookedBy?._id === user?.user?._id
@@ -71,17 +71,9 @@ const MainUser = ({
     user?.user?.isMusician,
     gigs,
     user?.user?.allreviews,
-    userLoading,
+
     gigsLoading,
   ]);
-
-  if (userLoading) {
-    return (
-      <div className="rounded-2xl p-5 bg-gray-800/20 border border-white/10">
-        Loading user data...
-      </div>
-    );
-  }
 
   return (
     <motion.div

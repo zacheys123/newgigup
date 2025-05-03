@@ -21,6 +21,7 @@ const useStore = create<StoreState>((set) => ({
 
   setData: (data: DashboardData) => set(() => ({ subscriptiondata: data })),
   setLoadingPostId: (data: string) => set(() => ({ loadingPostId: data })),
+  setLoadPostId: (data: string) => set(() => ({ loadPostId: data })),
   setIsDescriptionModal: (data: boolean) =>
     set(() => ({ isDescriptionModal: data })),
   setIsProfileModalOpen: (data: boolean) =>

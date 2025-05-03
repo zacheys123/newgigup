@@ -29,7 +29,7 @@ const useDebounce = (value: string, delay: number) => {
 };
 const Booked = () => {
   const { loading: gigsLoading, gigs } = useAllGigs();
-  const { user, loading: userLoading } = useCurrentUser();
+  const { user } = useCurrentUser();
   const [typeOfGig, setTypeOfGig] = useState<string>("");
   const debouncedSearch = useDebounce(typeOfGig, 300);
   const [category, setCategory] = useState<string>("all");
@@ -37,7 +37,12 @@ const Booked = () => {
     user?.user?.city ? user?.user?.city : "all"
   );
   const { showVideo } = useStore();
-
+  const normalizeString = (str?: string) =>
+    str
+      ?.trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "") || "";
   useEffect(() => {
     // if (!user) {
     //   mutateUser().catch((error) => {
@@ -46,8 +51,8 @@ const Booked = () => {
     //   });
     // }
 
-    if (user?.user?.city) {
-      setLocation(user?.user.city);
+    if (normalizeString(user?.user?.city)) {
+      setLocation(user.user?.city);
     }
   }, [user]);
   const filteredGigs = useMemo(() => {
@@ -65,7 +70,7 @@ const Booked = () => {
     );
   }, [gigs, debouncedSearch, category, location]);
 
-  const isLoading = gigsLoading || userLoading;
+  const isLoading = gigsLoading;
   console.log(filteredGigs);
   return (
     <div className="flex flex-col h-[calc(100vh-100px)] w-[100%] mx-auto my-2 shadow-md shadow-orange-300">

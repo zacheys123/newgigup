@@ -207,7 +207,7 @@ export const searchfunc = (
       return gig?.isPending === true;
     }
     if (scheduler === "notPending") {
-      return gig?.isPending === false;
+      return gig?.isPending === false && gig?.isTaken === false;
     }
     if (scheduler === "all") {
       return true;

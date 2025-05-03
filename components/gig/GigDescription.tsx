@@ -206,13 +206,6 @@ const GigDescription = ({}) => {
               </DetailItem>
 
               <DetailItem>
-                <DetailLabel variant="body2">Time</DetailLabel>
-                <DetailValue variant="body2">
-                  {currentgig?.time?.from} - {currentgig?.time?.to}
-                </DetailValue>
-              </DetailItem>
-
-              <DetailItem>
                 <DetailLabel variant="body2">Pay</DetailLabel>
                 <DetailValue variant="body2" sx={{ fontWeight: 500 }}>
                   {showPriceRangeAndCurrency}

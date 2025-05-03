@@ -3,10 +3,12 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import useSocket from "./useSocket";
+import { usePendingGigs } from "@/app/Context/PendinContext";
 
 export function useForgetBookings() {
   const [loading, setLoading] = useState<boolean>(false);
   const route = useRouter();
+  const { decrementPendingGigs } = usePendingGigs();
   const { socket } = useSocket();
   const forgetBookings = async (
     id: string,
@@ -28,6 +30,12 @@ export function useForgetBookings() {
       }
       console.log("Musician removed from book count.");
       const data: { message: string } = await response.json();
+
+      if (
+        myGig?.bookCount?.some((bookedUser) => bookedUser?.clerkId !== userId)
+      ) {
+        decrementPendingGigs();
+      }
       if (socket) {
         socket.emit("cancelBooking", {
           gigId: myGig._id,

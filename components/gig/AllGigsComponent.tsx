@@ -5,7 +5,7 @@ import ButtonComponent from "../ButtonComponent";
 import { PiDotsThreeVerticalBold } from "react-icons/pi";
 import GigDescription from "./GigDescription";
 import useStore from "@/app/zustand/useStore";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useAllGigs } from "@/hooks/useAllGigs";
 import { toast } from "react-toastify";
 import { useAuth } from "@clerk/nextjs";
@@ -36,10 +36,12 @@ interface AllGigsComponentProps {
 
 const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
   const { userId } = useAuth();
-  const { schedulegig, loading } = useScheduleGig();
+  const { schedulegig } = useScheduleGig();
   const { socket } = useSocketContext();
-  const { gigs } = useAllGigs() || { gigs: [] }; // Default to empty array if null or undefined
+  const { gigs, mutateGigs } = useAllGigs() || { gigs: [] }; // Default to empty array if null or undefined
   const { user } = useCurrentUser();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const {
     currentgig,
     setShowModal,
@@ -51,6 +53,8 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
     setShowVideo,
     setSelectedReview,
     loadingPostId,
+    loadPostId,
+    setLoadPostId,
     setLoadingPostId,
   } = useStore();
 
@@ -157,7 +161,6 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
       ? `${gig?.price},00000 ${gig?.currency} `
       : `${gig?.price} ${gig?.currency} `;
 
-  console.log(gig);
   //
 
   useEffect(() => {
@@ -181,8 +184,18 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
       socket.off("updateBookCount", handleUpdateBookCount);
     };
   }, [gig._id, socket]);
-
-  console.log(gig);
+  // Clear loading state when route changes
+  useEffect(() => {
+    setLoadingPostId("");
+  }, [pathname, searchParams]);
+  const handleNavigation = async (path: string) => {
+    setLoadingPostId(gig?._id || "");
+    try {
+      await router.push(path);
+    } finally {
+      setLoadingPostId("");
+    }
+  };
 
   return (
     <>
@@ -202,7 +215,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
           background:
             gig?.isPending === false
               ? gig?.backgroundColor || "rgba(26,28,35,0.8)"
-              : "grey",
+              : "rgba(66,28,35,0.9)",
           color: gig?.fontColor || "#f3f4f6",
         }}
       >
@@ -212,7 +225,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
             <h3 className="text-sm font-medium text-white truncate">
               {gig?.title}
             </h3>
-            <div className="flex items-center text-xs text-white/70 mt-1 space-x-3 line-clamp-1">
+            <div className="flex items-center text-xs text-white/70 mt-1 space-x-3 ">
               <span className="flex items-center">
                 <svg
                   className="w-3 h-3 mr-1"
@@ -235,7 +248,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                 </svg>
                 <span className="line-clamp-1">{gig?.location}</span>
               </span>
-              <span className="flex items-center">
+              <span className="flex items-center text-[11px] w-[200px]">
                 <svg
                   className="w-3 h-3 mr-1"
                   fill="none"
@@ -298,9 +311,9 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                 </div>
               )}
             </div>
-            <span className="text-xs text-white/70">
+            {/* <span className="text-xs text-white/70">
               {gig?.postedBy?.username?.split(" ")[0] || "User"}
-            </span>
+            </span> */}
           </div>
 
           <div className="flex space-x-2">
@@ -335,7 +348,6 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                   : "Leave Review"}
               </button>
             )}
-            {/* Primary Action Button */}
             {isCurrentWhoCreatedGig && (
               <div className="w-full h-full relative">
                 <span className="w6 h-6">
@@ -347,35 +359,30 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                   variant="secondary"
                   classname="!bg-indigo-600/90 hover:!bg-indigo-500 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
                   onclick={() => {
-                    setLoadingPostId(gig?._id as string);
-                    setTimeout(() => {
-                      handleBookedUsers(gig?._id as string);
-                      setLoadingPostId("");
-                    }, 2000);
+                    handleNavigation(`/pre_execute/${gig?._id}`);
+                    handleBookedUsers(gig?._id as string);
                   }}
-                  disabled={loadingPostId.length > 0}
+                  disabled={loadingPostId === gig._id}
                   title={loadingPostId === gig._id ? "Opening..." : "View"}
                 />
               </div>
-            )}{" "}
+            )}
             {isGigCreator && !hasBookedGig && gig?.isPending === true && (
               <div className="w-full h-full relative">
                 <ButtonComponent
                   variant="secondary"
                   classname="!bg-indigo-600/90 hover:!bg-indigo-500 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
-                  onclick={() => {
-                    setLoadingPostId(gig?._id as string);
-                    setTimeout(() => {
-                      schedulegig(gig?._id as string, toast);
-                      setLoadingPostId("");
-                    }, 2000);
+                  onclick={async () => {
+                    setLoadPostId(gig?._id as string);
+                    try {
+                      await schedulegig(gig?._id as string, toast);
+                      mutateGigs("/api/gigs/getgigs");
+                    } finally {
+                      setLoadPostId("");
+                    }
                   }}
-                  disabled={loadingPostId.length > 0}
-                  title={
-                    loadingPostId === gig._id && loading
-                      ? "Creating..."
-                      : "Post"
-                  }
+                  disabled={loadPostId === gig._id}
+                  title={loadPostId === gig._id ? "Creating..." : "Post"}
                 />
               </div>
             )}{" "}
@@ -384,12 +391,10 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                 variant="secondary"
                 classname="!bg-indigo-600/90 hover:!bg-indigo-500 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
                 onclick={() => {
-                  setLoadingPostId(gig?._id || "");
-                  setTimeout(() => {
-                    handleEditBooked(gig?._id || "");
-                    setLoadingPostId("");
-                  }, 2000);
+                  handleNavigation(`/execute/${gig?._id}`);
+                  handleEditBooked(gig?._id || "");
                 }}
+                disabled={loadingPostId === gig._id}
                 title={loadingPostId === gig._id ? "Opening..." : "View"}
               />
             )}{" "}
@@ -399,13 +404,12 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                 classname="!bg-white/10 hover:!bg-white/20 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
                 onclick={() => {
                   setLoadingPostId(gig?._id as string);
-                  setTimeout(() => {
-                    setCurrentGig(gig);
-                    setConfirmEdit(true);
-                    setLoadingPostId(gig?._id as string);
-                  }, 2000);
+                  setCurrentGig(gig);
+                  setConfirmEdit(true);
+                  // No need to clear loading state here as it's not a navigation
                 }}
                 title={loadingPostId === gig._id ? "Opening..." : "Edit"}
+                disabled={loadingPostId === gig._id}
               />
             )}
             {gig &&
@@ -420,10 +424,10 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                 <ButtonComponent
                   variant="secondary"
                   classname="!bg-purple-600/90 hover:!bg-purple-500 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
-                  onclick={() => {
+                  onclick={async () => {
                     setLoadingPostId(gig?._id || "");
-                    setTimeout(() => {
-                      bookGig(
+                    try {
+                      await bookGig(
                         gig,
                         myId as string,
                         gigs || [],
@@ -432,14 +436,14 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                         setRefetchGig,
                         router
                       );
+                      // If bookGig performs navigation, loading will be handled there
+                    } catch (error) {
+                      console.log(error);
                       setLoadingPostId("");
-                    }, 2000);
+                    }
                   }}
-                  title={
-                    loadingPostId === gig?._id && !bookLoading
-                      ? "Processing..."
-                      : "Book"
-                  }
+                  title={loadingPostId === gig?._id ? "Processing..." : "Book"}
+                  disabled={loadingPostId === gig?._id || bookLoading}
                 />
               )}
             {gig?.isPending === true &&
