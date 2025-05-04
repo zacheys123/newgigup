@@ -21,7 +21,7 @@ import {
   X,
 } from "lucide-react";
 import { UserProps, VideoProfileProps } from "@/types/userinterfaces";
-import { GigProps } from "@/types/gigsinterface";
+
 import VideoProfileComponent from "../user/VideoProfileComponent";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
@@ -41,6 +41,7 @@ import ToggleSwitch from "../gig/create/ToggleSwitch";
 import SelectInput from "../gig/create/SelectInput";
 import TextInput from "../gig/create/TextInput";
 import SectionContainer from "../gig/create/SectionContainer";
+import { GigProps } from "@/types/giginterface";
 
 interface UpdateResponse {
   updateStatus: boolean;
@@ -175,7 +176,7 @@ const CurrentUserProfile = () => {
 
   const { gigs } = useAllGigs();
   console.log(gigs[0]?.bookCount);
-  const myGigs = gigs?.filter((gig:GigProps) => {
+  const myGigs = gigs?.filter((gig: GigProps) => {
     const userId = user?.user?._id;
     if (!userId || !gig?.bookCount) return false;
 
@@ -228,7 +229,7 @@ const CurrentUserProfile = () => {
 
         if (resData.updateStatus) {
           if (socket) {
-            myGigs.forEach((gig) => {
+            myGigs.forEach((gig: GigProps) => {
               socket.emit("cancelBooking", {
                 gigId: gig._id,
                 bookCount: (gig?.bookCount?.length || 0) - 1, // Decrement count
