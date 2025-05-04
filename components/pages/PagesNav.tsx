@@ -38,7 +38,7 @@ const PagesNav = () => {
     hover: { scale: 1.02, opacity: 1 },
     tap: { scale: 0.98, opacity: 0.9 },
   };
-
+  console.log(user);
   const links = [];
 
   if (user?.user?.isMusician) {
@@ -88,7 +88,7 @@ const PagesNav = () => {
       extraStyle: "text-purple-400",
     });
     links.push({
-      href: `/my_gig/${user?._id}`,
+      href: `/my_gig/${userId}`,
       Icon: MdOutlinePersonalInjury,
       label: "My Gigs",
       size: 20,

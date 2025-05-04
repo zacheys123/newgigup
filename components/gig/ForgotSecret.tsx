@@ -28,6 +28,7 @@ const ForgotSecret = ({
   const [secretErrors, setSecretErrors] = useState<string[]>([]);
   const { setConfirmEdit } = useStore();
   const [loadingsecret, setLoadingSecret] = useState(false);
+  const [showSecret, setShowSecret] = useState(false);
 
   useEffect(() => {
     const timeout1 = setTimeout(() => setError(""), 5000);
@@ -83,7 +84,7 @@ const ForgotSecret = ({
 
     setSecretErrors(errors);
   };
-
+  //
   useEffect(() => {
     validateSecrets(newSecret, confirmSecret);
   }, [newSecret, confirmSecret]);
@@ -97,7 +98,6 @@ const ForgotSecret = ({
             : "flex flex-col gap-5 w-[85%] mx-auto max-w-md  shadow-lg p-6 rounded-xl -mt-7"
         }
       >
-        {/* Email Input */}{" "}
         {email === postedBy?.email && (
           <h4 className="text-center font-bold  font-sans">
             Personal Gig Secret Recovery
@@ -128,15 +128,28 @@ const ForgotSecret = ({
         {isValidEmail && (
           <div className="flex flex-col gap-3 relative">
             {/* Display Old Secret */}
-            <input
-              type="text"
-              value={secret}
-              name="secret"
-              placeholder="Gig Secret"
-              className="border-2 border-gray-300 rounded-md px-4 py-2 w-full bg-gray-100"
-              disabled
-            />
-
+            <div className="flex items-center border-2 border-gray-300 rounded-md px-4 py-2 w-full bg-gray-100">
+              <input
+                type={showSecret ? "text" : "password"}
+                value={secret}
+                name="secret"
+                placeholder="Gig Secret"
+                className="flex-1 outline-none bg-transparent text-sm "
+                disabled
+              />
+              {showSecret ? (
+                <EyeIcon
+                  size={20}
+                  onClick={() => setShowSecret((prev: boolean) => !prev)}
+                />
+              ) : (
+                <EyeOffIcon
+                  size={20}
+                  className="cursor-pointer text-gray-400 hover:text-gray-500"
+                  onClick={() => setShowSecret((prev: boolean) => !prev)}
+                />
+              )}
+            </div>
             {/* New Secret Input */}
             <div className="flex items-center border-2 border-gray-300 rounded-md px-4 py-2 w-full bg-gray-100">
               <input
@@ -144,7 +157,7 @@ const ForgotSecret = ({
                 value={newSecret}
                 name="newSecret"
                 placeholder="Enter New Secret"
-                className="flex-1 outline-none bg-transparent text-sm"
+                className="flex-1 outline-none bg-transparent text-sm "
                 onChange={(e) => setNewSecret(e.target.value)}
               />
               {showPassword ? (
@@ -168,7 +181,7 @@ const ForgotSecret = ({
               value={confirmSecret}
               name="confirmSecret"
               placeholder="Confirm New Secret"
-              className="border-2 border-gray-300 rounded-md px-4 py-2 w-full"
+              className="border-2 border-gray-300 rounded-md px-4 text-sm py-2 w-full"
               onChange={(e) => setConfirmSecret(e.target.value)}
             />
 
@@ -204,10 +217,7 @@ const ForgotSecret = ({
                     }
                   );
                   const response = await data.json();
-
-                  // Revalidate the gigs data
-                  mutateGigs(); // This will trigger a refetch of all gigs
-
+                  mutateGigs();
                   setSuccess(response?.message);
                   setError("");
                   setTimeout(() => {

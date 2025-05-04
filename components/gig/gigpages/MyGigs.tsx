@@ -35,7 +35,7 @@ const MyGigs = () => {
   const [loadingSecret, setLoadingSecret] = useState<boolean>(false);
   const [forgotsecret, setForgotSecret] = useState<boolean>(false);
   const debouncedSearch = useDebounce(typeOfGig, 300);
-  console.log(gigs);
+  //
   const checkSecret = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!secret.trim()) {
