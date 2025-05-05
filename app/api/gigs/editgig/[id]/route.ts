@@ -48,7 +48,7 @@ class GigValidator {
 
   validateRequiredFields(): NextResponse | null {
     const requiredFields = [
-      { field: "logo", message: "Logo is required" },
+      { field: "logo", message: "Logo is required here" },
       { field: "title", message: "Title is required" },
       { field: "description", message: "Description is required" },
       { field: "phoneNo", message: "Phone number is required" },
