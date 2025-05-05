@@ -569,968 +569,963 @@ const EditPage = () => {
     setShowOpen(false);
   };
   return (
-    <AnimatePresence>
-      <Dialog open={open} onOpenChange={handleClose}>
-        <DialogContent className="h-[80vh] sm:h-[88vh] mt-0 sm:mt-[20px] py-2 sm:py-3 overflow-y-auto bg-gray-900  w-[90%] sm:w-[90%] mx-auto px-2 sm:px-4 backdrop-blur-xl bg-opacity-80 shadow  shadow-orange-800 border-0">
-          {" "}
-          <AnimatePresence>
-            {isVisible && editMessage && (
-              <motion.div
-                initial={{ opacity: 0, y: -50 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -50 }}
-                className={cn(
-                  "fixed top-6 left-1/2 transform -translate-x-1/2 z-50 rounded-lg px-6 py-3 shadow-lg",
-                  error ? "bg-red-500/90" : "bg-emerald-500/90"
-                )}
-              >
-                <motion.span
-                  className="text-white font-medium"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
-                  {editMessage}
-                </motion.span>
-              </motion.div>
-            )}
-          </AnimatePresence>
-          <div className="w-[90%] h-full mx-auto px-4 py-3 md:py-8 overflow-y-auto">
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="h-[90vh] sm:h-[88vh] mt-0 sm:mt-[20px] py-2 sm:py-3 overflow-y-auto bg-gray-900  w-[90%] sm:w-[90%] mx-auto px-2 sm:px-4 backdrop-blur-xl bg-opacity-80 shadow  shadow-orange-800 border-0">
+        {" "}
+        <AnimatePresence>
+          {isVisible && editMessage && (
             <motion.div
-              initial={{ opacity: 0, y: -20 }}
+              initial={{ opacity: 0, y: -50 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="mb-2 md:mb-10 text-center -mt-4"
+              exit={{ opacity: 0, y: -50 }}
+              className={cn(
+                "fixed top-6 left-1/2 transform -translate-x-1/2 z-50 rounded-lg px-6 py-3 shadow-lg",
+                error ? "bg-red-500/90" : "bg-emerald-500/90"
+              )}
             >
-              <DialogTitle className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500 font-semibold text-xl sm:text-2xl md:text-3xl tracking-tight mb-2">
-                <span className="inline-flex items-center gap-2">
-                  <PencilLine className="w-5 h-5 sm:w-6 sm:h-6" />
-                  Update Gig Details
-                </span>
-              </DialogTitle>
+              <motion.span
+                className="text-white font-medium"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                {editMessage}
+              </motion.span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <div className="w-[90%] h-full mx-auto px-4 py-3 md:py-8 overflow-y-auto">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="mb-2 md:mb-10 text-center -mt-4"
+          >
+            <DialogTitle className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500 font-semibold text-xl sm:text-2xl md:text-3xl tracking-tight mb-2">
+              <span className="inline-flex items-center gap-2">
+                <PencilLine className="w-5 h-5 sm:w-6 sm:h-6" />
+                Update Gig Details
+              </span>
+            </DialogTitle>
+          </motion.div>
+
+          <motion.form
+            className="space-y-4 md:space-y-10 flex-col"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              visible: {
+                transition: {
+                  staggerChildren: 0.1,
+                },
+              },
+            }}
+          >
+            {/* Business Type Section */}
+            <motion.div
+              variants={sectionVariants}
+              className="space-y-2 md:space-y-4"
+            >
+              <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div className="w-full">
+                  <label className="block text-sm font-medium text-gray-300 mt-3 mb-2">
+                    Who do you want?
+                  </label>
+                  <select
+                    onChange={handleBussinessChange}
+                    value={bussinesscat || ""}
+                    className="w-full text-sm sm:text-base bg-gray-700/50 border border-gray-600 text-gray-100 h-12 rounded-lg px-4 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  >
+                    {" "}
+                    <option value="" className="bg-gray-800">
+                      Select category
+                    </option>
+                    <option value="full" className="bg-gray-800">
+                      Full Band
+                    </option>
+                    <option value="personal" className="bg-gray-800">
+                      Individual
+                    </option>
+                    <option value="other" className="bg-gray-800">
+                      Create your own band
+                    </option>
+                    <option value="mc" className="bg-gray-800">
+                      MC
+                    </option>
+                    <option value="dj" className="bg-gray-800">
+                      DJ
+                    </option>
+                    <option value="vocalist" className="bg-gray-800">
+                      Vocalist
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Talent Preview */}
+
+              {!show &&
+                (gigInputs.mcType ||
+                  gigInputs.djGenre ||
+                  gigInputs.vocalistGenre?.length) && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50 relative"
+                  >
+                    <div className="flex justify-between items-center mb-3">
+                      <div className="flex items-center gap-2">
+                        <Music className="text-amber-400" size={18} />
+                        <h3 className="text-gray-200 font-medium">
+                          Talent Details
+                        </h3>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-amber-400 hover:bg-gray-700/50"
+                        onClick={() => {
+                          const type = gigInputs.mcType
+                            ? "mc"
+                            : gigInputs.djGenre
+                            ? "dj"
+                            : gigInputs.vocalistGenre?.length
+                            ? "vocalist"
+                            : null;
+                          if (type) {
+                            setActiveTalentType(type);
+                            setShowTalentModal(true);
+                          }
+                        }}
+                      >
+                        <Edit size={14} className="mr-1" /> Edit
+                      </Button>
+                    </div>
+
+                    <div className="space-y-3">
+                      {gigInputs.mcType && (
+                        <div className="flex flex-col gap-1">
+                          <div className="flex gap-2 items-center">
+                            <span className="text-gray-400 text-sm flex items-center gap-1">
+                              <Mic size={14} /> MC Type:
+                            </span>
+                            <Badge
+                              variant="outline"
+                              className="text-amber-400 border-amber-400/30"
+                            >
+                              {gigInputs.mcType}
+                            </Badge>
+                          </div>
+                        </div>
+                      )}
+
+                      {gigInputs.djGenre && (
+                        <div className="flex flex-col gap-1">
+                          <div className="flex gap-2 items-center">
+                            <span className="text-gray-400 text-sm flex items-center gap-1">
+                              <Disc size={14} /> DJ Genre:
+                            </span>
+                            <Badge
+                              variant="outline"
+                              className="text-blue-400 border-blue-400/30"
+                            >
+                              {gigInputs.djGenre}
+                            </Badge>
+                          </div>
+                        </div>
+                      )}
+
+                      {gigInputs.vocalistGenre?.length && (
+                        <div className="flex flex-col gap-1">
+                          <div className="flex gap-2 items-center">
+                            <span className="text-gray-400 text-sm flex items-center gap-1">
+                              <Mic size={14} /> Vocalist Genres:
+                            </span>
+                            <div className="flex flex-wrap gap-1">
+                              {gigInputs.vocalistGenre.map((genre) => (
+                                <Badge
+                                  key={genre}
+                                  variant="outline"
+                                  className="text-purple-400 border-purple-400/30"
+                                >
+                                  {genre}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <span
+                      className="text-white text-[16px] absolute right-3 top-1 cursor-pointer"
+                      onClick={() => setShow(true)}
+                    >
+                      &times;
+                    </span>
+                  </motion.div>
+                )}
+            </motion.div>
+            <motion.div
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full md:w-auto  mt-0 flex justify-between item"
+            >
+              <Button
+                onClick={() => setShowCustomization(true)}
+                type="button"
+                variant="outline"
+                className="flex items-center gap-2 bg-gradient-to-r from-purple-600/30 to-blue-600/30 border border-purple-500/30 text-white hover:bg-purple-700/40 hover:border-purple-400/50 transition-all"
+              >
+                <span className="text-xs md:text-sm">Customize Gig Card</span>
+              </Button>
+              {show && (
+                <div
+                  className="p-2 h-[20px] text-neutral-400 text-[11px] bg-gray-200 w-fit flex justify-center items-center rounded-xl cursor-pointer"
+                  onClick={() => setShow(false)}
+                >
+                  Show Data
+                </div>
+              )}
+            </motion.div>
+            {/* Title Section */}
+            <motion.div variants={sectionVariants}>
+              <div
+                className={`flex justify-between items-center rounded-lg p-4 ${sectionBgClasses.title} mb-4`}
+                onClick={() =>
+                  setshowCategories({
+                    ...showCategories,
+                    title: !showCategories.title,
+                  })
+                }
+              >
+                <div className="flex items-center gap-3  ">
+                  <Type className="text-amber-400" size={18} />
+                  <h3 className="text-gray-200 font-medium">
+                    Title Information
+                  </h3>
+                </div>
+                <FaComment className="text-gray-400" size={16} />
+              </div>
+
+              <AnimatePresence>
+                {showCategories.title && (
+                  <motion.div
+                    initial={{ maxHeight: 0, opacity: 0 }}
+                    animate={{
+                      maxHeight: 200, // Enough for title fields
+                      opacity: 1,
+                    }}
+                    exit={{ maxHeight: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="overflow-hidden bg-gray-800/30 rounded-b-lg border border-gray-700/50 border-t-0"
+                  >
+                    <div className="p-4 space-y-4">
+                      <div className="relative">
+                        <Lock
+                          className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                          size={16}
+                        />
+                        <input
+                          onChange={handleInputChange}
+                          name="secret"
+                          value={gigInputs?.secret}
+                          type={!secretpass ? "password" : "text"}
+                          placeholder="Enter secret passphrase (optional)"
+                          className="w-full pl-10 pr-10 bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setSecretPass(!secretpass)}
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300"
+                        >
+                          {secretpass ? (
+                            <EyeOff size={18} />
+                          ) : (
+                            <EyeIcon size={18} />
+                          )}
+                        </button>
+                      </div>
+
+                      <div>
+                        <motion.input
+                          variants={inputVariants}
+                          whileFocus="focus"
+                          onChange={handleInputChange}
+                          name="title"
+                          value={gigInputs?.title}
+                          type="text"
+                          placeholder="Enter a captivating title for your gig"
+                          className={cn(
+                            "w-full bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-4 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all",
+                            fieldErrors.title
+                              ? "border-red-500/50 focus:ring-red-500/50"
+                              : ""
+                          )}
+                        />
+                        {fieldErrors.title && (
+                          <motion.p
+                            initial={{ opacity: 0, y: -5 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="text-red-400 text-xs mt-1 pl-2"
+                          >
+                            {fieldErrors.title}
+                          </motion.p>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.div>
 
-            <motion.form
-              className="space-y-4 md:space-y-10 flex-col"
-              initial="hidden"
-              animate="visible"
-              variants={{
-                visible: {
-                  transition: {
-                    staggerChildren: 0.1,
-                  },
-                },
-              }}
-            >
-              {/* Business Type Section */}
-              <motion.div
-                variants={sectionVariants}
-                className="space-y-2 md:space-y-4"
+            {/* Description Section */}
+            <motion.div variants={sectionVariants}>
+              <div
+                className={`flex justify-between items-center rounded-lg p-4 ${sectionBgClasses.description} mb-4`}
+                onClick={() =>
+                  setshowCategories({
+                    ...showCategories,
+                    description: !showCategories.description,
+                  })
+                }
               >
-                <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                  <div className="w-full">
-                    <label className="block text-sm font-medium text-gray-300 mt-3 mb-2">
-                      Who do you want?
-                    </label>
-                    <select
-                      onChange={handleBussinessChange}
-                      value={bussinesscat || ""}
-                      className="w-full text-sm sm:text-base bg-gray-700/50 border border-gray-600 text-gray-100 h-12 rounded-lg px-4 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                    >
-                      {" "}
-                      <option value="" className="bg-gray-800">
-                        Select category
-                      </option>
-                      <option value="full" className="bg-gray-800">
-                        Full Band
-                      </option>
-                      <option value="personal" className="bg-gray-800">
-                        Individual
-                      </option>
-                      <option value="other" className="bg-gray-800">
-                        Create your own band
-                      </option>
-                      <option value="mc" className="bg-gray-800">
-                        MC
-                      </option>
-                      <option value="dj" className="bg-gray-800">
-                        DJ
-                      </option>
-                      <option value="vocalist" className="bg-gray-800">
-                        Vocalist
-                      </option>
-                    </select>
-                  </div>
+                <div className="flex items-center gap-3">
+                  <FileText className="text-amber-400" size={18} />
+                  <h3 className="text-gray-200 font-medium">Description</h3>
                 </div>
+                <Info className="text-gray-400" size={16} />
+              </div>
 
-                {/* Talent Preview */}
-
-                {!show &&
-                  (gigInputs.mcType ||
-                    gigInputs.djGenre ||
-                    gigInputs.vocalistGenre?.length) && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50 relative"
-                    >
-                      <div className="flex justify-between items-center mb-3">
-                        <div className="flex items-center gap-2">
-                          <Music className="text-amber-400" size={18} />
-                          <h3 className="text-gray-200 font-medium">
-                            Talent Details
-                          </h3>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-amber-400 hover:bg-gray-700/50"
-                          onClick={() => {
-                            const type = gigInputs.mcType
-                              ? "mc"
-                              : gigInputs.djGenre
-                              ? "dj"
-                              : gigInputs.vocalistGenre?.length
-                              ? "vocalist"
-                              : null;
-                            if (type) {
-                              setActiveTalentType(type);
-                              setShowTalentModal(true);
-                            }
-                          }}
-                        >
-                          <Edit size={14} className="mr-1" /> Edit
-                        </Button>
-                      </div>
-
-                      <div className="space-y-3">
-                        {gigInputs.mcType && (
-                          <div className="flex flex-col gap-1">
-                            <div className="flex gap-2 items-center">
-                              <span className="text-gray-400 text-sm flex items-center gap-1">
-                                <Mic size={14} /> MC Type:
-                              </span>
-                              <Badge
-                                variant="outline"
-                                className="text-amber-400 border-amber-400/30"
-                              >
-                                {gigInputs.mcType}
-                              </Badge>
-                            </div>
-                          </div>
-                        )}
-
-                        {gigInputs.djGenre && (
-                          <div className="flex flex-col gap-1">
-                            <div className="flex gap-2 items-center">
-                              <span className="text-gray-400 text-sm flex items-center gap-1">
-                                <Disc size={14} /> DJ Genre:
-                              </span>
-                              <Badge
-                                variant="outline"
-                                className="text-blue-400 border-blue-400/30"
-                              >
-                                {gigInputs.djGenre}
-                              </Badge>
-                            </div>
-                          </div>
-                        )}
-
-                        {gigInputs.vocalistGenre?.length && (
-                          <div className="flex flex-col gap-1">
-                            <div className="flex gap-2 items-center">
-                              <span className="text-gray-400 text-sm flex items-center gap-1">
-                                <Mic size={14} /> Vocalist Genres:
-                              </span>
-                              <div className="flex flex-wrap gap-1">
-                                {gigInputs.vocalistGenre.map((genre) => (
-                                  <Badge
-                                    key={genre}
-                                    variant="outline"
-                                    className="text-purple-400 border-purple-400/30"
-                                  >
-                                    {genre}
-                                  </Badge>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                      <span
-                        className="text-white text-[16px] absolute right-3 top-1 cursor-pointer"
-                        onClick={() => setShow(true)}
-                      >
-                        &times;
-                      </span>
-                    </motion.div>
-                  )}
-              </motion.div>
-              <motion.div
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.98 }}
-                className="w-full md:w-auto  mt-0 flex justify-between item"
-              >
-                <Button
-                  onClick={() => setShowCustomization(true)}
-                  type="button"
-                  variant="outline"
-                  className="flex items-center gap-2 bg-gradient-to-r from-purple-600/30 to-blue-600/30 border border-purple-500/30 text-white hover:bg-purple-700/40 hover:border-purple-400/50 transition-all"
-                >
-                  <span className="text-xs md:text-sm">Customize Gig Card</span>
-                </Button>
-                {show && (
-                  <div
-                    className="p-2 h-[20px] text-neutral-400 text-[11px] bg-gray-200 w-fit flex justify-center items-center rounded-xl cursor-pointer"
-                    onClick={() => setShow(false)}
+              <AnimatePresence>
+                {showCategories.description && (
+                  <motion.div
+                    initial={{ maxHeight: 0, opacity: 0 }}
+                    animate={{
+                      maxHeight: 300, // Larger for textarea
+                      opacity: 1,
+                    }}
+                    exit={{ maxHeight: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="overflow-hidden bg-gray-800/30 rounded-b-lg border border-gray-700/50 border-t-0"
                   >
-                    Show Data
-                  </div>
-                )}
-              </motion.div>
-              {/* Title Section */}
-              <motion.div variants={sectionVariants}>
-                <div
-                  className={`flex justify-between items-center rounded-lg p-4 ${sectionBgClasses.title} mb-4`}
-                  onClick={() =>
-                    setshowCategories({
-                      ...showCategories,
-                      title: !showCategories.title,
-                    })
-                  }
-                >
-                  <div className="flex items-center gap-3  ">
-                    <Type className="text-amber-400" size={18} />
-                    <h3 className="text-gray-200 font-medium">
-                      Title Information
-                    </h3>
-                  </div>
-                  <FaComment className="text-gray-400" size={16} />
-                </div>
-
-                <AnimatePresence>
-                  {showCategories.title && (
-                    <motion.div
-                      initial={{ maxHeight: 0, opacity: 0 }}
-                      animate={{
-                        maxHeight: 200, // Enough for title fields
-                        opacity: 1,
-                      }}
-                      exit={{ maxHeight: 0, opacity: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="overflow-hidden bg-gray-800/30 rounded-b-lg border border-gray-700/50 border-t-0"
-                    >
-                      <div className="p-4 space-y-4">
-                        <div className="relative">
-                          <Lock
-                            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                            size={16}
-                          />
-                          <input
-                            onChange={handleInputChange}
-                            name="secret"
-                            value={gigInputs?.secret}
-                            type={!secretpass ? "password" : "text"}
-                            placeholder="Enter secret passphrase (optional)"
-                            className="w-full pl-10 pr-10 bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setSecretPass(!secretpass)}
-                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300"
+                    <div className="p-4">
+                      <motion.div variants={inputVariants} whileFocus="focus">
+                        <Textarea
+                          onChange={handleInputChange}
+                          name="description"
+                          value={gigInputs?.description}
+                          className={cn(
+                            "w-full bg-gray-700/50 text-gray-100 min-h-[120px] rounded-lg border border-gray-600 p-3 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all",
+                            fieldErrors.description
+                              ? "border-red-500/50 focus:ring-red-500/50"
+                              : ""
+                          )}
+                          placeholder="Describe your gig in detail (e.g., type of music, event vibe, special requirements)"
+                        />
+                        {fieldErrors.description && (
+                          <motion.p
+                            initial={{ opacity: 0, y: -5 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="text-red-400 text-xs mt-1 pl-2"
                           >
-                            {secretpass ? (
-                              <EyeOff size={18} />
-                            ) : (
-                              <EyeIcon size={18} />
-                            )}
-                          </button>
-                        </div>
+                            {fieldErrors.description}
+                          </motion.p>
+                        )}
+                      </motion.div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
 
-                        <div>
+            {/* Business Information Section */}
+            <motion.div variants={sectionVariants}>
+              <div
+                className={`flex justify-between items-center rounded-lg p-4 ${sectionBgClasses.business} mb-4`}
+                onClick={() =>
+                  setshowCategories({
+                    ...showCategories,
+                    business: !showCategories.business,
+                  })
+                }
+              >
+                <div className="flex items-center gap-3">
+                  <Briefcase className="text-amber-400" size={18} />
+                  <h3 className="text-gray-200 font-medium">
+                    Business Information
+                  </h3>
+                </div>
+                <Info className="text-gray-400" size={16} />
+              </div>
+
+              <AnimatePresence>
+                {showCategories.business && (
+                  <motion.div
+                    initial={{ maxHeight: 0, opacity: 0 }}
+                    animate={{
+                      maxHeight: 240, // Largest section
+                      opacity: 1,
+                    }}
+                    exit={{ maxHeight: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="overflow-y-auto bg-gray-800/30 rounded-b-lg border border-gray-700/50 border-t-0"
+                  >
+                    <div className="p-4 space-y-4">
+                      <div>
+                        <label className="block text-sm text-gray-400 mb-1">
+                          Contact Information
+                        </label>
+                        <div className="flex items-center bg-gray-700/50 rounded-lg border border-gray-600 px-3">
+                          <Phone className="text-gray-400 mr-2" size={16} />
                           <motion.input
                             variants={inputVariants}
                             whileFocus="focus"
-                            onChange={handleInputChange}
-                            name="title"
-                            value={gigInputs?.title}
                             type="text"
-                            placeholder="Enter a captivating title for your gig"
+                            placeholder="Your phone number"
                             className={cn(
-                              "w-full bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-4 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all",
-                              fieldErrors.title
-                                ? "border-red-500/50 focus:ring-red-500/50"
-                                : ""
+                              "w-full bg-transparent text-gray-100 h-12 focus:outline-none",
+                              fieldErrors.phoneNo ? "border-red-500/50" : ""
                             )}
-                          />
-                          {fieldErrors.title && (
-                            <motion.p
-                              initial={{ opacity: 0, y: -5 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              className="text-red-400 text-xs mt-1 pl-2"
-                            >
-                              {fieldErrors.title}
-                            </motion.p>
-                          )}
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-
-              {/* Description Section */}
-              <motion.div variants={sectionVariants}>
-                <div
-                  className={`flex justify-between items-center rounded-lg p-4 ${sectionBgClasses.description} mb-4`}
-                  onClick={() =>
-                    setshowCategories({
-                      ...showCategories,
-                      description: !showCategories.description,
-                    })
-                  }
-                >
-                  <div className="flex items-center gap-3">
-                    <FileText className="text-amber-400" size={18} />
-                    <h3 className="text-gray-200 font-medium">Description</h3>
-                  </div>
-                  <Info className="text-gray-400" size={16} />
-                </div>
-
-                <AnimatePresence>
-                  {showCategories.description && (
-                    <motion.div
-                      initial={{ maxHeight: 0, opacity: 0 }}
-                      animate={{
-                        maxHeight: 300, // Larger for textarea
-                        opacity: 1,
-                      }}
-                      exit={{ maxHeight: 0, opacity: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="overflow-hidden bg-gray-800/30 rounded-b-lg border border-gray-700/50 border-t-0"
-                    >
-                      <div className="p-4">
-                        <motion.div variants={inputVariants} whileFocus="focus">
-                          <Textarea
                             onChange={handleInputChange}
-                            name="description"
-                            value={gigInputs?.description}
-                            className={cn(
-                              "w-full bg-gray-700/50 text-gray-100 min-h-[120px] rounded-lg border border-gray-600 p-3 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all",
-                              fieldErrors.description
-                                ? "border-red-500/50 focus:ring-red-500/50"
-                                : ""
-                            )}
-                            placeholder="Describe your gig in detail (e.g., type of music, event vibe, special requirements)"
+                            name="phoneNo"
+                            value={gigInputs?.phoneNo}
                           />
-                          {fieldErrors.description && (
-                            <motion.p
-                              initial={{ opacity: 0, y: -5 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              className="text-red-400 text-xs mt-1 pl-2"
-                            >
-                              {fieldErrors.description}
-                            </motion.p>
-                          )}
-                        </motion.div>
+                        </div>
+                        {fieldErrors.phoneNo && (
+                          <motion.p
+                            initial={{ opacity: 0, y: -5 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="text-red-400 text-xs mt-1 pl-2"
+                          >
+                            {fieldErrors.phoneNo}
+                          </motion.p>
+                        )}
                       </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
 
-              {/* Business Information Section */}
-              <motion.div variants={sectionVariants}>
-                <div
-                  className={`flex justify-between items-center rounded-lg p-4 ${sectionBgClasses.business} mb-4`}
-                  onClick={() =>
-                    setshowCategories({
-                      ...showCategories,
-                      business: !showCategories.business,
-                    })
-                  }
-                >
-                  <div className="flex items-center gap-3">
-                    <Briefcase className="text-amber-400" size={18} />
-                    <h3 className="text-gray-200 font-medium">
-                      Business Information
-                    </h3>
-                  </div>
-                  <Info className="text-gray-400" size={16} />
-                </div>
-
-                <AnimatePresence>
-                  {showCategories.business && (
-                    <motion.div
-                      initial={{ maxHeight: 0, opacity: 0 }}
-                      animate={{
-                        maxHeight: 240, // Largest section
-                        opacity: 1,
-                      }}
-                      exit={{ maxHeight: 0, opacity: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="overflow-y-auto bg-gray-800/30 rounded-b-lg border border-gray-700/50 border-t-0"
-                    >
-                      <div className="p-4 space-y-4">
-                        <div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="col-span-1">
                           <label className="block text-sm text-gray-400 mb-1">
-                            Contact Information
+                            Currency
                           </label>
-                          <div className="flex items-center bg-gray-700/50 rounded-lg border border-gray-600 px-3">
-                            <Phone className="text-gray-400 mr-2" size={16} />
+                          <select
+                            onChange={(e) => {
+                              setGigs((prev) => ({
+                                ...prev,
+                                currency: e.target.value,
+                              }));
+                            }}
+                            value={gigInputs.currency || "USD"}
+                            className="w-full bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-3 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                          >
+                            <option value="USD">USD ($)</option>
+                            <option value="EUR">EUR (€)</option>
+                            <option value="GBP">GBP (£)</option>
+                            <option value="KES">KES (KSh)</option>
+                            <option value="NGN">NGN (₦)</option>
+                          </select>
+                        </div>
+
+                        <div className="col-span-1">
+                          <label className="block text-sm text-gray-400 mb-1">
+                            Price
+                          </label>
+                          <div className="relative">
+                            <DollarSign
+                              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                              size={16}
+                            />
                             <motion.input
                               variants={inputVariants}
                               whileFocus="focus"
-                              type="text"
-                              placeholder="Your phone number"
+                              type="number"
+                              placeholder="Amount"
                               className={cn(
-                                "w-full bg-transparent text-gray-100 h-12 focus:outline-none",
-                                fieldErrors.phoneNo ? "border-red-500/50" : ""
+                                "w-full bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 pl-10 pr-3 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent",
+                                fieldErrors.price
+                                  ? "border-red-500/50 focus:ring-red-500/50"
+                                  : ""
                               )}
                               onChange={handleInputChange}
-                              name="phoneNo"
-                              value={gigInputs?.phoneNo}
+                              name="price"
+                              value={gigInputs?.price}
+                              min="0"
                             />
                           </div>
-                          {fieldErrors.phoneNo && (
-                            <motion.p
-                              initial={{ opacity: 0, y: -5 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              className="text-red-400 text-xs mt-1 pl-2"
-                            >
-                              {fieldErrors.phoneNo}
-                            </motion.p>
-                          )}
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div className="col-span-1">
-                            <label className="block text-sm text-gray-400 mb-1">
-                              Currency
-                            </label>
-                            <select
-                              onChange={(e) => {
-                                setGigs((prev) => ({
-                                  ...prev,
-                                  currency: e.target.value,
-                                }));
-                              }}
-                              value={gigInputs.currency || "USD"}
-                              className="w-full bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-3 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                            >
-                              <option value="USD">USD ($)</option>
-                              <option value="EUR">EUR (€)</option>
-                              <option value="GBP">GBP (£)</option>
-                              <option value="KES">KES (KSh)</option>
-                              <option value="NGN">NGN (₦)</option>
-                            </select>
-                          </div>
-
-                          <div className="col-span-1">
-                            <label className="block text-sm text-gray-400 mb-1">
-                              Price
-                            </label>
-                            <div className="relative">
-                              <DollarSign
-                                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                                size={16}
-                              />
-                              <motion.input
-                                variants={inputVariants}
-                                whileFocus="focus"
-                                type="number"
-                                placeholder="Amount"
-                                className={cn(
-                                  "w-full bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 pl-10 pr-3 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent",
-                                  fieldErrors.price
-                                    ? "border-red-500/50 focus:ring-red-500/50"
-                                    : ""
-                                )}
-                                onChange={handleInputChange}
-                                name="price"
-                                value={gigInputs?.price}
-                                min="0"
-                              />
-                            </div>
-                          </div>
-
-                          <div className="col-span-1">
-                            <label className="block text-sm text-gray-400 mb-1">
-                              Price Range
-                            </label>
-                            <select
-                              onChange={handleInputChange}
-                              name="pricerange"
-                              value={gigInputs?.pricerange}
-                              className="w-full bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-3 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                            >
-                              <option value="0">Select range</option>
-                              <option value="hundreds">Hundreds (00)</option>
-                              <option value="thousands">Thousands (000)</option>
-                              <option value="tensofthousands">
-                                Tens of thousands (0000)
-                              </option>
-                              <option value="hundredsofthousands">
-                                Hundreds of thousands (00000)
-                              </option>
-                              <option value="millions">
-                                Millions (000000)
-                              </option>
-                            </select>
-                          </div>
-                        </div>
-
-                        {(gigInputs?.price ||
-                          gigInputs?.pricerange !== "0") && (
-                          <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="bg-gray-700/20 rounded-lg p-3 border border-gray-600/30"
+                        <div className="col-span-1">
+                          <label className="block text-sm text-gray-400 mb-1">
+                            Price Range
+                          </label>
+                          <select
+                            onChange={handleInputChange}
+                            name="pricerange"
+                            value={gigInputs?.pricerange}
+                            className="w-full bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-3 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                           >
-                            <div className="flex items-center gap-2 text-sm text-gray-300">
-                              <span className="font-medium">
-                                Estimated Price:
-                              </span>
-                              <span>
-                                {gigInputs?.price &&
-                                gigInputs?.pricerange !== "0" ? (
-                                  <>
-                                    {gigInputs.currency === "USD" && "$"}
-                                    {gigInputs.currency === "EUR" && "€"}
-                                    {gigInputs.currency === "GBP" && "£"}
-                                    {gigInputs.currency === "KES" && "KSh"}
-                                    {gigInputs.currency === "NGN" && "₦"}
-                                    {gigInputs.price} - {gigInputs.pricerange}
-                                  </>
-                                ) : gigInputs?.price ? (
-                                  <>
-                                    Fixed price:
-                                    {gigInputs.currency === "USD" && "$"}
-                                    {gigInputs.currency === "EUR" && "€"}
-                                    {gigInputs.currency === "GBP" && "£"}
-                                    {gigInputs.currency === "KES" && "KSh"}
-                                    {gigInputs.currency === "NGN" && "₦"}
-                                    {gigInputs.price}
-                                  </>
-                                ) : (
-                                  <span>
-                                    Price magnitude: {gigInputs.pricerange}
-                                  </span>
-                                )}
-                              </span>
-                            </div>
-                          </motion.div>
-                        )}
+                            <option value="0">Select range</option>
+                            <option value="hundreds">Hundreds (00)</option>
+                            <option value="thousands">Thousands (000)</option>
+                            <option value="tensofthousands">
+                              Tens of thousands (0000)
+                            </option>
+                            <option value="hundredsofthousands">
+                              Hundreds of thousands (00000)
+                            </option>
+                            <option value="millions">Millions (000000)</option>
+                          </select>
+                        </div>
                       </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
 
-              {/* Gig Timeline Section */}
+                      {(gigInputs?.price || gigInputs?.pricerange !== "0") && (
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="bg-gray-700/20 rounded-lg p-3 border border-gray-600/30"
+                        >
+                          <div className="flex items-center gap-2 text-sm text-gray-300">
+                            <span className="font-medium">
+                              Estimated Price:
+                            </span>
+                            <span>
+                              {gigInputs?.price &&
+                              gigInputs?.pricerange !== "0" ? (
+                                <>
+                                  {gigInputs.currency === "USD" && "$"}
+                                  {gigInputs.currency === "EUR" && "€"}
+                                  {gigInputs.currency === "GBP" && "£"}
+                                  {gigInputs.currency === "KES" && "KSh"}
+                                  {gigInputs.currency === "NGN" && "₦"}
+                                  {gigInputs.price} - {gigInputs.pricerange}
+                                </>
+                              ) : gigInputs?.price ? (
+                                <>
+                                  Fixed price:
+                                  {gigInputs.currency === "USD" && "$"}
+                                  {gigInputs.currency === "EUR" && "€"}
+                                  {gigInputs.currency === "GBP" && "£"}
+                                  {gigInputs.currency === "KES" && "KSh"}
+                                  {gigInputs.currency === "NGN" && "₦"}
+                                  {gigInputs.price}
+                                </>
+                              ) : (
+                                <span>
+                                  Price magnitude: {gigInputs.pricerange}
+                                </span>
+                              )}
+                            </span>
+                          </div>
+                        </motion.div>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+
+            {/* Gig Timeline Section */}
+            <motion.div variants={sectionVariants}>
+              <div
+                className={`flex justify-between items-center rounded-lg p-4 ${sectionBgClasses.timeline} mb-4`}
+                onClick={() =>
+                  setshowCategories({
+                    ...showCategories,
+                    gtimeline: !showCategories.gtimeline,
+                  })
+                }
+              >
+                <div className="flex items-center gap-3">
+                  <Clock className="text-amber-400" size={18} />
+                  <h3 className="text-gray-200 font-medium">Gig Timeline</h3>
+                </div>
+                <Calendar className="text-gray-400" size={16} />
+              </div>
+
+              <AnimatePresence>
+                {showCategories.gtimeline && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{
+                      height: 200, // Largest section
+                      opacity: 1,
+                    }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="overflow-y-scroll bg-gray-800/30 rounded-b-lg border border-gray-700/50 border-t-0"
+                  >
+                    <div className="p-4 space-y-4">
+                      <div className="flex items-center bg-gray-700/50 rounded-lg border border-gray-600 px-3">
+                        <MapPin className="text-gray-400 mr-2" size={16} />
+                        <motion.input
+                          variants={inputVariants}
+                          whileFocus="focus"
+                          type="text"
+                          placeholder="Location or venue"
+                          className={cn(
+                            "w-full bg-transparent text-gray-100 h-12 focus:outline-none",
+                            fieldErrors.location ? "border-red-500/50" : ""
+                          )}
+                          onChange={handleInputChange}
+                          name="location"
+                          value={gigInputs?.location}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm text-gray-400 mb-1">
+                            Gig Type
+                          </label>
+                          <select
+                            onChange={handleInputChange}
+                            name="gigtimeline"
+                            value={gigInputs.gigtimeline}
+                            className="w-full bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-3 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                          >
+                            <option value="">Select timeline</option>
+                            <option value="once">One-time event</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="other">Other...</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm text-gray-400 mb-1">
+                            Day of Week
+                          </label>
+                          <select
+                            className="w-full bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-3 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                            value={gigInputs?.day}
+                            onChange={handleInputChange}
+                            name="day"
+                          >
+                            {days().map((i) => (
+                              <option
+                                key={i?.id}
+                                value={i.val}
+                                className="bg-gray-800"
+                              >
+                                {i?.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+
+                      {gigInputs?.gigtimeline === "other" && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                        >
+                          <input
+                            type="text"
+                            placeholder="Describe your custom timeline info"
+                            className="w-full bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-4 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                            onChange={handleInputChange}
+                            name="otherTimeline"
+                            value={gigInputs?.otherTimeline}
+                          />
+                        </motion.div>
+                      )}
+
+                      {gigInputs?.gigtimeline === "once" && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                        >
+                          <label className="block text-sm text-gray-400 mb-1">
+                            Event Date
+                          </label>
+                          <DatePicker
+                            selected={selectedDate}
+                            onChange={handleDate}
+                            minDate={minDate}
+                            maxDate={maxDate}
+                            className="w-full bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-4 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                            placeholderText="Select date"
+                            isClearable
+                          />
+                        </motion.div>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+
+            {/* Duration Section */}
+            <motion.div variants={sectionVariants}>
+              {showduration ? (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  className={`flex justify-between items-center rounded-lg p-4 ${sectionBgClasses.duration} mb-4`}
+                >
+                  <div className="p-4">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-gray-200 font-medium flex items-center gap-2">
+                        <Clock className="text-amber-400" size={18} />
+                        Set Duration
+                      </h3>
+                      <button
+                        onClick={() => setshowduration(false)}
+                        className="text-gray-400 hover:text-gray-200 transition-colors"
+                      >
+                        &times;
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm text-gray-400 mb-1">
+                          Start Time
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            placeholder="Time (e.g., 10)"
+                            className="w-full bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-4 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                            onChange={handleInputChange}
+                            name="start"
+                            value={gigInputs?.start}
+                          />
+                          <select
+                            onChange={handleInputChange}
+                            name="durationfrom"
+                            value={gigInputs?.durationfrom}
+                            className="w-20 bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-2 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                          >
+                            <option value="pm">PM</option>
+                            <option value="am">AM</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm text-gray-400 mb-1">
+                          End Time
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            placeholder="Time (e.g., 10)"
+                            className="w-full bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-4 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                            onChange={handleInputChange}
+                            name="end"
+                            value={gigInputs?.end}
+                          />
+                          <select
+                            onChange={handleInputChange}
+                            name="durationto"
+                            value={gigInputs?.durationto}
+                            className="w-20 bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-2 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                          >
+                            <option value="pm">PM</option>
+                            <option value="am">AM</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ) : (
+                <div
+                  onClick={() => setshowduration(true)}
+                  className={`flex justify-between items-center rounded-lg p-4 ${sectionBgClasses.duration} mb-4`}
+                >
+                  <h3 className="text-gray-200 font-medium flex items-center gap-2">
+                    <Clock className="text-amber-400" size={18} />
+                    Add Duration
+                  </h3>
+                  <ArrowDown01Icon className="text-gray-400" size={18} />
+                </div>
+              )}
+            </motion.div>
+            {/* Band Setup Section */}
+            {bussinesscat === "other" && (
               <motion.div variants={sectionVariants}>
                 <div
                   className={`flex justify-between items-center rounded-lg p-4 ${sectionBgClasses.timeline} mb-4`}
                   onClick={() =>
                     setshowCategories({
                       ...showCategories,
-                      gtimeline: !showCategories.gtimeline,
+                      othergig: !showCategories.othergig,
                     })
                   }
                 >
-                  <div className="flex items-center gap-3">
-                    <Clock className="text-amber-400" size={18} />
-                    <h3 className="text-gray-200 font-medium">Gig Timeline</h3>
-                  </div>
-                  <Calendar className="text-gray-400" size={16} />
+                  <h3 className="text-gray-200 font-medium flex items-center gap-2">
+                    <Users className="text-amber-400" size={18} />
+                    Band Setup
+                  </h3>
+                  {showCategories.othergig ? (
+                    <ArrowDown className="text-gray-400" size={18} />
+                  ) : (
+                    <ArrowUp className="text-gray-400" size={18} />
+                  )}
                 </div>
 
                 <AnimatePresence>
-                  {showCategories.gtimeline && (
+                  {!showCategories.othergig && (
                     <motion.div
                       initial={{ height: 0, opacity: 0 }}
-                      animate={{
-                        height: 200, // Largest section
-                        opacity: 1,
-                      }}
+                      animate={{ maxHeight: 500, opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.3 }}
-                      className="overflow-y-scroll bg-gray-800/30 rounded-b-lg border border-gray-700/50 border-t-0"
+                      className="overflow-hidden bg-gray-800/30 rounded-b-lg border border-gray-700/50 border-t-0"
                     >
-                      <div className="p-4 space-y-4">
-                        <div className="flex items-center bg-gray-700/50 rounded-lg border border-gray-600 px-3">
-                          <MapPin className="text-gray-400 mr-2" size={16} />
-                          <motion.input
-                            variants={inputVariants}
-                            whileFocus="focus"
-                            type="text"
-                            placeholder="Location or venue"
-                            className={cn(
-                              "w-full bg-transparent text-gray-100 h-12 focus:outline-none",
-                              fieldErrors.location ? "border-red-500/50" : ""
-                            )}
-                            onChange={handleInputChange}
-                            name="location"
-                            value={gigInputs?.location}
-                          />
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-sm text-gray-400 mb-1">
-                              Gig Type
-                            </label>
-                            <select
-                              onChange={handleInputChange}
-                              name="gigtimeline"
-                              value={gigInputs.gigtimeline}
-                              className="w-full bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-3 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                      <div className="p-4">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                          {[
+                            "vocalist",
+                            "piano",
+                            "sax",
+                            "guitar",
+                            "drums",
+                            "bass",
+                          ].map((item) => (
+                            <motion.div
+                              key={item}
+                              whileHover={{ scale: 1.03 }}
+                              className="flex items-center space-x-2 bg-gray-700/30 hover:bg-gray-700/50 rounded-lg p-2 transition-colors"
                             >
-                              <option value="">Select timeline</option>
-                              <option value="once">One-time event</option>
-                              <option value="weekly">Weekly</option>
-                              <option value="other">Other...</option>
-                            </select>
-                          </div>
-
-                          <div>
-                            <label className="block text-sm text-gray-400 mb-1">
-                              Day of Week
-                            </label>
-                            <select
-                              className="w-full bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-3 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                              value={gigInputs?.day}
-                              onChange={handleInputChange}
-                              name="day"
-                            >
-                              {days().map((i) => (
-                                <option
-                                  key={i?.id}
-                                  value={i.val}
-                                  className="bg-gray-800"
-                                >
-                                  {i?.name}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
+                              <input
+                                onChange={handleChange}
+                                type="checkbox"
+                                id={item}
+                                name={item}
+                                value={item}
+                                checked={userinfo.prefferences.includes(item)}
+                                className="accent-amber-500"
+                              />
+                              <label
+                                htmlFor={item}
+                                className="text-gray-300 text-sm capitalize cursor-pointer"
+                              >
+                                {item === "sax"
+                                  ? "Saxophone"
+                                  : item === "drums"
+                                  ? "Drummer"
+                                  : item === "bass"
+                                  ? "Bass Guitar"
+                                  : item}
+                              </label>
+                            </motion.div>
+                          ))}
                         </div>
-
-                        {gigInputs?.gigtimeline === "other" && (
-                          <motion.div
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                          >
-                            <input
-                              type="text"
-                              placeholder="Describe your custom timeline info"
-                              className="w-full bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-4 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                              onChange={handleInputChange}
-                              name="otherTimeline"
-                              value={gigInputs?.otherTimeline}
-                            />
-                          </motion.div>
-                        )}
-
-                        {gigInputs?.gigtimeline === "once" && (
-                          <motion.div
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                          >
-                            <label className="block text-sm text-gray-400 mb-1">
-                              Event Date
-                            </label>
-                            <DatePicker
-                              selected={selectedDate}
-                              onChange={handleDate}
-                              minDate={minDate}
-                              maxDate={maxDate}
-                              className="w-full bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-4 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                              placeholderText="Select date"
-                              isClearable
-                            />
-                          </motion.div>
-                        )}
                       </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
               </motion.div>
-
-              {/* Duration Section */}
-              <motion.div variants={sectionVariants}>
-                {showduration ? (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    className={`flex justify-between items-center rounded-lg p-4 ${sectionBgClasses.duration} mb-4`}
-                  >
-                    <div className="p-4">
-                      <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-gray-200 font-medium flex items-center gap-2">
-                          <Clock className="text-amber-400" size={18} />
-                          Set Duration
-                        </h3>
-                        <button
-                          onClick={() => setshowduration(false)}
-                          className="text-gray-400 hover:text-gray-200 transition-colors"
-                        >
-                          &times;
-                        </button>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm text-gray-400 mb-1">
-                            Start Time
-                          </label>
-                          <div className="flex gap-2">
-                            <input
-                              type="text"
-                              placeholder="Time (e.g., 10)"
-                              className="w-full bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-4 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                              onChange={handleInputChange}
-                              name="start"
-                              value={gigInputs?.start}
-                            />
-                            <select
-                              onChange={handleInputChange}
-                              name="durationfrom"
-                              value={gigInputs?.durationfrom}
-                              className="w-20 bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-2 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                            >
-                              <option value="pm">PM</option>
-                              <option value="am">AM</option>
-                            </select>
-                          </div>
-                        </div>
-
-                        <div>
-                          <label className="block text-sm text-gray-400 mb-1">
-                            End Time
-                          </label>
-                          <div className="flex gap-2">
-                            <input
-                              type="text"
-                              placeholder="Time (e.g., 10)"
-                              className="w-full bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-4 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                              onChange={handleInputChange}
-                              name="end"
-                              value={gigInputs?.end}
-                            />
-                            <select
-                              onChange={handleInputChange}
-                              name="durationto"
-                              value={gigInputs?.durationto}
-                              className="w-20 bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-2 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                            >
-                              <option value="pm">PM</option>
-                              <option value="am">AM</option>
-                            </select>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                ) : (
-                  <div
-                    onClick={() => setshowduration(true)}
-                    className={`flex justify-between items-center rounded-lg p-4 ${sectionBgClasses.duration} mb-4`}
-                  >
-                    <h3 className="text-gray-200 font-medium flex items-center gap-2">
-                      <Clock className="text-amber-400" size={18} />
-                      Add Duration
-                    </h3>
-                    <ArrowDown01Icon className="text-gray-400" size={18} />
-                  </div>
-                )}
-              </motion.div>
-              {/* Band Setup Section */}
-              {bussinesscat === "other" && (
-                <motion.div variants={sectionVariants}>
-                  <div
-                    className={`flex justify-between items-center rounded-lg p-4 ${sectionBgClasses.timeline} mb-4`}
-                    onClick={() =>
-                      setshowCategories({
-                        ...showCategories,
-                        othergig: !showCategories.othergig,
-                      })
-                    }
-                  >
-                    <h3 className="text-gray-200 font-medium flex items-center gap-2">
-                      <Users className="text-amber-400" size={18} />
-                      Band Setup
-                    </h3>
-                    {showCategories.othergig ? (
-                      <ArrowDown className="text-gray-400" size={18} />
-                    ) : (
-                      <ArrowUp className="text-gray-400" size={18} />
-                    )}
-                  </div>
-
-                  <AnimatePresence>
-                    {!showCategories.othergig && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ maxHeight: 500, opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="overflow-hidden bg-gray-800/30 rounded-b-lg border border-gray-700/50 border-t-0"
-                      >
-                        <div className="p-4">
-                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                            {[
-                              "vocalist",
-                              "piano",
-                              "sax",
-                              "guitar",
-                              "drums",
-                              "bass",
-                            ].map((item) => (
-                              <motion.div
-                                key={item}
-                                whileHover={{ scale: 1.03 }}
-                                className="flex items-center space-x-2 bg-gray-700/30 hover:bg-gray-700/50 rounded-lg p-2 transition-colors"
-                              >
-                                <input
-                                  onChange={handleChange}
-                                  type="checkbox"
-                                  id={item}
-                                  name={item}
-                                  value={item}
-                                  checked={userinfo.prefferences.includes(item)}
-                                  className="accent-amber-500"
-                                />
-                                <label
-                                  htmlFor={item}
-                                  className="text-gray-300 text-sm capitalize cursor-pointer"
-                                >
-                                  {item === "sax"
-                                    ? "Saxophone"
-                                    : item === "drums"
-                                    ? "Drummer"
-                                    : item === "bass"
-                                    ? "Bass Guitar"
-                                    : item}
-                                </label>
-                              </motion.div>
-                            ))}
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
-              )}
-
-              {/* Individual Instrument Selection */}
-              {bussinesscat === "personal" && (
-                <motion.div variants={sectionVariants}>
-                  <div className="flex items-center bg-gray-800/50 rounded-lg border border-gray-700/50 px-3">
-                    <Guitar className="text-gray-400 mr-2" size={18} />
-                    <select
-                      onChange={handleInputChange}
-                      name="category"
-                      value={gigInputs?.category}
-                      className="w-full bg-gray-700/50 text-gray-100 h-12 focus:outline-none"
-                    >
-                      <option value="">Select your instrument</option>
-                      <option value="piano">Piano</option>
-                      <option value="guitar">Guitar</option>
-                      <option value="bass">Bass Guitar</option>
-                      <option value="saxophone">Saxophone</option>
-                      <option value="violin">Violin</option>
-                      <option value="ukulele">Ukulele</option>
-                      <option value="harp">Harp</option>
-                      <option value="xylophone">Xylophone</option>
-                      <option value="cello">Cello</option>
-                      <option value="percussion">Percussion</option>
-                    </select>
-                  </div>
-                </motion.div>
-              )}
-
-              {/* Submit Button */}
-              <motion.div variants={sectionVariants} className="pt-6">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  type="button"
-                  onClick={() => setisSchedulerOpen(true)}
-                  className="w-full bg-gradient-to-r from-amber-500 to-orange-600 text-white font-medium py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all"
-                >
-                  Finalize & Schedule Gig
-                </motion.button>
-              </motion.div>
-            </motion.form>
-          </div>
-          {/* Modals */}
-          <AnimatePresence>
-            {showcustomization && (
-              <GigCustomization
-                customization={gigcustom}
-                setCustomization={setGigCustom}
-                closeModal={() => setShowCustomization(false)}
-                logo={imageUrl}
-                handleFileChange={handleFileChange}
-                isUploading={isUploading}
-              />
             )}
-          </AnimatePresence>
-          <AnimatePresence>
-            {activeTalentType && (
-              <TalentModal
-                isOpen={showTalentModal}
-                onClose={() => setShowTalentModal(false)}
-                talentType={activeTalentType}
-                onSubmit={handleTalentSubmit}
-                initialData={{
-                  ...(activeTalentType === "mc" && {
-                    mcType: gigInputs.mcType,
-                    mcLanguages: gigInputs.mcLanguages,
-                  }),
-                  ...(activeTalentType === "dj" && {
-                    djGenre: gigInputs.djGenre,
-                    djEquipment: gigInputs.djEquipment,
-                  }),
-                  ...(activeTalentType === "vocalist" && {
-                    vocalistGenre: gigInputs.vocalistGenre,
-                  }),
-                }}
-                errors={fieldErrors}
-                validateField={(field, value) => {
-                  // For the modal, we only validate the field value without businesscat
-                  switch (field) {
-                    case "mcType":
-                    case "mcLanguages":
-                      return !value ? `${field} is required` : "";
-                    case "djGenre":
-                    case "djEquipment":
-                      return !value ? `${field} is required` : "";
-                    case "vocalistGenre":
-                      return !value ||
-                        (Array.isArray(value) && value.length === 0)
-                        ? "At least one genre is required"
-                        : "";
-                    default:
-                      return "";
-                  }
-                }}
-              />
-            )}{" "}
-          </AnimatePresence>
-          <AnimatePresence>
-            <SchedulerComponent
-              getScheduleData={getSchedulingData}
-              isLoading={isLoading}
-              isSchedulerOpen={isSchedulerOpen}
-              setisSchedulerOpen={setisSchedulerOpen}
-              onSubmit={onSubmit}
+
+            {/* Individual Instrument Selection */}
+            {bussinesscat === "personal" && (
+              <motion.div variants={sectionVariants}>
+                <div className="flex items-center bg-gray-800/50 rounded-lg border border-gray-700/50 px-3">
+                  <Guitar className="text-gray-400 mr-2" size={18} />
+                  <select
+                    onChange={handleInputChange}
+                    name="category"
+                    value={gigInputs?.category}
+                    className="w-full bg-gray-700/50 text-gray-100 h-12 focus:outline-none"
+                  >
+                    <option value="">Select your instrument</option>
+                    <option value="piano">Piano</option>
+                    <option value="guitar">Guitar</option>
+                    <option value="bass">Bass Guitar</option>
+                    <option value="saxophone">Saxophone</option>
+                    <option value="violin">Violin</option>
+                    <option value="ukulele">Ukulele</option>
+                    <option value="harp">Harp</option>
+                    <option value="xylophone">Xylophone</option>
+                    <option value="cello">Cello</option>
+                    <option value="percussion">Percussion</option>
+                  </select>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Submit Button */}
+            <motion.div variants={sectionVariants} className="pt-6">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="button"
+                onClick={() => setisSchedulerOpen(true)}
+                className="w-full bg-gradient-to-r from-amber-500 to-orange-600 text-white font-medium py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all"
+              >
+                Finalize & Schedule Gig
+              </motion.button>
+            </motion.div>
+          </motion.form>
+        </div>
+        {/* Modals */}
+        <AnimatePresence>
+          {showcustomization && (
+            <GigCustomization
+              customization={gigcustom}
+              setCustomization={setGigCustom}
+              closeModal={() => setShowCustomization(false)}
+              logo={imageUrl}
+              handleFileChange={handleFileChange}
+              isUploading={isUploading}
             />
-          </AnimatePresence>
-        </DialogContent>
-      </Dialog>
-    </AnimatePresence>
+          )}
+        </AnimatePresence>
+        <AnimatePresence>
+          {activeTalentType && (
+            <TalentModal
+              isOpen={showTalentModal}
+              onClose={() => setShowTalentModal(false)}
+              talentType={activeTalentType}
+              onSubmit={handleTalentSubmit}
+              initialData={{
+                ...(activeTalentType === "mc" && {
+                  mcType: gigInputs.mcType,
+                  mcLanguages: gigInputs.mcLanguages,
+                }),
+                ...(activeTalentType === "dj" && {
+                  djGenre: gigInputs.djGenre,
+                  djEquipment: gigInputs.djEquipment,
+                }),
+                ...(activeTalentType === "vocalist" && {
+                  vocalistGenre: gigInputs.vocalistGenre,
+                }),
+              }}
+              errors={fieldErrors}
+              validateField={(field, value) => {
+                // For the modal, we only validate the field value without businesscat
+                switch (field) {
+                  case "mcType":
+                  case "mcLanguages":
+                    return !value ? `${field} is required` : "";
+                  case "djGenre":
+                  case "djEquipment":
+                    return !value ? `${field} is required` : "";
+                  case "vocalistGenre":
+                    return !value ||
+                      (Array.isArray(value) && value.length === 0)
+                      ? "At least one genre is required"
+                      : "";
+                  default:
+                    return "";
+                }
+              }}
+            />
+          )}{" "}
+        </AnimatePresence>
+        <AnimatePresence>
+          <SchedulerComponent
+            getScheduleData={getSchedulingData}
+            isLoading={isLoading}
+            isSchedulerOpen={isSchedulerOpen}
+            setisSchedulerOpen={setisSchedulerOpen}
+            onSubmit={onSubmit}
+          />
+        </AnimatePresence>
+      </DialogContent>
+    </Dialog>
   );
 };
 

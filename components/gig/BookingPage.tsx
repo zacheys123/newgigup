@@ -45,7 +45,14 @@ const BookingPage = ({ currentGig }: BookingProps) => {
       currentgig?.bookCount?.some((myuser) => myuser?._id !== user?.user?._id)
     ) {
     }
-  }, [currentgig?.isTaken, currentgig?.isPending]);
+  }, [
+    currentgig?.isTaken,
+    currentgig?.isPending,
+    currentgig?.bookCount,
+    user?.user?._id,
+    userId,
+    router,
+  ]);
   const postedByUser = currentgig?.postedBy;
 
   const [modal, setModal] = useState<{
@@ -105,7 +112,7 @@ const BookingPage = ({ currentGig }: BookingProps) => {
         socket.off("updateGigStatus");
       };
     }
-  }, [socket, currentgig, userId, router]);
+  }, [socket, currentgig, userId, router, user?.user?._id]);
 
   if (!currentgig?.title || !user?.user?.firstname) {
     return (
@@ -166,7 +173,7 @@ const BookingPage = ({ currentGig }: BookingProps) => {
         )}
 
         {/* Personal Info Card */}
-        <div className="min-h-[130px] w-[90%] mx-auto p-6 bg-gray-700 shadow-lg rounded-lg mb-6 transform transition-transform hover:scale-105 hover:shadow-xl border-l-4 border-yellow-400">
+        <div className="min-h-[110px] w-[90%] mx-auto p-3 bg-gray-700 shadow-lg rounded-lg mb-6 transform transition-transform hover:scale-105 hover:shadow-xl border-l-4 border-yellow-400">
           <h4 className="text-gray-300 text-sm font-semibold uppercase tracking-widest mb-4">
             Personal
           </h4>
@@ -211,7 +218,7 @@ const BookingPage = ({ currentGig }: BookingProps) => {
         </div>
 
         {/* Gig Info Card */}
-        <div className="min-h-[160px] w-[90%] mx-auto p-6 bg-gray-700 shadow-lg rounded-lg mb-6 animate-fade-in border-l-4 border-blue-400">
+        <div className="min-h-[90px] w-[90%] mx-auto p-3 bg-gray-700 shadow-lg rounded-lg mb-6 animate-fade-in border-l-4 border-blue-400">
           <h4 className="text-gray-300 text-sm font-semibold uppercase tracking-widest mb-4">
             Gig Info
           </h4>
@@ -227,7 +234,7 @@ const BookingPage = ({ currentGig }: BookingProps) => {
         </div>
 
         {/* Business Info Card */}
-        <div className="min-h-[160px] w-[90%] mx-auto p-6 bg-gray-700 shadow-lg rounded-lg mb-6 transform transition-transform hover:scale-105 hover:shadow-xl border-l-4 border-green-400">
+        <div className="min-h-[100px] w-[90%] mx-auto p-3 bg-gray-700 shadow-lg rounded-lg mb-6 transform transition-transform hover:scale-105 hover:shadow-xl border-l-4 border-green-400">
           <h4 className="text-gray-300 text-sm font-semibold uppercase tracking-widest mb-4">
             Business Info
           </h4>
@@ -245,7 +252,7 @@ const BookingPage = ({ currentGig }: BookingProps) => {
         </div>
 
         {/* More Info Card */}
-        <div className="min-h-[160px] w-[90%] mx-auto p-6 mb-[150px] bg-gray-700 shadow-lg rounded-lg animate-slide-in border-l-4 border-purple-400">
+        <div className="min-h-[130px] w-[90%] mx-auto p-3 mb-[150px] bg-gray-700 shadow-lg rounded-lg animate-slide-in border-l-4 border-purple-400">
           <h4 className="text-gray-300 text-sm font-semibold uppercase tracking-widest mb-4">
             More Info
           </h4>
