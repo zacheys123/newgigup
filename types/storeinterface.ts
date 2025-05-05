@@ -85,7 +85,7 @@ export const initialState = {
     price: "",
     category: "",
     bandCategory: [],
-    bussinesscat: "",
+    bussinesscat: null,
     location: "",
     date: new Date(),
     time: {},

@@ -34,6 +34,7 @@ export async function POST(req: NextRequest) {
       gigstatus: "true",
       message: "Validation Successful",
       gigId: mygig._id,
+      secret: mygig?.secret,
     });
   } catch (error) {
     console.error("Error validating gig:", error);

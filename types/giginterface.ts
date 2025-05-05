@@ -1,3 +1,4 @@
+import { BusinessCategory } from "@/components/gig/create/types";
 import { UserProps } from "./userinterfaces";
 
 export interface TimeProps {
@@ -16,7 +17,7 @@ export interface GigProps {
   price?: string;
   category?: string;
   bandCategory?: string[];
-  bussinesscat?: string;
+  bussinesscat?: BusinessCategory;
   location?: string;
   date?: Date;
   time?: TimeProps;

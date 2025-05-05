@@ -22,12 +22,108 @@ type Info = {
   fontColor: string;
   backgroundColor: string;
   logo: string;
-
   otherTimeline: string;
   gigtimeline: string;
   day: string;
+  mcType: string;
+  mcLanguages: string;
+  djGenre: string;
+  djEquipment: string;
+  vocalistGenre: string[];
+  pricerange: string;
+  currency: string;
+  isPending: boolean;
+  scheduleDate: Date;
 };
+export class GigValidator {
+  private data: Partial<Info>;
+  private businessCategory: string;
+  private gigTimeline: string;
 
+  constructor(data: Partial<Info>) {
+    this.data = data;
+    this.businessCategory = this.data.bussinesscat || "";
+    this.gigTimeline = this.data.gigtimeline || "";
+  }
+
+  validateRequiredFields(): NextResponse | null {
+    const requiredFields = [
+      { field: "logo", message: "Logo is required" },
+      { field: "title", message: "Title is required" },
+      { field: "description", message: "Description is required" },
+      { field: "phoneNo", message: "Phone number is required" },
+      { field: "price", message: "Price is required" },
+      { field: "location", message: "Location is required" },
+      { field: "to", message: "To date is required" },
+      { field: "from", message: "From date is required" },
+      { field: "bussinesscat", message: "Business category is required" },
+      { field: "secret", message: "Secret is required" },
+      { field: "gigtimeline", message: "Gig timeline is required" },
+      { field: "currency", message: "Currency is required" },
+      { field: "pricerange", message: "Price Range is required" },
+    ];
+
+    for (const { field, message } of requiredFields) {
+      if (!this.data[field as keyof Info]) {
+        return this.createErrorResponse(message);
+      }
+    }
+
+    return null;
+  }
+
+  validateConditionalFields(): NextResponse | null {
+    // Validate day field based on gig timeline
+    if (
+      (this.gigTimeline === "weekly" || this.gigTimeline === "other") &&
+      !this.data.day
+    ) {
+      return this.createErrorResponse("Day is required");
+    }
+
+    // Validate business category specific fields
+    switch (this.businessCategory) {
+      case "vocalist":
+        if (!this.data.vocalistGenre || this.data.vocalistGenre.length === 0) {
+          return this.createErrorResponse("Vocalist Genre is required");
+        }
+        break;
+      case "mc":
+        if (!this.data.mcType || !this.data.mcLanguages) {
+          return this.createErrorResponse("Emcee data is required");
+        }
+        break;
+      case "dj":
+        if (!this.data.djGenre || !this.data.djEquipment) {
+          return this.createErrorResponse("DJ data is required");
+        }
+        break;
+    }
+
+    return null;
+  }
+
+  validateCategoryExclusivity(): NextResponse | null {
+    if (
+      this.data.category &&
+      this.data.bandCategory &&
+      this.data.bandCategory.length > 0
+    ) {
+      return this.createErrorResponse(
+        "Cannot submit both individual and band category, choose one",
+        400
+      );
+    }
+    return null;
+  }
+
+  private createErrorResponse(
+    message: string,
+    status: number = 200
+  ): NextResponse {
+    return NextResponse.json({ gigstatus: "false", message }, { status });
+  }
+}
 export async function PUT(req: NextRequest) {
   const searchUrl = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
 
@@ -35,14 +131,29 @@ export async function PUT(req: NextRequest) {
   if (!userId) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
+
   try {
+    const requestData = await req.json();
+
+    // Validate required fields first
+    const validator = new GigValidator(requestData);
+    const requiredValidation = validator.validateRequiredFields();
+    if (requiredValidation) return requiredValidation;
+
+    const conditionalValidation = validator.validateConditionalFields();
+    if (conditionalValidation) return conditionalValidation;
+
+    const categoryValidation = validator.validateCategoryExclusivity();
+    if (categoryValidation) return categoryValidation;
+
+    // Now destructure after validation
     const {
       title,
       description,
       phoneNo,
       price,
       category,
-      bandCategory,
+      bandCategory = [],
       location,
       date,
       to,
@@ -57,110 +168,26 @@ export async function PUT(req: NextRequest) {
       otherTimeline,
       gigtimeline,
       day,
-    }: Info = await req.json();
+      mcType,
+      mcLanguages,
+      djGenre,
+      djEquipment,
+      vocalistGenre = [],
+      pricerange,
+      currency,
+      isPending = false,
+      scheduleDate,
+    }: Info = requestData;
 
-    console.log("otherTimeline", otherTimeline);
-    console.log("gigtimeline", gigtimeline);
-    console.log("day", day);
-    if (!logo) {
-      return NextResponse.json({
-        gigstatus: "false",
-        message: "logo is required",
-      });
-    }
-    if (!title) {
-      return NextResponse.json({
-        gigstatus: "false",
-        message: "Title is required",
-      });
-    }
-    if (!description) {
-      return NextResponse.json({
-        gigstatus: "false",
-        message: "Description is required",
-      });
-    }
-    if (!phoneNo) {
-      return NextResponse.json({
-        gigstatus: "false",
-        message: "Phone number is required",
-      });
-    }
-    if (!price) {
-      return NextResponse.json({
-        gigstatus: "false",
-        message: "Price is required",
-      });
-    }
-    if (!location) {
-      return NextResponse.json({
-        gigstatus: "false",
-        message: "Location is required",
-      });
-    }
-    if (!to) {
-      return NextResponse.json({
-        gigstatus: "false",
-        message: "To date is required",
-      });
-    }
-
-    if (!from) {
-      return NextResponse.json({
-        gigstatus: "false",
-        message: "From date is required",
-      });
-    }
-    if (!bussinesscat) {
-      return NextResponse.json({
-        gigstatus: "false",
-        message: "Business category is required",
-      });
-    }
-    if (!secret) {
-      return NextResponse.json({
-        gigstatus: "false",
-        message: "Secret is required",
-      });
-    }
-    if (!gigtimeline) {
-      return NextResponse.json({
-        gigstatus: "false",
-        message: "Gig timeline is required",
-      });
-    }
-    if ((!day && gigtimeline === "weekly") || gigtimeline === "other") {
-      return NextResponse.json({
-        gigstatus: "false",
-        message: "Day is required",
-      });
-    }
-
-    if (day && date) {
-      return NextResponse.json({
-        gigstatus: "false",
-        message:
-          "Cannot submit both Day and other Date ,delete either date or day,Choose what you need",
-      });
-    }
     await connectDb();
-    console.log(searchUrl);
-    // Find existing gig by secret and ensure user is the owner
+
+    // Find the existing gig
     const existingGig = await Gigs.findOne({
       $or: [{ _id: searchUrl }, { secret: secret }],
     }).populate({
       path: "postedBy",
       model: User,
     });
-    // both id and secret and other fieldconst existingGig = await Gigs.findOne({
-    //   $or: [
-    //     { _id: searchUrl, secret: secret },  // both must match
-    //     { someOtherField: someValue }         // or this condition
-    //   ]
-    // }).populate({
-    //   path: "postedBy",
-    //   model: User,
-    // });
 
     if (!existingGig) {
       return NextResponse.json(
@@ -176,43 +203,42 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    // Ensure only one of category or bandCategory is used
-    if (category && bandCategory.length > 0) {
-      return NextResponse.json(
-        {
-          gigstatus: "false",
-          message:
-            "Cannot submit both individual and band category, choose one",
-        },
-        { status: 400 }
-      );
-    }
+    // Prepare update object
+    const updateData = {
+      title,
+      description,
+      phone: phoneNo, // Note: phone in model vs phoneNo in type
+      price,
+      category: bandCategory?.length > 0 ? "" : category,
+      bandCategory: category ? "" : bandCategory,
+      location,
+      date,
+      time: { to, from },
+      secret,
+      postedBy,
+      bussinesscat,
+      font,
+      fontColor,
+      backgroundColor,
+      logo,
+      otherTimeline,
+      gigtimeline,
+      day,
+      mcType,
+      mcLanguages,
+      djGenre,
+      djEquipment,
+      vocalistGenre,
+      pricerange,
+      currency,
+      isPending,
+      scheduleDate,
+    };
 
     // Update the gig
-    const updatedGig = await Gigs.findOneAndUpdate(
-      { secret },
-      {
-        title,
-        description,
-        phoneNo,
-        price,
-        category: bandCategory.length > 0 ? "" : category,
-        bandCategory: category ? [] : bandCategory,
-        location,
-        date,
-        time: { to, from },
-        bussinesscat,
-        font,
-        fontColor,
-        backgroundColor,
-        logo,
-        postedBy,
-        otherTimeline: gigtimeline !== "other" ? "" : otherTimeline,
-        gigtimeline: gigtimeline,
-        day,
-      },
-      { new: true }
-    );
+    const updatedGig = await Gigs.findOneAndUpdate({ secret }, updateData, {
+      new: true,
+    });
 
     return NextResponse.json(
       { gigstatus: "true", message: "Updated Gig successfully", updatedGig },

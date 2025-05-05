@@ -67,11 +67,14 @@ const MyGigs = () => {
       }
 
       if (data.gigstatus === "true") {
+        localStorage.setItem("secret", JSON.stringify(data?.secret));
+
         toast.success(data?.message);
         setTimeout(() => {
           router.push(`/editpage/${data?.gigId}`);
           setConfirmEdit(false);
         }, 0);
+        setLoadingSecret(false);
       } else {
         setLoadingSecret(false);
         toast.error(data?.message);
@@ -83,6 +86,7 @@ const MyGigs = () => {
       console.log(error);
     } finally {
       clearTimeout(timeoutId);
+      setLoadingSecret(false);
       // ... other cleanup
     }
   };
@@ -142,11 +146,12 @@ const MyGigs = () => {
   //   scheduler,
   // ]);
 
+  const existingSecret = localStorage.getItem("secret");
   const isLoading = gigsLoading;
   console.log(scheduler);
   return (
     <>
-      {confirmEdit && (
+      {confirmEdit && !existingSecret && (
         <div className="fixed z-50 inset-0 flex items-center justify-center bg-opacity-80 backdrop-blur-[13px] w-[100%] mx-auto h-full -py-6">
           {!forgotsecret ? (
             <>
@@ -188,6 +193,7 @@ const MyGigs = () => {
                     </div>
                   </div>
                   <input
+                    autoComplete="off"
                     type="text"
                     value={secret}
                     name="secret"

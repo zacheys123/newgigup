@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "./ui/button";
 
 interface ButtonProps {
-  onclick: () => void;
+  onclick: (ev: React.MouseEvent<HTMLButtonElement>) => void;
   classname?: string;
   variant?: "primary" | "secondary" | "default" | "ghost";
   title: string;

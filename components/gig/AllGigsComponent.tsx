@@ -196,7 +196,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
       setLoadingPostId("");
     }
   };
-
+  const existingSecret = localStorage.getItem("secret");
   return (
     <>
       {isDescriptionModal && <GigDescription />}
@@ -402,10 +402,15 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
               <ButtonComponent
                 variant="secondary"
                 classname="!bg-white/10 hover:!bg-white/20 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
-                onclick={() => {
+                onclick={(ev: React.MouseEvent<HTMLButtonElement>) => {
+                  ev.preventDefault();
                   setLoadingPostId(gig?._id as string);
                   setCurrentGig(gig);
-                  setConfirmEdit(true);
+                  if (!existingSecret) {
+                    setConfirmEdit(true);
+                  } else {
+                    router.push(`/editpage/${gig?._id}`);
+                  }
                   // No need to clear loading state here as it's not a navigation
                 }}
                 title={loadingPostId === gig._id ? "Opening..." : "Edit"}
