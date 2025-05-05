@@ -35,7 +35,7 @@ type Info = {
   isPending: boolean;
   scheduleDate: Date;
 };
-export class GigValidator {
+class GigValidator {
   private data: Partial<Info>;
   private businessCategory: string;
   private gigTimeline: string;
