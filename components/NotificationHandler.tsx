@@ -1,6 +1,5 @@
 // components/NotificationHandler.tsx
 "use client";
-
 import {
   AppNotification,
   useNotifications,
@@ -9,7 +8,8 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export default function NotificationHandler() {
-  const { notifications, removeNotification, markAsRead } = useNotifications();
+  const { notifications, removeNotification, markAsRead, setLastMessage } =
+    useNotifications();
   const [userInteracted, setUserInteracted] = useState(false);
 
   // Track user interaction
@@ -87,6 +87,7 @@ export default function NotificationHandler() {
     }
 
     unreadNotifications.forEach((notification) => {
+      setLastMessage(notification.content);
       // Show toast notification (always works)
       toast.info(
         <div

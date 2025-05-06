@@ -12,52 +12,53 @@ export const useAddChat = (chats: []) => {
   const [isAddingChat, setIsAddingChat] = useState(false);
   const router = useRouter();
   const loggedInUserId = myuser?.user?._id;
-  console.log(myuser?.user?.refferences);
-  const filteredUsers = users?.users?.filter((user: UserProps) => {
-    if (!myuser) return false; // Ensure the current user exists
 
-    // Exclude the logged-in user
-    if (user?._id === loggedInUserId) return false;
+  const filteredUsers = (searchParam: string = "") => {
+    if (!users?.users || !myuser) return [];
 
-    // Exclude users already in the chat list
-    const isUserInChat = chats?.some((chat: { users: UserProps[] }) =>
-      chat?.users.some((u) => u._id === user?._id)
-    );
+    return users.users.filter((user: UserProps) => {
+      // Exclude the logged-in user
+      if (user?._id === loggedInUserId) return false;
 
-    if (myuser?.user?.isClient) {
-      // Show all musicians and users in references of any musician
-      return (
-        user.isMusician ||
-        users?.users?.some((musician: UserProps) => musician.isMusician)
+      // Apply search filter if searchParam is provided
+      if (searchParam) {
+        const searchLower = searchParam.toLowerCase();
+        const firstname = user?.firstname?.toLowerCase() || "";
+        const userName = user?.username?.toLowerCase() || "";
+        const userEmail = user?.email?.toLowerCase() || "";
+        if (
+          !userName.includes(searchLower) &&
+          !userEmail.includes(searchLower) &&
+          !firstname.includes(searchLower)
+        ) {
+          return false;
+        }
+      }
+
+      // Check if user is in existing chats (EXCLUDE these users)
+      const isUserInChat = chats?.some((chat: { users: UserProps[] }) =>
+        chat?.users.some((u) => u._id === user?._id)
       );
-    }
-    return (
-      isUserInChat && user?.isMusician && user?.roleType === "instrumentalist"
-    );
-  });
+      if (isUserInChat) return false; // Exclude users we already chat with
 
-  // Fetch users from `myuser.refferences`
+      // Check if user is in references
+      const isUserInReferences = myuser?.refferences?.some(
+        (u: UserProps) => u._id === user?._id
+      );
 
-  // Merge both lists & remove duplicates
-  // const allFilteredUsers = [
-  //   ...filteredUsers,
-  //   ...referencedUsers.filter(
-  //     (user) => !filteredUsers.some((u) => u._id === user._id)
-  //   ),
-  // ];
+      // If current user is a musician
+      if (myuser?.user?.isMusician) {
+        return isUserInReferences || user?.isMusician; // Only show users in references
+      }
 
-  // const allFiltedUsers = () => {
-  //   const newData =
-  //     filteredUsers &&
-  //     filteredUsers?.filter((user: UserProps) => {
-  //       if (
-  //         user?.firstname?.toLowerCase().includes(searchAddChat.toLowerCase())
-  //       ) {
-  //         return true; // Show all clients who are in the current user's references
-  //       }
-  //     });
-  //   return newData;
-  // };
+      // If current user is a client, show all musicians and clients (except those already chatted with)
+      if (myuser?.user?.isClient) {
+        return true;
+      }
+
+      return false;
+    });
+  };
 
   const handleAddChat = async (otherUserId: string) => {
     setIsAddingChat(true);
@@ -86,11 +87,13 @@ export const useAddChat = (chats: []) => {
       setIsAddingChat(false);
     }
   };
+
   return {
-    allfilteredUsers: filteredUsers,
+    allfilteredUsers: filteredUsers(searchAddChat), // Apply current search filter
     handleAddChat,
     isAddingChat,
     searchAddChat,
     setSearchAddChat,
+    filteredUsers, // Expose the function if needed by the component
   };
 };

@@ -7,13 +7,14 @@ import ColorLoading from "@/components/loaders/ColorLoading";
 import AlreadyReviewModal from "@/components/modals/AlreadyReviewModall";
 import { useAllGigs } from "@/hooks/useAllGigs";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useDebounce } from "@/hooks/useDebounce";
 import { GigProps } from "@/types/giginterface";
 import { filterGigs, fonts } from "@/utils";
 import { CircularProgress } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { useDebounce } from "./Published";
+
 const MyGigs = () => {
   const { loading: gigsLoading, gigs, mutateGigs } = useAllGigs();
   const { user } = useCurrentUser();

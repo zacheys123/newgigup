@@ -5,6 +5,7 @@ import Gigheader from "@/components/gig/Gigheader";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { useAllGigs } from "@/hooks/useAllGigs";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useDebounce } from "@/hooks/useDebounce";
 import useSocket from "@/hooks/useSocket";
 import { GigProps } from "@/types/giginterface";
 import { filterGigs } from "@/utils";
@@ -19,21 +20,6 @@ const normalizeString = (str?: string) =>
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "") || "";
 
-export const useDebounce = (value: string, delay: number) => {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(normalizeString(value));
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
-};
 const Published = () => {
   const { loading: gigsLoading, gigs } = useAllGigs();
   const { user } = useCurrentUser();

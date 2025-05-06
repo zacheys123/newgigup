@@ -16,6 +16,9 @@ import React, { useEffect, useState, useRef } from "react";
 import { IoArrowBack, IoEllipsisVertical, IoSearch } from "react-icons/io5";
 import { v4 as uuidv4 } from "uuid"; // Install uuid: npm install uuid
 
+type NewUser = {
+  user: UserProps;
+};
 const ChatPage = () => {
   const params = useParams();
   const searchParams = useSearchParams();
@@ -25,10 +28,11 @@ const ChatPage = () => {
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [otherUser, setOtherUser] = useState<UserProps>();
+  const [otherUser, setOtherUser] = useState<NewUser>();
   const [isMenuOpen, setIsMenuOpen] = useState(false); // For dropdown menu
   const [isSearchOpen, setIsSearchOpen] = useState(false); // For search bar
   const [isTyping, setIsTyping] = useState(false); // For typing indicator
+  console.log(isTyping);
   const { user } = useCurrentUser();
   const [searchquery, setSearch] = useState<string>("");
   const {
@@ -67,7 +71,6 @@ const ChatPage = () => {
   const { socket } = useSocket();
   // Ref for the chat container to enable auto-scrolling
   const chatContainerRef = useRef<HTMLDivElement>(null);
-  console.log(isTyping);
   // Fetch messages and other user's details on component mount
   useEffect(() => {
     const fetchUser = async () => {
@@ -208,7 +211,7 @@ const ChatPage = () => {
       </div>
     );
   }
-
+  console.log(otherUser);
   return (
     <div
       className="h-screen flex flex-col bg-[#f0f2f5] pt-[65px] pb-[60px] "
@@ -225,11 +228,11 @@ const ChatPage = () => {
         <button onClick={() => router.back()} className="mr-4 text-gray-300">
           <IoArrowBack className="text-2xl" />
         </button>
-        {otherUser?.picture && (
+        {otherUser?.user?.picture && (
           <div className="flex items-center" onClick={handleAvatarClick}>
             <Image
-              src={otherUser?.picture}
-              alt={otherUser?.firstname?.split("")[0] as string}
+              src={otherUser?.user?.picture}
+              alt={otherUser?.user?.firstname?.split("")[0] as string}
               className="w-8 h-8 rounded-full mr-2"
               width={30}
               height={30}
@@ -237,7 +240,7 @@ const ChatPage = () => {
             <div>
               <div className="flex flex-col">
                 <span className="font-semibold text-gray-200">
-                  {otherUser?.firstname}
+                  {otherUser?.user?.firstname}
                 </span>
                 <span className={isOnline ? online : offline}>
                   {isOnline ? (
@@ -267,10 +270,10 @@ const ChatPage = () => {
               <button
                 className="block w-full px-4 py-2 text-left hover:bg-gray-100 title"
                 onClick={() => {
-                  if (otherUser?.isMusician) {
-                    router.push(`/search/${otherUser?.username}`);
-                  } else if (otherUser?.isClient) {
-                    router.push(`/client/search/${otherUser?.username}`);
+                  if (otherUser?.user?.isMusician) {
+                    router.push(`/search/${otherUser?.user?.username}`);
+                  } else if (otherUser?.user?.isClient) {
+                    router.push(`/client/search/${otherUser?.user?.username}`);
                   } else {
                     return;
                   }
@@ -372,19 +375,19 @@ const ChatPage = () => {
         {/* Profile Modal */}
         {IsProfileModalOpen && otherUser && (
           <SlideUpModal>
-            <ChatModal user={otherUser} onClose={closeProfileModal} />
+            <ChatModal user={otherUser?.user} onClose={closeProfileModal} />
           </SlideUpModal>
         )}
         {refferenceModalOpen && otherUser && (
           <SlideUpModal>
-            <RefferenceModal user={otherUser} getReviews={getReviews} />
+            <RefferenceModal user={otherUser?.user} getReviews={getReviews} />
           </SlideUpModal>
         )}
         {reviewModalOpen && otherUser && (
           <SlideUpModal>
             <ReviewModal
               reviewdata={reviewprops || []}
-              user={otherUser}
+              user={otherUser?.user}
               getVideos={getVideos}
             />
           </SlideUpModal>
@@ -394,7 +397,7 @@ const ChatPage = () => {
             <VideoModal
               videodata={videoprops?.videos || []}
               gigId={videoprops?.gigId as string}
-              user={otherUser}
+              user={otherUser?.user}
             />
           </SlideUpModal>
         )}

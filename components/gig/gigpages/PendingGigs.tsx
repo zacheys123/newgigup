@@ -18,9 +18,10 @@ import {
 import { searchPending } from "@/utils/index";
 import { GigProps } from "@/types/giginterface";
 import { useAuth } from "@clerk/nextjs";
-import { useDebounce } from "./Published";
+
 import { usePendingGigs } from "@/app/Context/PendinContext";
 import CountUp from "react-countup";
+import { useDebounce } from "@/hooks/useDebounce";
 
 const PendingGigs = () => {
   const { userId } = useAuth();

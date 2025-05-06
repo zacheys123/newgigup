@@ -22,6 +22,8 @@ interface NotificationContextType {
   addNotification: (notification: Omit<AppNotification, "id">) => void;
   removeNotification: (id: string) => void;
   markAsRead: (chatId: string) => void;
+  setLastMessage: (lastMessage: string) => void;
+  lastMessage: string;
 }
 
 const NotificationContext = createContext<NotificationContextType | null>(null);
@@ -32,6 +34,7 @@ export const NotificationProvider = ({
   children: React.ReactNode;
 }) => {
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
+  const [lastMessage, setLastMessage] = useState("");
 
   const addNotification = (notification: Omit<AppNotification, "id">) => {
     const id = Math.random().toString(36).substring(2, 9);
@@ -50,7 +53,14 @@ export const NotificationProvider = ({
 
   return (
     <NotificationContext.Provider
-      value={{ notifications, addNotification, removeNotification, markAsRead }}
+      value={{
+        notifications,
+        addNotification,
+        removeNotification,
+        markAsRead,
+        setLastMessage,
+        lastMessage,
+      }}
     >
       {children}
     </NotificationContext.Provider>

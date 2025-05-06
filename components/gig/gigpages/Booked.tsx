@@ -6,27 +6,13 @@ import Videos from "@/components/gig/Videos";
 import ColorLoading from "@/components/loaders/ColorLoading";
 import { useAllGigs } from "@/hooks/useAllGigs";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useDebounce } from "@/hooks/useDebounce";
 import { GigProps } from "@/types/giginterface";
 import { filterGigs } from "@/utils";
 
 import { motion } from "framer-motion";
 import React, { useEffect, useMemo, useState } from "react";
 
-const useDebounce = (value: string, delay: number) => {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
-};
 const Booked = () => {
   const { loading: gigsLoading, gigs } = useAllGigs();
   const { user } = useCurrentUser();

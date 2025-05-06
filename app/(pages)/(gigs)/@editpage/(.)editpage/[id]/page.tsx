@@ -628,7 +628,7 @@ const EditPage = () => {
             >
               <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                 <div className="w-full">
-                  <label className="block text-sm font-medium text-gray-300 mt-3 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-1 mt-4">
                     Who do you want?
                   </label>
                   <select

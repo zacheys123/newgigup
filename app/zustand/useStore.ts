@@ -5,16 +5,6 @@ import { GigProps } from "@/types/giginterface";
 import { initialState, StoreState } from "@/types/storeinterface";
 import { Review, UserProps } from "@/types/userinterfaces";
 import { create } from "zustand"; // Import SetState
-// import { unstable_batchedUpdates } from "react-dom";
-
-// const isDuplicateMessage = (
-//   messages: MessageProps[],
-//   newMessage: MessageProps
-// ) => {
-//   return messages.some(
-//     (msg) => msg._id === newMessage._id || msg.tempId === newMessage.tempId
-//   );
-// };
 
 const useStore = create<StoreState>((set) => ({
   ...initialState,
@@ -60,11 +50,19 @@ const useStore = create<StoreState>((set) => ({
   setMessages: (data: MessageProps[]) => set(() => ({ messages: data })),
   setOnlineUsers: (users) => set({ onlineUsers: users }),
   unreadCounts: {},
+  // Add this new action to reset unread count
+  resetUnreadCount: (chatId: string) =>
+    set((state) => ({
+      unreadCounts: {
+        ...state.unreadCounts,
+        [chatId]: 0,
+      },
+    })),
   updateUnreadCount: (chatId, increment = true) =>
     set((state) => ({
       unreadCounts: {
         ...state.unreadCounts,
-        [chatId]: (state.unreadCounts[chatId] || 0) + (increment ? 1 : 0),
+        [chatId]: increment ? (state.unreadCounts[chatId] || 0) + 1 : 0,
       },
     })),
   // In your Zustand store

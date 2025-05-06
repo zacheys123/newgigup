@@ -12,6 +12,7 @@ import { colors, fonts } from "@/utils";
 import useStore from "@/app/zustand/useStore";
 import { useAddChat } from "@/hooks/useAddChat";
 import { ChatSkeleton } from "./ChatSkeleton";
+import { useNotifications } from "@/app/Context/NotificationContext";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -20,15 +21,8 @@ const AllChats = () => {
 
   const router = useRouter();
   const loggedInUserId = myuser?.user?._id;
-  console.log(myuser);
 
-  // Filter chats based on the search query
-  // Filter and process chats
-  // In your AllChats component:
-
-  // Replace the localStorage usage with this approach:
-
-  // Fetch chats from the database - don't store in localStorage
+  const { lastMessage } = useNotifications();
   const { setIsOpen, updateUnreadCount, unreadCounts } = useStore();
   const [searchQuery, setSearchQuery] = useState(""); // State for search query
   const [isSearchVisible, setIsSearchVisible] = useState(false); // State to toggle search input
@@ -50,24 +44,6 @@ const AllChats = () => {
     }
   );
 
-  // Then your filteredChats can be simplified to:
-  // const filteredChats = useMemo(() => {
-  //   if (!chats) return [];
-
-  //   return chats.filter((chat) => {
-  //     // Find the other user in the chat
-  //     const otherUser = chat.users.find((user) => user._id !== loggedInUserId);
-  //     return otherUser?.firstname
-  //       ?.toLowerCase()
-  //       .includes(searchQuery.toLowerCase());
-  //   });
-  // }, [chats, loggedInUserId, searchQuery]);
-
-  // Remove these localStorage related effects:
-  // - Remove the onSuccess localStorage.setItem
-  // - Remove the useEffect that loads from localStorage
-
-  // Update your filteredChats to use chats directly:
   const filteredChats = useMemo(() => {
     if (!chats) return [];
 
@@ -147,18 +123,37 @@ const AllChats = () => {
     searchAddChat,
     setSearchAddChat,
   } = useAddChat(chats);
+
+  // Handling chat creation
   const handleChatClick = useCallback(
     async (chatId: string, otherUserId: string) => {
-      await fetch("/api/chat/readmessages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ chatId, userId: loggedInUserId }),
-      });
+      // Optimistically update UI
       updateUnreadCount(chatId, false);
+
+      try {
+        await fetch("/api/chat/readmessages", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ chatId, userId: loggedInUserId }),
+        });
+      } catch (error) {
+        console.log(error);
+        // Revert if API call fails
+        const unreadMessages =
+          chats
+            .find((c: ChatProps) => c._id === chatId)
+            ?.messages.filter(
+              (msg: MessageProps) => !msg.read && msg.sender !== loggedInUserId
+            ).length || 0;
+        updateUnreadCount(chatId, unreadMessages);
+      }
+
       router.push(`/chats/${chatId}?userId=${otherUserId}`);
     },
-    [loggedInUserId, router, updateUnreadCount]
+    [loggedInUserId, router, updateUnreadCount, chats]
   );
+
+  // UNIQUEcHATS
   const uniqueChats = useMemo(() => {
     if (!filteredChats) return [];
 
@@ -284,9 +279,7 @@ const AllChats = () => {
       {isAddChat && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-[4px] w-[100%] mx-auto h-full -py-6 z-50">
           <div className="w-[90%] p-4 max-w-lg sm:max-w-xl h-[80%] m-auto flex flex-col border border-gray-600/50 rounded-2xl shadow-2xl bg-neutral-900/50 overflow-y-auto">
-            {" "}
-            <div className="flex justify-between items-center  mt-4">
-              {" "}
+            <div className="flex justify-between items-center mt-4">
               <button
                 onClick={() => setIsAddChat(false)}
                 className="p-2 hover:bg-[#0e6e5f] rounded-full transition-colors duration-200 text-gray-300"
@@ -294,11 +287,11 @@ const AllChats = () => {
                 <FaArrowLeft size={20} />
               </button>
               <h1
-                className="text-xl sm:text-2xl font-bold text-gray-200 "
+                className="text-xl sm:text-2xl font-bold text-gray-200"
                 style={{ fontFamily: fonts[24] }}
               >
                 Add a new chat
-              </h1>{" "}
+              </h1>
             </div>
             <div className="mt-[55px] mb-[20px]">
               <input
@@ -306,72 +299,113 @@ const AllChats = () => {
                 placeholder="Type here to find a new chat"
                 value={searchAddChat}
                 onChange={(e) => setSearchAddChat(e.target.value)}
-                className={`w-full p-2 rounded-lg border border-gray-300 focus:outline-none text-[14px] focus:border-[#128C7E] text-gray-300 bg-neutral-700 `}
+                className={`w-full p-2 rounded-lg border border-gray-300 focus:outline-none text-[14px] focus:border-[#128C7E] text-gray-300 bg-neutral-700`}
                 style={{ fontFamily: fonts[26] }}
               />
             </div>
             <div className="my-[5px] overflow-y-auto flex-1">
-              {allfilteredUsers()?.map((user: UserProps) => (
-                <div
-                  key={user?._id}
-                  className="flex gap-2 items-center hover:bg-[#0e6e5f] transition-colors duration-200 cursor-pointer bg-neutral-500/50  first:rounded-tl-xl first:rounded-tr-xl last:rounded:bl-xl last:rounded-b-r-xl py-3 px-5 "
-                  onClick={() => handleAddChat(user?._id as string)}
-                >
-                  {user?.picture && (
-                    <Image
-                      src={user.picture}
-                      alt={user.firstname as string}
-                      width={40}
-                      height={40}
-                      className="rounded-full"
-                    />
-                  )}
-                  <span
-                    className="flex flex-col "
-                    style={{ fontFamily: fonts[32] }}
+              {allfilteredUsers?.length > 0 ? (
+                allfilteredUsers.map((user: UserProps) => (
+                  <div
+                    key={user?._id}
+                    className="flex gap-2 items-center hover:bg-[#0e6e5f] transition-colors duration-200 cursor-pointer bg-neutral-500/50 first:rounded-tl-xl first:rounded-tr-xl last:rounded-bl-xl last:rounded-br-xl py-3 px-5"
+                    onClick={() => handleAddChat(user?._id as string)}
                   >
-                    {" "}
+                    {user?.picture && (
+                      <Image
+                        src={user.picture}
+                        alt={user.firstname as string}
+                        width={40}
+                        height={40}
+                        className="rounded-full"
+                      />
+                    )}
                     <span
-                      className="text-gray-300"
-                      style={{ fontFamily: fonts[34] }}
+                      className="flex flex-col"
+                      style={{ fontFamily: fonts[32] }}
                     >
-                      {user.firstname}
+                      <span
+                        className="text-gray-300"
+                        style={{ fontFamily: fonts[34] }}
+                      >
+                        {user.firstname}
+                      </span>
+                      {!user?.isClient && !user?.isMusician && (
+                        <span
+                          className="text-red-500 tracking-wider text-[13px]"
+                          style={{
+                            fontFamily: fonts[23],
+                            color: colors[28],
+                          }}
+                        >
+                          unknown
+                        </span>
+                      )}
+                      {user?.isClient && (
+                        <span
+                          className="text-green-300 tracking-wider text-[13px]"
+                          style={{
+                            fontFamily: fonts[2],
+                          }}
+                        >
+                          {user?.organization ? user?.organization : "client"}
+                        </span>
+                      )}
+                      {user?.isMusician &&
+                        user?.roleType === "instrumentalist" && (
+                          <span
+                            className="text-amber-300 tracking-wider text-[13px] capitalize"
+                            style={{
+                              fontFamily: fonts[23],
+                              color: colors[28],
+                            }}
+                          >
+                            {user?.instrument}
+                          </span>
+                        )}
+                      {user?.isMusician && user?.roleType === "dj" && (
+                        <span
+                          className="text-amber-300 tracking-wider text-[13px] capitalize"
+                          style={{
+                            fontFamily: fonts[23],
+                            color: colors[28],
+                          }}
+                        >
+                          Deejay
+                        </span>
+                      )}
+                      {user?.isMusician && user?.roleType === "mc" && (
+                        <span
+                          className="text-amber-300 tracking-wider text-[13px] capitalize"
+                          style={{
+                            fontFamily: fonts[23],
+                            color: colors[28],
+                          }}
+                        >
+                          EMcee
+                        </span>
+                      )}
+                      {user?.isMusician && user?.roleType === "vocalist" && (
+                        <span
+                          className="text-amber-300 tracking-wider text-[13px] capitalize"
+                          style={{
+                            fontFamily: fonts[23],
+                            color: colors[28],
+                          }}
+                        >
+                          Vocalist
+                        </span>
+                      )}
                     </span>
-                    {!user?.isClient && !user?.isMusician && (
-                      <span
-                        className="text-red-500 tracking-wider text-[13px]"
-                        style={{
-                          fontFamily: fonts[23],
-                          color: colors[28],
-                        }}
-                      >
-                        unknown
-                      </span>
-                    )}
-                    {user?.isClient && (
-                      <span
-                        className="text-green-300 tracking-wider text-[13px]"
-                        style={{
-                          fontFamily: fonts[2],
-                        }}
-                      >
-                        client
-                      </span>
-                    )}{" "}
-                    {user?.isMusician && (
-                      <span
-                        className="text-amber-300 tracking-wider text-[13px]"
-                        style={{
-                          fontFamily: fonts[23],
-                          color: colors[28],
-                        }}
-                      >
-                        musician
-                      </span>
-                    )}
-                  </span>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center text-gray-400 py-4">
+                  {searchAddChat
+                    ? "No users found matching your search"
+                    : "No users available to chat"}
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>
@@ -480,12 +514,14 @@ const AllChats = () => {
                           <p
                             className={
                               chat.messages[chat.messages.length - 1]?.read ===
-                              true
+                                true && unreadCounts[chat._id] === 0
                                 ? "text-xs sm:text-sm text-gray-600 truncate"
                                 : "text-md font-bold text-gray-800 truncate"
                             }
                           >
-                            {chat.messages[chat.messages.length - 1].content}
+                            {!lastMessage
+                              ? chat.messages[chat.messages.length - 1].content
+                              : lastMessage}
                           </p>
                         )}
                       </div>

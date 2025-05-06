@@ -37,7 +37,6 @@ export function useBookGig() {
       toast.error("You have reached your maximum booking limit");
       return;
     }
-
     setBookloading(true);
     try {
       const res = await fetch(`/api/gigs/bookgig/${gig?._id}`, {

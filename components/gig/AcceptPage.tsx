@@ -56,13 +56,11 @@ const AcceptPage = ({
   };
 
   useEffect(() => {
-    if (bookCount?.length === 0 && isTaken === false) {
-      return;
-    }
-    if (bookCount?.length === 0 && isTaken === true) {
-      return;
-    }
-    if (isTaken === false) {
+    // if (bookCount?.length === 0 && isTaken === false) {
+    //   return;
+    // }
+
+    if (isTaken === false && bookCount?.length > 0) {
       router.push(`/gigs/${userId}`);
     }
   }, [isTaken, isPending, userId, router, bookCount]);

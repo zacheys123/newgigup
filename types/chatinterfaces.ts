@@ -1,6 +1,7 @@
 import { UserProps } from "./userinterfaces";
 
 export interface ChatProps {
+  _id?: string;
   chatId: string;
   receiver: string | undefined;
   sender: string | undefined;
