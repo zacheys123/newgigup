@@ -23,7 +23,7 @@ const SearchComponent = () => {
         <div className="pt-[40px]  grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 px-2">
           {users &&
             searchFunc(users?.users, searchQuery)
-              .filter((user: UserProps) => user.clerkId !== userId)
+              ?.filter((user: UserProps) => user.clerkId !== userId)
               .map((user: UserProps, index: number) => (
                 <motion.div
                   key={user?._id}
@@ -36,7 +36,7 @@ const SearchComponent = () => {
               ))}
         </div>
 
-        {users && searchFunc(users?.users, searchQuery).length === 0 && (
+        {users && searchFunc(users?.users, searchQuery)?.length === 0 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

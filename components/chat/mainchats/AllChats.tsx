@@ -164,28 +164,8 @@ const AllChats = () => {
       return !duplicate;
     });
   }, [filteredChats]);
-  const LoadingSkeleton = () => (
-    <div className="animate-pulse flex items-center p-3 space-x-4 mt-9">
-      <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
-      <div className="flex-1 space-y-5">
-        <div className="h-6 bg-gray-300  rounded-full"></div>
-        <div className="h-6 bg-gray-300  w-1/2 rounded-full"></div>
-      </div>
-    </div>
-  );
 
-  // Use it in your component
-  if (!chats) {
-    return (
-      <div className="flex-1 overflow-y-auto p-2 sm:p-4">
-        {[...Array(7)].map((_, index) => (
-          <LoadingSkeleton key={index} />
-        ))}
-      </div>
-    );
-  }
-
-  if (isLoading) {
+  if (isLoading || !chats) {
     return (
       <div className="h-screen bg-[#7f848b] flex flex-col overflow-y-auto pb-20">
         <div className="bg-[#128C7E] p-4 text-white flex justify-between items-center">

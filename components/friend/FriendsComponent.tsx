@@ -364,7 +364,8 @@ const FriendsComponent = () => {
                     <div className="text-neutral-400 font-medium title my-2">
                       Vocalist
                     </div>
-                    <div className="text-neutral-400 font-medium title my-2">
+                    <div className="text-neutral-400 font-medium title my-2 flex flex-col">
+                      <span className="text-emerald-400">Genre</span>
                       {friend?.vocalistGenre || "-"}
                     </div>
                   </div>

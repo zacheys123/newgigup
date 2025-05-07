@@ -10,20 +10,7 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { Box } from "@mui/material";
 import { BsFacebook, BsInstagram, BsTwitter } from "react-icons/bs";
 
-import {
-  ArrowLeftIcon,
-  AtSign,
-  Building2,
-  FileText,
-  Info,
-  MapPin,
-  Music,
-  Share2,
-  UserCircle,
-  UserPlus,
-  Users,
-  Video,
-} from "lucide-react";
+import { ArrowLeftIcon, Music, Video } from "lucide-react";
 import useStore from "@/app/zustand/useStore";
 import {
   handleFollow,
@@ -32,7 +19,6 @@ import {
   handleUnFollowingCurrent,
 } from "@/utils";
 import { FaTiktok, FaYoutube } from "react-icons/fa";
-import Image from "next/image";
 type FriendProps = {
   user: UserProps;
 };
@@ -140,238 +126,178 @@ const ClientSearchComponent = () => {
   })();
   if (loading) return <div>loading....</div>;
   return (
-    <div className="overflow-y-auto h-[95vh] w-full max-w-2xl mx-auto shadow-2xl shadow-purple-500/20 flex flex-col gap-4 rounded-2xl bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 backdrop-blur-sm transition-all duration-500 hover:shadow-purple-500/30 relative isolate">
-      {/* Animated background elements */}
-      {/* <div className="absolute inset-0 overflow-hidden -z-10">
-        <div className="absolute -left-20 -top-20 w-64 h-64 bg-purple-900/30 rounded-full filter blur-3xl animate-float opacity-40"></div>
-        <div className="absolute -right-10 -bottom-10 w-72 h-72 bg-indigo-900/30 rounded-full filter blur-3xl animate-float-delay opacity-40"></div>
-        <div className="absolute right-1/2 bottom-1/2 w-80 h-80 bg-emerald-900/20 rounded-full filter blur-3xl animate-float-delay-2 opacity-30"></div>
-      </div> */}
+    <div className="overflow-y-auto h-[95%] w-[90%] mx-auto  shadow-md shadow-orange-300 flex flex-col gap-2">
+      {/* Fixed Gigheader */}
 
-      {/* Header Section with Parallax Effect */}
-      <div className="h-[240px] bg-gradient-to-r from-purple-900/40 via-neutral-800/80 to-indigo-900/40 flex items-center px-8 justify-between rounded-t-2xl border-b border-neutral-700/50 relative overflow-hidden group transition-all duration-700 hover:bg-gradient-to-r hover:from-purple-900/50 hover:via-neutral-800/90 hover:to-indigo-900/50">
-        {/* Profile Picture with Hover Effect */}
-        <div className="flex items-center gap-6 z-10">
-          {friend?.user?.picture ? (
-            <div className="w-[130px] h-[130px] rounded-full overflow-hidden">
-              <Image
-                src={friend.user.picture}
-                alt="Profile"
-                width={130}
-                height={130}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          ) : (
-            <div className="w-[130px] h-[130px] rounded-full bg-gradient-to-br from-neutral-700 to-neutral-600 flex justify-center items-center border-2 border-neutral-500/30 shadow-lg group-hover:shadow-purple-500/30 transition-all duration-500 hover:scale-105 hover:border-purple-400/30">
-              <span className="text-5xl font-light text-neutral-200">
-                {friend?.user?.firstname?.split("")[0]}
-              </span>
-              <span className="text-3xl font-light text-neutral-200">
-                {friend?.user?.lastname?.split("")[0]}
-              </span>
-            </div>
-          )}
-
-          {/* Name and Info */}
-          <div className="flex flex-col mt-[110px]">
-            <h1 className="text-2xl font-medium text-neutral-100 bg-gradient-to-r from-neutral-200 to-neutral-300 bg-clip-text text-transparent">
-              {friend?.user?.firstname} {friend?.user?.lastname}
-            </h1>
-            <p className="text-sm text-neutral-400 mt-1 flex items-center gap-1">
-              <span>{friend?.user?.email}</span>
-            </p>
-          </div>
+      <div className="h-[180px] bg-neutral-800 flex items-center px-2 justify-around  rounded-bl-3xl rounded-br-3xl">
+        {/* {friend?.user?.picture && friend?.user?.picture !== null ? (
+          <Image
+            className="w-[100px] h-[100px] rounded-full object-cover bg-slate-400"
+            src={friend.picture}
+            alt="Profile Pic"
+            width={100}
+            height={100}
+          />
+        ) : ( */}
+        <div className="w-[100px] h-[100px] rounded-full  bg-neutral-300 flex justify-center items-center">
+          <span className="text-5xl">
+            {friend?.user?.firstname?.split("")[0]}
+          </span>
+          <span className="text-3xl">
+            {friend?.user?.lastname?.split("")[0]}
+          </span>
+        </div>
+        <div className="w-[60px] h-[60px] flex flex-col flex-1 mx-2 mt-[100px]">
+          <span className="flex gap-1">
+            <span className=" text-sm text-gray-400">
+              {friend?.user?.firstname}
+            </span>
+            <span className=" text-sm text-gray-400">
+              {friend?.user?.lastname}
+            </span>
+          </span>
+          <span className="text-[11px] text-gray-400">
+            {/* {friend?.user?.experience} years of experience in {friend?.user?.instrument}
+             */}
+            {friend?.user?.email}
+          </span>
         </div>
 
-        {/* Follow Button with Pulse Animation */}
-        <div className="mt-[110px] z-10 flex flex-col items-end gap-2">
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-neutral-400">
-              Followers: {friend?.user?.followers?.length || 0}
-            </span>
-            <span className="text-xs text-neutral-400">
-              Following: {friend?.user?.followings?.length || 0}
-            </span>
-          </div>
+        <div className=" flex justify-center items-center">
           {(friend && !follow && isFollowing) || optimisticFollow ? (
             <Button
-              className="min-w-[120px] h-[42px] text-neutral-100 text-sm bg-gradient-to-r from-emerald-600/90 to-emerald-500/90 hover:from-emerald-500 hover:to-emerald-400 border border-emerald-600/50 transition-all duration-300 flex items-center justify-center gap-1 rounded-xl shadow-md hover:shadow-emerald-500/20 group-hover:animate-pulse-slow"
+              className="min-w-[50px] h-[30px] text-white  text-[11px] bg-transparent border-2 border-gray-300 "
               onClick={() => {
                 if (friend && friend?.user?._id) {
+                  // Ensure _id is defined
                   try {
                     handleUnfollow(friend?.user?._id, user?.user);
                     handleUnFollowingCurrent(friend?.user?._id, user?.user);
                     setRefetch((prev) => !prev);
                     setOptimisticFollow(false);
-                    setFollow(false);
+                    setFollow(false); // Update global state as well
                   } catch (error) {
                     setOptimisticFollow(true);
-                    setFollow(true);
+                    setFollow(true); // Update global state as well
                     console.error("Error following:", error);
                   }
+                } else {
+                  console.log("No friend Id");
                 }
               }}
             >
-              <IoCheckmarkDone className="text-white group-hover:animate-bounce" />
-              <span>Following</span>
+              following <IoCheckmarkDone />
             </Button>
           ) : (
             <Button
-              className="min-w-[120px] h-[42px] text-white text-sm bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-400 hover:to-indigo-400 transition-all duration-300 shadow-lg hover:shadow-blue-500/30 flex items-center justify-center gap-1 rounded-xl animate-pulse-slow"
+              className="min-w-[50px] h-[30px] text-white  text-[11px] bg-blue-600 hover:bg-blue-700"
               onClick={() => {
                 if (friend && friend?.user?._id) {
+                  // Ensure _id is defined
                   try {
                     handleFollow(friend?.user?._id, user?.user);
                     handleFollowing(friend?.user?._id, user?.user);
                     setRefetch((prev) => !prev);
                     setOptimisticFollow(true);
-                    setFollow(true);
+                    setFollow(true); // Update global state as well
                   } catch (error) {
                     setOptimisticFollow(false);
-                    setFollow(!follow);
+                    setFollow(!follow); // Update global state as well
                     console.error("Error following:", error);
                   }
                 }
               }}
             >
-              <MdAdd className="group-hover:rotate-180 transition-transform duration-500" />
-              <span>Follow</span>
+              Follow <MdAdd />
             </Button>
           )}
         </div>
       </div>
-
-      {/* Navigation Icons with Hover Effects */}
-      <div className="h-[90px] flex gap-10 justify-center items-center bg-neutral-800/50 rounded-xl mx-6 border border-neutral-700/50 backdrop-blur-md hover:bg-neutral-700/60 transition-colors duration-300 shadow-inner shadow-neutral-900/30">
-        <button
+      <div className="h-[70px] flex gap-2 justify-around items-center">
+        <ArrowLeftIcon
+          size="19"
+          style={{ color: "lightgrey" }}
           onClick={() => router.back()}
-          className="p-3 rounded-full bg-neutral-700/50 hover:bg-neutral-600/60 transition-all duration-300 group"
-        >
-          <ArrowLeftIcon
-            size={26}
-            className="text-neutral-400 group-hover:text-white transition-all duration-300 group-hover:scale-125"
-          />
-        </button>
-        <button
+        />
+
+        <Music
+          size="19"
+          style={{ color: "lightgreen" }}
           onClick={() => router.push(`/gigs/${userId}`)}
-          className="p-3 rounded-full bg-neutral-700/50 hover:bg-emerald-500/20 transition-all duration-300 group relative overflow-hidden"
-        >
-          <div className="absolute inset-0 bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-all duration-500 rounded-full scale-0 group-hover:scale-100"></div>
-          <Music
-            size={26}
-            className="text-emerald-400 group-hover:text-emerald-300 transition-all duration-300 group-hover:scale-125 drop-shadow-[0_0_8px_rgba(74,222,128,0.4)]"
-          />
-        </button>
-        <button
+        />
+        <Video
+          size="19"
+          style={{ color: "pink" }}
           onClick={() =>
             router.push(
               `/search/allvideos/${friend?.user?._id}/*${user?.user?.firstname}${user?.user?.lastname}`
             )
           }
-          className="p-3 rounded-full bg-neutral-700/50 hover:bg-rose-500/20 transition-all duration-300 group relative overflow-hidden"
-        >
-          <div className="absolute inset-0 bg-rose-500/10 group-hover:bg-rose-500/20 transition-all duration-500 rounded-full scale-0 group-hover:scale-100"></div>
-          <Video
-            size={26}
-            className="text-rose-400 group-hover:text-rose-300 transition-all duration-300 group-hover:scale-125 drop-shadow-[0_0_8px_rgba(251,113,133,0.4)]"
-          />
-        </button>
+        />
       </div>
-
-      {/* Information Sections with Slide-in Animation */}
-      <div className="flex flex-col gap-6 px-6 pb-8">
-        {/* Fullname Section */}
-        <Box className="bg-neutral-800/50 rounded-xl p-6 border border-neutral-700/40 backdrop-blur-sm hover:border-purple-500/40 transition-all duration-500 animate-slide-up delay-100 hover:shadow-purple-500/10 hover:translate-y-[-2px]">
-          <h4 className="text-xs font-semibold text-neutral-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-            <UserCircle size={18} className="text-purple-400" />
-            <span>Fullname</span>
-          </h4>
-          <div className="flex gap-3">
-            <span className="text-lg font-normal text-neutral-200">
-              {friend?.user?.firstname}
+      <Box className="h-fit bg-neutral-800 w-[100%] px-2 py-3">
+        <h4 className="text-[16px] font-bold text-gray-400 mt-3 mb-1 ">
+          Fullname
+        </h4>
+        <div className="flex gap-2">
+          <span className="text-[12px] font-bold text-gray-500">
+            {friend?.user?.firstname}
+          </span>
+          <span className="text-[12px] font-bold text-gray-500 ">
+            {friend?.user?.lastname}
+          </span>
+        </div>
+      </Box>
+      <Box className="h-fit bg-neutral-800 w-[100%] px-2 py-3">
+        <h4 className="text-[16px] font-bold text-gray-400 mt-3 mb-1 ">
+          Contact Info
+        </h4>
+        <div className="flex flex-col">
+          <span className="text-[12px] font-bold text-gray-500">
+            {friend?.user?.email}
+          </span>
+        </div>
+      </Box>
+      <Box className="h-fit bg-neutral-800 w-[100%] px-2 py-5">
+        <h4 className="text-[16px] font-bold text-gray-400 mt-3 mb-1 ">
+          General Info
+        </h4>
+        <div className="flex flex-col h-fit py-2">
+          <span className="text-[12px] font-bold text-gray-500 flex flex-col">
+            <span className="text-[15px] font-bold text-neutral-400 font-mono">
+              City:{" "}
             </span>
-            <span className="text-lg font-normal text-neutral-200">
-              {friend?.user?.lastname}
+            {friend?.user?.city ? friend?.user?.city : "-null"}
+          </span>
+
+          <div className="flex justify-around my-3 gap-2">
+            <span className="text-[12px] font-bold text-red-500 bg-gray-200 opacity-80 rounded-md py-1 px-2">
+              {friend?.user?.followers && friend?.user?.followers?.length === 1
+                ? `${friend?.user?.followers?.length} follower`
+                : `${friend?.user?.followers?.length} followers`}
+            </span>
+            <span className="text-gray-400">|</span>
+            <span className="text-[12px] font-bold text-red-500 bg-gray-200 opacity-80 rounded-md py-1 px-2">
+              {friend?.user?.followings?.length === 1 ||
+              friend?.user?.followings?.length === 0
+                ? `${friend?.user?.followings?.length} following`
+                : `${friend?.user?.followings?.length} followings`}
             </span>
           </div>
-        </Box>
-
-        {/* Contact Info Section */}
-        <Box className="bg-neutral-800/50 rounded-xl p-6 border border-neutral-700/40 backdrop-blur-sm hover:border-blue-500/40 transition-all duration-500 animate-slide-up delay-200 hover:shadow-blue-500/10 hover:translate-y-[-2px]">
-          <h4 className="text-xs font-semibold text-neutral-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-            <AtSign size={18} className="text-blue-400" />
-            <span>Contact Info</span>
-          </h4>
           <div className="flex flex-col gap-2">
-            <span className="text-lg text-neutral-200">
-              {friend?.user?.email}
+            <span className="text-[12px] font-bold text-gray-500 flex flex-col">
+              <span className="text-[15px] font-bold text-neutral-400 font-mono">
+                Organization/Company/Hotel:
+              </span>
+              {friend?.user?.organization
+                ? friend?.user?.organization
+                : "-null"}
             </span>
-            {friend?.user?.phone && (
-              <span className="text-lg text-neutral-200">
-                {friend.user.phone}
-              </span>
-            )}
-          </div>
-        </Box>
-
-        {/* General Info Section */}
-        <Box className="bg-neutral-800/50 rounded-xl p-6 border border-neutral-700/40 backdrop-blur-sm hover:border-emerald-500/40 transition-all duration-500 animate-slide-up delay-300 hover:shadow-emerald-500/10 hover:translate-y-[-2px]">
-          <h4 className="text-xs font-semibold text-neutral-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-            <Info size={18} className="text-emerald-400" />
-            <span>General Info</span>
-          </h4>
-          <div className="space-y-6">
-            <div>
-              <h5 className="text-xs font-medium text-neutral-500/80 mb-2 flex items-center gap-1">
-                <MapPin size={14} className="text-amber-400" />
-                <span>Location</span>
-              </h5>
-              <p className="text-lg text-neutral-200">
-                {friend?.user?.city ? friend?.user?.city : "Not specified"}
-              </p>
-            </div>
-
-            <div className="flex justify-center gap-6 my-5">
-              <span className="text-xs font-medium bg-gradient-to-r from-neutral-700/60 to-neutral-600/60 text-neutral-300 rounded-full py-2 px-5 hover:scale-105 transition-transform duration-300 flex items-center gap-1">
-                <Users size={14} className="text-purple-400" />
-                {friend?.user?.followers?.length || 0}{" "}
-                {friend?.user?.followers?.length === 1
-                  ? "Follower"
-                  : "Followers"}
-              </span>
-              <span className="text-neutral-600">|</span>
-              <span className="text-xs font-medium bg-gradient-to-r from-neutral-700/60 to-neutral-600/60 text-neutral-300 rounded-full py-2 px-5 hover:scale-105 transition-transform duration-300 flex items-center gap-1">
-                <UserPlus size={14} className="text-blue-400" />
-                {friend?.user?.followings?.length || 0} Following
-              </span>
-            </div>
-
-            <div>
-              <h5 className="text-xs font-medium text-neutral-500/80 mb-2 flex items-center gap-1">
-                <Building2 size={14} className="text-rose-400" />
-                <span>Organization</span>
-              </h5>
-              <p className="text-lg text-neutral-200">
-                {friend?.user?.organization
-                  ? friend?.user?.organization
-                  : "Not specified"}
-              </p>
-            </div>
-
-            {friend?.user?.handles && (
-              <div>
-                <h5 className="text-xs font-medium text-neutral-500/80 mb-3 flex items-center gap-1">
-                  <Share2 size={14} className="text-cyan-400" />
-                  <span>Social Media</span>
-                </h5>
-                <div className="flex justify-center gap-8 mt-6">
-                  {friend.user.handles.split(",").map((handle, i) => (
-                    <div
-                      key={i}
-                      className="cursor-pointer hover:scale-125 transition-transform duration-300 hover:drop-shadow-lg relative group"
-                    >
-                      <div className="absolute inset-0 bg-current rounded-full opacity-0 group-hover:opacity-10 scale-0 group-hover:scale-125 transition-all duration-500"></div>
+            <div className="text-[12px] font-bold text-gray-500 flex gap-5 mt-3 justify-center">
+              {friend?.user?.handles &&
+                friend?.user?.handles.split(",").map((handle, i) => (
+                  <div key={i} className="mx-4">
+                    <span className="text-[12px]  font-bold text-gray-500 flex items-center ">
                       {handle.includes("instagram") && (
                         <BsInstagram
                           onClick={() =>
@@ -382,8 +308,8 @@ const ClientSearchComponent = () => {
                               "_blank"
                             )
                           }
-                          size={24}
-                          className="text-pink-500 hover:text-pink-400"
+                          size="19"
+                          style={{ color: "yellow" }}
                         />
                       )}
                       {handle.includes("tiktok") && (
@@ -396,8 +322,8 @@ const ClientSearchComponent = () => {
                               "_blank"
                             )
                           }
-                          size={24}
-                          className="text-cyan-300 hover:text-cyan-200"
+                          size="19"
+                          style={{ color: "purple" }}
                         />
                       )}
                       {handle.includes("youtube") && (
@@ -410,8 +336,8 @@ const ClientSearchComponent = () => {
                               "_blank"
                             )
                           }
-                          size={24}
-                          className="text-red-500 hover:text-red-400"
+                          size="19"
+                          style={{ color: "red" }}
                         />
                       )}
                       {handle.includes("x") && (
@@ -424,8 +350,8 @@ const ClientSearchComponent = () => {
                               "_blank"
                             )
                           }
-                          size={24}
-                          className="text-blue-400 hover:text-blue-300"
+                          size="19"
+                          style={{ color: "blue" }}
                         />
                       )}
                       {handle.includes("facebook") && (
@@ -438,35 +364,29 @@ const ClientSearchComponent = () => {
                               "_blank"
                             )
                           }
-                          size={24}
-                          className="text-blue-600 hover:text-blue-500"
+                          size="19"
+                          style={{ color: "lightblue" }}
                         />
                       )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+                    </span>
+                  </div>
+                ))}
+            </div>
           </div>
-        </Box>
-
-        {/* Bio Section */}
-        <Box className="bg-neutral-800/50 rounded-xl p-6 border border-neutral-700/40 backdrop-blur-sm hover:border-amber-500/40 transition-all duration-500 animate-slide-up delay-400 hover:shadow-amber-500/10 hover:translate-y-[-2px]">
-          <h4 className="text-xs font-semibold text-neutral-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-            <FileText size={18} className="text-amber-400" />
-            <span>Bio</span>
-          </h4>
-          <p className="text-lg text-neutral-300 leading-relaxed">
-            {friend?.user?.bio ? friend?.user?.bio : "No bio available"}
-          </p>
-        </Box>
-      </div>
-
-      {/* Footer with Glow Effect */}
-      <div className="py-6 text-center">
-        <span className="text-xs text-neutral-500 hover:text-neutral-400 transition-colors duration-300">
-          &copy; Gigup 2025 | All Rights Reserved
-        </span>
+        </div>
+      </Box>
+      <Box className="h-fit bg-neutral-800 w-[100%] px-2 py-3">
+        <h4 className="text-[16px] font-bold text-gray-400 mt-3 mb-1 ">
+          Bio Info
+        </h4>
+        <div className="flex flex-col">
+          <span className="text-[12px] font-bold text-gray-500">
+            {friend?.user?.bio ? friend?.user?.bio : "-null"}
+          </span>
+        </div>
+      </Box>
+      <div className="flex justify-center p-2">
+        <span className="text-neutral-500 link"> &copy;Gigup 2025 </span>
       </div>
     </div>
   );

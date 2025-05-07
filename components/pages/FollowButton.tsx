@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { IoMdAdd } from "react-icons/io";
 import { useRouter } from "next/navigation";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
@@ -28,7 +28,7 @@ const FollowButton = ({
         : follower._id === userId
     );
   });
-  console.log(optimisticFollow);
+
   // Function to handle the follow action
   const handleFollow = async () => {
     // Optimistically set follow status
@@ -115,18 +115,17 @@ const FollowButton = ({
       const followingData: FetchResponse = await res.json();
       console.log(followingData);
       if (res.ok) {
-        console.log("following!!!", followingData);
         router.refresh();
       }
     } catch (error) {
       console.log(error);
     }
   };
-  useEffect(() => {
-    console.log("Initial optimisticFollow:", optimisticFollow);
-    console.log("Followers array:", followers);
-    console.log("Current User ID:", user?.user?._id);
-  }, [optimisticFollow, followers, user]);
+  // useEffect(() => {
+  //   console.log("Initial optimisticFollow:", optimisticFollow);
+  //   console.log("Followers array:", followers);
+  //   console.log("Current User ID:", user?.user?._id);
+  // }, [optimisticFollow, followers, user]);
   const isFollowing = (() => {
     const userId = user?.user?._id;
     if (!userId || !followers) return false;

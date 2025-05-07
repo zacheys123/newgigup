@@ -21,6 +21,8 @@ const MainUser = ({
   isClient,
   isMusician,
   organization,
+  roleType,
+  instrument,
 }: UserProps) => {
   const router = useRouter();
   const { loading: gigsLoading, gigs } = useAllGigs();
@@ -55,25 +57,18 @@ const MainUser = ({
   };
 
   useEffect(() => {
-    if (gigsLoading || !user?.user?._id || !gigs) return;
+    if (gigsLoading || !gigs) return;
 
-    const bookedGigs = gigs.filter(
-      (gig: GigProps) => gig?.bookedBy?._id === user?.user?._id
-    ).length;
+    const bookedGigs = gigs.filter((gig: GigProps) => {
+      return gig?.bookedBy?._id === _id;
+    }).length;
 
     setMusicianGigCount(bookedGigs);
     console.log(bookedGigs);
     if (user?.user?.isMusician) {
       setRating(calculateRating(user?.user?.allreviews || [], bookedGigs));
     }
-  }, [
-    user?.user?._id,
-    user?.user?.isMusician,
-    gigs,
-    user?.user?.allreviews,
-
-    gigsLoading,
-  ]);
+  }, [_id, user?.user?.isMusician, gigs, user?.user?.allreviews, gigsLoading]);
 
   return (
     <motion.div
@@ -107,11 +102,25 @@ const MainUser = ({
                 <FiUser className="text-xs" />
                 <span>{organization || `${firstname}'s Org`}</span>
                 <span>{organization ? `${organization}` : ""}</span>
+                <span className="text-emerald-300 font-bold">
+                  {isClient && "client"}
+                </span>
               </>
             ) : (
               <>
                 <FiMail className="text-xs" />
-                <span>{email}</span>
+                <span>{email}</span>{" "}
+                <span className="text-emerald-300 font-bold">
+                  {isMusician && roleType === "instrumentalist"
+                    ? `I play ${instrument}`
+                    : roleType === "dj"
+                    ? "Deejay"
+                    : roleType === "mc"
+                    ? "EMcee"
+                    : roleType === "vocalist"
+                    ? "i'm a Vocalist"
+                    : "musician"}
+                </span>
               </>
             )}
           </div>
