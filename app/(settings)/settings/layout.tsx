@@ -1,3 +1,8 @@
+import NotificationHandler from "@/components/NotificationHandler";
+import MobileSheet from "@/components/pages/MobileSheet";
+import UserNav from "@/components/user/UsersNav";
+import { UserButton } from "@clerk/nextjs";
+
 import { Toaster } from "sonner";
 
 export default function SettingsLayout({
@@ -7,15 +12,18 @@ export default function SettingsLayout({
 }>) {
   return (
     <div className="bg-black h-full w-full overflow-scroll">
-      <div className="flex items-center justify-between mt-4 mx-6  "></div>
+      <div className="flex items-center justify-between mt-4 mx-6  ">
+        <MobileSheet />
+        <UserButton />
+      </div>
       <Toaster
         position="top-right"
         toastOptions={{
           duration: 3000,
         }}
       />
-
-      {children}
+      <NotificationHandler />
+      {children} <UserNav />
     </div>
   );
 }

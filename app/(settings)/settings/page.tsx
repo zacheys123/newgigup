@@ -1,5 +1,6 @@
 "use client";
 import { Switch } from "@/components/ui/switch";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import React, { useState } from "react";
 import {
   User,
@@ -33,7 +34,7 @@ type ModalContent = {
 };
 
 type ModalType =
-  | "profile"
+  | "deleteaccount"
   | "password"
   | "email"
   | "push"
@@ -49,14 +50,14 @@ type ModalType =
 const SettingPage = () => {
   const [darkMode, setDarkMode] = useState<boolean>(false);
   const [activeModal, setActiveModal] = useState<ModalType | null>(null);
+  const { user } = useCurrentUser();
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
     phoneNumber: "",
   });
+  const [username, setUsername] = useState("");
   const [notifications, setNotifications] = useState({
     push: true,
     email: true,
@@ -81,7 +82,7 @@ const SettingPage = () => {
       items: [
         { label: "Change Password", action: () => openModal("password") },
         { label: "Email Preferences", action: () => openModal("email") },
-        { label: "Delete Account", action: () => openModal("profile") },
+        { label: "Delete Account", action: () => openModal("deleteaccount") },
       ],
     },
     {
@@ -132,53 +133,100 @@ const SettingPage = () => {
   };
 
   // Modal components
-  const ProfileModal = () => (
-    <form onSubmit={handleSubmit}>
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1 ">
-            Name
-          </label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            className="w-full bg-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Your name"
-          />
+  const DeleteAccountModal = () => {
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [error, setError] = useState("");
+    const currentUsername = user?.user?.username; // Replace with actual username from your auth system
+
+    const handleDeleteAccount = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setIsDeleting(true);
+      setError("");
+
+      try {
+        const response = await fetch("/api/account/delete", {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username: username }),
+        });
+
+        if (!response.ok) {
+          throw new Error(await response.text());
+        }
+
+        // Account deleted successfully - redirect to home or login page
+        window.location.href = "/";
+      } catch (err: unknown) {
+        console.log(err);
+        setError("Failed to delete account");
+      } finally {
+        setIsDeleting(false);
+      }
+    };
+
+    const usernameMatches = username === currentUsername;
+
+    return (
+      <form onSubmit={handleDeleteAccount}>
+        <div className="space-y-6">
+          <div className="bg-red-900/20 border border-red-900/50 rounded-lg p-4">
+            <h4 className="font-bold text-red-400 flex items-center">
+              <Info size={18} className="mr-2" />
+              Dangerous Action
+            </h4>
+            <p className="text-sm text-red-300 mt-1">
+              This will permanently delete your account and all associated data.
+              This action cannot be undone.
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-1">
+              Enter your username to confirm
+            </label>
+            <input
+              type="text"
+              name="username"
+              value={username}
+              onChange={(ev) => setUsername(ev.target.value)}
+              className="w-full bg-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              placeholder="Your username"
+            />
+            {username && !usernameMatches && (
+              <p className="text-red-400 text-sm mt-1">
+                Username does not match
+              </p>
+            )}
+          </div>
+
+          {error && <div className="text-red-400 text-sm">{error}</div>}
+
+          <div className="flex justify-end space-x-3 pt-4">
+            <button
+              type="button"
+              onClick={closeModal}
+              className="px-4 py-2 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-700 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={!usernameMatches || isDeleting}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                usernameMatches
+                  ? "bg-red-600 hover:bg-red-700"
+                  : "bg-red-900/50 cursor-not-allowed"
+              }`}
+            >
+              {isDeleting ? "Deleting..." : "Permanently Delete Account"}
+            </button>
+          </div>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">
-            Email
-          </label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleInputChange}
-            className="w-full bg-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="your@email.com"
-          />
-        </div>
-        <div className="flex justify-end space-x-3 pt-4">
-          <button
-            type="button"
-            onClick={closeModal}
-            className="px-4 py-2 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-700 transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors"
-          >
-            Save Changes
-          </button>
-        </div>
-      </div>
-    </form>
-  );
+      </form>
+    );
+  };
 
   const PasswordModal = () => (
     <form onSubmit={handleSubmit}>
@@ -393,9 +441,9 @@ const SettingPage = () => {
   );
 
   const modalContent: Record<ModalType, ModalContent> = {
-    profile: {
+    deleteaccount: {
       title: "Delete Account",
-      component: <ProfileModal />,
+      component: <DeleteAccountModal />,
     },
     password: {
       title: "Change Password",
