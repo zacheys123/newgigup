@@ -1,7 +1,7 @@
 "use client";
 import { Switch } from "@/components/ui/switch";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   User,
   Bell,
@@ -57,7 +57,6 @@ const SettingPage = () => {
     confirmPassword: "",
     phoneNumber: "",
   });
-  const [username, setUsername] = useState("");
   const [notifications, setNotifications] = useState({
     push: true,
     email: true,
@@ -133,10 +132,21 @@ const SettingPage = () => {
   };
 
   // Modal components
+
   const DeleteAccountModal = () => {
     const [isDeleting, setIsDeleting] = useState(false);
     const [error, setError] = useState("");
-    const currentUsername = user?.user?.username; // Replace with actual username from your auth system
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmChecked, setConfirmChecked] = useState(false);
+
+    const currentUsername = user?.user?.username;
+    const usernameMatches = username === currentUsername;
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+      inputRef.current?.focus();
+    }, []);
 
     const handleDeleteAccount = async (e: React.FormEvent) => {
       e.preventDefault();
@@ -146,30 +156,28 @@ const SettingPage = () => {
       try {
         const response = await fetch("/api/account/delete", {
           method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ username: username }),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
         });
 
         if (!response.ok) {
           throw new Error(await response.text());
         }
 
-        // Account deleted successfully - redirect to home or login page
+        // Optionally show success message before redirect
         window.location.href = "/";
       } catch (err: unknown) {
-        console.log(err);
-        setError("Failed to delete account");
+        setError((err as Error).message || "Failed to delete account");
       } finally {
         setIsDeleting(false);
       }
     };
 
-    const usernameMatches = username === currentUsername;
-
     return (
-      <form onSubmit={handleDeleteAccount}>
+      <form
+        onSubmit={handleDeleteAccount}
+        aria-label="Delete account confirmation"
+      >
         <div className="space-y-6">
           <div className="bg-red-900/20 border border-red-900/50 rounded-lg p-4">
             <h4 className="font-bold text-red-400 flex items-center">
@@ -187,18 +195,46 @@ const SettingPage = () => {
               Enter your username to confirm
             </label>
             <input
+              ref={inputRef}
               type="text"
-              name="username"
               value={username}
               onChange={(ev) => setUsername(ev.target.value)}
-              className="w-full bg-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              className="w-full bg-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-red-500"
               placeholder="Your username"
+              aria-required
             />
             {username && !usernameMatches && (
               <p className="text-red-400 text-sm mt-1">
                 Username does not match
               </p>
             )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-1">
+              Enter your password to confirm
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(ev) => setPassword(ev.target.value)}
+              className="w-full bg-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-red-500"
+              placeholder="Your password"
+              aria-required
+            />
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={confirmChecked}
+              onChange={(e) => setConfirmChecked(e.target.checked)}
+              id="confirm"
+              className="accent-red-600"
+            />
+            <label htmlFor="confirm" className="text-sm text-gray-300">
+              I understand this action cannot be undone
+            </label>
           </div>
 
           {error && <div className="text-red-400 text-sm">{error}</div>}
@@ -213,9 +249,11 @@ const SettingPage = () => {
             </button>
             <button
               type="submit"
-              disabled={!usernameMatches || isDeleting}
+              disabled={
+                !usernameMatches || !password || !confirmChecked || isDeleting
+              }
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                usernameMatches
+                usernameMatches && password && confirmChecked
                   ? "bg-red-600 hover:bg-red-700"
                   : "bg-red-900/50 cursor-not-allowed"
               }`}
