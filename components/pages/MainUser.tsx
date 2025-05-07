@@ -1,14 +1,13 @@
 "use client";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import AvatarComponent from "./Avatar";
 import FollowButton from "./FollowButton";
 import { UserProps } from "@/types/userinterfaces";
 import { FiUser, FiMail, FiAtSign } from "react-icons/fi";
 import { useAllGigs } from "@/hooks/useAllGigs";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useEffect, useState } from "react";
 import { GigProps } from "@/types/giginterface";
+import Image from "next/image";
 
 const MainUser = ({
   _id,
@@ -26,7 +25,6 @@ const MainUser = ({
 }: UserProps) => {
   const router = useRouter();
   const { loading: gigsLoading, gigs } = useAllGigs();
-  const { user } = useCurrentUser();
 
   const handleClick = () => {
     if (isMusician) {
@@ -58,17 +56,25 @@ const MainUser = ({
 
   useEffect(() => {
     if (gigsLoading || !gigs) return;
-
+    // Filter gigs where bookedBy._id matches the current user's _id
     const bookedGigs = gigs.filter((gig: GigProps) => {
       return gig?.bookedBy?._id === _id;
-    }).length;
+    });
 
-    setMusicianGigCount(bookedGigs);
-    console.log(bookedGigs);
-    if (user?.user?.isMusician) {
-      setRating(calculateRating(user?.user?.allreviews || [], bookedGigs));
+    setMusicianGigCount(bookedGigs.length);
+
+    if (isMusician) {
+      // Only calculate rating for musicians
+      setRating(
+        calculateRating(
+          bookedGigs.flatMap(
+            (bookedBy: UserProps) => bookedBy.allreviews || []
+          ),
+          bookedGigs.length
+        )
+      );
     }
-  }, [_id, user?.user?.isMusician, gigs, user?.user?.allreviews, gigsLoading]);
+  }, [_id, isMusician, gigs, gigsLoading]);
 
   return (
     <motion.div
@@ -87,11 +93,19 @@ const MainUser = ({
     >
       {/* Avatar + Basic Info */}
       <div className="flex items-center gap-4">
-        <AvatarComponent
-          picture={picture || ""}
-          posts="rounded-full w-14 h-14 border border-white/20 shadow-md"
-          firstname={firstname ? firstname : ""}
-        />
+        {picture ? (
+          <Image
+            src={picture || ""}
+            alt="pic"
+            width={30}
+            height={30}
+            className="object-cover rounded-full"
+          />
+        ) : (
+          <div className="w-[30px] h-[30px] rounded-full flex justify-center items-center">
+            {firstname ? firstname[0] : ""}
+          </div>
+        )}
         <div className="flex-1 min-w-0">
           <h3 className="text-base font-medium text-white truncate">
             {firstname} {lastname}

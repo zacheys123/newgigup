@@ -19,7 +19,7 @@ const SearchInput = () => {
       autoComplete="off"
       onChange={(ev) => handleInputChange(ev.target.value)}
       value={searchQuery}
-      className="w-full bg-transparent text-gray-200 placeholder-gray-500 focus:outline-none text-sm md:text-base font-medium tracking-wide"
+      className="w-full bg-transparent text-orange-200 px-3 placeholder-gray-500 focus:outline-none text-sm md:text-base font-medium tracking-wide"
       id="search"
       type="text"
       data-autofocus
