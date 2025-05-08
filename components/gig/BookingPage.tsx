@@ -223,8 +223,8 @@ const BookingPage = ({ currentGig }: BookingProps) => {
 
           {/* Profile Header */}
           <section className="mb-8">
-            <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl p-6 shadow-xl border border-gray-700 transition-all hover:shadow-2xl">
-              <div className="flex flex-col sm:flex-row items-start justify-between gap-6">
+            <div className="p-6">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                   {currentgig?.logo && (
                     <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-yellow-400 shadow-lg">
@@ -238,44 +238,61 @@ const BookingPage = ({ currentGig }: BookingProps) => {
                     </div>
                   )}
                   <div>
-                    <h2 className="text-2xl font-bold text-white">
+                    <h2 className="text-xl font-bold text-white">
                       {currentgig?.postedBy?.firstname}{" "}
                       {currentgig?.postedBy?.lastname}
                     </h2>
-                    <p className="text-gray-400">
+                    <p className="text-gray-400 text-sm">
                       @{currentgig?.postedBy?.username}
                     </p>
-                    <div className="mt-1 flex items-center space-x-2">
-                      <span className="text-sm text-gray-300 bg-gray-700 px-2 py-1 rounded">
-                        {currentgig?.viewCount?.length} views
-                      </span>
-                    </div>
                   </div>
                 </div>
-                <div className="flex items-center space-x-3 self-end sm:self-center">
-                  {user?.user?._id && currentgig?.postedBy?.followers && (
-                    <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <FollowButton
-                        _id={currentgig?.postedBy?._id as string}
-                        followers={currentgig?.postedBy?.followers}
-                        myid={user?.user?.id}
-                      />
-                    </motion.div>
-                  )}
-                  <button
-                    onClick={() => {
-                      setShowX(true);
-                      setModal({ type: "chat", user: postedByUser });
-                    }}
-                    className="p-2.5 bg-gray-700 hover:bg-gray-600 rounded-full text-yellow-400 hover:text-yellow-300 transition-all duration-200 shadow"
-                    aria-label="Chat"
-                  >
-                    <ChatBubbleOvalLeftIcon className="w-5 h-5" />
-                  </button>
+              </div>
+              <div className="mt-6 flex justify-between items-center">
+                <div className="flex space-x-6">
+                  <div className="text-center">
+                    <p className="text-amber-400 font-bold">
+                      {currentgig?.viewCount?.length}
+                    </p>
+                    <p className="text-gray-400 text-xs">Views</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-amber-400 font-bold">
+                      {currentgig?.postedBy?.followers?.length || 0}
+                    </p>
+                    <p className="text-gray-400 text-xs">Followers</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-amber-400 font-bold">
+                      {currentgig?.postedBy?.followings?.length || 0}
+                    </p>
+                    <p className="text-gray-400 text-xs">Following</p>
+                  </div>
                 </div>
+              </div>{" "}
+              <div className="flex items-center space-x-3 self-end sm:self-center">
+                {user?.user?._id && currentgig?.postedBy?.followers && (
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <FollowButton
+                      _id={currentgig?.postedBy?._id as string}
+                      followers={currentgig?.postedBy?.followers}
+                      myid={user?.user?.id}
+                    />
+                  </motion.div>
+                )}
+                <button
+                  onClick={() => {
+                    setShowX(true);
+                    setModal({ type: "chat", user: postedByUser });
+                  }}
+                  className="p-2.5 bg-gray-700 hover:bg-gray-600 rounded-full text-yellow-400 hover:text-yellow-300 transition-all duration-200 shadow"
+                  aria-label="Chat"
+                >
+                  <ChatBubbleOvalLeftIcon className="w-5 h-5" />
+                </button>
               </div>
             </div>
           </section>

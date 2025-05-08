@@ -10,8 +10,7 @@ const BillingComponent = () => {
   const { userId } = useAuth();
   const { user } = useCurrentUser();
   const { subscription } = useSubscription(userId as string);
-  console.log(user);
-  const isPro = subscription?.isPro ?? false;
+  const isPro = subscription?.tier === "free" ? false : true;
 
   const plans = useMemo(() => {
     return [

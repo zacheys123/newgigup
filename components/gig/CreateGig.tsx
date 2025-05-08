@@ -366,7 +366,6 @@ const CreateGig = () => {
 
     if (!validateFields()) {
       setIsVisible(true);
-      setEditMessage("Please fill all required fields");
       setError(true);
       return;
     }

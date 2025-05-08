@@ -19,7 +19,7 @@ export function ClientDashboard({
 }: ClientDashboardProps) {
   const { userId } = useAuth();
   const { gigs, loading } = useAllGigs();
-  console.log(gigs);
+
   const gigsBookedAndCompleted = gigs?.filter((f: GigProps) => {
     return f?.postedBy?.clerkId === userId && f.isTaken === true;
   }).length;

@@ -70,6 +70,7 @@ const AllGigs = () => {
         (gig: GigProps) =>
           gig?.isTaken === false &&
           gig?.isPending === false &&
+          gig?.bookCount.length < 10 &&
           !gig?.bookCount?.some((bookedUser) => bookedUser?.clerkId === userId)
         // gig?.bookCount?.some(
         //   (bookedUser) => bookedUser?._id === user?.user?._id

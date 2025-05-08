@@ -73,7 +73,7 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
       setIsMutating(false);
     }
   };
-  console.log(plan.name);
+
   return (
     <div
       onClick={() => {

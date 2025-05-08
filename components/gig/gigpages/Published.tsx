@@ -85,7 +85,7 @@ const Published = () => {
       filtered?.filter(
         (gig: GigProps) =>
           gig?.isTaken === false &&
-          gig?.bookCount.length < 2 &&
+          gig?.bookCount.length < 10 &&
           !gig?.bookCount?.some((bookedUser) => bookedUser?.clerkId === userId)
       ) || []
     );
