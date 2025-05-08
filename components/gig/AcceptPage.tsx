@@ -1,22 +1,18 @@
 "use client";
-import { Box, CircularProgress, Divider } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import { motion } from "framer-motion";
-// import { EyeIcon, MessageCircle, X } from "lucide-react";
 import Image from "next/image";
 import React, { FormEvent, useEffect, useState } from "react";
-// import { MdAdd } from "react-icons/md";
 import { Button } from "../ui/button";
 import Rating from "./Rating";
-import { ArrowDown, ArrowUp, MessageCircle } from "lucide-react";
+import { ArrowDown, ArrowUp } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
-
 import { Textarea } from "flowbite-react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { MdAdd } from "react-icons/md";
 import { FetchResponse, GigProps } from "@/types/giginterface";
-
-// import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { Review } from "@/types/userinterfaces";
 
 const AcceptPage = ({
   _id,
@@ -32,6 +28,7 @@ const AcceptPage = ({
   const [comment, setComment] = useState<string>("");
   const [rating, setRating] = useState<number>(0);
   const [loadingreview, setLoadingreview] = useState(false);
+  const [pers, setPers] = useState<boolean>(false);
 
   const [rate] = useState<number>(
     bookedBy?.allreviews?.length
@@ -56,14 +53,11 @@ const AcceptPage = ({
   };
 
   useEffect(() => {
-    // if (bookCount?.length === 0 && isTaken === false) {
-    //   return;
-    // }
-
     if (isTaken === false && bookCount?.length > 0) {
       router.push(`/gigs/${userId}`);
     }
   }, [isTaken, isPending, userId, router, bookCount]);
+
   const handleRatingChange = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -71,7 +65,7 @@ const AcceptPage = ({
       setLoadingreview(true);
 
       if (!comment) {
-        toast.error("A written review  is needed.");
+        toast.error("A written review is needed.");
         return;
       }
       if (comment && comment.length > 200) {
@@ -116,232 +110,241 @@ const AcceptPage = ({
       setLoadingreview(false);
     }
   };
-  const [pers, setPers] = useState<boolean>(false);
-  console.log(bookedBy);
+
   return (
-    <div className="h-[83%] w-full overflow-y-auto relative">
-      {/* {!isTaken && (
-        <div className="absolute w-[40px] h-[90px] flex flex-col gap-[10px] bg-gray-700 right-5 top-[460px] opacity-85 rounded-xl pt-4 animate-pulse ">
-          {" "}
-          {!loading ? (
-            <X
-              size="26"
-              style={{
-                marginLeft: "5px",
-                cursor: "pointer",
-                color: "white",
-                fontWeight: "bold",
-              }}
-              className="shadow shadow-red-200 "
-              onClick={forget}
-            />
-          ) : (
-            <CircularProgress
-              size="20px"
-              color="primary"
-              style={{
-                marginLeft: "10px",
-                cursor: "pointer",
-                color: "white",
-                fontWeight: "bold",
-              }}
-            />
-          )}
-          {/* {bookloading ? (
-            <CircularProgress
-              size="20px"
-              color="primary"
-              style={{
-                marginLeft: "10px",
-                cursor: "pointer",
-                color: "white",
-                fontWeight: "bold",
-              }}
-            />
-          ) : (
-            <RiCornerDownRightLine
-              size="26"
-              style={{
-                marginLeft: "5px",
-                cursor: "pointer",
-                color: "lightgray",
-              }}
-              className="shadow shadow-slate-200"
-         
-            />
-          )} */}
-      {/* </div>
-      )} */}
-
-      <div className="h-[130px] w-[90%] mx-auto p-4 bg-zinc-600  shadow-md shadow-zinc-700 my-4 flex flex-col gap-3 rounded-xl">
-        <h4 className="text-gray-400 text-[13px] font-serif underline underline-offset-2">
-          Personal
-        </h4>
-        <div className="w-full h-[30px] flex justify-end  items-center gap-[90px] ">
-          {bookedBy?.picture && (
-            <Image
-              src={bookedBy?.picture}
-              alt="Prof pic "
-              width={30}
-              height={30}
-              objectFit="cover"
-              className="rounded-full text-center text-white font-mono text-[13px]"
-            />
-          )}
-
-          <div className="flex gap-4 items-center">
-            <div className="flex items-center ">
-              <h4 className="text-gray-300 text-[14px] font-mono font-bold flex items-center gap-1">
-                {viewCount?.length} <span className="text-gray-400">views</span>
-              </h4>
-            </div>
-            <div className="flex  items-center">
-              <h4 className="text-gray-400 text-[13px] font-sans">follow</h4>
-              <MdAdd
-                size="21px"
-                style={{
-                  marginLeft: "5px",
-                  cursor: "pointer",
-                  color: "white",
-                }}
-              />
-            </div>
-            <MessageCircle
-              size="21px"
-              style={{
-                marginLeft: "10px",
-                cursor: "pointer",
-                color: "white",
-              }}
-            />
-          </div>
-        </div>
-        <div className="w-full  h-full flex justify-around">
-          <h4 className="text-gray-300 text-[13px] font-bold">
-            {postedBy?.firstname}
-          </h4>{" "}
-          <h4 className="text-gray-300 text-[13px] font-bold">
-            {postedBy?.lastname}
-          </h4>
-        </div>
-      </div>
-      <h6
-        className="text-sm w-[85%] mx-auto font-semibold text-neutral-200 mb-2 bg-amber-800  py-1 px-2 rounded-md flex justify-between items-center"
-        onClick={() => setPers((prev) => !prev)}
-      >
-        <span> More Info</span>
-        {!pers ? <ArrowDown /> : <ArrowUp />}
-      </h6>
-      {pers && (
+    <div className="h-screen w-full overflow-y-auto bg-gradient-to-br from-gray-900 to-gray-800 scroll-smooth">
+      <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
+        {/* Profile Card */}
         <motion.div
-          className="bg-gray-900 text-white p-8 rounded-lg shadow-lg"
-          initial="initial"
-          animate="animate"
-          variants={variant}
+          className="w-full bg-gray-800 rounded-xl shadow-2xl overflow-hidden"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
         >
+          <div className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                {bookedBy?.picture && (
+                  <div className="relative h-16 w-16 rounded-full overflow-hidden border-2 border-amber-500">
+                    <Image
+                      src={bookedBy?.picture}
+                      alt="Profile picture"
+                      layout="fill"
+                      objectFit="cover"
+                      className="rounded-full"
+                    />
+                  </div>
+                )}
+                <div>
+                  <h2 className="text-xl font-bold text-white">
+                    {postedBy?.firstname} {postedBy?.lastname}
+                  </h2>
+                  <p className="text-gray-400 text-sm">@{bookedBy?.username}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-4">
+                <button className="flex items-center space-x-1 bg-amber-600 hover:bg-amber-700 px-3 py-1 rounded-full transition-all">
+                  <MdAdd className="text-white" size={18} />
+                  <span className="text-white text-sm">Follow</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-between items-center">
+              <div className="flex space-x-6">
+                <div className="text-center">
+                  <p className="text-amber-400 font-bold">
+                    {viewCount?.length}
+                  </p>
+                  <p className="text-gray-400 text-xs">Views</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-amber-400 font-bold">
+                    {bookedBy?.followers?.length || 0}
+                  </p>
+                  <p className="text-gray-400 text-xs">Followers</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-amber-400 font-bold">
+                    {bookedBy?.followings?.length || 0}
+                  </p>
+                  <p className="text-gray-400 text-xs">Following</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* More Info Section */}
+          <div className="border-t border-gray-700 px-6 py-4">
+            <button
+              className="flex items-center justify-between w-full text-left"
+              onClick={() => setPers((prev) => !prev)}
+            >
+              <span className="text-amber-400 font-medium">
+                More Information
+              </span>
+              {!pers ? (
+                <ArrowDown className="text-amber-400" />
+              ) : (
+                <ArrowUp className="text-amber-400" />
+              )}
+            </button>
+
+            {pers && (
+              <motion.div
+                className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4"
+                initial="initial"
+                animate="animate"
+                variants={variant}
+              >
+                <div className="bg-gray-700 bg-opacity-50 p-4 rounded-lg">
+                  <p className="text-gray-400 text-sm">Email Address</p>
+                  <p className="text-white title">{bookedBy?.email || "-"}</p>
+                </div>
+                <div className="bg-gray-700 bg-opacity-50 p-4 rounded-lg">
+                  <p className="text-gray-400 text-sm">Profession</p>
+                  <p className="text-white title">
+                    {bookedBy?.roleType === "instrumentalist"
+                      ? bookedBy?.instrument
+                      : bookedBy?.roleType === "dj"
+                      ? "Deejay"
+                      : bookedBy?.roleType === "mc"
+                      ? "EMcee"
+                      : bookedBy?.roleType === "vocalist"
+                      ? "Vocalist"
+                      : "-"}
+                  </p>
+                </div>
+                <div className="bg-gray-700 bg-opacity-50 p-4 rounded-lg">
+                  <p className="text-gray-400 text-sm">Experience</p>
+                  <p className="text-white title">
+                    {bookedBy?.experience || "-"}
+                  </p>
+                </div>
+              </motion.div>
+            )}
+          </div>
+        </motion.div>
+
+        {/* Rating Section */}
+        {isTaken && (
           <motion.div
-            className="bg-gray-800 bg-opacity-30 p-6 rounded-lg shadow-md"
-            whileHover={{ scale: 1.02 }}
-            transition={{ duration: 0.2 }}
+            className="w-full bg-gray-800 rounded-xl shadow-xl p-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
           >
-            {" "}
-            <div className="text-sm text-neutral-300 space-y-3">
-              <div>
-                <span className="font-bold text-neutral-400">Username:</span>{" "}
-                {bookedBy?.username}
+            <div className="flex flex-col md:flex-row items-center justify-between">
+              <div className="mb-4 md:mb-0">
+                <h3 className="text-lg font-semibold text-amber-400 mb-2">
+                  Rate This Musician
+                </h3>
+                <Rating rating={rating ? rating : rate} setRating={setRating} />
               </div>
-              <div>
-                <span className="font-bold text-neutral-400">
-                  Email Address:
-                </span>{" "}
-                {bookedBy?.email}
+
+              {bookedBy?.picture && (
+                <div className="relative h-20 w-20 rounded-full overflow-hidden border-2 border-amber-500">
+                  <Image
+                    src={bookedBy?.picture}
+                    alt="Profile picture"
+                    layout="fill"
+                    objectFit="cover"
+                    className="rounded-full"
+                  />
+                </div>
+              )}
+            </div>
+
+            <form onSubmit={handleRatingChange} className="mt-6">
+              <Textarea
+                placeholder="Share your experience with this musician..."
+                value={comment ? comment : comm}
+                onChange={(e) => setComment(e.target.value)}
+                className="w-full h-32 p-4 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-white"
+                rows={4}
+              />
+
+              <div className="mt-4 flex justify-end">
+                <Button
+                  variant="destructive"
+                  disabled={loadingreview}
+                  className="bg-gradient-to-r from-amber-600 to-amber-800 hover:from-amber-700 hover:to-amber-900 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all"
+                >
+                  {loadingreview ? (
+                    <div className="flex items-center">
+                      <CircularProgress
+                        size={20}
+                        className="text-amber-300 mr-2"
+                      />
+                      <span>Submitting...</span>
+                    </div>
+                  ) : (
+                    "Submit Review"
+                  )}
+                </Button>
               </div>
-              <div>
-                <span className="font-bold text-neutral-400">Instrumment:</span>{" "}
-                {bookedBy?.instrument ? bookedBy?.instrument : "-"}
-              </div>
-              <div>
-                <span className="font-bold text-neutral-400">Experience:</span>{" "}
-                {bookedBy?.experience ? bookedBy?.experience : "-"}
-              </div>
+            </form>
+          </motion.div>
+        )}
+
+        {/* Existing Reviews Section */}
+        {bookedBy?.allreviews && bookedBy?.allreviews?.length > 0 && (
+          <motion.div
+            className="w-full bg-gray-800 rounded-xl shadow-xl p-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+          >
+            <h3 className="text-lg font-semibold text-amber-400 mb-4">
+              Previous Reviews
+            </h3>
+
+            <div className="space-y-4 max-h-96 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-amber-600 scrollbar-track-gray-700">
+              {bookedBy.allreviews
+                .filter((review: { gigId: string }) => review.gigId === _id)
+                .map((review: Review, index: number) => {
+                  const reviewDate = review.createdAt
+                    ? new Date(review.createdAt).toLocaleDateString()
+                    : "No date available";
+
+                  return (
+                    <div
+                      key={index}
+                      className="bg-gray-700 bg-opacity-50 p-4 rounded-lg"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center space-x-2">
+                          <div className="text-amber-400 font-bold">
+                            {review.rating}.0
+                          </div>
+                          <div className="flex">
+                            {[...Array(5)].map((_, i) => (
+                              <svg
+                                key={i}
+                                className={`w-4 h-4 ${
+                                  i < review.rating
+                                    ? "text-amber-400"
+                                    : "text-gray-500"
+                                }`}
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                            ))}
+                          </div>
+                        </div>
+                        <span className="text-gray-400 text-sm">
+                          {reviewDate}
+                        </span>
+                      </div>
+                      <p className="text-gray-300">{review.comment}</p>
+                    </div>
+                  );
+                })}
             </div>
           </motion.div>
-        </motion.div>
-      )}
-      <Divider className="my-6 border-neutral-700" />
-      <div className="flex justify-center space-x-10 w-3/4 mx-auto mt-6 border-t border-neutral-700 pt-6">
-        <motion.div className="text-center" whileHover={{ scale: 1.1 }}>
-          <span className="text-purple-400 font-medium title">Followers</span>
-          <p className="text-sm font-bold text-red-500 mt-1 choice">
-            {bookedBy?.followers?.length || 0}
-          </p>
-        </motion.div>
-        <motion.div className="text-center" whileHover={{ scale: 1.1 }}>
-          <span className="text-purple-400 font-medium title">Following</span>
-          <p className="text-sm font-bold text-red-500 mt-1 font-mono ">
-            {bookedBy?.followings?.length || 0}
-          </p>
-        </motion.div>
-      </div>
-      <Divider className="my-6 border-neutral-700" />
-      <Divider sx={{ backgroundColor: "gray", width: "82%", margin: "auto" }} />
-      {isTaken && (
-        <div className="w-full flex justify-between gap-4 my-8 p-3 rounded-lg shadow-md shadow-amber-600">
-          <Box className="flex flex-col gap-3">
-            <h6 className="text-neutral-400 font-semibold ">Rate Musician</h6>
-            <Rating rating={rating ? rating : rate} setRating={setRating} />
-          </Box>
-
-          {bookedBy?.picture && (
-            <Image
-              width={50}
-              height={50}
-              className="w-12 h-12 rounded-full shadow-sm"
-              src={bookedBy?.picture}
-              alt="Booker profile"
-            />
-          )}
-        </div>
-      )}
-      <div className="flex justify-center mt-8 space-x-6">
-        {isTaken && (
-          <form
-            className="flex flex-col gap-2 w-full"
-            onSubmit={handleRatingChange}
-          >
-            <Textarea
-              placeholder="Write a review here...
-              "
-              value={comment ? comment : comm}
-              onChange={(e) => setComment(e.target.value)}
-              className="w-[88%] mx-auto h-[80px] py-2 px-3 rounded-md shadow-md focus-within:ring-0 outline-none"
-            />
-            <Button
-              variant="destructive"
-              disabled={loadingreview}
-              className="w-48 h-[30px] mt-8 choice mx-auto"
-            >
-              {loadingreview ? (
-                <CircularProgress
-                  size="15px"
-                  sx={{ color: "yellow" }}
-                  className="
-                      text-white
-                    bg-gradient-to-br
-                    from-red-500
-                     to-gray-200
-                   via-yellow-500
-                    rounded-se-full
-                    rounded-ss-full
-                    rounded-ee-xl
-
-                    "
-                />
-              ) : (
-                "Review"
-              )}
-            </Button>{" "}
-          </form>
         )}
       </div>
     </div>

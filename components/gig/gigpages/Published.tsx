@@ -49,6 +49,7 @@ const Published = () => {
   // Add this useEffect to listen for socket updates
   // Socket.io effect
   console.log(gigs);
+
   useEffect(() => {
     if (!socket) return;
 
@@ -84,6 +85,7 @@ const Published = () => {
       filtered?.filter(
         (gig: GigProps) =>
           gig?.isTaken === false &&
+          gig?.bookCount.length < 2 &&
           !gig?.bookCount?.some((bookedUser) => bookedUser?.clerkId === userId)
       ) || []
     );

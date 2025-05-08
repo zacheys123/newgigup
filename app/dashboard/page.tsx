@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { ClientDashboard } from "@/components/dashboard/client";
 import { MusicianDashboard } from "@/components/dashboard/muscian";
 import useStore from "../zustand/useStore";
+import { motion } from "framer-motion";
 
 export default function Dashboard() {
   const { userId, isLoaded } = useAuth();
@@ -65,7 +66,18 @@ export default function Dashboard() {
   }
 
   if (!data) {
-    return null;
+    return (
+      <div className="flex justify-center items-center min-h-screen text-gray-300 backdrop-blur-sm bg-neutral-700/50 flex-col gap-4 ">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          className="w-8 h-8 border-4 border-lime-400 border-t-transparent rounded-full"
+        />
+        <h6 className="animate-pulse font-mono text-1xl  text-amber-500">
+          {`Loading User's Data`}
+        </h6>
+      </div>
+    );
   }
 
   return (

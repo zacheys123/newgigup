@@ -12,7 +12,7 @@ import { GigProps } from "@/types/giginterface";
 import { filterGigs, fonts } from "@/utils";
 import { CircularProgress } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 const MyGigs = () => {
@@ -20,10 +20,8 @@ const MyGigs = () => {
   const { user } = useCurrentUser();
   const [typeOfGig, setTypeOfGig] = useState<string>("");
   const [category, setCategory] = useState<string>("all");
-  const [location, setLocation] = useState<string>(() =>
-    user?.user?.city ? user?.user?.city : "all"
-  );
-  const [scheduler, setScheduler] = useState<string>("notPending");
+  const [location, setLocation] = useState<string>(() => "all");
+  const [scheduler, setScheduler] = useState<string>("all");
   const router = useRouter();
   const [secret, setSecret] = useState<string>("");
   const {
@@ -91,24 +89,6 @@ const MyGigs = () => {
       // ... other cleanup
     }
   };
-  const normalizeString = (str?: string) =>
-    str
-      ?.trim()
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "") || "";
-  useEffect(() => {
-    // if (!user) {
-    //   mutateUser().catch((error) => {
-    //     console.error("Failed to mutate user:", error);
-    //     // Consider adding toast notification here
-    //   });
-    // }
-
-    if (normalizeString(user?.user?.city)) {
-      setLocation(user.user?.city);
-    }
-  }, [user]);
 
   const filteredGigs = useMemo(() => {
     const filtered = filterGigs(gigs, {

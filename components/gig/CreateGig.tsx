@@ -782,7 +782,7 @@ const CreateGig = () => {
                         value={gigInputs?.secret}
                         type={!secretpass ? "password" : "text"}
                         placeholder="Enter secret passphrase (optional)"
-                        className="w-full pl-10 pr-10 bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+                        className="w-full pl-10 pr-10 bg-gray-700/50 text-gray-100 h-12 title rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
                       />
                       <button
                         type="button"
@@ -807,7 +807,7 @@ const CreateGig = () => {
                         type="text"
                         placeholder="Enter a captivating title for your gig"
                         className={cn(
-                          "w-full bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-4 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all",
+                          "w-full bg-gray-700/50 text-gray-100 h-12 title rounded-lg border border-gray-600 px-4 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all",
                           fieldErrors.title
                             ? "border-red-500/50 focus:ring-red-500/50"
                             : ""
@@ -966,7 +966,7 @@ const CreateGig = () => {
                             }));
                           }}
                           value={gigInputs.currency || "USD"}
-                          className="w-full bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-3 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                          className="w-full bg-gray-700/50 text-gray-100 h-12 title rounded-lg border border-gray-600 px-3 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                         >
                           <option value="USD">USD ($)</option>
                           <option value="EUR">EUR (€)</option>
@@ -991,7 +991,7 @@ const CreateGig = () => {
                             type="number"
                             placeholder="Amount"
                             className={cn(
-                              "w-full bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 pl-10 pr-3 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent",
+                              "w-full bg-gray-700/50 text-gray-100 h-12 title rounded-lg border border-gray-600 pl-10 pr-3 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent",
                               fieldErrors.price
                                 ? "border-red-500/50 focus:ring-red-500/50"
                                 : ""
@@ -1012,7 +1012,7 @@ const CreateGig = () => {
                           onChange={handleInputChange}
                           name="pricerange"
                           value={gigInputs?.pricerange}
-                          className="w-full bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-3 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                          className="w-full bg-gray-700/50 text-gray-100 h-12 title rounded-lg border border-gray-600 px-3 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                         >
                           <option value="0">Select range</option>
                           <option value="hundreds">Hundreds (00)</option>
@@ -1129,7 +1129,7 @@ const CreateGig = () => {
                           onChange={handleInputChange}
                           name="gigtimeline"
                           value={gigInputs.gigtimeline}
-                          className="w-full bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-3 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                          className="w-full bg-gray-700/50 text-gray-100 h-12 title rounded-lg border border-gray-600 px-3 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                         >
                           <option value="">Select timeline</option>
                           <option value="once">One-time event</option>
@@ -1143,7 +1143,7 @@ const CreateGig = () => {
                           Day of Week
                         </label>
                         <select
-                          className="w-full bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-3 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                          className="w-full bg-gray-700/50 text-gray-100 h-12 title rounded-lg border border-gray-600 px-3 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                           value={gigInputs?.day}
                           onChange={handleInputChange}
                           name="day"
@@ -1169,7 +1169,7 @@ const CreateGig = () => {
                         <input
                           type="text"
                           placeholder="Describe your custom timeline info"
-                          className="w-full bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-4 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                          className="w-full bg-gray-700/50 text-gray-100 h-12 title rounded-lg border border-gray-600 px-4 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                           onChange={handleInputChange}
                           name="otherTimeline"
                           value={gigInputs?.otherTimeline}
@@ -1190,7 +1190,7 @@ const CreateGig = () => {
                           onChange={handleDate}
                           minDate={minDate}
                           maxDate={maxDate}
-                          className="w-full bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-4 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                          className="w-full bg-gray-700/50 text-gray-100 h-12 title rounded-lg border border-gray-600 px-4 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                           placeholderText="Select date"
                           isClearable
                         />
@@ -1233,7 +1233,7 @@ const CreateGig = () => {
                         <input
                           type="text"
                           placeholder="Time (e.g., 10)"
-                          className="w-full bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-4 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                          className="w-full bg-gray-700/50 text-gray-100 h-12 title rounded-lg border border-gray-600 px-4 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                           onChange={handleInputChange}
                           name="start"
                           value={gigInputs?.start}
@@ -1242,7 +1242,7 @@ const CreateGig = () => {
                           onChange={handleInputChange}
                           name="durationfrom"
                           value={gigInputs?.durationfrom}
-                          className="w-20 bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-2 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                          className="w-20 bg-gray-700/50 text-gray-100 h-12 title rounded-lg border border-gray-600 px-2 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                         >
                           <option value="pm">PM</option>
                           <option value="am">AM</option>
@@ -1258,7 +1258,7 @@ const CreateGig = () => {
                         <input
                           type="text"
                           placeholder="Time (e.g., 10)"
-                          className="w-full bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-4 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                          className="w-full bg-gray-700/50 text-gray-100 h-12 title rounded-lg border border-gray-600 px-4 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                           onChange={handleInputChange}
                           name="end"
                           value={gigInputs?.end}
@@ -1267,7 +1267,7 @@ const CreateGig = () => {
                           onChange={handleInputChange}
                           name="durationto"
                           value={gigInputs?.durationto}
-                          className="w-20 bg-gray-700/50 text-gray-100 h-12 rounded-lg border border-gray-600 px-2 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                          className="w-20 bg-gray-700/50 text-gray-100 h-12 title rounded-lg border border-gray-600 px-2 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                         >
                           <option value="pm">PM</option>
                           <option value="am">AM</option>
@@ -1317,7 +1317,10 @@ const CreateGig = () => {
                 {!showCategories.othergig && (
                   <motion.div
                     initial={{ height: 0, opacity: 0 }}
-                    animate={{ maxHeight: 500, opacity: 1 }}
+                    animate={{
+                      height: 200, // Largest section
+                      opacity: 1,
+                    }}
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.3 }}
                     className="overflow-hidden bg-gray-800/30 rounded-b-lg border border-gray-700/50 border-t-0"
@@ -1377,7 +1380,7 @@ const CreateGig = () => {
                   onChange={handleInputChange}
                   name="category"
                   value={gigInputs?.category}
-                  className="w-full bg-gray-700/50 text-gray-100 h-12 focus:outline-none"
+                  className="w-full bg-gray-700/50 text-gray-100 h-12 title focus:outline-none"
                 >
                   <option value="">Select your instrument</option>
                   <option value="piano">Piano</option>

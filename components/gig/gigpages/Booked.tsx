@@ -11,7 +11,7 @@ import { GigProps } from "@/types/giginterface";
 import { filterGigs } from "@/utils";
 
 import { motion } from "framer-motion";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 
 const Booked = () => {
   const { loading: gigsLoading, gigs } = useAllGigs();
@@ -19,28 +19,15 @@ const Booked = () => {
   const [typeOfGig, setTypeOfGig] = useState<string>("");
   const debouncedSearch = useDebounce(typeOfGig, 300);
   const [category, setCategory] = useState<string>("all");
-  const [location, setLocation] = useState<string>(() =>
-    user?.user?.city ? user?.user?.city : "all"
-  );
+  const [location, setLocation] = useState<string>(() => "all");
   const { showVideo } = useStore();
-  const normalizeString = (str?: string) =>
-    str
-      ?.trim()
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "") || "";
-  useEffect(() => {
-    // if (!user) {
-    //   mutateUser().catch((error) => {
-    //     console.error("Failed to mutate user:", error);
-    //     // Consider adding toast notification here
-    //   });
-    // }
+  // const normalizeString = (str?: string) =>
+  //   str
+  //     ?.trim()
+  //     .toLowerCase()
+  //     .normalize("NFD")
+  //     .replace(/[\u0300-\u036f]/g, "") || "";
 
-    if (normalizeString(user?.user?.city)) {
-      setLocation(user.user?.city);
-    }
-  }, [user]);
   const filteredGigs = useMemo(() => {
     const filtered = filterGigs(gigs, {
       searchQuery: debouncedSearch,

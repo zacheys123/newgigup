@@ -9,9 +9,11 @@ import { FetchResponse, UserProps } from "@/types/userinterfaces";
 const FollowButton = ({
   _id,
   followers,
+  myid,
 }: {
   _id: string;
   followers: string[] | UserProps[];
+  myid?: string;
 }) => {
   const { user } = useCurrentUser();
   const { setFollow, follow } = useStore();
@@ -41,7 +43,7 @@ const FollowButton = ({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ follower: user?.user?._id }),
+        body: JSON.stringify({ follower: user?.user?._id || myid }),
       });
 
       if (res.ok) {

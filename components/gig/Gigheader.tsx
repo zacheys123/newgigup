@@ -524,7 +524,7 @@ const Gigheader = ({
           <div className="flex items-center  gap-1 w-[100%]">
             <select
               className={`relative w-[55%]  h-11 bg-gray-900/60 text-gray-300 pl-4 pr-10 rounded-lg text-xs font-medium  md:text-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-500/50 border border-gray-800 hover:border-gray-700 transition-all`}
-              value={location || myuser?.city || "all"} // Fallback to "all" if nothing is set
+              value={location} // Fallback to "all" if nothing is set
               onChange={(ev) => setLocation(ev.target.value)}
             >
               {!myuser?.city ? (

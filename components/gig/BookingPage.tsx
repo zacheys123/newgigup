@@ -6,7 +6,7 @@ import { X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { MdAdd } from "react-icons/md";
+
 import Modal from "../Modal";
 import { UserProps } from "@/types/userinterfaces";
 import { ChatBubbleOvalLeftIcon } from "@heroicons/react/24/solid";
@@ -14,10 +14,13 @@ import useSocket from "@/hooks/useSocket";
 import { toast } from "sonner";
 import { GigProps } from "@/types/giginterface";
 import MusicWaveLoader from "../loaders/MusicWaver";
+import { motion } from "framer-motion";
+import FollowButton from "../pages/FollowButton";
 
 interface BookingProps {
   currentGig: GigProps;
 }
+
 const BookingPage = ({ currentGig }: BookingProps) => {
   const currentgig = currentGig;
   const { userId } = useAuth();
@@ -28,7 +31,6 @@ const BookingPage = ({ currentGig }: BookingProps) => {
   const forget = () =>
     forgetBookings(user?.user?._id as string, currentgig, userId as string);
 
-  console.log(currentgig);
   useEffect(() => {
     if (currentgig?.isTaken === true) {
       router.push(`/gigs/${userId}`);
@@ -41,10 +43,6 @@ const BookingPage = ({ currentGig }: BookingProps) => {
     ) {
       return;
     }
-    if (
-      currentgig?.bookCount?.some((myuser) => myuser?._id !== user?.user?._id)
-    ) {
-    }
   }, [
     currentgig?.isTaken,
     currentgig?.isPending,
@@ -53,13 +51,12 @@ const BookingPage = ({ currentGig }: BookingProps) => {
     userId,
     router,
   ]);
-  const postedByUser = currentgig?.postedBy;
 
+  const postedByUser = currentgig?.postedBy;
   const [modal, setModal] = useState<{
     type: "chat" | "video";
     user: UserProps;
   } | null>(null);
-
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showX, setShowX] = useState(false);
 
@@ -83,30 +80,24 @@ const BookingPage = ({ currentGig }: BookingProps) => {
     forget();
     setShowConfirmation(false);
   };
-  // Define the onOpenX function
+
   const handleOpenX = () => {
-    setShowX(false); // Reset the showX state
+    setShowX(false);
   };
 
   useEffect(() => {
     if (socket) {
       socket.on("musicianBooked", ({ gigId, message }) => {
-        // Show a notification to the musician
         console.log(gigId);
-        console.log(message);
         toast.success(message);
-
-        // Refresh the page or redirect if needed
       });
 
       socket.on("updateGigStatus", ({ gigId, isTaken }) => {
-        // Refresh the page if the gig is taken
         if (isTaken && gigId && currentgig?.bookedBy !== user?.user?._id) {
           router.push(`/gigs/${userId}`);
         }
       });
 
-      // Cleanup listeners on unmount
       return () => {
         socket.off("musicianBooked");
         socket.off("updateGigStatus");
@@ -116,194 +107,298 @@ const BookingPage = ({ currentGig }: BookingProps) => {
 
   if (!currentgig?.title || !user?.user?.firstname) {
     return (
-      <div className="h-full w-full flex justify-center items-center">
+      <div className="flex items-center justify-center w-full h-full">
         <MusicWaveLoader />
       </div>
     );
   }
 
+  const showPriceRangeAndCurrency =
+    currentgig?.pricerange === "thousands"
+      ? `${currentgig?.price}k ${currentgig?.currency} `
+      : currentgig?.pricerange === "hundreds"
+      ? `${currentgig?.price},00 ${currentgig?.currency} `
+      : currentgig?.pricerange === "tensofthousands"
+      ? `${currentgig?.price}0000 ${currentgig?.currency} `
+      : currentgig?.pricerange === "hundredsofthousands"
+      ? `${currentgig?.price},00000 ${currentgig?.currency} `
+      : `${currentgig?.price} ${currentgig?.currency} `;
+
+  console.log(currentgig?.postedBy?.followers);
   return (
-    <div className="flex flex-col h-[calc(100vh)-100px] w-full py-1 my-1 overflow-y-auto bg-gradient-to-b from-gray-900 to-gray-800">
-      {/* Add this wrapper div with specific height calculation */}
-      <div className="flex-1 overflow-y-auto pb-[20px]">
-        {!showX && (
-          <div className="fixed w-[40px] h-[40px] flex justify-center items-center right-5 top-[calc(100px+460px)] opacity-85 rounded-md shadow-lg shadow-slate-700 bg-gray-700 hover:bg-gray-600 transition-all animate-pulse z-50 hover:animate-none group">
-            {!loading ? (
-              <div
-                className="w-full h-full flex justify-center items-center bg-red-500 hover:bg-red-600 rounded-full shadow-lg cursor-pointer transition-all transform hover:rotate-90 hover:scale-110"
-                onClick={handleCancel}
-              >
-                <X size="24" className="text-white" />
-              </div>
-            ) : (
-              <CircularProgress size="20px" className="text-white" />
-            )}
-            {/* Tooltip */}
-            <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
-              Cancel Gig
-            </div>
-          </div>
-        )}
-        {/* Confirmation Modal */}
-        {showConfirmation && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm z-50">
-            <div className="bg-gray-700 p-6 rounded-lg shadow-lg ">
-              <h4 className="text-gray-200 text-lg font-bold mb-4">
-                Are you sure?
-              </h4>
-              <p className="text-gray-400 text-sm mb-4">
-                This action cannot be undone.
-              </p>
-              <div className="flex gap-4">
-                <button
-                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition-colors"
-                  onClick={confirmCancel}
-                >
-                  Confirm
-                </button>
-                <button
-                  className="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-md transition-colors"
-                  onClick={() => setShowConfirmation(false)}
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Personal Info Card */}
-        <div className="min-h-[110px] w-[90%] mx-auto p-3 bg-gray-700 shadow-lg rounded-lg mb-6 transform transition-transform hover:scale-105 hover:shadow-xl border-l-4 border-yellow-400">
-          <h4 className="text-gray-300 text-sm font-semibold uppercase tracking-widest mb-4">
-            Personal
-          </h4>
-          <div className="flex justify-between items-center">
-            {currentgig?.logo && (
-              <Image
-                src={currentgig.logo}
-                alt="Profile Pic"
-                width={40}
-                height={40}
-                className="rounded-full transform transition-transform hover:scale-110"
-              />
-            )}
-            <div className="flex items-center gap-4">
-              <div className="flex items-center">
-                <h4 className="text-gray-300 text-xs font-medium">
-                  {currentgig?.viewCount?.length} views
-                </h4>
-              </div>
-              <button className="flex items-center bg-gray-600 hover:bg-gray-500 text-white text-xs font-medium py-1 px-3 rounded-md transition-all transform hover:scale-105">
-                Follow
-                <MdAdd size="14" className="ml-1" />
-              </button>
-              <ChatBubbleOvalLeftIcon
-                className="w-5 h-5 text-yellow-300 hover:text-yellow-400 cursor-pointer transition-transform hover:scale-125"
-                onClick={() => {
-                  setShowX(true);
-
-                  setModal({ type: "chat", user: postedByUser });
-                }}
-              />
-            </div>
-          </div>
-          <div className="mt-4">
-            <h4 className="text-gray-200 text-lg font-bold">
-              {currentgig?.postedBy?.firstname} {currentgig?.postedBy?.lastname}
-            </h4>
-            <h4 className="text-gray-400 text-sm">
-              @{currentgig?.postedBy?.username}
-            </h4>
-          </div>
-        </div>
-
-        {/* Gig Info Card */}
-        <div className="min-h-[90px] w-[90%] mx-auto p-3 bg-gray-700 shadow-lg rounded-lg mb-6 animate-fade-in border-l-4 border-blue-400">
-          <h4 className="text-gray-300 text-sm font-semibold uppercase tracking-widest mb-4">
-            Gig Info
-          </h4>
-          <div className="space-y-2">
-            <h4 className="text-gray-200 text-lg font-bold">
-              {currentgig?.title || "No Title Available"}
-            </h4>
-            <p className="text-gray-400 text-sm">{currentgig?.description}</p>
-            <h4 className="text-gray-400 text-sm">
-              Location: {currentgig?.location}
-            </h4>
-          </div>
-        </div>
-
-        {/* Business Info Card */}
-        <div className="min-h-[100px] w-[90%] mx-auto p-3 bg-gray-700 shadow-lg rounded-lg mb-6 transform transition-transform hover:scale-105 hover:shadow-xl border-l-4 border-green-400">
-          <h4 className="text-gray-300 text-sm font-semibold uppercase tracking-widest mb-4">
-            Business Info
-          </h4>
-          <div className="space-y-2">
-            <h4 className="text-gray-400 text-sm">
-              Price: {currentgig?.price}
-            </h4>
-            <h4 className="text-gray-400 text-sm">
-              Contact: {currentgig?.phone}
-            </h4>
-            <h4 className="text-gray-400 text-sm">
-              Email: {currentgig?.postedBy?.email}
-            </h4>
-          </div>
-        </div>
-
-        {/* More Info Card */}
-        <div className="min-h-[130px] w-[90%] mx-auto p-3 mb-[150px] bg-gray-700 shadow-lg rounded-lg animate-slide-in border-l-4 border-purple-400">
-          <h4 className="text-gray-300 text-sm font-semibold uppercase tracking-widest mb-4">
-            More Info
-          </h4>
-          <div className="space-y-2">
-            <h4 className="text-gray-400 text-sm">
-              Gig Type:{" "}
-              {currentgig?.bussinesscat === "full"
-                ? "Full Band"
-                : currentgig?.bussinesscat === "personal"
-                ? "Individual"
-                : currentgig?.bussinesscat === "other"
-                ? "Musicians Cocktail"
-                : ""}
-            </h4>
-            {currentgig?.bussinesscat === "other" &&
-              currentgig?.bandCategory &&
-              currentgig?.bandCategory.length > 0 && (
-                <ul className="mt-1">
-                  {[...new Set(currentgig.bandCategory)].map(
-                    (bnd: string, i: number) => (
-                      <li
+    <div className="relative w-full h-[calc(100vh-100px)] bg-gray-950 overflow-hidden">
+      {/* Floating Action Button */}
+      {!showX && (
+        <div className="fixed right-6 top-24 z-50 group">
+          <div className="relative">
+            {/* Floating cancel button with animated pulses */}
+            <button
+              onClick={handleCancel}
+              disabled={loading}
+              className={`flex items-center justify-center w-14 h-14 rounded-full shadow-xl cursor-pointer transform transition-all duration-300
+          ${
+            loading
+              ? "bg-gray-600 hover:bg-gray-600"
+              : "bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700"
+          }
+          hover:scale-110 hover:shadow-2xl active:scale-95
+          animate-[float_3s_ease-in-out_infinite] hover:animate-none
+          ring-2 ring-transparent hover:ring-red-400/50`}
+              aria-label="Cancel booking"
+            >
+              {!loading ? (
+                <>
+                  <X size={24} className="text-white" />
+                  {/* Micro-interaction particles */}
+                  <span className="absolute inset-0 overflow-hidden rounded-full">
+                    {[...Array(8)].map((_, i) => (
+                      <span
                         key={i}
-                        className="text-red-400 text-sm font-medium animate-bounce"
-                      >
-                        {bnd}
-                      </li>
-                    )
-                  )}
-                </ul>
+                        className="absolute block w-1 h-1 bg-white/80 rounded-full"
+                        style={{
+                          top: "50%",
+                          left: "50%",
+                          transform: "translate(-50%, -50%)",
+                          opacity: 0,
+                          transition: "all 0.6s ease-out",
+                        }}
+                      />
+                    ))}
+                  </span>
+                </>
+              ) : (
+                <CircularProgress size={24} className="text-white" />
               )}
-            <h4 className="text-gray-400 text-sm">
-              Start Time: {currentgig?.time?.from}
-            </h4>
-            <h4 className="text-gray-400 text-sm">
-              Finish Time: {currentgig?.time?.to}
-            </h4>
+            </button>
+
+            {/* Animated tooltip */}
+            <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-3 py-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-lg flex items-center">
+              <span>Cancel Booking</span>
+              {/* Tooltip arrow */}
+              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-800 rotate-45"></span>
+            </div>
           </div>
         </div>
+      )}
 
-        {/* Modal */}
-        {modal && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm animate-fade-in">
-            <Modal
-              onClose={() => setModal(null)}
-              modal={modal}
-              user={user?.user}
-              onOpenX={handleOpenX}
-            />
+      {/* Main Content */}
+      <div className="h-full overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          {/* Confirmation Modal */}
+          {showConfirmation && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+              <div className="bg-gray-800 rounded-xl p-6 max-w-md w-full border border-gray-700 shadow-2xl animate-fade-in">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-bold text-white">
+                    Confirm Cancellation
+                  </h3>
+                  <button
+                    onClick={() => setShowConfirmation(false)}
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+                <p className="text-gray-300 mb-6">
+                  Are you sure you want to cancel this booking? This action
+                  cannot be undone.
+                </p>
+                <div className="flex justify-end space-x-3">
+                  <button
+                    onClick={() => setShowConfirmation(false)}
+                    className="px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-white transition-all duration-200 hover:shadow-md"
+                  >
+                    Go Back
+                  </button>
+                  <button
+                    onClick={confirmCancel}
+                    className="px-4 py-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white transition-all duration-200 hover:shadow-md"
+                  >
+                    Confirm
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Profile Header */}
+          <section className="mb-8">
+            <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl p-6 shadow-xl border border-gray-700 transition-all hover:shadow-2xl">
+              <div className="flex flex-col sm:flex-row items-start justify-between gap-6">
+                <div className="flex items-center space-x-4">
+                  {currentgig?.logo && (
+                    <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-yellow-400 shadow-lg">
+                      <Image
+                        src={currentgig.logo}
+                        alt="Profile"
+                        width={64}
+                        height={64}
+                        className="object-cover"
+                      />
+                    </div>
+                  )}
+                  <div>
+                    <h2 className="text-2xl font-bold text-white">
+                      {currentgig?.postedBy?.firstname}{" "}
+                      {currentgig?.postedBy?.lastname}
+                    </h2>
+                    <p className="text-gray-400">
+                      @{currentgig?.postedBy?.username}
+                    </p>
+                    <div className="mt-1 flex items-center space-x-2">
+                      <span className="text-sm text-gray-300 bg-gray-700 px-2 py-1 rounded">
+                        {currentgig?.viewCount?.length} views
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-3 self-end sm:self-center">
+                  {user?.user?._id && currentgig?.postedBy?.followers && (
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <FollowButton
+                        _id={currentgig?.postedBy?._id as string}
+                        followers={currentgig?.postedBy?.followers}
+                        myid={user?.user?.id}
+                      />
+                    </motion.div>
+                  )}
+                  <button
+                    onClick={() => {
+                      setShowX(true);
+                      setModal({ type: "chat", user: postedByUser });
+                    }}
+                    className="p-2.5 bg-gray-700 hover:bg-gray-600 rounded-full text-yellow-400 hover:text-yellow-300 transition-all duration-200 shadow"
+                    aria-label="Chat"
+                  >
+                    <ChatBubbleOvalLeftIcon className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Gig Details Sections */}
+          <div className="space-y-6">
+            {/* Gig Information Card */}
+            <section className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 shadow-xl border border-gray-700">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm uppercase tracking-wider text-gray-400 font-medium">
+                  Gig Details
+                </h3>
+                <div className="text-xs text-yellow-400 bg-yellow-400/10 px-2 py-1 rounded-full">
+                  Active Booking
+                </div>
+              </div>
+              <h2 className="text-3xl font-bold text-white mb-3">
+                {currentgig?.title}
+              </h2>
+              <p className="text-gray-300 mb-6 leading-relaxed">
+                {currentgig?.description}
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                  <div className="text-gray-400 text-sm mb-1">Location</div>
+                  <div className="text-white font-medium">
+                    {currentgig?.location}
+                  </div>
+                </div>
+                <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                  <div className="text-gray-400 text-sm mb-1">Compensation</div>
+                  <div className="text-white font-medium">
+                    {showPriceRangeAndCurrency}
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Schedule Card */}
+            <section className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 shadow-xl border border-gray-700">
+              <h3 className="text-sm uppercase tracking-wider text-gray-400 mb-6 font-medium">
+                Schedule
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="text-gray-400 text-sm mb-1">Start Time</h4>
+                    <p className="text-white font-medium">
+                      {currentgig?.time?.from}
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="text-gray-400 text-sm mb-1">Finish Time</h4>
+                    <p className="text-white font-medium">
+                      {currentgig?.time?.to}
+                    </p>
+                  </div>
+                </div>
+                <div>
+                  <h4 className="text-gray-400 text-sm mb-1">Gig Type</h4>
+                  <p className="text-white font-medium mb-3">
+                    {currentgig?.bussinesscat === "full"
+                      ? "Full Band"
+                      : currentgig?.bussinesscat === "personal"
+                      ? "Individual"
+                      : currentgig?.bussinesscat === "other"
+                      ? "Musicians Cocktail"
+                      : ""}
+                  </p>
+                  {currentgig?.bussinesscat === "other" &&
+                    currentgig?.bandCategory &&
+                    currentgig?.bandCategory.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {[...new Set(currentgig.bandCategory)].map(
+                          (bnd: string, i: number) => (
+                            <span
+                              key={i}
+                              className="inline-block px-3 py-1 bg-gray-700 rounded-full text-xs text-yellow-400 animate-pulse"
+                            >
+                              {bnd}
+                            </span>
+                          )
+                        )}
+                      </div>
+                    )}
+                </div>
+              </div>
+            </section>
+
+            {/* Contact Card */}
+            <section className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 shadow-xl border border-gray-700 mb-12">
+              <h3 className="text-sm uppercase tracking-wider text-gray-400 mb-6 font-medium">
+                Contact Information
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                  <h4 className="text-gray-400 text-sm mb-1">Phone</h4>
+                  <p className="text-white font-medium">{currentgig?.phone}</p>
+                </div>
+                <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                  <h4 className="text-gray-400 text-sm mb-1">Email</h4>
+                  <p className="text-white font-medium">
+                    {currentgig?.postedBy?.email}
+                  </p>
+                </div>
+              </div>
+            </section>
           </div>
-        )}
+        </div>
       </div>
+
+      {/* Chat/Video Modal */}
+      {modal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+          <Modal
+            onClose={() => setModal(null)}
+            modal={modal}
+            user={user?.user}
+            onOpenX={handleOpenX}
+          />
+        </div>
+      )}
     </div>
   );
 };
