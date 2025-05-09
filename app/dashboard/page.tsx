@@ -44,7 +44,7 @@ export default function Dashboard() {
     fetchData();
   }, [userId, isLoaded, router]);
 
-  console.log(data?.user);
+  console.log(data);
 
   if (!isLoaded || loading) {
     return (
@@ -91,6 +91,7 @@ export default function Dashboard() {
         <ClientDashboard
           gigsPosted={data?.user?.gigsPosted}
           total={data?.user?.total}
+          isPro={data?.subscription?.isPro}
         />
       ) : null}
 

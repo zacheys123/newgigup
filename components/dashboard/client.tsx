@@ -7,15 +7,19 @@ import { UsageMeter } from "./UsageMeter";
 import { Calendar, DollarSign, Music } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
 import { GigProps } from "@/types/giginterface";
+import { DownGradeBanner } from "./DowngradeBanner";
 
 interface ClientDashboardProps {
   gigsPosted?: number;
   total?: number;
+
+  isPro: boolean;
 }
 
 export function ClientDashboard({
   gigsPosted = 0,
   total = 0,
+  isPro,
 }: ClientDashboardProps) {
   const { userId } = useAuth();
   const { gigs, loading } = useAllGigs();
@@ -29,7 +33,7 @@ export function ClientDashboard({
 
   return (
     <div className="space-y-8 p-4 md:p-6 lg:p-8">
-      <UpgradeBanner />
+      {isPro === true ? <DownGradeBanner /> : <UpgradeBanner />}
 
       {/* Gradient Section with Soft Glow */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

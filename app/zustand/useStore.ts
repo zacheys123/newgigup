@@ -11,11 +11,13 @@ const useStore = create<StoreState>((set) => ({
 
   setData: (data: DashboardData) => set(() => ({ subscriptiondata: data })),
   setLoadingPostId: (data: string) => set(() => ({ loadingPostId: data })),
+  setIsProfileModalOpen: (data: boolean) =>
+    set(() => ({ IsProfileModalOpen: data })),
   setLoadPostId: (data: string) => set(() => ({ loadPostId: data })),
   setIsDescriptionModal: (data: boolean) =>
     set(() => ({ isDescriptionModal: data })),
-  setIsProfileModalOpen: (data: boolean) =>
-    set(() => ({ IsProfileModalOpen: data })),
+  setShowConfirmModal: (data: boolean) =>
+    set(() => ({ showConfirmModal: data })),
   setConfirmEdit: (data: boolean) => set(() => ({ confirmEdit: data })),
   setVideoModalOpen: (data: boolean) => set(() => ({ videoModalOpen: data })),
   setReviewModalOpen: (data: boolean) => set(() => ({ reviewModalOpen: data })),

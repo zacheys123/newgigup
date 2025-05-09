@@ -130,6 +130,7 @@ export const initialState = {
   videoModalOpen: false,
   IsProfileModalOpen: false,
   isDescriptionModal: false,
+  showConfirmModal: false,
 };
 interface OnlineUser {
   userId: string;
@@ -163,6 +164,7 @@ export interface StoreState {
   followingsModal: boolean;
   currentFollowers: boolean;
   refetchGig: boolean;
+  showConfirmModal: boolean;
   messages: MessageProps[];
   chats: Record<string, ChatProps>;
   onlineUsers: OnlineUser[];
@@ -186,6 +188,7 @@ export interface StoreState {
   setIsDescriptionModal: (isOpen: boolean) => void;
   setReviewModalOpen: (data: boolean) => void;
   setIsProfileModalOpen: (data: boolean) => void;
+  setShowConfirmModal: (showconfirmModal: boolean) => void;
   setVideoModalOpen: (data: boolean) => void;
   setCurrentGig: (data: Partial<GigProps>) => void;
   setCurrentUser: (data: Partial<UserProps>) => void;

@@ -4,13 +4,17 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { updateSubscription } from "@/lib/mutations";
 import { cn } from "@/lib/utils";
 import { useUser } from "@clerk/nextjs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogTitle,
 } from "../ui/dialog";
+import useStore from "@/app/zustand/useStore";
+import { useSearchParams } from "next/navigation";
+
+type Tier = "free" | "pro";
 
 interface Plan {
   name: string;
@@ -26,35 +30,35 @@ interface SubscriptionCardProps {
 
 export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
   const { user } = useUser();
-  const { subscription, mutateSubscription } = useSubscription(
-    user?.id as string
-  );
+  const { subscription, mutateSubscription } = useSubscription(user?.id ?? "");
+  const searchParams = useSearchParams();
+  const searchParam = searchParams.get("dep") as Tier | null;
   const [isMutating, setIsMutating] = useState(false);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [pendingTier, setPendingTier] = useState<"free" | "pro">("free");
+  const { showConfirmModal, setShowConfirmModal } = useStore();
+  const [pendingTier, setPendingTier] = useState<Tier>("free");
 
-  const handleSubscriptionChange = async (newTier: "free" | "pro") => {
+  const getTierFromPlan = (): Tier =>
+    plan.name === "Free Tier" ? "free" : "pro";
+
+  const handleSubscriptionUpdate = async (tier: Tier) => {
     if (!user?.id) return;
 
     setIsMutating(true);
     setShowConfirmModal(false);
 
     try {
-      // Optimistic update
       const optimisticData = {
-        tier: newTier,
-        isPro: newTier === "pro",
+        tier,
+        isPro: tier === "pro",
         nextBillingDate:
-          newTier === "pro"
+          tier === "pro"
             ? new Date(new Date().setMonth(new Date().getMonth() + 1))
             : null,
       };
 
       await mutateSubscription(
         async () => {
-          const result = await updateSubscription(user.id, newTier, {
-            onSuccess: () => mutateSubscription(),
-          });
+          const result = await updateSubscription(user.id, tier);
           return result;
         },
         {
@@ -64,27 +68,35 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
           revalidate: false,
         }
       );
-      setTimeout(() => {
-        setShowConfirmModal(false);
-      }, 3000);
     } catch (error) {
       console.error("Error updating subscription:", error);
     } finally {
       setIsMutating(false);
+      setTimeout(() => setShowConfirmModal(false), 3000);
+    }
+  };
+
+  useEffect(() => {
+    if (user && searchParam) {
+      handleSubscriptionUpdate(searchParam);
+    } else {
+      setShowConfirmModal(false);
+    }
+  }, [searchParam]);
+
+  const handlePlanClick = () => {
+    const newTier = getTierFromPlan();
+    if (newTier === "free" && !plan.current) {
+      setPendingTier("free");
+      setShowConfirmModal(true);
+    } else {
+      handleSubscriptionUpdate(newTier);
     }
   };
 
   return (
     <div
-      onClick={() => {
-        const newTier = plan.name === "Free Tier" ? "free" : "pro";
-        if (newTier === "free" && !plan.current) {
-          setPendingTier("free");
-          setShowConfirmModal(true);
-        } else {
-          handleSubscriptionChange(newTier);
-        }
-      }}
+      onClick={handlePlanClick}
       className={cn(
         "border rounded-lg p-4 md:p-6 w-full max-w-md mx-auto",
         plan.current
@@ -114,21 +126,15 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
       </ul>
 
       <Button
-        onClick={() => {
-          const newTier = plan.name === "Free Tier" ? "free" : "pro";
-          if (newTier === "free" && !plan.current) {
-            setPendingTier("free");
-            setShowConfirmModal(true);
-          } else {
-            handleSubscriptionChange(newTier);
-          }
-        }}
+        onClick={handlePlanClick}
         disabled={isMutating || plan.current}
-        className={`w-full py-1.5 md:py-2 px-3 md:px-4 text-sm md:text-base rounded-md font-medium ${
+        className={cn(
+          "w-full py-1.5 md:py-2 px-3 md:px-4 text-sm md:text-base rounded-md font-medium",
           plan.current
             ? "bg-gray-100 text-gray-600 cursor-default"
-            : "bg-blue-600 hover:bg-blue-700 text-white"
-        } ${isMutating ? "opacity-70 cursor-wait" : ""}`}
+            : "bg-blue-600 hover:bg-blue-700 text-white",
+          isMutating && "opacity-70 cursor-wait"
+        )}
       >
         {isMutating ? "Processing..." : plan.cta}
       </Button>
@@ -139,7 +145,7 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
           {subscription?.nextBillingDate && (
             <span className="block text-[10px] md:text-xs text-gray-500">
               Renews on{" "}
-              {new Date(subscription?.nextBillingDate).toLocaleDateString()}
+              {new Date(subscription.nextBillingDate).toLocaleDateString()}
             </span>
           )}
         </p>
@@ -151,7 +157,7 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
             Confirm Downgrade
           </DialogTitle>
           <DialogDescription className="mb-4 md:mb-6 text-gray-300">
-            {`Are you sure you want to downgrade to the Free Tier? You'll lose
+            {`     Are you sure you want to downgrade to the Free Tier? You'll lose
             access to Pro features immediately.`}
           </DialogDescription>
 
@@ -165,7 +171,7 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
             </Button>
             <Button
               variant="destructive"
-              onClick={() => handleSubscriptionChange(pendingTier)}
+              onClick={() => handleSubscriptionUpdate(pendingTier)}
               disabled={isMutating}
               className="px-3 py-1.5 md:px-4 md:py-2 text-sm md:text-base"
             >

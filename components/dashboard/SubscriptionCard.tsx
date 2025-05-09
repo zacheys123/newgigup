@@ -4,13 +4,16 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { updateSubscription } from "@/lib/mutations";
 import { cn } from "@/lib/utils";
 import { useUser } from "@clerk/nextjs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogTitle,
 } from "../ui/dialog";
+import useStore from "@/app/zustand/useStore";
+import { useSearchParams } from "next/navigation";
+type Tier = "free" | "pro";
 
 interface Plan {
   name: string;
@@ -26,35 +29,35 @@ interface SubscriptionCardProps {
 
 export function SubscriptionCard({ plan }: SubscriptionCardProps) {
   const { user } = useUser();
-  const { subscription, mutateSubscription } = useSubscription(
-    user?.id as string
-  );
+  const { subscription, mutateSubscription } = useSubscription(user?.id ?? "");
+  const searchParams = useSearchParams();
+  const searchParam = searchParams.get("dep") as Tier | null;
   const [isMutating, setIsMutating] = useState(false);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [pendingTier, setPendingTier] = useState<"free" | "pro">("free");
+  const { showConfirmModal, setShowConfirmModal } = useStore();
+  const [pendingTier, setPendingTier] = useState<Tier>("free");
 
-  const handleSubscriptionChange = async (newTier: "free" | "pro") => {
+  const getTierFromPlan = (): Tier =>
+    plan.name === "Free Tier" ? "free" : "pro";
+
+  const handleSubscriptionUpdate = async (tier: Tier) => {
     if (!user?.id) return;
 
     setIsMutating(true);
     setShowConfirmModal(false);
 
     try {
-      // Optimistic update
       const optimisticData = {
-        tier: newTier,
-        isPro: newTier === "pro",
+        tier,
+        isPro: tier === "pro",
         nextBillingDate:
-          newTier === "pro"
+          tier === "pro"
             ? new Date(new Date().setMonth(new Date().getMonth() + 1))
             : null,
       };
 
       await mutateSubscription(
         async () => {
-          const result = await updateSubscription(user.id, newTier, {
-            onSuccess: () => mutateSubscription(),
-          });
+          const result = await updateSubscription(user.id, tier);
           return result;
         },
         {
@@ -65,24 +68,34 @@ export function SubscriptionCard({ plan }: SubscriptionCardProps) {
         }
       );
     } catch (error) {
-      // Error handling is done in the mutation function
       console.error("Error updating subscription:", error);
     } finally {
       setIsMutating(false);
+      setTimeout(() => setShowConfirmModal(false), 3000);
+    }
+  };
+
+  useEffect(() => {
+    if (user && searchParam) {
+      handleSubscriptionUpdate(searchParam);
+    } else {
+      setShowConfirmModal(false);
+    }
+  }, [searchParam]);
+
+  const handlePlanClick = () => {
+    const newTier = getTierFromPlan();
+    if (newTier === "free" && !plan.current) {
+      setPendingTier("free");
+      setShowConfirmModal(true);
+    } else {
+      handleSubscriptionUpdate(newTier);
     }
   };
 
   return (
     <div
-      onClick={() => {
-        const newTier = plan.name === "Free Tier" ? "free" : "pro";
-        if (newTier === "free" && !plan.current) {
-          setPendingTier("free");
-          setShowConfirmModal(true);
-        } else {
-          handleSubscriptionChange(newTier);
-        }
-      }}
+      onClick={handlePlanClick}
       className={cn(
         "border rounded-lg p-6",
         plan.current
@@ -108,15 +121,7 @@ export function SubscriptionCard({ plan }: SubscriptionCardProps) {
       </ul>
 
       <Button
-        onClick={() => {
-          const newTier = plan.name === "Free Tier" ? "free" : "pro";
-          if (newTier === "free" && !plan.current) {
-            setPendingTier("free");
-            setShowConfirmModal(true);
-          } else {
-            handleSubscriptionChange(newTier);
-          }
-        }}
+        onClick={handlePlanClick}
         disabled={isMutating || plan.current}
         className={`w-full py-2 px-4 rounded-md font-medium transition-colors ${
           plan.current
@@ -161,7 +166,7 @@ export function SubscriptionCard({ plan }: SubscriptionCardProps) {
                 Cancel
               </button>
               <button
-                onClick={() => handleSubscriptionChange(pendingTier)}
+                onClick={() => handleSubscriptionUpdate(pendingTier)}
                 disabled={isMutating}
                 className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-70"
               >
