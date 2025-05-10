@@ -91,7 +91,7 @@ export default function NotificationHandler() {
       // Show toast notification (always works)
       toast.info(
         <div
-          className="cursor-pointer"
+          className="cursor-pointer bg-gray-600"
           onClick={() => {
             markAsRead?.(notification.chatId);
             removeNotification(notification.id);
@@ -101,7 +101,7 @@ export default function NotificationHandler() {
             {notification.text ||
               `New message from ${notification.sender.firstname || "Someone"}`}
           </p>
-          <p className="text-sm text-gray-600 truncate max-w-xs">
+          <p className="text-sm text-gray-300 truncate max-w-xs">
             {notification.content}
           </p>
         </div>,

@@ -35,7 +35,6 @@ type ModalContent = {
 
 type ModalType =
   | "deleteaccount"
-  | "password"
   | "email"
   | "push"
   | "email-notifications"
@@ -52,9 +51,6 @@ const SettingPage = () => {
   const [activeModal, setActiveModal] = useState<ModalType | null>(null);
   const { user } = useCurrentUser();
   const [formData, setFormData] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
     phoneNumber: "",
   });
   const [notifications, setNotifications] = useState({
@@ -79,7 +75,6 @@ const SettingPage = () => {
       title: "Account",
       icon: <User size={18} className="mr-3" />,
       items: [
-        { label: "Change Password", action: () => openModal("password") },
         { label: "Email Preferences", action: () => openModal("email") },
         { label: "Delete Account", action: () => openModal("deleteaccount") },
       ],
@@ -124,20 +119,20 @@ const SettingPage = () => {
     setActiveModal(null);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle form submission here
-    alert("Settings saved!");
-    closeModal();
-  };
+  // const handleSubmit = (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   // Handle form submission here
+  //   alert("Settings saved!");
+  //   closeModal();
+  // };
 
   // Modal components
 
   const DeleteAccountModal = () => {
     const [isDeleting, setIsDeleting] = useState(false);
     const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
     const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
     const [confirmChecked, setConfirmChecked] = useState(false);
 
     const currentUsername = user?.user?.username;
@@ -152,18 +147,19 @@ const SettingPage = () => {
       e.preventDefault();
       setIsDeleting(true);
       setError("");
+      setSuccess("");
 
       try {
         const response = await fetch("/api/account/delete", {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, password }),
+          body: JSON.stringify({ username }),
         });
 
         if (!response.ok) {
           throw new Error(await response.text());
         }
-
+        setSuccess("Successfully Deleted Account");
         // Optionally show success message before redirect
         window.location.href = "/";
       } catch (err: unknown) {
@@ -195,6 +191,7 @@ const SettingPage = () => {
               Enter your username to confirm
             </label>
             <input
+              autoComplete="off"
               ref={inputRef}
               type="text"
               value={username}
@@ -208,20 +205,9 @@ const SettingPage = () => {
                 Username does not match
               </p>
             )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">
-              Enter your password to confirm
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(ev) => setPassword(ev.target.value)}
-              className="w-full bg-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-red-500"
-              placeholder="Your password"
-              aria-required
-            />
+            {username && usernameMatches && (
+              <p className="text-emerald-400 text-sm mt-1">Username Verified</p>
+            )}
           </div>
 
           <div className="flex items-center space-x-2">
@@ -238,6 +224,7 @@ const SettingPage = () => {
           </div>
 
           {error && <div className="text-red-400 text-sm">{error}</div>}
+          {success && <div className="text-emerald-400 text-sm">{success}</div>}
 
           <div className="flex justify-end space-x-3 pt-4">
             <button
@@ -249,11 +236,9 @@ const SettingPage = () => {
             </button>
             <button
               type="submit"
-              disabled={
-                !usernameMatches || !password || !confirmChecked || isDeleting
-              }
+              disabled={!usernameMatches || isDeleting}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                usernameMatches && password && confirmChecked
+                usernameMatches && confirmChecked
                   ? "bg-red-600 hover:bg-red-700"
                   : "bg-red-900/50 cursor-not-allowed"
               }`}
@@ -266,66 +251,6 @@ const SettingPage = () => {
     );
   };
 
-  const PasswordModal = () => (
-    <form onSubmit={handleSubmit}>
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">
-            Current Password
-          </label>
-          <input
-            type="password"
-            name="currentPassword"
-            value={formData.currentPassword}
-            onChange={handleInputChange}
-            className="w-full bg-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="••••••••"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">
-            New Password
-          </label>
-          <input
-            type="password"
-            name="newPassword"
-            value={formData.newPassword}
-            onChange={handleInputChange}
-            className="w-full bg-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="••••••••"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">
-            Confirm New Password
-          </label>
-          <input
-            type="password"
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleInputChange}
-            className="w-full bg-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="••••••••"
-          />
-        </div>
-        <div className="flex justify-end space-x-3 pt-4">
-          <button
-            type="button"
-            onClick={closeModal}
-            className="px-4 py-2 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-700 transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors"
-          >
-            Update Password
-          </button>
-        </div>
-      </div>
-    </form>
-  );
   const NotificationToggle = ({
     name,
     label,
@@ -482,10 +407,6 @@ const SettingPage = () => {
     deleteaccount: {
       title: "Delete Account",
       component: <DeleteAccountModal />,
-    },
-    password: {
-      title: "Change Password",
-      component: <PasswordModal />,
     },
     email: {
       title: "Email Preferences",
