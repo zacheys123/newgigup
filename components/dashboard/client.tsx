@@ -2,17 +2,16 @@
 import { useAllGigs } from "@/hooks/useAllGigs";
 import GigChart from "./GigChart";
 import { RoleStatusCard } from "./RoleStatusCard";
-import { UpgradeBanner } from "./UpgradBanner";
 import { UsageMeter } from "./UsageMeter";
-import { Calendar, DollarSign, Music } from "lucide-react";
+import { Calendar, DollarSign, Music, Star, Rocket } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 import { GigProps } from "@/types/giginterface";
-import { DownGradeBanner } from "./DowngradeBanner";
+import { Button } from "../ui/button";
 
 interface ClientDashboardProps {
   gigsPosted?: number;
   total?: number;
-
   isPro: boolean;
 }
 
@@ -23,100 +22,128 @@ export function ClientDashboard({
 }: ClientDashboardProps) {
   const { userId } = useAuth();
   const { gigs, loading } = useAllGigs();
+  const router = useRouter();
 
-  const gigsBookedAndCompleted = gigs?.filter((f: GigProps) => {
-    return f?.postedBy?.clerkId === userId && f.isTaken === true;
-  }).length;
-  const upcoming = gigs?.filter((f: GigProps) => {
-    return f?.postedBy?.clerkId === userId && f?.isPending === true;
-  }).length;
+  const gigsBookedAndCompleted = gigs?.filter(
+    (f: GigProps) => f?.postedBy?.clerkId === userId && f.isTaken
+  ).length;
+
+  const upcoming = gigs?.filter(
+    (f: GigProps) => f?.postedBy?.clerkId === userId && f?.isPending
+  ).length;
 
   return (
-    <div className="space-y-8 p-4 md:p-6 lg:p-8">
-      {isPro === true ? <DownGradeBanner /> : <UpgradeBanner />}
+    <div className="space-y-10 p-4 md:p-6 lg:p-10 bg-gradient-to-br from-[#0f0f0f] to-[#1a1a1a] text-white min-h-screen">
+      {/* Pro or Free Badge */}
+      {isPro ? (
+        <>
+          {/* Pro Badge and Cards (same as before) */}
+          <div className="flex items-center gap-3 bg-gradient-to-r from-purple-600/20 to-purple-900/10 border border-purple-700/50 p-4 rounded-2xl shadow-md backdrop-blur-md">
+            <Star className="text-yellow-400 animate-pulse" />
+            <span className="text-sm font-medium tracking-wide text-purple-200">
+              You’re a{" "}
+              <span className="text-yellow-300 font-semibold">Pro</span> member
+              – Enjoy priority posting and analytics!
+            </span>
+          </div>
 
-      {/* Gradient Section with Soft Glow */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="p-6 bg-gradient-to-br from-gray-900 via-gray-850 to-gray-800 rounded-2xl border border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:border-purple-500/30 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-transparent opacity-20 pointer-events-none"></div>
-          <h3 className="font-medium text-white mb-4 text-lg relative z-10">
-            Your Usage
-          </h3>
-          <UsageMeter current={2} max={3} label="Gig Postings" />
-        </div>
+          {/* Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="p-6 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl border border-slate-700 shadow-lg hover:shadow-xl transition-all hover:border-purple-500/40 relative overflow-hidden">
+              <div className="absolute inset-0 bg-purple-500/10 blur-sm opacity-20 pointer-events-none rounded-2xl"></div>
+              <h3 className="text-lg font-semibold mb-4">Your Usage</h3>
+              <UsageMeter current={2} max={3} label="Gig Postings" />
+            </div>
 
-        <div className="p-6 bg-gradient-to-br from-gray-900 via-gray-850 to-gray-800 rounded-2xl border border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:border-blue-500/30 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent opacity-20 pointer-events-none"></div>
-          <h3 className="font-medium text-white mb-4 text-lg relative z-10">
-            Your Activity
-          </h3>
-          <GigChart />
-        </div>
-      </div>
+            <div className="p-6 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl border border-gray-700 shadow-lg hover:shadow-xl transition-all hover:border-blue-500/40 relative overflow-hidden">
+              <div className="absolute inset-0 bg-blue-500/10 blur-sm opacity-20 pointer-events-none rounded-2xl"></div>
+              <h3 className="text-lg font-semibold mb-4">Your Activity</h3>
+              <GigChart />
+            </div>
+          </div>
 
-      {/* Header with Animated Underline */}
-      <div className="space-y-4 group">
-        <h1 className="text-3xl font-bold text-white relative inline-block">
-          Event Management
-          <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-500 group-hover:w-full"></span>
-        </h1>
-        <p className="text-gray-400/90 font-light">
-          Overview of your gigs and spending
-        </p>
-      </div>
+          {/* Header */}
+          <div className="space-y-2 group mt-6">
+            <h1 className="text-3xl font-bold relative inline-block">
+              Event Management
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-500 group-hover:w-full"></span>
+            </h1>
+            <p className="text-sm text-gray-400">
+              Overview of your gigs and spending
+            </p>
+          </div>
 
-      {/* Cards with Hover Effects */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {!loading && (
-          <>
-            {" "}
+          {/* ✅ Status Cards ONLY for Pro */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {!loading && (
+              <>
+                <RoleStatusCard
+                  title="Gigs Posted This Month"
+                  value={gigsPosted}
+                  icon={
+                    <div className="p-3 rounded-full bg-purple-500/10 backdrop-blur-sm">
+                      <Music className="text-purple-400" size={20} />
+                    </div>
+                  }
+                  trend="up"
+                />
+                <RoleStatusCard
+                  title="Gigs Booked and Completed"
+                  value={gigsBookedAndCompleted}
+                  icon={
+                    <div className="p-3 rounded-full bg-purple-500/10 backdrop-blur-sm">
+                      <Music className="text-purple-400" size={20} />
+                    </div>
+                  }
+                  trend="up"
+                />
+              </>
+            )}
+
             <RoleStatusCard
-              title="Gigs Posted this Month"
-              value={gigsPosted}
+              title="Total Spent"
+              value={total}
+              format="currency"
               icon={
-                <div className="p-3 rounded-full bg-purple-500/10 backdrop-blur-sm">
-                  <Music className="text-purple-400" size={20} />
+                <div className="p-3 rounded-full bg-green-500/10 backdrop-blur-sm">
+                  <DollarSign className="text-green-400" size={20} />
                 </div>
               }
-              trend="up"
+              trend="steady"
             />
+
             <RoleStatusCard
-              title="Gigs Booked and Completed"
-              value={gigsBookedAndCompleted}
+              title="Upcoming Events"
+              value={upcoming}
               icon={
-                <div className="p-3 rounded-full bg-purple-500/10 backdrop-blur-sm">
-                  <Music className="text-purple-400" size={20} />
+                <div className="p-3 rounded-full bg-blue-500/10 backdrop-blur-sm">
+                  <Calendar className="text-blue-400" size={20} />
                 </div>
               }
-              trend="up"
+              trend="down"
             />
-          </>
-        )}
-        <RoleStatusCard
-          title="Total Spent"
-          value={total}
-          format="currency"
-          icon={
-            <div className="p-3 rounded-full bg-green-500/10 backdrop-blur-sm">
-              <DollarSign className="text-green-400" size={20} />
-            </div>
-          }
-          trend="steady"
-        />
-        <RoleStatusCard
-          title="Upcoming Events"
-          value={upcoming}
-          icon={
-            <div className="p-3 rounded-full bg-blue-500/10 backdrop-blur-sm">
-              <Calendar className="text-blue-400" size={20} />
-            </div>
-          }
-          trend="down"
-        />
-      </div>
-
-      {/* Responsive Spacing */}
-      <div className="h-8 md:h-12"></div>
+          </div>
+        </>
+      ) : (
+        <>
+          {/* Free User Upgrade Prompt */}
+          <div className="bg-gradient-to-r from-gray-800 via-gray-700 to-gray-800 border border-gray-600 p-6 rounded-2xl text-center space-y-4 shadow-md">
+            <h2 className="text-2xl font-bold text-white flex items-center justify-center gap-2">
+              <Rocket className="text-pink-400" /> Upgrade to Pro
+            </h2>
+            <p className="text-gray-300 text-sm">
+              Unlock full access to analytics, unlimited gig postings, premium
+              visibility and priority booking!
+            </p>
+            <Button
+              onClick={() => router.push("/dashboard/billing")}
+              className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white px-6 py-2 rounded-lg font-semibold shadow-md transition"
+            >
+              Upgrade Now
+            </Button>
+          </div>
+        </>
+      )}
     </div>
   );
 }

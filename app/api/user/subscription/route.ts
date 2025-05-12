@@ -10,20 +10,18 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const clerkId = searchParams.get("clerkId");
 
-    console.log(clerkId);
     if (!clerkId) {
       return NextResponse.json({ error: "User ID required" }, { status: 400 });
     }
 
     const userdata = await User.findOne({ clerkId: clerkId });
-    console.log("tier", userdata);
     if (!userdata) {
       return NextResponse.json(
         { error: "Userdata not found" },
         { status: 404 }
       );
     }
-    console.log("tier", userdata);
+
     return NextResponse.json({
       user: {
         isClient: userdata.isClient,

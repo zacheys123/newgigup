@@ -10,8 +10,9 @@ const BillingComponent = () => {
   const { userId } = useAuth();
   const { user } = useCurrentUser();
   const { subscription } = useSubscription(userId as string);
-  const isPro = subscription?.tier === "free" ? false : true;
+  const isPro = subscription?.subscription?.tier === "free" ? false : true;
 
+  console.log(subscription);
   const plans = useMemo(() => {
     return [
       {
@@ -19,19 +20,17 @@ const BillingComponent = () => {
         price: "$0",
         features: user?.user?.isMusician
           ? [
-              "Apply to 5 gigs/month",
-              "Basic profile visibility",
-              "Message 3 clients",
+              "Book to 2 gigs/week",
+              "Limited Messages to clients(50msgs a month)",
               "Performance analytics",
-              "7 days of access",
+              "30days  of access",
             ]
           : user?.user?.isClient
           ? [
-              "Post 3 gigs/month",
-              "Browse musician profiles",
-              "Message 5 musicians",
-              "Basic hiring tools",
-              "7 days of access",
+              "Post 2 gigs/week",
+              "Browse musician profiles and musician reviews",
+              "Limited Messages to musicians(50msgs a month)",
+              "30days of access",
             ]
           : [],
         cta: isPro ? "Downgrade" : "Current Plan",
@@ -40,9 +39,9 @@ const BillingComponent = () => {
       {
         name: "Pro Tier",
         price: user?.user?.isMusician
-          ? "$15/month"
+          ? "1500KES/month"
           : user?.user?.isClient
-          ? "$20/month"
+          ? "2000KES/month"
           : "",
         features: user?.user?.isMusician
           ? [

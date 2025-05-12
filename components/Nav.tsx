@@ -2,11 +2,12 @@
 import { UserButton, useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 import Logo from "./Logo";
-import { User, MessageCircleQuestion } from "lucide-react";
+import { User } from "lucide-react";
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { MdEmail } from "react-icons/md";
+import { Settings } from "react-feather";
 
 const Nav = () => {
   const { userId } = useAuth();
@@ -41,10 +42,10 @@ const Nav = () => {
                 </Link>
 
                 <Link
-                  href="/about"
+                  href="/settings"
                   className="flex items-center gap-2 p-3 rounded-full transition-all hover:bg-neutral-700 hover:scale-105"
                 >
-                  <MessageCircleQuestion size="21" />
+                  <Settings size="21" />
                   <span className="hidden md:inline">FAQ</span>
                 </Link>
               </>

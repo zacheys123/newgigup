@@ -17,7 +17,7 @@ export async function updateSubscription(
       },
       body: JSON.stringify({ clerkId, tier }),
     });
-
+    console.log("new tier", tier);
     if (!response.ok) {
       throw new Error(
         response.status === 403

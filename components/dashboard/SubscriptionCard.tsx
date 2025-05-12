@@ -1,19 +1,17 @@
 "use client";
+import { useUser } from "@clerk/nextjs";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useSubscription } from "@/hooks/useSubscription";
 import { updateSubscription } from "@/lib/mutations";
 import { cn } from "@/lib/utils";
-import { useUser } from "@clerk/nextjs";
-import { useEffect, useState } from "react";
+import useStore from "@/app/zustand/useStore";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogTitle,
 } from "../ui/dialog";
-import useStore from "@/app/zustand/useStore";
-import { useSearchParams } from "next/navigation";
-type Tier = "free" | "pro";
 
 interface Plan {
   name: string;
@@ -29,35 +27,34 @@ interface SubscriptionCardProps {
 
 export function SubscriptionCard({ plan }: SubscriptionCardProps) {
   const { user } = useUser();
-  const { subscription, mutateSubscription } = useSubscription(user?.id ?? "");
-  const searchParams = useSearchParams();
-  const searchParam = searchParams.get("dep") as Tier | null;
-  const [isMutating, setIsMutating] = useState(false);
+  const { subscription, mutateSubscription } = useSubscription(
+    user?.id as string
+  );
   const { showConfirmModal, setShowConfirmModal } = useStore();
-  const [pendingTier, setPendingTier] = useState<Tier>("free");
+  const [isMutating, setIsMutating] = useState(false);
+  const [pendingTier, setPendingTier] = useState<"free" | "pro">("free");
 
-  const getTierFromPlan = (): Tier =>
-    plan.name === "Free Tier" ? "free" : "pro";
-
-  const handleSubscriptionUpdate = async (tier: Tier) => {
+  const handleChange = async (newTier: "free" | "pro") => {
     if (!user?.id) return;
 
     setIsMutating(true);
     setShowConfirmModal(false);
 
-    try {
-      const optimisticData = {
-        tier,
-        isPro: tier === "pro",
-        nextBillingDate:
-          tier === "pro"
-            ? new Date(new Date().setMonth(new Date().getMonth() + 1))
-            : null,
-      };
+    const optimisticData = {
+      tier: newTier,
+      isPro: newTier === "pro",
+      nextBillingDate:
+        newTier === "pro"
+          ? new Date(new Date().setMonth(new Date().getMonth() + 1))
+          : null,
+    };
 
+    try {
       await mutateSubscription(
         async () => {
-          const result = await updateSubscription(user.id, tier);
+          const result = await updateSubscription(user.id, newTier, {
+            onSuccess: () => mutateSubscription(),
+          });
           return result;
         },
         {
@@ -68,114 +65,110 @@ export function SubscriptionCard({ plan }: SubscriptionCardProps) {
         }
       );
     } catch (error) {
-      console.error("Error updating subscription:", error);
+      console.error("Subscription error:", error);
     } finally {
       setIsMutating(false);
-      setTimeout(() => setShowConfirmModal(false), 3000);
     }
   };
 
-  useEffect(() => {
-    if (user && searchParam) {
-      handleSubscriptionUpdate(searchParam);
-    } else {
-      setShowConfirmModal(false);
-    }
-  }, [searchParam]);
+  const newTier = plan.name === "Pro Tier" ? "pro" : "free";
 
-  const handlePlanClick = () => {
-    const newTier = getTierFromPlan();
-    if (newTier === "free" && !plan.current) {
+  const triggerAction = () => {
+    if (plan.current) return;
+    if (newTier === "free") {
       setPendingTier("free");
       setShowConfirmModal(true);
     } else {
-      handleSubscriptionUpdate(newTier);
+      handleChange("pro");
     }
   };
 
   return (
-    <div
-      onClick={handlePlanClick}
-      className={cn(
-        "border rounded-lg p-6",
-        plan.current
-          ? "border-orange-500 bg-orange-900/10"
-          : "border-gray-700 bg-gray-900"
-      )}
-    >
-      <h3 className="text-xl font-semibold text-white">{plan.name}</h3>
-      <p className="text-2xl font-bold my-4 text-white">{plan.price}</p>
-
-      <ul className="space-y-2 mb-6">
-        {plan.features.map((feature, i) => (
-          <li key={i} className="flex items-start">
-            <svg className="w-5 h-5 text-green-500 mt-0.5 mr-2 flex-shrink-0">
-              <path
-                fill="currentColor"
-                d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"
-              />
-            </svg>
-            <span>{feature}</span>
-          </li>
-        ))}
-      </ul>
-
-      <Button
-        onClick={handlePlanClick}
-        disabled={isMutating || plan.current}
-        className={`w-full py-2 px-4 rounded-md font-medium transition-colors ${
+    <>
+      <div
+        onClick={triggerAction}
+        className={cn(
+          "border rounded-xl p-6 w-full cursor-pointer transition duration-200",
           plan.current
-            ? "bg-gray-100 text-gray-600 cursor-default"
-            : "bg-blue-600 hover:bg-blue-700 text-white"
-        } ${isMutating ? "opacity-70 cursor-wait" : ""}`}
+            ? "border-orange-500 bg-orange-900/10"
+            : "border-gray-700 bg-gray-900 hover:border-blue-500"
+        )}
       >
-        {isMutating ? "Processing..." : plan.cta}
-      </Button>
-
-      {plan.current && (
-        <p className="mt-2 text-sm text-green-600 text-center">
-          Your current plan
-          {subscription?.nextBillingDate && (
-            <span className="block text-xs text-gray-500">
-              Renews on{" "}
-              {new Date(subscription?.nextBillingDate).toLocaleDateString()}
-            </span>
-          )}
-        </p>
-      )}
-      <Dialog
-        open={showConfirmModal}
-        onOpenChange={() => setShowConfirmModal(false)}
-      >
-        <div className="fixed inset-0 bg-black/30" />
-        <div className="fixed inset-0 flex items-center justify-center p-4">
-          <DialogContent className="w-full max-w-md rounded-lg bg-white p-6">
-            <DialogTitle className="text-xl font-bold mb-4">
-              Confirm Downgrade
-            </DialogTitle>
-            <DialogDescription className="mb-6">
-              {`Are you sure you want to downgrade to the Free Tier? You'll lose
-              access to Pro features immediately.`}
-            </DialogDescription>
-
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={() => setShowConfirmModal(false)}
-                className="px-4 py-2 border rounded-md hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => handleSubscriptionUpdate(pendingTier)}
-                disabled={isMutating}
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-70"
-              >
-                {isMutating ? "Processing..." : "Confirm Downgrade"}
-              </button>
-            </div>
-          </DialogContent>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-xl font-semibold text-white">{plan.name}</h3>
+          <p className="text-2xl font-bold text-white">{plan.price}</p>
         </div>
+
+        <ul className="space-y-2 mb-4">
+          {plan.features.map((feature, i) => (
+            <li key={i} className="flex text-sm text-gray-300">
+              <svg
+                className="w-5 h-5 text-green-500 mr-2 mt-0.5"
+                fill="currentColor"
+              >
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
+              </svg>
+              {feature}
+            </li>
+          ))}
+        </ul>
+
+        <Button
+          onClick={(e) => {
+            e.stopPropagation();
+            triggerAction();
+          }}
+          disabled={isMutating || plan.current}
+          className={cn(
+            "w-full py-2 text-base rounded-md",
+            plan.current
+              ? "bg-gray-100 text-gray-600"
+              : "bg-blue-600 hover:bg-blue-700 text-white",
+            isMutating && !plan.current && "opacity-70 cursor-wait"
+          )}
+        >
+          {isMutating ? "Processing..." : plan.cta}
+        </Button>
+
+        {plan.current && (
+          <p className="mt-2 text-sm text-green-600 text-center">
+            Your current plan
+            {subscription?.nextBillingDate && (
+              <span className="block text-xs text-gray-400">
+                Renews on{" "}
+                {new Date(subscription.nextBillingDate).toLocaleDateString()}
+              </span>
+            )}
+          </p>
+        )}
+      </div>
+
+      <Dialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
+        <DialogContent className="bg-gray-900 border border-gray-700 rounded-lg p-6">
+          <DialogTitle className="text-xl font-bold text-white">
+            Confirm Downgrade
+          </DialogTitle>
+          <DialogDescription className="text-gray-300 my-4">
+            Are you sure you want to downgrade to the Free Tier? You’ll lose
+            access to Pro features immediately.
+          </DialogDescription>
+          <div className="flex justify-end gap-3">
+            <Button
+              variant="outline"
+              onClick={() => setShowConfirmModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => handleChange(pendingTier)}
+              disabled={isMutating}
+            >
+              {isMutating ? "Processing..." : "Confirm"}
+            </Button>
+          </div>
+        </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

@@ -148,9 +148,8 @@ const SettingPage = () => {
       setIsDeleting(true);
       setError("");
       setSuccess("");
-
       try {
-        const response = await fetch("/api/account/delete", {
+        const response = await fetch("/api/user/account/delete", {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ username }),
@@ -159,7 +158,8 @@ const SettingPage = () => {
         if (!response.ok) {
           throw new Error(await response.text());
         }
-        setSuccess("Successfully Deleted Account");
+        const data: { message: string } = await response.json();
+        setSuccess(data?.message);
         // Optionally show success message before redirect
         window.location.href = "/";
       } catch (err: unknown) {

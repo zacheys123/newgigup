@@ -1,7 +1,14 @@
 "use client";
 import useStore from "@/app/zustand/useStore";
 import { RoleStatusCard } from "./RoleStatusCard";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  FiAlertCircle,
+  FiStar,
+  FiTrendingUp,
+  FiDollarSign,
+  FiMusic,
+} from "react-icons/fi";
 
 export function MusicianDashboard({
   gigsBooked,
@@ -11,62 +18,128 @@ export function MusicianDashboard({
   earnings: number;
 }) {
   const { subscriptiondata: data } = useStore();
-  console.log(data);
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="space-y-6 p-6 bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl shadow-lg"
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className="space-y-6 p-6 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-xl shadow-2xl border border-gray-800 overflow-hidden"
     >
-      <div className="flex items-start justify-between">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">
+          <motion.h1
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-400 via-pink-300 to-blue-400 bg-clip-text text-transparent"
+          >
             Your Performance Hub
-          </h1>
-          <p className="text-gray-400 mt-1">
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="text-gray-400 mt-1 text-sm md:text-base"
+          >
             Track your gigs and earnings in real-time
-          </p>
+          </motion.p>
         </div>
 
-        <motion.span
-          whileHover={{ scale: 1.05 }}
-          className="flex justify-center items-center"
+        <motion.div
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.98 }}
+          className="flex items-center gap-2 bg-gray-800/50 px-3 py-1.5 rounded-full border border-gray-700"
         >
-          <span className="text-red-500 title">current:</span>
-          <h5
-            className={`px-3 py-1 text-sm rounded-full font-medium ${
+          <span className="text-gray-400 text-sm">Current plan:</span>
+          <span
+            className={`px-2 py-1 text-xs font-semibold rounded-full ${
               data?.subscription?.isPro
-                ? "bg-purple-900/30 text-purple-300 border border-purple-800/50"
-                : "bg-gray-800 text-gray-400 border border-gray-700"
+                ? "bg-purple-900/40 text-purple-300 border border-purple-500/30"
+                : "bg-gray-700/50 text-gray-300 border border-gray-600/50"
             }`}
           >
             {data?.subscription?.isPro ? "PRO" : "FREE"}
-          </h5>
-        </motion.span>
+          </span>
+        </motion.div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-        <RoleStatusCard
-          title="Gigs Booked"
-          value={gigsBooked}
-          trend="up"
-          icon="🎸"
-        />
-        <RoleStatusCard
-          title="Earnings (KES)"
-          value={earnings}
-          format="currency"
-          icon="💰"
-        />
-        <RoleStatusCard
-          title="Rating"
-          value={4.8}
-          format="stars"
-          trend="steady"
-          icon="⭐"
-        />
-      </div>
+      {/* Content Section */}
+      <AnimatePresence mode="wait">
+        {data?.subscription?.isPro ? (
+          <motion.div
+            key="pro-content"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <RoleStatusCard
+              title="Gigs Booked"
+              value={gigsBooked}
+              trend="up"
+              icon={<FiMusic className="text-purple-400" />}
+            />
+            <RoleStatusCard
+              title="Earnings (KES)"
+              value={earnings}
+              format="currency"
+              icon={<FiDollarSign className="text-green-400" />}
+            />
+            <RoleStatusCard
+              title="Rating"
+              value={4.8}
+              format="stars"
+              trend="steady"
+              icon={<FiStar className="text-yellow-400" />}
+            />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="free-content"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="flex flex-col items-center justify-center p-8 rounded-lg bg-gray-800/30 border border-dashed border-gray-700 text-center"
+          >
+            <FiAlertCircle className="text-yellow-500 text-4xl mb-4" />
+            <h3 className="text-lg font-medium text-gray-200 mb-2">
+              Upgrade to Pro
+            </h3>
+            <p className="text-gray-400 text-sm max-w-md">
+              Unlock your full performance analytics and track your gigs,
+              earnings, and ratings in real-time with our Pro version.
+            </p>
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.98 }}
+              className="mt-4 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm font-medium rounded-full shadow-lg"
+            >
+              Upgrade Now
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Footer */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.4 }}
+        className="pt-4 border-t border-gray-800/50"
+      >
+        <div className="flex items-center justify-between text-xs text-gray-500">
+          <span>Last updated: {new Date().toLocaleString()}</span>
+          {data?.subscription?.isPro && (
+            <span className="flex items-center gap-1">
+              <FiTrendingUp className="text-green-400" />
+              <span className="text-green-400">+12% from last month</span>
+            </span>
+          )}
+        </div>
+      </motion.div>
     </motion.div>
   );
 }
