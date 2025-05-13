@@ -60,6 +60,7 @@ interface IUser extends Document {
   talentbio?: string;
   vocalistGenre?: string;
   musicianhandles: [{ platform: string; handle: string }];
+  gigsBookedThisWeek: { count: number; weekStart: Date };
   musiciangenres: string[];
   tier: "free" | "pro";
   earnings: number;
@@ -71,7 +72,6 @@ interface IUser extends Document {
   firstLogin: boolean;
   onboardingComplete: boolean;
   lastActive: Date;
-  gigsBookedThisWeek: number;
   lastBookingDate?: Date;
 }
 
@@ -164,7 +164,10 @@ const userSchema = new Schema<IUser>(
       type: Date,
       default: new Date(),
     },
-    gigsBookedThisWeek: Number,
+    gigsBookedThisWeek: {
+      count: { type: Number, default: 0 },
+      weekStart: { type: Date, default: null },
+    },
     lastBookingDate: Date,
   },
 

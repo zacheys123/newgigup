@@ -37,7 +37,7 @@ interface UserInput {
   monthlyGigsPosted: number; //
   monthlyMessages: number; //
   monthlyGigsBooked: number; //
-  gigsBookedThisWeek: number; // Track weekly bookings
+  gigsBookedThisWeek: [{ count: number; weekStart: Date }];
   lastBookingDate?: Date; // To track weekly reset
   firstLogin: boolean; // Add this flag
   totalSpent: number;
@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
         nextBillingDate: body.nextBillingDate,
         monthlyGigsPosted: body.monthlyGigsPosted,
 
-        gigsBookedThisWeek: body.gigsCreatedThisWeek, // Track weekly bookings
+        gigsBookedThisWeek: body.gigsBookedThisWeek, // Track weekly bookings
         lastBookingDate: body.lastBookingDate, // To track weekly reset
 
         monthlyMessages: body.monthlyMessages,

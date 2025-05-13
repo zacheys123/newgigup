@@ -15,6 +15,7 @@ export function useForgetBookings() {
     myGig: GigProps,
     userId: string
   ) => {
+    console.log(myGig);
     try {
       setLoading(true);
       const response = await fetch(`/api/gigs/cancelgig/${myGig?._id}`, {

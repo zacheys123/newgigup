@@ -22,6 +22,9 @@ import { useAuth } from "@clerk/nextjs";
 import { usePendingGigs } from "@/app/Context/PendinContext";
 import CountUp from "react-countup";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useForgetBookings } from "@/hooks/useForgetBooking";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { CircularProgress } from "@mui/material";
 
 const PendingGigs = () => {
   const { userId } = useAuth();
@@ -30,10 +33,15 @@ const PendingGigs = () => {
   const [typeOfGig, setTypeOfGig] = useState<string>("");
   const [localGigs, setLocalGigs] = useState<GigProps[]>([]);
   const { pendingGigsCount, setPendingGigsCount } = usePendingGigs();
-
   const debouncedSearch = useDebounce(typeOfGig, 300);
   const [isLocalLoading, setIsLocalLoading] = useState(true);
-
+  const { forgetBookings } = useForgetBookings();
+  const { user } = useCurrentUser();
+  const [loadingGig, setLoadingGig] = useState<string>("");
+  const forget = (curr: GigProps) => {
+    setLoadingGig(curr?._id as string);
+    forgetBookings(user?.user?._id as string, curr, userId as string);
+  };
   useEffect(() => {
     const savedGigs = localStorage.getItem("pendingGigs");
     setIsLocalLoading(false);
@@ -354,12 +362,29 @@ const PendingGigs = () => {
 
                       {renderCategorySpecificContent(gig)}
 
-                      <div className="mt-6 pt-4 border-t border-gray-700/50 flex justify-end">
+                      <div className="mt-6 pt-4 border-t w-full border-gray-700/50 flex justify-end">
+                        <motion.button
+                          whileHover={{ scale: 1.03 }}
+                          whileTap={{ scale: 0.97 }}
+                          onClick={() => forget(gig)}
+                          className="px-4 py-2 w-[100px]  bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-lg text-[10px] font-medium shadow-lg hover:shadow-cyan-500/20 transition-all mx-4"
+                        >
+                          {loadingGig !== gig?._id ? (
+                            " Cancel Gig"
+                          ) : (
+                            <CircularProgress
+                              size={14}
+                              className="text-white "
+                              style={{ color: "white" }}
+                            />
+                          )}
+                        </motion.button>
+
                         <motion.button
                           whileHover={{ scale: 1.03 }}
                           whileTap={{ scale: 0.97 }}
                           onClick={() => router.push(`/execute/${gig._id}`)}
-                          className="px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-lg text-sm font-medium shadow-lg hover:shadow-cyan-500/20 transition-all"
+                          className="px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-lg text-[10px] font-medium shadow-lg hover:shadow-cyan-500/20 transition-all"
                         >
                           View Gig
                         </motion.button>

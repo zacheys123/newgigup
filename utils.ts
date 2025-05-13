@@ -1,7 +1,7 @@
 // c/users/admin/appdata/roaming/wondershare/wondersharefilmora/output
 import { GigProps } from "./types/giginterface";
 import { FetchResponse, UserProps } from "./types/userinterfaces";
-
+import moment from "moment-timezone";
 interface SearchOptions {
   searchQuery?: string;
   category?: string;
@@ -442,15 +442,18 @@ export const dataCounties = [
 
 // utils/subscriptionHelpers.ts
 
-import moment from "moment-timezone";
-
 interface Subscription {
   tier: "free" | "pro";
   lastBookingDate?: Date;
 }
 
+interface WeeklyBooking {
+  count: number;
+  weekStart: Date;
+}
+
 interface UserInfo {
-  gigsBookedThisWeek?: number;
+  gigsBookedThisWeek?: WeeklyBooking;
 }
 
 interface DashboardData {
@@ -458,29 +461,95 @@ interface DashboardData {
   user?: UserInfo;
 }
 
-export const canBookMoreGigs = (
-  user: DashboardData | null,
-  weeklyBookings?: number
-): boolean => {
-  if (!user) return false;
+interface BookingEligibility {
+  canBook: boolean;
+  reason: string | null;
+}
 
-  // Pro users have no limits
-  if (user.subscription?.tier === "pro") return true;
+export const canStillBookThisWeekDetailed = (
+  data: DashboardData | null,
+  timezone = "America/New_York"
+): BookingEligibility => {
+  if (!data || !data.user) {
+    return {
+      canBook: false,
+      reason: "User not logged in or incomplete data.",
+    };
+  }
 
-  // Use either passed count or user's count
-  const bookingsCount = weeklyBookings ?? user.user?.gigsBookedThisWeek ?? 0;
+  const { subscription, user } = data;
 
-  // Free users limited to 3 gigs/week
-  return bookingsCount < 3;
-};
+  if (subscription?.tier === "pro") {
+    return {
+      canBook: true,
+      reason: null,
+    };
+  }
 
-// Timezone-aware week check
-export const isNewWeek = (lastDate?: Date): boolean => {
-  if (!lastDate) return true;
+  const weeklyBooking = user.gigsBookedThisWeek;
+  const count = weeklyBooking?.count ?? 0;
+  const weekStart = weeklyBooking?.weekStart;
 
-  const timezone = "America/New_York"; // Must match backend timezone
+  if (!weekStart) {
+    return {
+      canBook: true,
+      reason: null,
+    };
+  }
+
   const now = moment().tz(timezone);
-  const last = moment(lastDate).tz(timezone);
+  const last = moment(weekStart).tz(timezone);
+  const isNewWeek = now.diff(last, "weeks") > 0;
 
-  return now.diff(last, "weeks") > 0;
+  if (isNewWeek) {
+    return {
+      canBook: true,
+      reason: null,
+    };
+  }
+
+  if (count > 3) {
+    return {
+      canBook: false,
+      reason:
+        "Free tier limit reached (3 gigs/week). Upgrade to Pro for unlimited bookings.",
+    };
+  }
+
+  return {
+    canBook: true,
+    reason: null,
+  };
 };
+
+interface UpdateResult {
+  updatedCount: number;
+  newWeekStart: Date;
+  isSameWeek: boolean;
+}
+
+/**
+ * Updates the weekly booking count based on timezone-aware weekly tracking.
+ * @param previous - Previous weekly booking data from the user.
+ * @param timezone - Timezone string, e.g., "America/New_York".
+ * @returns Updated count and week start.
+ */
+export function updateWeeklyBooking(
+  previous: WeeklyBooking,
+  timezone: string = "America/New_York"
+): UpdateResult {
+  const now = moment().tz(timezone);
+  const currentWeekStart = now.clone().startOf("week").toDate();
+
+  const wasSameWeek = previous.weekStart
+    ? moment(previous.weekStart).isSame(currentWeekStart, "week")
+    : false;
+
+  const updatedCount = wasSameWeek ? previous.count + 1 : 0;
+
+  return {
+    updatedCount,
+    newWeekStart: currentWeekStart,
+    isSameWeek: wasSameWeek,
+  };
+}

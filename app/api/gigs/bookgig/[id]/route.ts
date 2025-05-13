@@ -65,27 +65,39 @@ export async function PUT(req: NextRequest) {
     }
 
     // Calculate weekly bookings with timezone awareness
-    const timezone = "America/New_York"; // Set your preferred timezone
-    const startOfWeek = moment().tz(timezone).startOf("week").toDate();
-    const endOfWeek = moment().tz(timezone).endOf("week").toDate();
+    // Calculate the start of the current week
+    const timezone = "America/New_York";
+    const now = moment().tz(timezone);
+    const startOfWeek = now.clone().startOf("week").toDate();
 
-    const weeklyBookings = await Gigs.countDocuments({
-      bookCount: userid,
-      updatedAt: {
-        $gte: startOfWeek,
-        $lte: endOfWeek,
-      },
-    });
+    let updatedCount = 1;
 
-    // Enforce subscription limits
-    if (user?.tier === "free" && weeklyBookings >= 3) {
+    if (
+      user.gigsBookedThisWeek?.weekStart &&
+      moment(user.gigsBookedThisWeek.weekStart).isSame(startOfWeek, "week")
+    ) {
+      // Same week, increment count
+      updatedCount = user.gigsBookedThisWeek.count + 1;
+    } else {
+      // New week, reset count
+      updatedCount = 1;
+    }
+
+    if (user.tier === "free" && updatedCount > 3) {
       return NextResponse.json({
         success: false,
         message:
           "Free tier limit reached (3 gigs/week). Upgrade to Pro for unlimited bookings.",
-        weeklyBookings: weeklyBookings,
+        weeklyBookings: updatedCount - 1,
       });
     }
+
+    await User.findByIdAndUpdate(userid, {
+      $set: {
+        gigsBookedThisWeek: { count: updatedCount, weekStart: startOfWeek },
+        lastBookingDate: new Date(),
+      },
+    });
 
     // Update viewCount if not already viewed
     if (!gig.viewCount.includes(userid)) {
@@ -98,11 +110,7 @@ export async function PUT(req: NextRequest) {
     await gig.updateOne({
       $push: { bookCount: userid },
     });
-
     // Update user's last booking date
-    await User.findByIdAndUpdate(userid, {
-      $set: { lastBookingDate: new Date() },
-    });
 
     // Get updated gig data
     const updatedGig = await Gigs.findById(id);
@@ -110,7 +118,7 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "Booked successfully",
-      weeklyBookings: weeklyBookings + 1,
+      weeklyBookings: updatedCount + 1,
       updatedGig,
       isPro: user?.tier === "pro",
     });

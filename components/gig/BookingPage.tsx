@@ -2,7 +2,7 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useForgetBookings } from "@/hooks/useForgetBooking";
 import { useAuth } from "@clerk/nextjs";
 import { CircularProgress } from "@mui/material";
-import { X } from "lucide-react";
+import { ArrowLeft, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -62,7 +62,7 @@ const BookingPage = ({ currentGig }: BookingProps) => {
 
   const playSound = () => {
     try {
-      const audio = new Audio("/sounds/click.mp3");
+      const audio = new Audio("../../public/notification-tone.mp3");
       audio.play().catch((error) => {
         console.error("Failed to play sound:", error);
       });
@@ -270,7 +270,12 @@ const BookingPage = ({ currentGig }: BookingProps) => {
                   </div>
                 </div>
               </div>{" "}
-              <div className="flex items-center space-x-3 self-end sm:self-center">
+              <div className="flex items-center space-x-3 self-end sm:self-center mt-3">
+                <ArrowLeft
+                  size={16}
+                  className="text-neutral-300"
+                  onClick={() => router.back()}
+                />
                 {user?.user?._id && currentgig?.postedBy?.followers && (
                   <motion.div
                     whileHover={{ scale: 1.05 }}

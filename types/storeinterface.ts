@@ -18,11 +18,13 @@ export const initialState = {
       gigsPosted: 0,
       total: 0,
       onboardingComplete: false,
+      gigsBookedThisWeek: { count: 0, weekStart: new Date() },
     },
     subscription: {
       tier: "",
       isPro: false,
       nextBillingDate: new Date() || null,
+      lastBookingDate: new Date() || null,
     },
   },
   loadingPostId: "",
