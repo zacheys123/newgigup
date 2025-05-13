@@ -32,12 +32,16 @@ export async function GET(request: NextRequest) {
         onboardingComplete: userdata.onboardingComplete,
         gigsPosted: userdata?.monthlyGigsPosted,
         gigsBooked: userdata.monthlyGigsBooked,
+
+        gigsBookedThisWeek: userdata?.gigsBookedThisWeek, // Track weekly bookings
         totalSpent: userdata.totalSpent,
         userearnings: userdata.earnings,
       },
       subscription: {
         tier: userdata.tier,
         nextBillingDate: userdata.nextBillingDate,
+        lastBookingDate: userdata?.lastBookingDate, // To track weekly reset
+
         isPro:
           userdata.tier === "pro" &&
           (!userdata.nextBillingDate ||

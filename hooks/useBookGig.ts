@@ -1,31 +1,48 @@
-// src/hooks/useBookGig.ts
 "use client";
-import { FetchResponse, GigProps } from "@/types/giginterface";
+import { GigProps } from "@/types/giginterface";
 import useSocket from "./useSocket";
 import { useState } from "react";
 import { usePendingGigs } from "@/app/Context/PendinContext";
+import { mutate, type MutatorCallback } from "swr";
+import { DashboardData } from "@/types/dashboard";
+import { UserProps } from "@/types/userinterfaces";
+
+interface BookGigOptions {
+  redirectOnSuccess?: boolean;
+  redirectUrl?: string;
+  preventAutoRevalidate?: boolean;
+}
 
 export function useBookGig() {
   const { socket } = useSocket();
-  const [bookLoading, setBookloading] = useState(false);
+  const [bookLoading, setBookLoading] = useState(false);
   const { incrementPendingGigs } = usePendingGigs();
 
   const bookGig = async (
     gig: GigProps,
     myId: string,
-    gigs: Array<GigProps> | null,
+    gigs: GigProps[] | null,
     userId: string | null,
     toast: { error: (msg: string) => void; success: (msg: string) => void },
     setRefetchGig: (refetchgig: boolean) => void,
-    router: {
+    navigation: {
       push: (url: string) => void;
       replace: (url: string) => void;
       refresh: () => void;
+    },
+    options: BookGigOptions = {
+      redirectOnSuccess: true,
+      redirectUrl: `/execute/${gig?._id}`,
+      preventAutoRevalidate: false,
     }
-  ): Promise<void> => {
+  ): Promise<{
+    success: boolean;
+    message?: string;
+    data?: { updatedGig: GigProps; weeklyBookings: number };
+  }> => {
     if (!gig) {
       toast.error("Invalid gig data.");
-      return;
+      return { success: false, message: "Invalid gig data" };
     }
 
     const countUserPosts = gigs
@@ -35,11 +52,34 @@ export function useBookGig() {
 
     if (countUserPosts > 4) {
       toast.error("You have reached your maximum booking limit");
-      return;
+      return { success: false, message: "Maximum booking limit reached" };
     }
-    setBookloading(true);
+
+    setBookLoading(true);
+
+    // Type-safe optimistic update
+    const optimisticUpdate: MutatorCallback<GigProps[]> = (
+      currentData: GigProps[] | undefined
+    ) => {
+      return (
+        currentData?.map((g) =>
+          g._id === gig._id
+            ? {
+                ...g,
+                bookCount: [
+                  ...g.bookCount,
+                  { _id: myId, clerkId: userId } as UserProps,
+                ],
+              }
+            : g
+        ) ?? []
+      );
+    };
+
+    mutate("/api/gigs/getgigs", optimisticUpdate, { revalidate: false });
+
     try {
-      const res = await fetch(`/api/gigs/bookgig/${gig?._id}`, {
+      const res = await fetch(`/api/gigs/bookgig/${gig._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -47,41 +87,87 @@ export function useBookGig() {
         body: JSON.stringify({ userid: myId }),
       });
 
-      const data: FetchResponse = await res.json();
-      console.log(data);
+      const data = await res.json();
 
-      if (data.gigstatus === true) {
-        toast.success(data.message || "Booked successfully");
-        setBookloading(false);
-
-        // Increment pending gigs count
-        // Only increment if this is a new booking
-        if (
-          gig?.bookCount?.some((bookedUser) => bookedUser?.clerkId !== userId)
-        ) {
-          incrementPendingGigs();
-        }
-        // Emit Socket.IO event before updating state
-        if (socket) {
-          socket.emit("gigBooked", {
-            gigId: gig?._id,
-            bookCount: (gig?.bookCount?.length || 0) + 1,
-          });
-        } else {
-          console.warn("Socket connection unavailable");
-        }
-
-        setRefetchGig(true);
-        router.push(`/execute/${gig?._id}`);
-      } else {
-        toast.error(data.message || "Error occurred");
-        router.replace(`/gigs/${userId}`);
-        router.refresh();
+      if (!res.ok) {
+        throw new Error(data.message || "Booking failed");
       }
-    } catch (error) {
+
+      // Type-safe server response update
+      const updateWithServerData: MutatorCallback<GigProps[]> = (
+        currentData: GigProps[] | undefined
+      ) => {
+        return (
+          currentData?.map((g) =>
+            g._id === gig._id ? data.updatedGig || g : g
+          ) ?? []
+        );
+      };
+
+      mutate("/api/gigs/getgigs", updateWithServerData, {
+        revalidate: !options.preventAutoRevalidate,
+      });
+
+      // Update user data
+      const updateUserData: MutatorCallback<DashboardData> = (
+        currentData: DashboardData | undefined
+      ) => {
+        if (!currentData) return currentData;
+        return {
+          ...currentData,
+          user: {
+            ...currentData.user,
+            gigsBookedThisWeek: data.weeklyBookings,
+            gigsBooked: (currentData.user.gigsBooked || 0) + 1,
+          },
+          subscription: {
+            ...currentData.subscription,
+            lastBookingDate: new Date(),
+          },
+        };
+      };
+
+      mutate<DashboardData>(`/api/user/getuser/${userId}`, updateUserData, {
+        revalidate: false,
+      });
+      setBookLoading(false);
+
+      if (!gig.bookCount.some((bookedUser) => bookedUser?.clerkId === userId)) {
+        incrementPendingGigs();
+      }
+
+      if (socket) {
+        socket.emit("gigBooked", {
+          gigId: gig._id,
+          bookCount:
+            data.updatedGig?.bookCount?.length || gig.bookCount.length + 1,
+        });
+      }
+
+      setRefetchGig(true);
+
+      if (options.redirectOnSuccess && options.redirectUrl) {
+        navigation.push(options.redirectUrl);
+      }
+
+      return {
+        success: true,
+        message: data.message,
+        data,
+      };
+    } catch (error: unknown) {
+      mutate("/api/gigs/getgigs");
+      mutate(`/api/user/getuser/${userId}`);
+
+      const errorMessage =
+        error instanceof Error ? error.message : "Booking failed";
       console.error("Booking Error:", error);
-      toast.error("Failed to book the gig. Please try again.");
-      setBookloading(false);
+      toast.error(errorMessage);
+      setBookLoading(false);
+      return {
+        success: false,
+        message: errorMessage,
+      };
     }
   };
 

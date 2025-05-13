@@ -31,6 +31,7 @@ const BillingComponent = () => {
               "Browse musician profiles and musician reviews",
               "Limited Messages to musicians(50msgs a month)",
               "30days of access",
+              "No scheduling of gigs",
             ]
           : [],
         cta: isPro ? "Downgrade" : "Current Plan",
@@ -61,6 +62,7 @@ const BillingComponent = () => {
               "Booking management tools",
               "Unlimited messaging",
               "Dedicated support",
+              "Scheduling gigs (automatic ,regular and more)",
             ]
           : [],
         cta: isPro ? "Current Plan" : "Upgrade",

@@ -1,5 +1,4 @@
 // c/users/admin/appdata/roaming/wondershare/wondersharefilmora/output
-
 import { GigProps } from "./types/giginterface";
 import { FetchResponse, UserProps } from "./types/userinterfaces";
 
@@ -240,62 +239,6 @@ export const searchFunc = (users: UserProps[], searchQuery: string) => {
   return sortedData;
 };
 
-// export const fetchVideos = async (userid: string) => {
-//   const response = await fetch(`/api/videos/getvideos/${userid}`);
-//   if (!response.ok) throw new Error("Failed to fetch videos");
-//   return response.json();
-// };
-
-// export const deleteVideo = async (
-//   id: string,
-//   setVideos: () => void,
-//   videos: VideoProps[]
-// ) => {
-//   try {
-//     await fetch(`/api/videos/deletevideo/${id}`, {
-//       method: "DELETE",
-//       headers: { "Content-Type": "application/json" },
-//     });
-//     setRefetch((prev) => !prev);
-//     setVideos(videos?.filter((v: VideoProps) => v._id !== id));
-//     setDeleteLoading(false);
-//   } catch (error) {
-//     console.error("Error deleting video:", error);
-//   }
-// };
-// export const gigcards = [
-//   {
-//     role: "client",
-//     title: "Client",
-//     color: "orange",
-//     description:
-//       "Join as a client to create gigs for musicians and choose the best talent to deliver quality music for you.",
-//     onClick: () => handleRoleSelection(false),
-//     buttonText: clientload ? <BallLoader /> : "Join as Client",
-//     disabled: !!myuser?.isClient,
-//   },
-//   {
-//     role: "musician",
-//     title: "Musician",
-//     color: "blue",
-//     description:
-//       "Join as a musician to discover and book gigs while connecting with fellow musicians and clients.",
-//     onClick: () => handleRoleSelection(true),
-//     buttonText: musicianload ? <BallLoader /> : "Join as Musician",
-//     disabled: !!myuser?.isMusician,
-//   },
-//   {
-//     role: "both",
-//     title: "Both",
-//     color: "gray",
-//     description:
-//       "Join as both a Client and a musician to be able to create gigs and offer other musicians gigs and also be able to book a gig yourself.",
-//     buttonText: "Coming Soon",
-//     disabled: true,
-//   },
-// ];
-
-// Function to handle the follow action
 export const handleFollow = async (_id: string, user: UserProps) => {
   // Optimistically set follow status
 
@@ -362,64 +305,6 @@ export const handleFollowing = async (_id: string, user: UserProps) => {
   }
 };
 
-// function gigme(query: string, data: GigProps, sorted: GigProps[]) {
-//   if (data?.location?.toLowerCase().includes(query.toLowerCase())) {
-//     return sorted;
-//   } else if (
-//     data?.time?.from?.toLowerCase().includes(query.toLowerCase()) ||
-//     data?.time?.to?.toLowerCase().includes(query.toLowerCase())
-//   ) {
-//     return sorted;
-//   } else if (data?.title?.toLowerCase().includes(query.toLowerCase())) {
-//     return sorted;
-//   }
-// }
-// export const searchfunc = (
-//   data: GigProps[],
-//   searchquery: string,
-//   category: string,
-//   gigQuery: [],
-//   location: string
-// ) => {
-//   let sortedData = data;
-
-//   sortedData = sortedData?.filter((gig) => {
-//     if (searchquery) {
-//       gigQuery = gigme(searchquery, gig, sortedData);
-//       return gigQuery;
-//     } else {
-//       if (
-//         gig?.category &&
-//         gig?.category?.toLowerCase() === category?.toLowerCase()
-//       ) {
-//         return sortedData;
-//       } else if (gig.bussinesscat?.toLowerCase() === category?.toLowerCase()) {
-//         return sortedData;
-//       } else if (
-//         category.toLowerCase() === "all" &&
-//         gig?.location?.toLowerCase().includes(location.toLowerCase())
-//       ) {
-//         console.log(location);
-//         return sortedData;
-//       } else if (
-//         category.toLowerCase() === "all" &&
-//         location.toLowerCase() === "all"
-//       ) {
-//         return data;
-//       }
-//     }
-//     if (location) {
-//       if (gig?.location?.toLowerCase().includes(location.toLowerCase())) {
-//         return sortedData;
-//       }
-//     }
-//   });
-
-//   return sortedData;
-// };
-
-// Font Choices
-// Font Choices (Expanded List)
 export const fonts = [
   // Modern Sans-Serif
   "Poppins",
@@ -554,3 +439,48 @@ export const dataCounties = [
   "Vihiga",
   "All",
 ];
+
+// utils/subscriptionHelpers.ts
+
+import moment from "moment-timezone";
+
+interface Subscription {
+  tier: "free" | "pro";
+  lastBookingDate?: Date;
+}
+
+interface UserInfo {
+  gigsBookedThisWeek?: number;
+}
+
+interface DashboardData {
+  subscription?: Subscription;
+  user?: UserInfo;
+}
+
+export const canBookMoreGigs = (
+  user: DashboardData | null,
+  weeklyBookings?: number
+): boolean => {
+  if (!user) return false;
+
+  // Pro users have no limits
+  if (user.subscription?.tier === "pro") return true;
+
+  // Use either passed count or user's count
+  const bookingsCount = weeklyBookings ?? user.user?.gigsBookedThisWeek ?? 0;
+
+  // Free users limited to 3 gigs/week
+  return bookingsCount < 3;
+};
+
+// Timezone-aware week check
+export const isNewWeek = (lastDate?: Date): boolean => {
+  if (!lastDate) return true;
+
+  const timezone = "America/New_York"; // Must match backend timezone
+  const now = moment().tz(timezone);
+  const last = moment(lastDate).tz(timezone);
+
+  return now.diff(last, "weeks") > 0;
+};

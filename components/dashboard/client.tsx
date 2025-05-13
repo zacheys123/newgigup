@@ -147,3 +147,5 @@ export function ClientDashboard({
     </div>
   );
 }
+
+// now from that i have this const{gigs} =useAllGigs() i get all gigs ...i want to be able to filter all gigs belonging to thelogged in user...and then making sure that if the user is in free subscription they cannot create anymore gigs past 3...and there should be a n overlay to tell them whenever this page loads,,and suggests for them to upgrade and taes them to/dashboard/billing

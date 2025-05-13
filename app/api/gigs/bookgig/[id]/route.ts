@@ -1,18 +1,13 @@
 import connectDb from "@/lib/connectDb";
-
 import Gigs from "@/models/gigs";
 import User from "@/models/user";
 import { getAuth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
-
-// import ioClient from "socket.io-client"; // Import Socket.io client
-// // import { sendFCMNotification } from "@/utils/notifications";
-// import moment from "moment";
-// import { sendPushNotification } from "@/lib/firebase/firebaseAdmin";
+import moment from "moment-timezone";
 
 export async function PUT(req: NextRequest) {
   const { userid } = await req.json();
-  const id = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
+  const id = req.nextUrl.pathname.split("/").pop();
 
   const { userId } = getAuth(req);
   if (!userId) {
@@ -21,105 +16,109 @@ export async function PUT(req: NextRequest) {
 
   try {
     await connectDb();
-    // Find the event and ensure it's not already booked
-    const newGig = await Gigs.findById(id).populate({
+
+    // Get user with subscription info
+    const user = await User.findById(userid).select("tier isMusician");
+    if (!user) {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
+
+    if (!user.isMusician) {
+      return NextResponse.json(
+        { message: "Only musicians can book gigs" },
+        { status: 403 }
+      );
+    }
+    const gig = await Gigs.findById(id).populate({
       path: "postedBy",
       model: User,
     });
-
-    if (!userid || userid === undefined) {
-      return NextResponse.json({
-        gigstatus: "false",
-        message: "Invalid request,try again later ",
-      });
+    // Add these checks before booking
+    if (gig.isTaken) {
+      return NextResponse.json(
+        { message: "This gig is already taken" },
+        { status: 400 }
+      );
     }
 
+    if (gig.isPending) {
+      return NextResponse.json(
+        { message: "This gig is not yet available" },
+        { status: 400 }
+      );
+    }
+
+    if (!gig) {
+      return NextResponse.json({ message: "Gig not found" }, { status: 404 });
+    }
+
+    // Basic validation checks
     if (
-      newGig?.bookCount.length > 3 ||
-      newGig?.postedBy?.equals(userid) ||
-      newGig?.bookCount?.includes(userid)
+      !userid ||
+      gig.postedBy.equals(userid) ||
+      gig.bookCount.includes(userid)
     ) {
       return NextResponse.json({
-        gigstatus: "false",
-        message: "Cannot Book this Gig,already booked? ",
-      });
-    } else {
-      // update viewCount
-      if (!newGig?.viewCount.includes(userid)) {
-        await newGig.updateOne(
-          {
-            $push: {
-              viewCount: userid,
-            },
-          },
-          { new: true }
-        );
-      }
-      // update the bookCount by adding ur id to the array of users that clicked on book gig
-      if (!newGig?.bookCount.includes(userid)) {
-        await newGig.updateOne(
-          {
-            $push: {
-              bookCount: userid,
-              // bookedBy: userid,
-            },
-            $inc: {},
-          },
-          { new: true }
-        );
-      }
-
-      // get the details of the person tha posted the gig
-      // const postedByid = newGig?.postedBy?._id;
-      // const updateUsersBookedByfield = await User.findByIdAndUpdate(postedByid, {
-      //   $push: {
-      //     usersbookgig: newGig?.bookedBy?._id,
-      //   },
-      // });
-
-      return NextResponse.json({
-        gigstatus: true,
-        message:
-          "Booked the gig successfully, wait for confirmation from client...",
-        // data: updateUsersBookedByfield,
+        success: false,
+        message: "Cannot book this gig",
       });
     }
 
-    // await newGig.updateOne(
-    //   {
-    //     $set: {
-    //       isPending: true,
-    //       bookedBy: userid,
-    //     },
-    //   },
-    //   { new: true }
-    // );
+    // Calculate weekly bookings with timezone awareness
+    const timezone = "America/New_York"; // Set your preferred timezone
+    const startOfWeek = moment().tz(timezone).startOf("week").toDate();
+    const endOfWeek = moment().tz(timezone).endOf("week").toDate();
 
-    // Notify Socket.io server directly
-    // socket.emit("book-gig", {
-    //   _id: currentgig?._id,
-    //   title: currentgig?.title,
-    //   bookedBy: userid,
-    // });
-    // Notify event owner (optional)
+    const weeklyBookings = await Gigs.countDocuments({
+      bookCount: userid,
+      updatedAt: {
+        $gte: startOfWeek,
+        $lte: endOfWeek,
+      },
+    });
 
-    // if (gigCreator && gigCreator.fcmToken) {
-    //   const payload = {
-    //     notification: {
-    //       title: "Gig Booked!",
-    //       body: `Your gig "${currentgig?.title}" was booked!`,
-    //     },
-    //   };
+    // Enforce subscription limits
+    if (user?.tier === "free" && weeklyBookings >= 3) {
+      return NextResponse.json({
+        success: false,
+        message:
+          "Free tier limit reached (3 gigs/week). Upgrade to Pro for unlimited bookings.",
+        weeklyBookings: weeklyBookings,
+      });
+    }
 
-    //   await sendPushNotification(gigCreator.fcmToken, payload);
-    // }
-    // const creatorId = currentgig.postedBy._id;
-    // await sendFCMNotification(
-    //   creatorId,
-    //   "Your gig was booked!",
-    //   `Gig "${currentgig.title}" has been booked.`
-    // );
+    // Update viewCount if not already viewed
+    if (!gig.viewCount.includes(userid)) {
+      await gig.updateOne({
+        $push: { viewCount: userid },
+      });
+    }
+
+    // Update bookCount
+    await gig.updateOne({
+      $push: { bookCount: userid },
+    });
+
+    // Update user's last booking date
+    await User.findByIdAndUpdate(userid, {
+      $set: { lastBookingDate: new Date() },
+    });
+
+    // Get updated gig data
+    const updatedGig = await Gigs.findById(id);
+
+    return NextResponse.json({
+      success: true,
+      message: "Booked successfully",
+      weeklyBookings: weeklyBookings + 1,
+      updatedGig,
+      isPro: user?.tier === "pro",
+    });
   } catch (error) {
-    console.log(error);
+    console.error("Booking error:", error);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }

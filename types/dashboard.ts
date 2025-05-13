@@ -4,6 +4,7 @@ export type UserData = {
   firstLogin: boolean;
   clerkId: string;
   gigsBooked?: number; // Add this
+  gigsBookedThisWeek?: number; // Add this
   userearnings: number; // Add this
   gigsPosted: number; // Add this
   total: number;
@@ -14,6 +15,7 @@ export type SubscriptionData = {
   tier: string;
   isPro: boolean;
   nextBillingDate: Date | null;
+  lastBookingDate: Date | null;
 };
 
 export type DashboardData = {

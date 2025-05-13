@@ -15,12 +15,15 @@ import { useVideos } from "@/hooks/useVideos";
 import { useSocketContext } from "@/app/Context/socket";
 import { useBookGig } from "@/hooks/useBookGig";
 import { isCreatorIsCurrentUserAndTaken } from "@/constants";
-import { Video } from "lucide-react";
+import { Check, Video } from "lucide-react";
 import { motion } from "framer-motion";
 import { Trash2, X } from "lucide-react";
 import { Input } from "../ui/input";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useScheduleGig } from "@/hooks/useScheduleGig";
+import { canBookMoreGigs } from "@/utils";
+import { useSubscription } from "@/hooks/useSubscription";
+import { mutate } from "swr";
 
 // import { useCurrentUser } from "@/hooks/useCurrentUser";
 interface FetchResponse {
@@ -58,6 +61,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
     setLoadingPostId,
   } = useStore();
 
+  const { subscription } = useSubscription(userId as string);
   const [bookCount, setBookCount] = useState(gig.bookCount.length || 0);
   const [currviewCount, setCurrviewCount] = useState(0);
   const [isDeleteModal, setIsDeleteModal] = useState(false);
@@ -163,6 +167,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
 
   //
 
+  console.log("userData", subscription);
   useEffect(() => {
     if (!socket) return;
 
@@ -196,15 +201,140 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
       setLoadingPostId("");
     }
   };
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [lastBookedGigId, setLastBookedGigId] = useState<string | null>(null);
+  const handleBookGig = async (giginfo: GigProps) => {
+    const result = await bookGig(
+      giginfo,
+      myId,
+      gigs,
+      userId as string,
+      toast,
+      setRefetchGig,
+      router,
+      {
+        redirectOnSuccess: false,
+        preventAutoRevalidate: true, // Prevent auto refresh
+      }
+    );
+
+    if (result.success) {
+      setLastBookedGigId(giginfo?._id as string);
+      setShowConfirmation(true);
+    }
+  };
   const existingSecret = localStorage.getItem("secret");
   return (
     <>
       {isDescriptionModal && <GigDescription />}
+
       {isDeleteModal && (
         <DeleteModal
           setIsDeleteModal={setIsDeleteModal}
           currentGig={currentgig}
         />
+      )}
+      {showConfirmation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop with glass effect */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-md"
+            onClick={() => setShowConfirmation(false)}
+          />
+
+          {/* Main modal container */}
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            transition={{
+              type: "spring",
+              damping: 20,
+              stiffness: 300,
+            }}
+            className="relative z-10 w-full max-w-md"
+          >
+            {/* Glass card */}
+            <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl overflow-hidden">
+              {/* Decorative gradient border */}
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-emerald-500/20 rounded-2xl pointer-events-none" />
+
+              <div className="p-6">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-2xl font-bold text-white font-[Inter] tracking-tight">
+                    Booking Confirmed
+                  </h3>
+                  <button
+                    onClick={() => setShowConfirmation(false)}
+                    className="p-1 text-gray-400 hover:text-white transition-colors rounded-full hover:bg-white/10"
+                    aria-label="Close"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+
+                {/* Success icon */}
+                <motion.div
+                  initial={{ scale: 0, rotate: -30 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="mx-auto mb-6 w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center border border-green-500/20"
+                >
+                  <Check
+                    className="text-green-400"
+                    size={36}
+                    strokeWidth={2.5}
+                  />
+                </motion.div>
+
+                {/* Content */}
+                <p className="mb-8 text-center text-gray-300 font-[sans] text-md leading-relaxed">
+                  Your booking was successful! Would you like to view the gig
+                  details or continue browsing?
+                </p>
+
+                {/* Buttons */}
+                <div className="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3">
+                  <motion.button
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => {
+                      setShowConfirmation(false);
+                      router.push("/gigs/" + userId);
+                    }}
+                    className="px-6 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white transition-all duration-300 font-medium flex-1"
+                  >
+                    Browse More
+                  </motion.button>
+
+                  <motion.button
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => {
+                      setShowConfirmation(false);
+                      mutate("/api/gigs/getgigs");
+                      router.push(`/execute/${lastBookedGigId}`);
+                    }}
+                    className="px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white transition-all duration-300 font-medium shadow-lg shadow-indigo-500/20 flex-1"
+                  >
+                    View Details
+                  </motion.button>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="px-6 py-4 bg-white/5 border-t border-white/5 text-center">
+                <p className="text-xs text-gray-400 font-mono">
+                  You can access this booking anytime in pending gigs page
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
       )}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
@@ -417,7 +547,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                 disabled={loadingPostId === gig._id}
               />
             )}
-            {gig &&
+            {(gig &&
               user &&
               gig?.postedBy?._id &&
               gig?.postedBy?._id !== myId &&
@@ -425,32 +555,31 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
               gig?.bookCount.length < 4 &&
               user?.user?.isMusician === true &&
               gig?.isTaken === false &&
-              gig?.isPending === false && (
+              gig?.isPending === false &&
+              subscription?.gigsBookedThisWeek < 3) ||
+              (subscription?.tier !== "free" && (
                 <ButtonComponent
                   variant="secondary"
-                  classname="!bg-purple-600/90 hover:!bg-purple-500 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
-                  onclick={async () => {
-                    setLoadingPostId(gig?._id || "");
-                    try {
-                      await bookGig(
-                        gig,
-                        myId as string,
-                        gigs || [],
-                        userId as string,
-                        toast,
-                        setRefetchGig,
-                        router
-                      );
-                      // If bookGig performs navigation, loading will be handled there
-                    } catch (error) {
-                      console.log(error);
-                      setLoadingPostId("");
-                    }
-                  }}
-                  title={loadingPostId === gig?._id ? "Processing..." : "Book"}
-                  disabled={loadingPostId === gig?._id || bookLoading}
+                  classname={`!bg-purple-600/90 hover:!bg-purple-500 h-7 text-[11px] font-normal text-white px-3 rounded transition-all ${
+                    !canBookMoreGigs(user.user)
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                  }`}
+                  onclick={() => handleBookGig(gig)}
+                  title={
+                    loadingPostId === gig?._id
+                      ? "Processing..."
+                      : !canBookMoreGigs(user.user)
+                      ? "Limit Reached"
+                      : "Book"
+                  }
+                  disabled={
+                    loadingPostId === gig?._id ||
+                    bookLoading ||
+                    !canBookMoreGigs(user.user)
+                  }
                 />
-              )}
+              ))}
             {gig?.isPending === true &&
               gig?.postedBy?._id !== user?.user?._id && (
                 <ButtonComponent

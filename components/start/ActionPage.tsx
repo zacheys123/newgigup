@@ -167,6 +167,8 @@ const ActionPage = () => {
               monthlyGigsPosted: 0,
               monthlyMessages: 0,
               monthlyGigsBooked: 0,
+              gigsBookedThisWeek: 0,
+              lastBookingDate: Date.now(), // To track weekly reset
               earnings: 0,
               totalSpent: 0,
               firstLogin: true,

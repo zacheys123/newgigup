@@ -71,6 +71,8 @@ interface IUser extends Document {
   firstLogin: boolean;
   onboardingComplete: boolean;
   lastActive: Date;
+  gigsBookedThisWeek: number;
+  lastBookingDate?: Date;
 }
 
 // Define Mongoose Schema
@@ -162,7 +164,10 @@ const userSchema = new Schema<IUser>(
       type: Date,
       default: new Date(),
     },
+    gigsBookedThisWeek: Number,
+    lastBookingDate: Date,
   },
+
   { timestamps: true }
 );
 

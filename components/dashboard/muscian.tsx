@@ -9,6 +9,7 @@ import {
   FiDollarSign,
   FiMusic,
 } from "react-icons/fi";
+import { useRouter } from "next/navigation";
 
 export function MusicianDashboard({
   gigsBooked,
@@ -18,7 +19,7 @@ export function MusicianDashboard({
   earnings: number;
 }) {
   const { subscriptiondata: data } = useStore();
-
+  const router = useRouter();
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -113,6 +114,7 @@ export function MusicianDashboard({
               earnings, and ratings in real-time with our Pro version.
             </p>
             <motion.button
+              onClick={() => router.push("/dashboard/billing")}
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.98 }}
               className="mt-4 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm font-medium rounded-full shadow-lg"
