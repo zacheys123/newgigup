@@ -69,6 +69,7 @@ const VideoProfile = () => {
               onboardingComplete: false,
               lastActive: new Date(),
               year: "",
+              createdAt: new Date(),
             },
           });
         }
