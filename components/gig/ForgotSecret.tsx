@@ -228,7 +228,7 @@ const ForgotSecret = ({
                   }, 2000);
                 } catch (error) {
                   setLoadingSecret(false);
-                  console.error("Error updating secret:", error);
+                  console.log("Error updating secret:", error);
                 }
               }}
             >
