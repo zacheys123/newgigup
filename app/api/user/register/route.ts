@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
         mcLanguages: body.mcLanguages,
         talentbio: body.talentbio,
         vocalistGenre: body.vocalistGenre,
-        tier: body.tier,
+        tier: body.tier ? body.tier : "free",
         nextBillingDate: body.nextBillingDate,
         monthlyGigsPosted: body.monthlyGigsPosted,
 

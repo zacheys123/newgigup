@@ -1,4 +1,9 @@
 // c/users/admin/appdata/roaming/wondershare/wondersharefilmora/output
+import {
+  BookingEligibility,
+  DashboardData,
+  WeeklyBooking,
+} from "./types/dashboard";
 import { GigProps } from "./types/giginterface";
 import { FetchResponse, UserProps } from "./types/userinterfaces";
 import moment from "moment-timezone";
@@ -442,83 +447,92 @@ export const dataCounties = [
 
 // utils/subscriptionHelpers.ts
 
-interface Subscription {
-  tier: "free" | "pro";
-  lastBookingDate?: Date;
-}
-
-interface WeeklyBooking {
-  count: number;
-  weekStart: Date;
-}
-
-interface UserInfo {
-  gigsBookedThisWeek?: WeeklyBooking;
-}
-
-interface DashboardData {
-  subscription?: Subscription;
-  user?: UserInfo;
-}
-
-interface BookingEligibility {
-  canBook: boolean;
-  reason: string | null;
-}
+// utils/booking.ts
 
 export const canStillBookThisWeekDetailed = (
   data: DashboardData | null,
-  timezone = "America/New_York"
+  user: UserProps
 ): BookingEligibility => {
-  if (!data || !data.user) {
+  // Handle null/undefined case
+  if (!data?.user) {
+    console.log("No user data available");
     return {
       canBook: false,
-      reason: "User not logged in or incomplete data.",
+      reason: "User data not available",
+      status: "pro-only",
     };
   }
 
-  const { subscription, user } = data;
-
-  if (subscription?.tier === "pro") {
+  const { user: myuser, subscription } = data;
+  console.log("User created at:", user.createdAt);
+  console.log("Current tier:", subscription?.tier || myuser.tier);
+  console.log("CreatedAt type:", typeof user.createdAt);
+  console.log("CreatedAt value:", user.createdAt);
+  // Pro users can always book
+  if (subscription?.tier === "pro" || myuser.tier === "pro") {
+    console.log("Pro user - allowed to book");
     return {
       canBook: true,
       reason: null,
+      status: "available",
     };
   }
 
-  const weeklyBooking = user.gigsBookedThisWeek;
-  const count = weeklyBooking?.count ?? 0;
-  const weekStart = weeklyBooking?.weekStart;
+  // Check if user is in first month
+  const signupDate = new Date(user.createdAt);
+  const oneMonthLater = new Date(signupDate);
+  oneMonthLater.setMonth(oneMonthLater.getMonth() + 1);
+  const isFirstMonth = new Date() < oneMonthLater;
 
-  if (!weekStart) {
-    return {
-      canBook: true,
-      reason: null,
-    };
-  }
+  console.log("Signup date:", signupDate);
+  console.log("One month later:", oneMonthLater);
+  console.log("Is first month:", isFirstMonth);
 
-  const now = moment().tz(timezone);
-  const last = moment(weekStart).tz(timezone);
-  const isNewWeek = now.diff(last, "weeks") > 0;
-
-  if (isNewWeek) {
-    return {
-      canBook: true,
-      reason: null,
-    };
-  }
-
-  if (count > 3) {
+  if (!isFirstMonth) {
+    console.log("Free trial expired - must upgrade");
     return {
       canBook: false,
-      reason:
-        "Free tier limit reached (3 gigs/week). Upgrade to Pro for unlimited bookings.",
+      reason: "Upgrade to Pro to continue booking",
+      status: "pro-only",
+    };
+  }
+
+  // Check weekly limit for free users in first month
+  const weeklyBooking = myuser.gigsBookedThisWeek || {
+    count: 0,
+    weekStart: null,
+  };
+  const currentWeekStart = new Date();
+  currentWeekStart.setHours(0, 0, 0, 0);
+  currentWeekStart.setDate(
+    currentWeekStart.getDate() - currentWeekStart.getDay()
+  );
+
+  // Reset count if new week
+  if (
+    !weeklyBooking.weekStart ||
+    new Date(weeklyBooking.weekStart).getTime() < currentWeekStart.getTime()
+  ) {
+    return {
+      canBook: true,
+      reason: null,
+      status: "available",
+    };
+  }
+
+  // Enforce 3 gigs/week limit
+  if (weeklyBooking.count >= 3) {
+    return {
+      canBook: false,
+      reason: "Free limit reached (3 gigs/week)",
+      status: "free-limit",
     };
   }
 
   return {
     canBook: true,
     reason: null,
+    status: "available",
   };
 };
 

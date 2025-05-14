@@ -73,6 +73,8 @@ interface IUser extends Document {
   onboardingComplete: boolean;
   lastActive: Date;
   lastBookingDate?: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 // Define Mongoose Schema
@@ -150,7 +152,6 @@ const userSchema = new Schema<IUser>(
       },
     ],
     musiciangenres: { type: [String], default: [] },
-    tier: { type: String, enum: ["free", "pro"], default: "free" },
 
     nextBillingDate: Date,
     monthlyGigsPosted: Number,
@@ -164,6 +165,7 @@ const userSchema = new Schema<IUser>(
       type: Date,
       default: new Date(),
     },
+    tier: { type: String, enum: ["free", "pro"], default: "free" },
     gigsBookedThisWeek: {
       count: { type: Number, default: 0 },
       weekStart: { type: Date, default: null },

@@ -19,9 +19,11 @@ export const initialState = {
       total: 0,
       onboardingComplete: false,
       gigsBookedThisWeek: { count: 0, weekStart: new Date() },
+      createdAt: new Date(),
+      tier: "free",
     },
     subscription: {
-      tier: "",
+      tier: "free",
       isPro: false,
       nextBillingDate: new Date() || null,
       lastBookingDate: new Date() || null,

@@ -15,7 +15,7 @@ import { useVideos } from "@/hooks/useVideos";
 import { useSocketContext } from "@/app/Context/socket";
 import { useBookGig } from "@/hooks/useBookGig";
 import { isCreatorIsCurrentUserAndTaken } from "@/constants";
-import { Check, Video } from "lucide-react";
+import { Ban, Check, Lock, Video } from "lucide-react";
 import { motion } from "framer-motion";
 import { Trash2, X } from "lucide-react";
 import { Input } from "../ui/input";
@@ -24,6 +24,7 @@ import { useScheduleGig } from "@/hooks/useScheduleGig";
 import { canStillBookThisWeekDetailed } from "@/utils";
 import { useSubscription } from "@/hooks/useSubscription";
 import { mutate } from "swr";
+import clsx from "clsx";
 
 // import { useCurrentUser } from "@/hooks/useCurrentUser";
 interface FetchResponse {
@@ -166,6 +167,15 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
       : `${gig?.price} ${gig?.currency} `;
 
   //
+  const canPostAScheduledGig =
+    isGigCreator && !hasBookedGig && gig?.isPending === true;
+  const allowedToBookGig =
+    gig &&
+    user &&
+    gig?.postedBy?._id !== myId &&
+    !hasBookedGig &&
+    gig?.isTaken === false &&
+    gig?.isPending === false;
 
   console.log("userData", subscription);
   useEffect(() => {
@@ -224,8 +234,16 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
     }
   };
   const existingSecret = localStorage.getItem("secret");
-  const bookingStatus = canStillBookThisWeekDetailed(user);
-
+  const bookingStatus = canStillBookThisWeekDetailed(subscription, user?.user);
+  const classes = clsx(
+    "h-7 text-[11px] font-normal px-3 my-1 transition-all rounded",
+    {
+      "!bg-purple-600 hover:!bg-purple-700 text-white": bookingStatus.canBook,
+      "!bg-gray-200 text-gray-600 cursor-not-allowed": !bookingStatus.canBook,
+      "opacity-70": bookLoading,
+    }
+  );
+  console.log(user);
   return (
     <>
       {isDescriptionModal && <GigDescription />}
@@ -271,7 +289,10 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                     Booking Confirmed
                   </h3>
                   <button
-                    onClick={() => setShowConfirmation(false)}
+                    onClick={() => {
+                      mutate("/api/gigs/getgigs");
+                      setShowConfirmation(false);
+                    }}
                     className="p-1 text-gray-400 hover:text-white transition-colors rounded-full hover:bg-white/10"
                     aria-label="Close"
                   >
@@ -305,7 +326,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => {
-                      mutate("/api/gigs/getgigs");
+                      mutate("g");
                       setShowConfirmation(false);
 
                       router.push("/av_gigs/" + userId);
@@ -320,7 +341,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                     whileTap={{ scale: 0.98 }}
                     onClick={() => {
                       setShowConfirmation(false);
-                      mutate("/api/gigs/getgigs");
+                      mutate("g");
                       router.push(`/execute/${lastBookedGigId}`);
                     }}
                     className="px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white transition-all duration-300 font-medium shadow-lg shadow-indigo-500/20 flex-1"
@@ -414,7 +435,9 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
             ) : gig?.isPending ? (
               <span className="text-yellow-300">Coming Soon</span>
             ) : (
-              <span className="text-green-300 space-x-2">Available</span>
+              <span className="text-green-300 space-x-2">
+                {bookingStatus.status === "available" && "Available"}
+              </span>
             )}
           </span>
         </div>
@@ -501,7 +524,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                 />
               </div>
             )}
-            {isGigCreator && !hasBookedGig && gig?.isPending === true && (
+            {canPostAScheduledGig && (
               <div className="w-full h-full relative">
                 <ButtonComponent
                   variant="secondary"
@@ -510,7 +533,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                     setLoadPostId(gig?._id as string);
                     try {
                       await schedulegig(gig?._id as string, toast);
-                      mutateGigs("/api/gigs/getgigs");
+                      mutateGigs("g");
                     } finally {
                       setLoadPostId("");
                     }
@@ -551,40 +574,43 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                 disabled={loadingPostId === gig._id}
               />
             )}
-            {gig &&
-              user &&
-              gig?.postedBy?._id &&
-              gig?.postedBy?._id !== myId &&
-              !hasBookedGig &&
-              gig?.bookCount.length < 4 &&
-              user?.user?.isMusician === true &&
-              gig?.isTaken === false &&
-              gig?.isPending === false &&
-              bookingStatus.canBook && (
+            {allowedToBookGig && (
+              <div className="flex flex-col gap-1">
                 <ButtonComponent
-                  variant="secondary"
-                  classname={`!bg-purple-600/90 hover:!bg-purple-500 h-7 text-[11px] font-normal text-white px-3 rounded transition-all ${
-                    canStillBookThisWeekDetailed(user)
-                      ? ""
-                      : "opacity-50 cursor-not-allowed"
-                  }`}
-                  onclick={() => handleBookGig(gig)}
-                  title={
-                    loadingPostId === gig?._id
-                      ? "Processing..."
-                      : bookingStatus.reason ?? "Book"
-                  }
-                  disabled={
-                    loadingPostId === gig?._id ||
-                    bookLoading ||
-                    !bookingStatus.canBook
-                  }
-                />
-              )}
-            {!bookingStatus.canBook && (
-              <p className="text-xs text-red-500 mt-1">
-                {bookingStatus.reason}
-              </p>
+                  variant={bookingStatus.canBook ? "default" : "ghost"}
+                  classname={classes}
+                  onclick={() => bookingStatus.canBook && handleBookGig(gig)}
+                  disabled={!bookingStatus.canBook || bookLoading}
+                >
+                  {bookLoading ? (
+                    "Processing..."
+                  ) : bookingStatus.canBook ? (
+                    "Book Now"
+                  ) : (
+                    <>
+                      {bookingStatus.status === "pro-only" ? (
+                        <span className="flex items-center gap-1">
+                          <Lock className="h-3 w-3" />
+                          Pro Only
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-1">
+                          <Ban className="h-3 w-3" />
+                          Limit Reached
+                        </span>
+                      )}
+                    </>
+                  )}
+                </ButtonComponent>
+                {!bookingStatus.canBook && (
+                  <p
+                    className="text-xs text-amber-600"
+                    onClick={() => router.push("/dashboard/billing")}
+                  >
+                    {bookingStatus.reason}
+                  </p>
+                )}
+              </div>
             )}
             {gig?.isPending === true &&
               gig?.postedBy?._id !== user?.user?._id && (

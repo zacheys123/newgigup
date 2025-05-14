@@ -5,12 +5,13 @@ interface ButtonProps {
   onclick: (ev: React.MouseEvent<HTMLButtonElement>) => void;
   classname?: string;
   variant?: "primary" | "secondary" | "default" | "ghost";
-  title: string;
+  title?: string;
   loading?: boolean;
   loadingtitle?: string;
   disabled?: boolean;
-  // additional props to pass to the button component, e.g., disabled, href, etc.
+  children?: React.ReactNode; // <-- add this line
 }
+
 const ButtonComponent = ({
   onclick,
   classname,
@@ -19,6 +20,7 @@ const ButtonComponent = ({
   loading,
   loadingtitle,
   disabled,
+  children,
 }: ButtonProps) => {
   return (
     <Button
@@ -27,7 +29,7 @@ const ButtonComponent = ({
       onClick={onclick}
       disabled={disabled}
     >
-      {!loading ? title : loadingtitle}
+      {children ?? (!loading ? title : loadingtitle)}
     </Button>
   );
 };

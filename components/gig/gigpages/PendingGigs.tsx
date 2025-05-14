@@ -25,6 +25,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useForgetBookings } from "@/hooks/useForgetBooking";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { CircularProgress } from "@mui/material";
+import { Button } from "@/components/ui/button";
 
 const PendingGigs = () => {
   const { userId } = useAuth();
@@ -363,11 +364,10 @@ const PendingGigs = () => {
                       {renderCategorySpecificContent(gig)}
 
                       <div className="mt-6 pt-4 border-t w-full border-gray-700/50 flex justify-end">
-                        <motion.button
-                          whileHover={{ scale: 1.03 }}
-                          whileTap={{ scale: 0.97 }}
+                        <Button
+                          variant="outline"
                           onClick={() => forget(gig)}
-                          className="px-4 py-2 w-[100px]  bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-lg text-[10px] font-medium shadow-lg hover:shadow-cyan-500/20 transition-all mx-4"
+                          className=" mx-4 py-1 h-[30px]"
                         >
                           {loadingGig !== gig?._id ? (
                             " Cancel Gig"
@@ -375,10 +375,10 @@ const PendingGigs = () => {
                             <CircularProgress
                               size={14}
                               className="text-white "
-                              style={{ color: "white" }}
+                              style={{ color: "blue" }}
                             />
                           )}
-                        </motion.button>
+                        </Button>
 
                         <motion.button
                           whileHover={{ scale: 1.03 }}

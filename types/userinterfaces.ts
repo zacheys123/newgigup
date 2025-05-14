@@ -71,6 +71,7 @@ export interface UserProps {
   firstLogin: boolean;
   onboardingComplete: boolean;
   lastActive: Date;
+  createdAt: Date;
 }
 export interface Users {
   users: UserProps[]; // Optional}

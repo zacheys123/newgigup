@@ -108,6 +108,7 @@ export function useBookGig() {
         revalidate: !options.preventAutoRevalidate,
       });
 
+      console.log("my data here", data);
       // Update user data
       const updateUserData: MutatorCallback<DashboardData> = (
         currentData: DashboardData | undefined
