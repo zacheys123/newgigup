@@ -77,6 +77,7 @@ export const initialState = {
     firstLogin: true,
     onboardingComplete: false,
     lastActive: new Date(),
+    createdAt: new Date(),
   },
   currentgig: {
     _id: "",

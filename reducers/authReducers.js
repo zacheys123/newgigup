@@ -12,6 +12,7 @@ export const authReducer = (state = initialState, action) => {
       return {
         ...state,
         toggle: false,
+        loading: false,
       };
     case global.LOADING:
       return {

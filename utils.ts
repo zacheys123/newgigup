@@ -123,6 +123,7 @@ export const postedBy = {
   firstLogin: true,
   onboardingComplete: false,
   lastActive: new Date(),
+  createdAt: new Date(),
 };
 
 export const instruments = [
