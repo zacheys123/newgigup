@@ -450,27 +450,25 @@ export const dataCounties = [
 
 // utils/booking.ts
 
+// utils/booking.ts - Add this helper
+
 export const canStillBookThisWeekDetailed = (
-  data: DashboardData | null,
-  user: UserProps
+  data: DashboardData | null
 ): BookingEligibility => {
-  // Handle null/undefined case
-  if (!data?.user) {
-    console.log("No user data available");
+  // Return temporary state if data isn't fully loaded
+  if (!data?.user?.createdAt || !data.subscription) {
     return {
       canBook: false,
-      reason: "User data not available",
-      status: "pro-only",
+      reason: null,
+      status: "loading",
+      isLoading: true,
     };
   }
 
-  const { user: myuser, subscription } = data;
-  console.log("User created at:", user.createdAt);
-  console.log("Current tier:", subscription?.tier || myuser.tier);
-  console.log("CreatedAt type:", typeof user.createdAt);
-  console.log("CreatedAt value:", user.createdAt);
+  const { user, subscription } = data;
+
   // Pro users can always book
-  if (subscription?.tier === "pro" || myuser.tier === "pro") {
+  if (subscription?.tier === "pro" || user.tier === "pro") {
     console.log("Pro user - allowed to book");
     return {
       canBook: true,
@@ -478,7 +476,6 @@ export const canStillBookThisWeekDetailed = (
       status: "available",
     };
   }
-
   // Check if user is in first month
   const signupDate = new Date(user.createdAt);
   const oneMonthLater = new Date(signupDate);
@@ -499,7 +496,7 @@ export const canStillBookThisWeekDetailed = (
   }
 
   // Check weekly limit for free users in first month
-  const weeklyBooking = myuser.gigsBookedThisWeek || {
+  const weeklyBooking = user.gigsBookedThisWeek || {
     count: 0,
     weekStart: null,
   };

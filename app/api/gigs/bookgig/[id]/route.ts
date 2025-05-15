@@ -15,10 +15,13 @@ export async function PUT(req: NextRequest) {
 
   try {
     await connectDb();
-
     const user = await User.findById(userid);
-    if (!user) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
+
+    if (!user?.createdAt) {
+      return NextResponse.json(
+        { success: false, message: "User data incomplete" },
+        { status: 400 }
+      );
     }
 
     const gig = await Gig.findById(id);

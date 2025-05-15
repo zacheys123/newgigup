@@ -36,6 +36,7 @@ export async function GET(request: NextRequest) {
         gigsBookedThisWeek: userdata?.gigsBookedThisWeek, // Track weekly bookings
         totalSpent: userdata.totalSpent,
         userearnings: userdata.earnings,
+        createdAt: userdata?.createdAt,
       },
       subscription: {
         tier: userdata.tier,

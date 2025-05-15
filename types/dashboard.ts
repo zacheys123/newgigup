@@ -37,5 +37,6 @@ export interface DashboardData {
 export interface BookingEligibility {
   canBook: boolean;
   reason: string | null;
-  status?: "free-limit" | "pro-only" | "available"; // Added for UI states
+  status: "free-limit" | "pro-only" | "available" | "loading";
+  isLoading?: boolean;
 }

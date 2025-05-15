@@ -13,7 +13,8 @@ export function useForgetBookings() {
   const forgetBookings = async (
     id: string,
     myGig: GigProps,
-    userId: string
+    userId: string,
+    dep?: string
   ) => {
     console.log(myGig);
     try {
@@ -23,7 +24,7 @@ export function useForgetBookings() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ musicianId: id }),
+        body: JSON.stringify({ musicianId: id, dep }),
       });
       console.log(response);
       if (!response.ok) {
