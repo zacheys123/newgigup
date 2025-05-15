@@ -85,6 +85,7 @@ const ClientSearchComponent = () => {
               firstLogin: true,
               onboardingComplete: false,
               lastActive: new Date(),
+              createdAt: new Date(),
             },
           });
         }
