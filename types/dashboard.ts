@@ -39,4 +39,5 @@ export interface BookingEligibility {
   reason: string | null;
   status: "free-limit" | "pro-only" | "available" | "loading";
   isLoading?: boolean;
+  desc?: string;
 }

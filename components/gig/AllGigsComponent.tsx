@@ -626,6 +626,16 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                     {bookingStatus.reason}
                   </p>
                 )}
+                {!bookingStatus.isLoading &&
+                  !bookingStatus.canBook &&
+                  bookingStatus.desc && (
+                    <p
+                      onClick={() => router.push(`/dashboard/billing`)}
+                      className="cursor-pointer text-xs text-amber-100 flex justify-center bg-emerald-500 animate-pulse p-2 rounded-xl"
+                    >
+                      {bookingStatus.desc}
+                    </p>
+                  )}
               </div>
             )}
             {gig?.isPending === true &&

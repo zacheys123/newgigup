@@ -92,7 +92,7 @@ export async function PUT(request: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
-
+    console.log("user.tier", user?.tier);
     return NextResponse.json({
       tier: user.tier,
       nextBillingDate: user.nextBillingDate,

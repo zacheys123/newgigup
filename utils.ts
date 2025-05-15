@@ -523,6 +523,7 @@ export const canStillBookThisWeekDetailed = (
     return {
       canBook: false,
       reason: "Free limit reached (3 gigs/week)",
+      desc: "Upgrade to Pro",
       status: "free-limit",
     };
   }
