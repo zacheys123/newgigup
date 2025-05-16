@@ -54,7 +54,9 @@ const Modal = ({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
           className={`   w-full
-           fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm`}
+           fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm ${
+             dep === "videos" ? "oveflow-y-auto h-full" : ""
+           }`}
           onClick={handleOutsideClick}
         >
           {/* Overlay with subtle gradient */}

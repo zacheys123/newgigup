@@ -35,7 +35,34 @@ const Videos = () => {
     typeof gig?.bookedBy?._id === "string" ? gig?.bookedBy?._id : "";
 
   const { friendvideos, setRefetch } = useVideos(validGigid, validUserId);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
+  const handleDeleteVideo = async (videoId: string) => {
+    try {
+      setDeletingId(videoId);
+      const response = await fetch(`/api/videos/deletevideo/${videoId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) throw new Error("Failed to delete video");
+
+      // Optimistic update
+      setRefetch((prev) => !prev);
+      mutate(`/api/videos/getvideos/${validUserId}`);
+      toast.success("Video deleted successfully");
+    } catch (error) {
+      console.error("Error deleting video:", error);
+      toast.error("Failed to delete video");
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const filteredVideos = useMemo(() => {
+    return friendvideos?.videos?.filter((video: VideoProps) => {
+      return video?.gigId === gig?._id;
+    });
+  }, [friendvideos?.videos, gig?._id]);
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
@@ -109,12 +136,6 @@ const Videos = () => {
     },
     []
   );
-
-  const filteredVideos = useMemo(() => {
-    return friendvideos?.videos?.filter((video: VideoProps) => {
-      return video?.gigId === gig?._id;
-    });
-  }, [friendvideos?.videos, gig?._id]);
 
   return (
     <motion.div
@@ -283,38 +304,86 @@ const Videos = () => {
             {filteredVideos && filteredVideos?.length < 4 ? (
               <>
                 {!videoUrl ? (
-                  <div className=" w-[80%]  mx-auto flex flex-col items-center justify-center border-2 border-dashed border-neutral-600 rounded-xl p-8 text-center transition-all hover:border-amber-500/50 hover:bg-neutral-700/20">
-                    <label
-                      htmlFor="postvideo"
-                      className="cursor-pointer flex flex-col items-center w-full "
-                    >
-                      <div className="p-4 bg-amber-500/10 rounded-full mb-3">
-                        <FiUpload className="text-amber-400 text-2xl" />
-                      </div>
-                      <span className="text-neutral-300 font-medium text-lg mb-1">
-                        Upload Your Work Video
-                      </span>
-                      <span className="text-sm text-neutral-500 max-w-md">
-                        Drag & drop your video file here or click to browse
-                        (MP4, MOV, or AVI - Max 100MB)
-                      </span>
-                      {loading && (
-                        <div className="mt-4">
-                          <CircularProgress
-                            size={24}
-                            className="text-amber-500"
-                          />
+                  <div className=" w-[80%]  mx-auto flex flex-col items-center justify-center ">
+                    <div className="w-full mx-auto flex flex-col items-center justify-center border-2 border-dashed border-neutral-600 rounded-xl p-8 text-center transition-all hover:border-amber-500/50 hover:bg-neutral-700/20">
+                      <label
+                        htmlFor="postvideo"
+                        className="cursor-pointer flex flex-col items-center w-full "
+                      >
+                        <div className="p-4 bg-amber-500/10 rounded-full mb-3">
+                          <FiUpload className="text-amber-400 text-2xl" />
                         </div>
-                      )}
-                    </label>
-                    <input
-                      id="postvideo"
-                      className="hidden"
-                      type="file"
-                      accept="video/*"
-                      onChange={handleFileChange}
-                      disabled={loading}
-                    />
+                        <span className="text-neutral-300 font-medium text-lg mb-1">
+                          Upload Your Work Video
+                        </span>
+                        <span className="text-sm text-neutral-500 max-w-md">
+                          Drag & drop your video file here or click to browse
+                          (MP4, MOV, or AVI - Max 100MB)
+                        </span>
+                        {loading && (
+                          <div className="mt-4">
+                            <CircularProgress
+                              size={24}
+                              className="text-amber-500"
+                            />
+                          </div>
+                        )}
+                      </label>
+                      <input
+                        id="postvideo"
+                        className="hidden"
+                        type="file"
+                        accept="video/*"
+                        onChange={handleFileChange}
+                        disabled={loading}
+                      />
+                    </div>
+                    {filteredVideos?.length > 0 && (
+  <div className="w-full mt-6 bg-neutral-800/50 rounded-lg p-4 border border-neutral-700">
+    <h4 className="text-amber-400 text-sm font-semibold mb-1 -mt-2 ">
+      Your Existing Videos
+    </h4>
+
+    <div className="overflow-x-auto whitespace-nowrap pr-2 custom-scroll">
+      <div className="flex gap-4 pr-10">
+        {filteredVideos.map((video) => (
+          <div
+            key={video._id}
+            className="relative w-44 min-w-[176px] aspect-video bg-neutral-900 rounded-lg overflow-hidden shrink-0"
+          >
+            <video
+              src={video.source}
+              className="w-full h-full object-cover "
+              muted
+              playsInline
+            />
+            
+            {/* Always visible delete icon */}
+            <button
+              onClick={() => handleDeleteVideo(video._id)}
+              disabled={deletingId === video._id}
+              className="absolute top-2 right-2 z-10 text-white bg-red-600/90 hover:bg-red-500 rounded-full p-1 transition-colors"
+            >
+              {deletingId === video._id ? (
+                <CircularProgress size={14} className="text-white" />
+              ) : (
+                <FiX size={14} />
+              )}
+            </button>
+
+            {/* Title overlay */}
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-1">
+              <p className="text-white text-[11px] truncate">
+                {video.title || "Untitled"}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+)}
+
                   </div>
                 ) : (
                   <div className="flex flex-col items-center">
@@ -373,6 +442,7 @@ const Videos = () => {
                     mutate(`/api/videos/getvideos/${validUserId}`);
                     setShowVideo(false);
                     setAddVideo(false);
+                    window.location.reload();
                   }}
                   className="w-full bg-neutral-600 hover:bg-neutral-500 text-white py-2 rounded-lg transition-colors text-sm sm:text-base"
                 >
