@@ -1,12 +1,8 @@
 // c/users/admin/appdata/roaming/wondershare/wondersharefilmora/output
-import {
-  BookingEligibility,
-  DashboardData,
-  WeeklyBooking,
-} from "./types/dashboard";
+import { BookingEligibility, DashboardData } from "./types/dashboard";
 import { GigProps } from "./types/giginterface";
 import { FetchResponse, UserProps } from "./types/userinterfaces";
-import moment from "moment-timezone";
+
 interface SearchOptions {
   searchQuery?: string;
   category?: string;
@@ -80,6 +76,23 @@ export const filterGigs = (
   });
 };
 
+export const formatViewCount = (count?: number | string[]): string => {
+  const num = Array.isArray(count)
+    ? count.length
+    : typeof count === "number"
+    ? count
+    : 0;
+
+  if (num >= 1000000) {
+    const millions = num / 1000000;
+    return millions % 1 === 0 ? `${millions}M` : `${millions.toFixed(1)}M`;
+  }
+  if (num >= 1000) {
+    const thousands = num / 1000;
+    return thousands % 1 === 0 ? `${thousands}k` : `${thousands.toFixed(1)}k`;
+  }
+  return num.toString();
+};
 const randomId = Math.floor(Math.random() * 1000000000);
 export const postedBy = {
   _id: "",
@@ -446,123 +459,87 @@ export const dataCounties = [
   "All",
 ];
 
-// utils/subscriptionHelpers.ts
-
-// utils/booking.ts
-
-// utils/booking.ts - Add this helper
-
 export const canStillBookThisWeekDetailed = (
   data: DashboardData | null
 ): BookingEligibility => {
   // Return temporary state if data isn't fully loaded
-  if (!data?.user?.createdAt || !data.subscription) {
-    return {
-      canBook: false,
-      reason: null,
-      status: "loading",
-      isLoading: true,
+  if (data) {
+    if (!data?.user?.createdAt || !data.subscription) {
+      return {
+        canBook: false,
+        reason: null,
+        status: "loading",
+        isLoading: true,
+      };
+    }
+
+    const { user, subscription } = data;
+
+    // Pro users can always book
+    if (subscription?.tier === "pro" || user.tier === "pro") {
+      console.log("Pro user - allowed to book");
+      return {
+        canBook: true,
+        reason: null,
+        status: "available",
+      };
+    }
+    // Check if user is in first month
+    const signupDate = new Date(user.createdAt);
+    const oneMonthLater = new Date(signupDate);
+    oneMonthLater.setMonth(oneMonthLater.getMonth() + 1);
+    const isFirstMonth = new Date() < oneMonthLater;
+
+    console.log("Signup date:", signupDate);
+    console.log("One month later:", oneMonthLater);
+    console.log("Is first month:", isFirstMonth);
+
+    if (!isFirstMonth) {
+      console.log("Free trial expired - must upgrade");
+      return {
+        canBook: false,
+        reason: "Upgrade to Pro to continue booking",
+        status: "pro-only",
+        desc: "1 month trial is over",
+      };
+    }
+
+    // Check weekly limit for free users in first month
+    const weeklyBooking = user.gigsBookedThisWeek || {
+      count: 0,
+      weekStart: null,
     };
+    const currentWeekStart = new Date();
+    currentWeekStart.setHours(0, 0, 0, 0);
+    currentWeekStart.setDate(
+      currentWeekStart.getDate() - currentWeekStart.getDay()
+    );
+
+    // Reset count if new week
+    if (
+      !weeklyBooking.weekStart ||
+      new Date(weeklyBooking.weekStart).getTime() < currentWeekStart.getTime()
+    ) {
+      return {
+        canBook: true,
+        reason: null,
+        status: "available",
+      };
+    }
+
+    // Enforce 3 gigs/week limit
+    if (weeklyBooking.count >= 2) {
+      return {
+        canBook: false,
+        reason: "Free limit reached (3 gigs/week)",
+        desc: "Upgrade to Pro",
+        status: "free-limit",
+      };
+    }
   }
-
-  const { user, subscription } = data;
-
-  // Pro users can always book
-  if (subscription?.tier === "pro" || user.tier === "pro") {
-    console.log("Pro user - allowed to book");
-    return {
-      canBook: true,
-      reason: null,
-      status: "available",
-    };
-  }
-  // Check if user is in first month
-  const signupDate = new Date(user.createdAt);
-  const oneMonthLater = new Date(signupDate);
-  oneMonthLater.setMonth(oneMonthLater.getMonth() + 1);
-  const isFirstMonth = new Date() < oneMonthLater;
-
-  console.log("Signup date:", signupDate);
-  console.log("One month later:", oneMonthLater);
-  console.log("Is first month:", isFirstMonth);
-
-  if (!isFirstMonth) {
-    console.log("Free trial expired - must upgrade");
-    return {
-      canBook: false,
-      reason: "Upgrade to Pro to continue booking",
-      status: "pro-only",
-    };
-  }
-
-  // Check weekly limit for free users in first month
-  const weeklyBooking = user.gigsBookedThisWeek || {
-    count: 0,
-    weekStart: null,
-  };
-  const currentWeekStart = new Date();
-  currentWeekStart.setHours(0, 0, 0, 0);
-  currentWeekStart.setDate(
-    currentWeekStart.getDate() - currentWeekStart.getDay()
-  );
-
-  // Reset count if new week
-  if (
-    !weeklyBooking.weekStart ||
-    new Date(weeklyBooking.weekStart).getTime() < currentWeekStart.getTime()
-  ) {
-    return {
-      canBook: true,
-      reason: null,
-      status: "available",
-    };
-  }
-
-  // Enforce 3 gigs/week limit
-  if (weeklyBooking.count >= 3) {
-    return {
-      canBook: false,
-      reason: "Free limit reached (3 gigs/week)",
-      desc: "Upgrade to Pro",
-      status: "free-limit",
-    };
-  }
-
   return {
     canBook: true,
     reason: null,
     status: "available",
   };
 };
-
-interface UpdateResult {
-  updatedCount: number;
-  newWeekStart: Date;
-  isSameWeek: boolean;
-}
-
-/**
- * Updates the weekly booking count based on timezone-aware weekly tracking.
- * @param previous - Previous weekly booking data from the user.
- * @param timezone - Timezone string, e.g., "America/New_York".
- * @returns Updated count and week start.
- */
-export function updateWeeklyBooking(
-  previous: WeeklyBooking,
-  timezone: string = "America/New_York"
-): UpdateResult {
-  const now = moment().tz(timezone);
-  const currentWeekStart = now.clone().startOf("week").toDate();
-
-  const wasSameWeek = previous.weekStart
-    ? moment(previous.weekStart).isSame(currentWeekStart, "week")
-    : false;
-
-  const updatedCount = wasSameWeek ? previous.count + 1 : 0;
-
-  return {
-    updatedCount,
-    newWeekStart: currentWeekStart,
-    isSameWeek: wasSameWeek,
-  };
-}

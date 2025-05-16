@@ -11,24 +11,21 @@ import { toast } from "react-toastify";
 import { useAuth } from "@clerk/nextjs";
 // import { ArrowRight } from "lucide-react";
 import Image from "next/image";
-import { useVideos } from "@/hooks/useVideos";
 import { useSocketContext } from "@/app/Context/socket";
 import { useBookGig } from "@/hooks/useBookGig";
 import { isCreatorIsCurrentUserAndTaken } from "@/constants";
-import { Ban, Check, Lock, Trash, Video } from "lucide-react";
+import { Ban, Check, EyeIcon, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import { Trash2, X } from "lucide-react";
 import { Input } from "../ui/input";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useScheduleGig } from "@/hooks/useScheduleGig";
-import { canStillBookThisWeekDetailed } from "@/utils";
+import { canStillBookThisWeekDetailed, formatViewCount } from "@/utils";
 import { useSubscription } from "@/hooks/useSubscription";
 import { mutate } from "swr";
 import clsx from "clsx";
 import { getGigConditions } from "@/gigHelper";
 import { useMemo } from "react";
-import { useForgetBookings } from "@/hooks/useForgetBooking";
-import { CircularProgress } from "@mui/material";
 
 //
 // import { useCurrentUser } from "@/hooks/useCurrentUser";
@@ -59,7 +56,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
     isDescriptionModal,
     setCurrentGig,
     setConfirmEdit,
-    setShowVideo,
+
     setSelectedReview,
     loadingPostId,
     loadPostId,
@@ -128,15 +125,6 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
     }
   };
 
-  const validGigid = typeof gig?._id === "string" ? gig?._id : ""; // Default to empty string if undefined
-  const validUserId =
-    typeof gig?.bookedBy?._id === "string" ? gig?.bookedBy?._id : ""; // Default to empty string if undefined
-
-  const { friendvideos } = useVideos(validGigid, validUserId);
-  const testfilteredvids = friendvideos?.videos?.filter(
-    (video) => video.gigId === gig._id
-  );
-
   useEffect(() => {
     if (!socket) return;
 
@@ -194,13 +182,6 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
   };
   // In your parent component
 
-  // Only render booking button when data is fully loaded
-  const { forgetBookings } = useForgetBookings();
-  const [loadingGig, setLoadingGig] = useState<string>("");
-  const forget = (curr: GigProps) => {
-    setLoadingGig(curr?._id as string);
-    forgetBookings(user?.user?._id as string, curr, userId as string, "taken");
-  };
   const existingSecret = localStorage.getItem("secret");
   const bookingStatus = canStillBookThisWeekDetailed(subscription);
   const classes = clsx(
@@ -215,19 +196,26 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
   // Inside your component
 
   const {
-    canShowAddGigVideos,
-
     isCurrentWhoCreatedGig,
     isCurrentWhoBooked,
     canEditGig,
     formattedPrice,
     canPostAScheduledGig,
     allowedToBookGig,
+    isProOnlyForFreeUser,
   } = useMemo(
-    () => getGigConditions(gig, user, myId, testfilteredvids, bookCount),
-    [gig, user, myId, testfilteredvids, bookCount]
+    () =>
+      getGigConditions(
+        gig,
+        user,
+        myId,
+
+        bookCount,
+        subscription
+      ),
+    [gig, user, myId, bookCount, subscription]
   );
-  console.log("gig daaataa", gig);
+
   return (
     <>
       {isDescriptionModal && <GigDescription />}
@@ -405,13 +393,23 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
               </span>
             </div>
           </div>
+          <div className="flex items-center gap-1 text-sm text-gray-400">
+            <EyeIcon className="h-3 w-3" />
+            <span className="title">
+              {formatViewCount(gig?.viewCount)} views
+            </span>
+          </div>
 
           {/* Status Badge */}
-          <span
+          <div
             className={`text-[10px] px-2 py-0.5 rounded-full ml-2 ${
               gig?.isTaken
                 ? "bg-emerald-900/50 text-emerald-300"
-                : "bg-blue-900/60 text-cyan-400"
+                : isProOnlyForFreeUser
+                ? "bg-purple-900/60 text-purple-300"
+                : bookingStatus.status === "available"
+                ? "bg-blue-900/60 text-cyan-400"
+                : "inline-flex items-center px-3 py-1 rounded-full text-[9px] font-medium bg-gradient-to-r from-amber-600/90 to-amber-700/90 text-amber-100 border border-amber-500/30 shadow-sm"
             }`}
           >
             {gig?.isTaken ? (
@@ -419,11 +417,24 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
             ) : gig?.isPending ? (
               <span className="text-yellow-300">Coming Soon</span>
             ) : (
-              <span className="text-green-300 space-x-2">
-                {bookingStatus.status === "available" && "Available"}
+              <span className="space-x-2">
+                {gig?.postedBy?._id !== user?.user?._id ||
+                gig?.bookedBy?._id === user?.user?._id ? (
+                  <>
+                    {isProOnlyForFreeUser ? (
+                      "Pro Only"
+                    ) : bookingStatus.status === "available" ? (
+                      <span className="text-green-300">Available</span>
+                    ) : (
+                      <span className="text-amber-300">Premium</span>
+                    )}
+                  </>
+                ) : (
+                  ""
+                )}
               </span>
             )}
-          </span>
+          </div>
         </div>
 
         {/* Minimal Footer */}
@@ -458,36 +469,6 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
           </div>
 
           <div className="flex space-x-2">
-            {canShowAddGigVideos && (
-              <div className="flex items-center gap-1 justify-around">
-                {" "}
-                <button
-                  onClick={() => forget(gig)}
-                  className="text-xs bg-rose-600/90 hover:bg-emerald-500 px-2 py-2 rounded transition-colors flex items-center"
-                >
-                  <Trash size={12} className="mr-1" />
-                  {loadingGig !== gig?._id ? (
-                    " Cancel Gig"
-                  ) : (
-                    <CircularProgress
-                      size={14}
-                      className="text-white "
-                      style={{ color: "blue" }}
-                    />
-                  )}
-                </button>
-                <button
-                  onClick={() => {
-                    setCurrentGig(gig);
-                    setShowVideo(true);
-                  }}
-                  className="text-xs bg-emerald-600/90 hover:bg-emerald-500 px-2 py-2 rounded transition-colors flex items-center"
-                >
-                  <Video size={12} className="mr-1" />
-                  Add Videos
-                </button>
-              </div>
-            )}
             {/* Review Button (Restored) */}
             {isCreatorIsCurrentUserAndTaken(gig, myId as string) && (
               <button
@@ -576,7 +557,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                 disabled={loadingPostId === gig._id}
               />
             )}
-            {allowedToBookGig && (
+            {allowedToBookGig ? (
               <div className="flex flex-col gap-1">
                 <ButtonComponent
                   variant={
@@ -637,6 +618,38 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                     </p>
                   )}
               </div>
+            ) : (
+              gig?.postedBy?._id !== myId &&
+              gig?.bookedBy?._id !== user?.user?._id && (
+                <>
+                  {isProOnlyForFreeUser ? (
+                    <div className="text-center">
+                      <p className="text-xs text-amber-300 mb-1 bg-gray-500 p-2">
+                        Pro members only for gigs over $10
+                      </p>
+                      <ButtonComponent
+                        variant="ghost"
+                        classname="!bg-purple-600 hover:!bg-purple-700 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
+                        onclick={() => router.push("/dashboard/billing")}
+                        title="Upgrade to Pro"
+                      />
+                    </div>
+                  ) : (
+                    <div className="text-center">
+                      <ButtonComponent
+                        variant="ghost"
+                        classname="!bg-gray-400 hover:!bg-gray-500 h-7 text-[11px] font-normal text-white px-3 rounded transition-all cursor-not-allowed"
+                        disabled={true}
+                        title="Not Available"
+                        onclick={() => console.log("data")}
+                      />
+                      <p className="text-xs text-amber-600 mt-1">
+                        This gig is not available for booking
+                      </p>
+                    </div>
+                  )}
+                </>
+              )
             )}
             {gig?.isPending === true &&
               gig?.postedBy?._id !== user?.user?._id && (

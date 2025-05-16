@@ -86,13 +86,11 @@ export async function POST(req: NextRequest) {
         mcLanguages: body.mcLanguages,
         talentbio: body.talentbio,
         vocalistGenre: body.vocalistGenre,
-        tier: body.tier ? body.tier : "free",
+        tier: body.tier,
         nextBillingDate: body.nextBillingDate,
         monthlyGigsPosted: body.monthlyGigsPosted,
-
         gigsBookedThisWeek: body.gigsBookedThisWeek, // Track weekly bookings
         lastBookingDate: body.lastBookingDate, // To track weekly reset
-
         monthlyMessages: body.monthlyMessages,
         monthlyGigsBooked: body.monthlyGigsBooked,
         firstLogin: body.firstLogin,

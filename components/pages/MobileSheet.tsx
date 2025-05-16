@@ -25,13 +25,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MdDashboard } from "react-icons/md";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { useAllUsers } from "@/hooks/useAllUsers";
+import { useSubscription } from "@/hooks/useSubscription";
 const MobileSheet = () => {
   const { userId } = useAuth();
   const pathname = usePathname();
   const { user } = useCurrentUser();
-  const { users } = useAllUsers();
-  console.log(users);
+  const { subscription } = useSubscription(userId as string);
+
   return (
     <Sheet>
       <SheetTrigger>
@@ -40,7 +40,7 @@ const MobileSheet = () => {
 
       <SheetContent
         side="left"
-        className="w-[75%] sm:w-[60%] bg-zink-700  bg-opacity-25 p-6 flex flex-col gap-6 justify-start items-start rounded-br-[180px] shadow-3xl backdrop-blur-lg"
+        className="w-[75%] sm:w-[60%] bg-zink-700  bg-opacity-25 px-6 py-3 flex flex-col gap-[17px] justify-start items-start rounded-br-[180px] shadow-3xl backdrop-blur-lg"
       >
         <SheetTitle className="text-2xl font-semibold text-white mb-6">
           Access More Info
@@ -147,6 +147,9 @@ const MobileSheet = () => {
             Settings
           </SheetDescription>
         </Link>
+        <div className="p-1 w-[100px] bg-gradient-to-br from-purple-400 via-emerald-400 to-orange-500 capitalize rounded title text-gray-100">
+          {subscription?.subscription?.tier} version
+        </div>
       </SheetContent>
     </Sheet>
   );

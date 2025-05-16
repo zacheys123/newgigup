@@ -9,6 +9,7 @@ const Modal = ({
   description,
   width,
   children,
+  dep,
 }: {
   isOpen: boolean;
   onClose?: () => void;
@@ -16,6 +17,7 @@ const Modal = ({
   width?: string;
   description?: string;
   children: React.ReactNode;
+  dep?: string;
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
 

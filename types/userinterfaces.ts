@@ -1,18 +1,3 @@
-export interface VideoProps {
-  _id: string;
-  title: string;
-  source: string;
-  description?: string;
-  gigId: string;
-  postedBy?: string | { _id: string; firstname: string; [key: string]: string };
-  createdAt?: Date;
-}
-export interface VideoProfileProps {
-  _id: string;
-  title: string;
-  url: string;
-  createdAt?: Date;
-}
 export interface handleProfileprops {
   _id: string;
   name: string;
@@ -75,6 +60,22 @@ export interface UserProps {
 }
 export interface Users {
   users: UserProps[]; // Optional}
+}
+
+export interface VideoProps {
+  _id: string;
+  title: string;
+  source: string;
+  description?: string;
+  gigId: string;
+  postedBy?: string | { _id: string; firstname: string; [key: string]: string };
+  createdAt?: Date;
+}
+export interface VideoProfileProps {
+  _id: string;
+  title: string;
+  url: string;
+  createdAt?: Date;
 }
 export interface Videos {
   videos: VideoProps[]; // Optional}

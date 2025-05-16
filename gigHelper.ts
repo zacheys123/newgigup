@@ -1,8 +1,8 @@
 import { GigProps } from "@/types/giginterface";
-import { UserProps, VideoProps } from "./types/userinterfaces";
+import { UserProps } from "./types/userinterfaces";
+import { DashboardData } from "./types/dashboard";
 
 interface GigConditions {
-  canShowAddGigVideos: boolean;
   isGigCreator: boolean;
   hasBookedGig: boolean;
   isCurrentWhoCreatedGig: boolean;
@@ -11,22 +11,17 @@ interface GigConditions {
   formattedPrice: string;
   canPostAScheduledGig: boolean;
   allowedToBookGig: boolean;
+  isProOnlyForFreeUser: boolean;
 }
 
 export const getGigConditions = (
   gig: GigProps,
   user: UserProps | null,
   myId: string,
-  testfilteredvids: VideoProps[] = [],
-  bookCount: number = 0
+  bookCount: number = 0,
+  subscription: DashboardData
 ): GigConditions => {
   // Video related conditions
-  const canShowAddGigVideos =
-    gig?.isPending === false &&
-    gig?.isTaken === true &&
-    gig?.bookedBy?._id === myId &&
-    gig?.postedBy?._id !== myId &&
-    testfilteredvids?.length < 4;
 
   // User role conditions
   const isGigCreator = gig?.postedBy?._id === myId;
@@ -50,6 +45,9 @@ export const getGigConditions = (
   const canPostAScheduledGig =
     isGigCreator && !hasBookedGig && gig?.isPending === true;
 
+  const gigPrice = parseFloat(gig.price || "0");
+  const isFreeUser = !subscription?.subscription?.isPro;
+  const isProOnlyGig = gigPrice > 10;
   // Booking eligibility
   const allowedToBookGig =
     !!gig &&
@@ -57,10 +55,10 @@ export const getGigConditions = (
     gig?.postedBy?._id !== myId &&
     !hasBookedGig &&
     gig?.isTaken === false &&
-    gig?.isPending === false;
+    gig?.isPending === false &&
+    !(isFreeUser && isProOnlyGig);
 
   return {
-    canShowAddGigVideos,
     isGigCreator,
     hasBookedGig,
     isCurrentWhoCreatedGig,
@@ -69,11 +67,12 @@ export const getGigConditions = (
     formattedPrice,
     canPostAScheduledGig,
     allowedToBookGig,
+    isProOnlyForFreeUser: isFreeUser && isProOnlyGig,
   };
 };
 
 // Helper function for price formatting
-const getFormattedPrice = (gig: GigProps): string => {
+export const getFormattedPrice = (gig: GigProps): string => {
   if (!gig?.price || !gig?.currency) return "";
 
   switch (gig.pricerange) {

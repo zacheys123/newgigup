@@ -38,6 +38,7 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
     setIsMutating(true);
     setShowConfirmModal(false);
 
+    // Create optimistic data for both tiers
     const optimisticData = {
       tier: newTier,
       isPro: newTier === "pro",
@@ -46,10 +47,17 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
           ? new Date(new Date().setMonth(new Date().getMonth() + 1))
           : null,
     };
-
+    console.log("Optimistic update data:", optimisticData);
     try {
       await mutateSubscription(
-        async () => updateSubscription(user.id, newTier),
+        async () => {
+          const result = await updateSubscription(user.id, newTier);
+          return {
+            ...optimisticData,
+            // Include any additional fields from the actual response
+            ...result,
+          };
+        },
         {
           optimisticData,
           rollbackOnError: true,
@@ -157,7 +165,12 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
             </Button>
             <Button
               variant="destructive"
-              onClick={() => handleSubscriptionChange(pendingTier)}
+              onClick={() => {
+                handleSubscriptionChange(pendingTier);
+                mutateSubscription(
+                  `/api/user/subscription?clerkId=${user?.id}`
+                );
+              }}
               disabled={isMutating}
               className="px-4 py-2 text-sm"
             >

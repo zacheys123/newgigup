@@ -42,7 +42,7 @@ export function MobileNav() {
     },
     {
       name: "Earnings",
-      href: "/dashboard/earnings",
+      href: "/settings",
       icon: <DollarSignIcon className="w-5 h-5" />,
     },
     {
