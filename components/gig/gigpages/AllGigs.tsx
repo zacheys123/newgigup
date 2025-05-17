@@ -6,36 +6,25 @@ import Gigheader from "@/components/gig/Gigheader";
 import Clockwise from "@/components/loaders/Clockwise";
 import { useAllGigs } from "@/hooks/useAllGigs";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useDebounce } from "@/hooks/useDebounce";
 import { GigProps } from "@/types/giginterface";
 import { filterGigs } from "@/utils";
 import { useAuth } from "@clerk/nextjs";
-
+import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 
-const useDebounce = (value: string, delay: number) => {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
-};
 const AllGigs = () => {
   const { loading: gigsLoading, gigs } = useAllGigs();
   const { user } = useCurrentUser();
+  const { userId } = useAuth();
   const [typeOfGig, setTypeOfGig] = useState<string>("");
-  const debouncedSearch = useDebounce(typeOfGig, 300);
   const [category, setCategory] = useState<string>("all");
   const [location, setLocation] = useState<string>("all");
   const [scheduler, setScheduler] = useState<string>();
-  const { userId } = useAuth();
+  const [showFilters, setShowFilters] = useState(false);
+  const [sortOption, setSortOption] = useState<string>("relevance");
+
+  const debouncedSearch = useDebounce(typeOfGig, 300);
 
   const normalizeString = (str?: string) =>
     str
@@ -43,24 +32,19 @@ const AllGigs = () => {
       .toLowerCase()
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "") || "";
-  useEffect(() => {
-    // if (!user) {
-    //   mutateUser().catch((error) => {
-    //     console.error("Failed to mutate user:", error);
-    //     // Consider adding toast notification here
-    //   });
-    // }
 
+  useEffect(() => {
     if (normalizeString(user?.user?.city)) {
-      if (user?.user?.isClient) {
-        setLocation("all");
-      } else {
-        setLocation(user.user?.city);
-      }
+      setLocation(user?.user?.isClient ? "all" : user.user.city);
     }
   }, [user]);
 
-  const [sortOption, setSortOption] = useState<string>("relevance");
+  useEffect(() => {
+    if (typeOfGig.trim() !== "") {
+      setShowFilters(true);
+    }
+  }, [typeOfGig]);
+
   const filteredGigs = useMemo(() => {
     const filtered = filterGigs(gigs, {
       searchQuery: debouncedSearch,
@@ -69,31 +53,28 @@ const AllGigs = () => {
       scheduler,
     });
 
-    // Additional filtering for user-specific conditions
     const result =
       filtered?.filter(
         (gig: GigProps) =>
-          gig?.isTaken === false &&
-          gig?.isPending === false &&
+          !gig?.isTaken &&
+          !gig?.isPending &&
           gig?.bookCount.length < 10 &&
           !gig?.bookCount?.some((bookedUser) => bookedUser?.clerkId === userId)
       ) || [];
 
-    // Apply sorting
     switch (sortOption) {
       case "newest":
         result.sort(
           (a, b) =>
-            new Date(b.createdAt || 0).getTime() -
-            new Date(a.createdAt || 0).getTime()
+            new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
         );
         break;
       case "highest":
-        result.sort((a, b) => {
-          const priceA = parseFloat(a.price || "0") || 0;
-          const priceB = parseFloat(b.price || "0") || 0;
-          return priceB - priceA;
-        });
+        result.sort(
+          (a, b) =>
+            (parseFloat(b.price || "0") || 0) -
+            (parseFloat(a.price || "0") || 0)
+        );
         break;
       case "popular":
         result.sort(
@@ -101,16 +82,15 @@ const AllGigs = () => {
         );
         break;
       default:
-        // Relevance sorting
         result.sort((a, b) => {
-          const aViews = a.viewCount?.length || 0;
-          const bViews = b.viewCount?.length || 0;
-          const aDate = new Date(a.createdAt || 0).getTime();
-          const bDate = new Date(b.createdAt || 0).getTime();
-
-          return bViews * 0.7 + bDate * 0.3 - (aViews * 0.7 + aDate * 0.3);
+          const aScore =
+            (a.viewCount?.length || 0) * 0.7 +
+            new Date(a.createdAt!).getTime() * 0.3;
+          const bScore =
+            (b.viewCount?.length || 0) * 0.7 +
+            new Date(b.createdAt!).getTime() * 0.3;
+          return bScore - aScore;
         });
-        break;
     }
 
     return result;
@@ -123,92 +103,104 @@ const AllGigs = () => {
     userId,
     sortOption,
   ]);
+
   const isLoading = gigsLoading;
-  console.log(filteredGigs);
+
   return (
     <div className="flex flex-col min-h-screen w-full bg-gray-900">
-      {/* Sticky Glass Header */}
-      <div className="sticky top-0 z-30 bg-gray-800/80 backdrop-blur-lg border-b border-gray-700 shadow-lg">
-        <Gigheader
-          typeOfGig={typeOfGig}
-          setTypeOfGig={setTypeOfGig}
-          category={category}
-          setCategory={setCategory}
-          location={location}
-          setLocation={setLocation}
-          myuser={user?.user}
-          scheduler={scheduler}
-          setScheduler={setScheduler}
-        />
+      {/* Toggle Filter Button */}
+      <div className="flex justify-end max-w-7xl mx-auto p-4">
+        <button
+          onClick={() => setShowFilters((prev) => !prev)}
+          className="text-sm px-3 py-1.5 rounded-md text-gray-200 bg-gray-800 border border-gray-700 hover:bg-gray-700/70 transition-all"
+        >
+          {showFilters ? "Hide Filters" : "Show Filters"}
+        </button>
       </div>
 
-      {/* Main Content Area */}
+      <AnimatePresence mode="wait">
+        {showFilters && (
+          <motion.div
+            key="gig-header"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.4, ease: [0.25, 0.8, 0.25, 1] }}
+            className="w-full max-w-7xl mx-auto mb-6"
+          >
+            <Gigheader
+              typeOfGig={typeOfGig}
+              setTypeOfGig={setTypeOfGig}
+              category={category}
+              setCategory={setCategory}
+              location={location}
+              setLocation={setLocation}
+              myuser={user?.user}
+              scheduler={scheduler}
+              setScheduler={setScheduler}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Main Content */}
       <main className="flex-1 overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800 p-4 md:p-8">
-        {/* Premium Empty State */}{" "}
-        <div className="flex-1 overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
-          {filteredGigs.length === 0 && !isLoading && (
-            <div className="max-w-4xl mx-auto text-center py-16 px-4 sm:px-6 lg:px-8">
-              <div className="bg-gray-800 p-8 md:p-12 rounded-xl shadow-2xl border border-gray-700">
-                <div className="inline-flex mb-6 p-3 bg-gray-700 rounded-full">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-10 w-10 text-amber-400"
-                    fill="none"
-                    viewBox="0 0 24 24"
+        <div className="max-w-7xl mx-auto space-y-10">
+          {/* Empty State */}
+          {!isLoading && filteredGigs.length === 0 && (
+            <div className="text-center py-16 px-4 sm:px-6 lg:px-8 bg-gray-800 rounded-xl border border-gray-700 shadow-xl">
+              <div className="inline-flex mb-6 p-3 bg-gray-700 rounded-full">
+                <svg
+                  className="h-10 w-10 text-amber-400"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <path
+                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
                     stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                    />
-                  </svg>
-                </div>
-                <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-amber-600">
-                    Premium Opportunities Await
-                  </span>
-                </h1>
-                <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
-                  Discover high-value gigs from top clients. Refine your search
-                  or explore our curated selections no gigs available in{" "}
-                  {user?.user?.city}.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <button
-                    onClick={() => {
-                      setCategory("all");
-                      setLocation("all");
-                    }}
-                    className="px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-gray-900 font-medium rounded-lg transition-all hover:shadow-lg hover:shadow-amber-500/20 hover:brightness-110"
-                  >
-                    Show All Listings
-                  </button>
-                  <button className="px-6 py-3 border border-gray-600 text-gray-300 font-medium rounded-lg transition-all hover:bg-gray-700/50 hover:border-amber-500/30">
-                    View Featured
-                  </button>
-                </div>
+                    strokeWidth={1.5}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </div>
+              <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-amber-600">
+                  Premium Opportunities Await
+                </span>
+              </h1>
+              <p className="text-lg text-gray-300 mb-8">
+                Discover high-value gigs from top clients. No gigs available in{" "}
+                <span className="font-semibold">{user?.user?.city}</span>.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button
+                  onClick={() => setLocation("all")}
+                  className="px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-gray-900 font-medium rounded-lg hover:shadow-lg hover:brightness-110 transition-all"
+                >
+                  Show All Listings
+                </button>
+                <button className="px-6 py-3 border border-gray-600 text-gray-300 font-medium rounded-lg hover:bg-gray-700/50 hover:border-amber-500/30 transition-all">
+                  View Featured
+                </button>
               </div>
             </div>
           )}
 
-          {/* Loading State */}
+          {/* Loader */}
           {isLoading && (
             <div className="flex flex-col items-center justify-center h-96">
-              <div className="relative">
-                <Clockwise />
-                <p className="mt-6 text-gray-400 font-medium animate-pulse">
-                  Gathering premium opportunities...
-                </p>
-              </div>
+              <Clockwise />
+              <p className="mt-6 text-gray-400 font-medium animate-pulse">
+                Gathering premium opportunities...
+              </p>
             </div>
           )}
 
-          {/* Gigs Grid */}
+          {/* Gigs Display */}
           {filteredGigs.length > 0 && (
-            <div className="max-w-7xl mx-auto">
-              <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                 <div className="relative pl-5">
                   <div className="absolute left-0 top-1 h-3/4 w-0.5 bg-gradient-to-b from-amber-400 to-transparent"></div>
                   <div className="flex items-baseline gap-2">
@@ -221,55 +213,44 @@ const AllGigs = () => {
                         : "Premium Opportunities"}
                     </span>
                   </div>
-                  <p className="text-gray-400/90 text-[12px] font-mono mt-1 tracking-wider">
+                  <p className="text-gray-400/90 text-xs font-mono mt-1 tracking-wide">
                     Handpicked for quality and value
                   </p>
                 </div>
                 <div className="flex items-center space-x-3">
                   <span className="text-sm text-gray-400">Sort:</span>
                   <select
-                    className="text-sm bg-gray-600 border-gray-700 rounded-lg focus:ring-amber-500 focus:border-amber-500 text-white p-2"
                     value={sortOption}
                     onChange={(e) => setSortOption(e.target.value)}
+                    className="text-sm bg-gray-600 border-gray-700 rounded-lg focus:ring-amber-500 focus:border-amber-500 text-white p-2"
                   >
-                    <option className="bg-gray-800" value="relevance">
-                      Relevance
-                    </option>
-                    <option className="bg-gray-800" value="newest">
-                      Newest First
-                    </option>
-                    <option className="bg-gray-800" value="highest">
-                      Highest Budget
-                    </option>
-                    <option className="bg-gray-800" value="popular">
-                      Most Viewed
-                    </option>
+                    <option value="relevance">Relevance</option>
+                    <option value="newest">Newest First</option>
+                    <option value="highest">Highest Budget</option>
+                    <option value="popular">Most Viewed</option>
                   </select>
                 </div>
               </div>
-              <div className="max-h-[60vh] sm:max-h-[65vh] md:max-h-[70vh] lg:max-h-[75vh] xl:max-h-[80vh] overflow-y-auto scrollbar-thin scrollbar-thumb-transparent scrollbar-track-gray-800 pr-2 pb-20">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1 pb-20">
-                  {filteredGigs.map((gig: GigProps) => (
-                    <div
-                      key={gig?._id}
-                      className="border-gray-700 overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-amber-500/30 hover:-translate-y-1"
-                    >
-                      <AllGigsComponent gig={gig} />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                    </div>
-                  ))}
-                </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                {filteredGigs.map((gig: GigProps) => (
+                  <div
+                    key={gig._id}
+                    className="overflow-hidden border border-gray-700 rounded-xl hover:border-amber-500/30 hover:-translate-y-1 transition-all duration-300"
+                  >
+                    <AllGigsComponent gig={gig} />
+                  </div>
+                ))}
               </div>
             </div>
           )}
 
-          {/* Featured Section */}
+          {/* Featured Fallback */}
           {(filteredGigs.length === 0 || filteredGigs.length < 4) &&
             !isLoading && (
-              <div className="max-w-7xl mx-auto mt-12 border-t border-gray-800 pt-12">
+              <div className="mt-12 border-t border-gray-800 pt-12">
                 <h3 className="text-xl font-semibold text-white mb-6 px-4 flex items-center">
                   <svg
-                    xmlns="http://www.w3.org/2000/svg"
                     className="h-5 w-5 text-amber-500 mr-2"
                     viewBox="0 0 20 20"
                     fill="currentColor"
@@ -298,26 +279,6 @@ const AllGigs = () => {
             )}
         </div>
       </main>
-
-      {/* Floating CTA */}
-      <div className="fixed bottom-6 right-6 z-20">
-        <button className="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full shadow-xl hover:from-amber-600 hover:to-amber-700 transition-all transform hover:scale-105 group">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6 text-gray-900 group-hover:rotate-90 transition-transform"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-            />
-          </svg>
-        </button>
-      </div>
     </div>
   );
 };
