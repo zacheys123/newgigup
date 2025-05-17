@@ -228,7 +228,7 @@ const Published = () => {
                     </span>
                   </div>
                   <p className="text-gray-400/90 text-[12px] font-mono mt-1 tracking-wider">
-                    Handpicked for quality and value
+                    Handpicked for quality and value 
                   </p>
                 </div>
                 <div className="flex items-center space-x-3">
@@ -253,8 +253,8 @@ const Published = () => {
                   </select>
                 </div>
               </div>
-              <div className="max-h-[60vh] sm:max-h-[65vh] md:max-h-[70vh] lg:max-h-[75vh] xl:max-h-[80vh] overflow-y-auto scrollbar-thin scrollbar-thumb-transparent scrollbar-track-gray-800 pr-2 pb-10">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1 pb-10">
+              <div className="max-h-[60vh] sm:max-h-[65vh] md:max-h-[70vh] lg:max-h-[75vh] xl:max-h-[80vh] overflow-y-auto scrollbar-thin scrollbar-thumb-transparent scrollbar-track-gray-800 pr-2 pb-20">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1 pb-20">
                   {filteredGigs.map((gig: GigProps) => (
                     <div
                       key={gig?._id}

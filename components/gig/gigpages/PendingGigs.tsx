@@ -26,6 +26,7 @@ import { useForgetBookings } from "@/hooks/useForgetBooking";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { CircularProgress } from "@mui/material";
 import { Button } from "@/components/ui/button";
+import { Briefcase } from "react-feather";
 
 const PendingGigs = () => {
   const { userId } = useAuth();
@@ -120,7 +121,7 @@ const PendingGigs = () => {
       );
       localStorage.setItem("pendingGigs", JSON.stringify(userPendingGigs));
     }
-    window.location.reload();
+    router.refresh();
   };
 
   const renderCategorySpecificContent = (gig: GigProps) => {
@@ -276,16 +277,24 @@ const PendingGigs = () => {
           </div>
         </motion.div>
 
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-white">
-            {" "}
-            <CountUp
-              end={filteredGigs?.length || 0}
-              duration={1.5}
-              delay={0.2}
-            />{" "}
-            Pending Gigs
-          </h2>
+        <div
+          className={
+            filteredGigs?.length > 0
+              ? "flex justify-between items-center mb-6"
+              : "flex justify-end"
+          }
+        >
+          {filteredGigs?.length > 0 && (
+            <h2 className="text-2xl font-bold text-white">
+              {" "}
+              <CountUp
+                end={filteredGigs?.length || 0}
+                duration={1.5}
+                delay={0.2}
+              />{" "}
+              Pending Gigs
+            </h2>
+          )}
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -302,11 +311,23 @@ const PendingGigs = () => {
             <ColorLoading />
           </div>
         ) : filteredGigs?.length === 0 ? (
-          <div className="flex-1 flex justify-center items-center">
-            <span className="text-neutral-400 font-mono text-lg">
-              No Pending Gigs Available
-            </span>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center justify-center py-16 h-full min-h-[300px]" /* Add min height */
+          >
+            <div className="w-24 h-24 bg-red-500/20 rounded-full flex items-center justify-center mb-6">
+              <div className="w-16 h-16 bg-indigo-800/30 rounded-full flex items-center justify-center">
+                <Briefcase className="text-red-400" size={32} />
+              </div>
+            </div>
+            <h1 className="text-white text-2xl font-bold mb-2">
+              No results found
+            </h1>
+            <p className="text-gray-400 max-w-md text-center">
+              Your pending gigs will appear here when available
+            </p>
+          </motion.div>
         ) : (
           <div className="flex-1 overflow-y-auto smooth-scroll">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-6 pr-2">

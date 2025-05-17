@@ -1,20 +1,19 @@
 "use client";
-import React, { ChangeEvent, useCallback, useMemo, useState } from "react";
+import React, { ChangeEvent, useCallback, useState } from "react";
 import { motion } from "framer-motion";
 import { fileupload } from "@/hooks/fileUpload";
 import { toast } from "sonner";
-import { Input } from "../ui/input";
+
 import { BsCameraVideo, BsLightningCharge } from "react-icons/bs";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { Button } from "../ui/button";
+
 import { CircularProgress } from "@mui/material";
 import { FetchResponse } from "@/types/giginterface";
-import { VideoProps } from "@/types/userinterfaces";
 import { useVideos } from "@/hooks/useVideos";
 import useStore from "@/app/zustand/useStore";
-import { Textarea } from "../ui/textarea";
-import { FiUpload, FiX } from "react-icons/fi";
+import { FiAlertTriangle, FiUpload, FiX } from "react-icons/fi";
 import { mutate } from "swr";
+import { useVideoActions } from "@/hooks/useVideoActions";
 
 const Videos = () => {
   const [addvideo, setAddVideo] = useState<boolean>(false);
@@ -35,34 +34,23 @@ const Videos = () => {
     typeof gig?.bookedBy?._id === "string" ? gig?.bookedBy?._id : "";
 
   const { friendvideos, setRefetch } = useVideos(validGigid, validUserId);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const filteredVideos =
+    friendvideos?.videos?.filter((video) => video.gigId === gig._id) || [];
+
+  const { deleteVideo, deletingId } = useVideoActions();
 
   const handleDeleteVideo = async (videoId: string) => {
     try {
-      setDeletingId(videoId);
-      const response = await fetch(`/api/videos/deletevideo/${videoId}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) throw new Error("Failed to delete video");
-
-      // Optimistic update
-      setRefetch((prev) => !prev);
-      mutate(`/api/videos/getvideos/${validUserId}`);
+      await deleteVideo(videoId, mutate);
+      // No need to manually refresh - SWR handles it
       toast.success("Video deleted successfully");
     } catch (error) {
-      console.error("Error deleting video:", error);
       toast.error("Failed to delete video");
-    } finally {
-      setDeletingId(null);
+      console.error("Failed to delete video:", error);
     }
   };
 
-  const filteredVideos = useMemo(() => {
-    return friendvideos?.videos?.filter((video: VideoProps) => {
-      return video?.gigId === gig?._id;
-    });
-  }, [friendvideos?.videos, gig?._id]);
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
@@ -233,7 +221,7 @@ const Videos = () => {
 
           <button
             onClick={() => setAddVideo(true)}
-            className="mt-3 sm:mt-4 w-full bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white font-bold py-2 sm:py-3 px-4 rounded-lg shadow-md transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center gap-2 text-sm sm:text-base"
+            className="mb-10 sm:mt-4 w-full bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white font-bold py-2 sm:py-3 px-4 rounded-lg shadow-md transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center gap-2 text-sm sm:text-base"
           >
             <BsCameraVideo className="text-sm sm:text-base" /> Start Showcasing
           </button>
@@ -243,36 +231,41 @@ const Videos = () => {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.3 }}
-          className="h-full bg-neutral-800 bg-opacity-70 rounded-lg p-3 sm:p-4 flex flex-col"
+          className="h-full max-h-[90vh] bg-gray-900/90 backdrop-blur-sm rounded-xl border border-gray-700/50 p-4 flex flex-col overflow-y-auto"
           onClick={(ev) => ev.stopPropagation()}
         >
-          <div className="flex justify-between items-center mb-3 sm:mb-4">
-            <h3 className="text-base sm:text-lg font-semibold text-amber-400">
-              Add New Video
-            </h3>
+          {/* Header with close button */}
+          <div className="flex justify-between items-center mb-4 sticky top-0 bg-gray-900/80 py-2 z-10">
+            <div>
+              <h3 className="text-xl font-semibold text-white">
+                Add Portfolio Content
+              </h3>
+              <p className="text-xs text-gray-400 mt-1">
+                Showcase your best work to clients
+              </p>
+            </div>
             <button
               onClick={() => setShowVideo(false)}
-              className="text-neutral-400 hover:text-white transition-colors text-lg sm:text-xl"
+              className="text-gray-400 hover:text-white transition-colors p-1 rounded-full bg-gray-800/50 hover:bg-gray-700/50"
             >
-              &times;
+              <FiX size={24} />
             </button>
           </div>
 
-          <form className="flex-1 flex flex-col" onSubmit={handlePost}>
-            <div className="space-y-3 sm:space-y-4">
+          <form className="flex-1 flex flex-col gap-5" onSubmit={handlePost}>
+            {/* Form Fields */}
+            <div className="space-y-4">
               <div>
-                <label
-                  htmlFor="title"
-                  className="block text-xs sm:text-sm font-medium text-neutral-300 mb-1"
-                >
-                  Video Title*
+                <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center">
+                  Video Title
+                  <span className="text-rose-500 ml-1">*</span>
                 </label>
-                <Input
+                <input
                   id="title"
                   autoComplete="off"
                   type="text"
-                  className="w-[97%] mx-auto bg-neutral-700 border border-neutral-600 focus:border-amber-500 focus:ring-amber-500 text-white placeholder-neutral-400 text-sm sm:text-base"
-                  placeholder="Catchy title that describes your work..."
+                  className="w-full bg-gray-800 border border-gray-700 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 text-white placeholder-gray-500 rounded-lg px-4 py-3 text-sm transition-all"
+                  placeholder="e.g. 'Wedding Highlights - Summer 2023'"
                   required
                   name="title"
                   value={videos?.title}
@@ -281,51 +274,49 @@ const Videos = () => {
               </div>
 
               <div>
-                <label
-                  htmlFor="description"
-                  className="block text-xs sm:text-sm font-medium text-neutral-300 mb-1"
-                >
-                  Description*
+                <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center">
+                  Description
+                  <span className="text-rose-500 ml-1">*</span>
                 </label>
-                <Textarea
+                <textarea
                   id="description"
                   name="description"
                   value={videos?.description}
                   onChange={handleInputChange}
-                  placeholder="What makes this clip special?..."
+                  placeholder="Describe the content, equipment used, or special moments captured..."
                   required
-                  cols={10}
-                  rows={4}
-                  className=" bg-neutral-700 border border-neutral-600 focus:border-amber-500 focus:ring-amber-500 text-white placeholder-neutral-400 text-sm sm:text-base mb-12 w-[97%] mx-auto"
-                ></Textarea>
+                  className="w-full bg-gray-800 border border-gray-700 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 text-white placeholder-gray-500 rounded-lg px-4 py-3 text-sm transition-all min-h-[120px]"
+                />
               </div>
             </div>
 
+            {/* Video Upload Section */}
             {filteredVideos && filteredVideos?.length < 4 ? (
               <>
                 {!videoUrl ? (
-                  <div className=" w-[80%]  mx-auto flex flex-col items-center justify-center ">
-                    <div className="w-full mx-auto flex flex-col items-center justify-center border-2 border-dashed border-neutral-600 rounded-xl p-8 text-center transition-all hover:border-amber-500/50 hover:bg-neutral-700/20">
+                  <div className="flex-1 flex flex-col">
+                    {/* Upload Area */}
+                    <div className="flex-1 flex flex-col items-center justify-center">
                       <label
                         htmlFor="postvideo"
-                        className="cursor-pointer flex flex-col items-center w-full "
+                        className="w-full max-w-md mx-auto flex flex-col items-center justify-center border-2 border-dashed border-gray-700 rounded-xl p-6 text-center transition-all hover:border-indigo-500/50 hover:bg-gray-800/30 cursor-pointer"
                       >
-                        <div className="p-4 bg-amber-500/10 rounded-full mb-3">
-                          <FiUpload className="text-amber-400 text-2xl" />
+                        <div className="p-3 bg-indigo-500/10 rounded-full mb-3">
+                          <FiUpload className="text-indigo-400 text-2xl" />
                         </div>
-                        <span className="text-neutral-300 font-medium text-lg mb-1">
-                          Upload Your Work Video
+                        <span className="text-gray-200 font-medium text-lg mb-1">
+                          Upload Your Video
                         </span>
-                        <span className="text-sm text-neutral-500 max-w-md">
-                          Drag & drop your video file here or click to browse
-                          (MP4, MOV, or AVI - Max 100MB)
+                        <span className="text-sm text-gray-500">
+                          MP4, MOV or AVI (Max 100MB)
                         </span>
                         {loading && (
-                          <div className="mt-4">
+                          <div className="mt-4 flex items-center gap-2 text-indigo-400">
                             <CircularProgress
-                              size={24}
-                              className="text-amber-500"
+                              size={18}
+                              className="text-indigo-400"
                             />
+                            <span className="text-xs">Processing...</span>
                           </div>
                         )}
                       </label>
@@ -338,56 +329,72 @@ const Videos = () => {
                         disabled={loading}
                       />
                     </div>
+
+                    {/* Existing Videos */}
                     {filteredVideos?.length > 0 && (
-  <div className="w-full mt-6 bg-neutral-800/50 rounded-lg p-4 border border-neutral-700">
-    <h4 className="text-amber-400 text-sm font-semibold mb-1 -mt-2 ">
-      Your Existing Videos
-    </h4>
+                      <div className="mt-6">
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="text-gray-300 text-sm font-semibold">
+                            Your Portfolio Videos ({filteredVideos.length}/4)
+                          </h4>
+                          <span className="text-xs text-gray-500">
+                            Swipe to view →
+                          </span>
+                        </div>
 
-    <div className="overflow-x-auto whitespace-nowrap pr-2 custom-scroll">
-      <div className="flex gap-4 pr-10">
-        {filteredVideos.map((video) => (
-          <div
-            key={video._id}
-            className="relative w-44 min-w-[176px] aspect-video bg-neutral-900 rounded-lg overflow-hidden shrink-0"
-          >
-            <video
-              src={video.source}
-              className="w-full h-full object-cover "
-              muted
-              playsInline
-            />
-            
-            {/* Always visible delete icon */}
-            <button
-              onClick={() => handleDeleteVideo(video._id)}
-              disabled={deletingId === video._id}
-              className="absolute top-2 right-2 z-10 text-white bg-red-600/90 hover:bg-red-500 rounded-full p-1 transition-colors"
-            >
-              {deletingId === video._id ? (
-                <CircularProgress size={14} className="text-white" />
-              ) : (
-                <FiX size={14} />
-              )}
-            </button>
-
-            {/* Title overlay */}
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-1">
-              <p className="text-white text-[11px] truncate">
-                {video.title || "Untitled"}
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </div>
-)}
-
+                        <div className="relative">
+                          <div className="overflow-x-auto pb-4 -mx-4 px-4">
+                            <div
+                              className="flex gap-4"
+                              style={{
+                                minWidth: `${filteredVideos.length * 176}px`,
+                              }}
+                            >
+                              {filteredVideos.map((video) => (
+                                <div
+                                  key={video._id}
+                                  className="relative w-44 flex-shrink-0 rounded-xl overflow-hidden bg-gray-800 border border-gray-700/50 hover:border-indigo-500/50 transition-all group"
+                                >
+                                  <video
+                                    src={video.source}
+                                    className="w-full h-full aspect-video object-cover"
+                                    muted
+                                    playsInline
+                                  />
+                                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
+                                    <p className="text-white text-xs font-medium truncate w-full">
+                                      {video.title || "Untitled"}
+                                    </p>
+                                  </div>
+                                  <button
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      handleDeleteVideo(video._id);
+                                    }}
+                                    disabled={deletingId === video._id}
+                                    className="absolute top-2 right-2 z-10 text-white bg-rose-600/90 hover:bg-rose-500 rounded-full p-1.5 transition-all"
+                                  >
+                                    {deletingId === video._id ? (
+                                      <CircularProgress
+                                        size={12}
+                                        className="text-white"
+                                      />
+                                    ) : (
+                                      <FiX size={12} />
+                                    )}
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center">
-                    <div className="relative aspect-video w-full max-w-2xl bg-black rounded-xl overflow-hidden shadow-lg">
+                  <div className="flex-1 flex flex-col">
+                    {/* Video Preview */}
+                    <div className="relative aspect-video w-full bg-black rounded-xl overflow-hidden border border-gray-700/50">
                       <video
                         className="w-full h-full object-contain"
                         src={fileUrl}
@@ -398,56 +405,75 @@ const Videos = () => {
                       />
                       <button
                         type="button"
-                        className="absolute top-3 right-3 bg-black/70 text-white p-2 rounded-full hover:bg-black transition-colors"
+                        className="absolute top-3 right-3 bg-gray-900/80 text-white p-2 rounded-full hover:bg-gray-800 transition-all"
                         onClick={() => setVideoUrl(null)}
                       >
                         <FiX size={18} />
                       </button>
                     </div>
+
+                    {/* Description Preview */}
                     {videos.description.length > 0 && (
-                      <div className="mt-4 p-3 bg-neutral-800 rounded-lg border border-neutral-700 w-full max-w-2xl">
-                        <span className="text-amber-500 font-mono">#</span>
-                        <span className="text-neutral-300 ml-2">
+                      <div className="mt-4 p-4 bg-gray-800/50 rounded-lg border border-gray-700/50">
+                        <h4 className="text-gray-400 text-xs font-medium mb-2">
+                          DESCRIPTION PREVIEW
+                        </h4>
+                        <p className="text-gray-200 text-sm">
                           {videos.description}
-                        </span>
+                        </p>
                       </div>
                     )}
-                  </div>
-                )}
 
-                {videoUrl && (
-                  <div className="mt-auto pt-3 sm:pt-4">
-                    <Button
-                      disabled={isloading}
-                      type="submit"
-                      className="w-full bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white font-medium py-2 px-4 rounded-lg shadow transition-all text-sm sm:text-base"
-                    >
-                      {isloading ? (
-                        <CircularProgress size={14} className="text-white" />
-                      ) : (
-                        "Publish Video"
-                      )}
-                    </Button>
+                    {/* Submit Button */}
+                    <div className="mt-6 sticky bottom-0 bg-gray-900/80 py-3 -mx-4 px-4">
+                      <button
+                        disabled={isloading}
+                        type="submit"
+                        className="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-medium py-3 px-6 rounded-lg shadow-lg transition-all flex items-center justify-center gap-2"
+                      >
+                        {isloading ? (
+                          <>
+                            <CircularProgress
+                              size={16}
+                              className="text-white"
+                            />
+                            <span>Publishing...</span>
+                          </>
+                        ) : (
+                          <>
+                            <FiUpload className="w-4 h-4" />
+                            <span>Publish Video</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
                   </div>
                 )}
               </>
             ) : (
-              <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-neutral-700 rounded-lg border border-amber-500/30">
-                <p className="text-neutral-400 text-sm mb-4">
-                  {`You've reached the maximum number of portfolio videos (4). 
-                Consider replacing older videos with newer, higher-quality work.`}
-                </p>
-                <button
-                  onClick={() => {
-                    mutate(`/api/videos/getvideos/${validUserId}`);
-                    setShowVideo(false);
-                    setAddVideo(false);
-                    window.location.reload();
-                  }}
-                  className="w-full bg-neutral-600 hover:bg-neutral-500 text-white py-2 rounded-lg transition-colors text-sm sm:text-base"
-                >
-                  Return to Dashboard
-                </button>
+              <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+                <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-6 max-w-md">
+                  <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-amber-500/10 mb-3">
+                    <FiAlertTriangle className="h-5 w-5 text-amber-400" />
+                  </div>
+                  <h3 className="text-lg font-medium text-white mb-2">
+                    Portfolio Limit Reached
+                  </h3>
+                  <p className="text-gray-400 text-sm mb-4">
+                    {`  You've reached the maximum of 4 portfolio videos. Remove
+                    older videos to add new content.`}
+                  </p>
+                  <button
+                    onClick={() => {
+                      setRefetch((prev) => !prev);
+                      setShowVideo(false);
+                      setAddVideo(false);
+                    }}
+                    className="w-full bg-gray-700 hover:bg-gray-600 text-white py-2.5 px-4 rounded-lg transition-colors text-sm"
+                  >
+                    Return to Dashboard
+                  </button>
+                </div>
               </div>
             )}
           </form>

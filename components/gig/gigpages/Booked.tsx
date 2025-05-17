@@ -1,65 +1,92 @@
 "use client";
 import useStore from "@/app/zustand/useStore";
-import Gigheader from "@/components/gig/Gigheader";
 import Videos from "@/components/gig/Videos";
 import ColorLoading from "@/components/loaders/ColorLoading";
 import { useAllGigs } from "@/hooks/useAllGigs";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useDebounce } from "@/hooks/useDebounce";
 import { GigProps } from "@/types/giginterface";
-import { filterGigs } from "@/utils";
 import { motion } from "framer-motion";
 import React, { useMemo, useState } from "react";
-import { Video } from "lucide-react";
+import { BanIcon, Video } from "lucide-react";
 
 import GigCard from "./GigCard";
+import { Search } from "react-feather";
 
 const Booked = () => {
   const { loading: gigsLoading, gigs } = useAllGigs();
 
-  const { user } = useCurrentUser();
   const [typeOfGig, setTypeOfGig] = useState<string>("");
   const debouncedSearch = useDebounce(typeOfGig, 300);
-  const [category, setCategory] = useState<string>("all");
-  const [location, setLocation] = useState<string>("all");
+
   const { showVideo, setShowVideo, currentgig } = useStore();
 
+  const filterGigs = (gigs: GigProps[], searchquery?: string) => {
+    let sortedData = gigs;
+    console.log(sortedData);
+    if (searchquery) {
+      sortedData = sortedData?.filter((gig) => {
+        if (
+          gig?.title?.toLowerCase().includes(searchquery) ||
+          gig?.location?.toLowerCase().includes(searchquery) ||
+          // gig?.gigname?.toLowerCase().includes(searchquery) ||
+          gig?.category?.toLowerCase().includes(searchquery) ||
+          gig?.gigtimeline?.toLowerCase().includes(searchquery) ||
+          gig?.price?.toLowerCase().includes(searchquery)
+        ) {
+          return sortedData;
+        } else {
+          return false;
+        }
+      });
+    }
+    return sortedData;
+  };
   const filteredGigs = useMemo(() => {
-    const filtered = filterGigs(gigs, {
-      searchQuery: debouncedSearch,
-      category,
-      location,
-    });
+    const filtered = filterGigs(gigs, debouncedSearch);
     return (
       filtered?.filter(
         (gig: GigProps) => gig?.isTaken === true && gig?.isPending === false
       ) || []
     );
-  }, [gigs, debouncedSearch, category, location]);
+  }, [gigs, debouncedSearch]);
 
   return (
     <div className="flex flex-col h-[calc(100vh-100px)] w-full bg-gradient-to-br from-gray-900 to-gray-800">
-      {/* Enhanced Header with Glass Morphism */}
-      <div className="sticky top-0 z-10 backdrop-blur-md bg-gray-800/50 border-b border-gray-700/50 shadow-lg">
-        <Gigheader
-          typeOfGig={typeOfGig}
-          setTypeOfGig={setTypeOfGig}
-          category={category}
-          setCategory={setCategory}
-          location={location}
-          setLocation={setLocation}
-          myuser={user?.user}
-        />
-      </div>
-
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-h-0">
-        {" "}
+        <motion.div
+          className="relative group mb-8"
+          initial="hidden"
+          animate="show"
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-blue-600/10 rounded-xl blur-lg opacity-0 group-hover:opacity-40 transition-all duration-700"></div>
+          <div className="relative flex items-center bg-gray-900/50 px-5 py-3.5 rounded-full border border-gray-600 group-hover:border-cyan-400/30 transition-all duration-500 mt-2">
+            <Search size={18} className="text-cyan-400 mr-3" />
+            <input
+              placeholder="Search Gig Title/Location/Time etc..."
+              className="flex-1 bg-transparent border-none outline-none text-gray-100 placeholder-gray-400 text-sm font-medium focus:ring-0"
+              value={typeOfGig}
+              onChange={(ev) => setTypeOfGig(ev.target.value)}
+              autoFocus
+            />
+            <motion.div
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              className="p-2 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg shadow cursor-pointer"
+            >
+              <Search size={16} className="text-white" />
+            </motion.div>
+          </div>
+        </motion.div>{" "}
         {/* Add flex-col and min-h-0 for proper scrolling */}
         <div className="overflow-y-auto p-4 h-full">
-          {" "}
+          {typeOfGig && (
+            <span className="text-neutral-300 title">
+              Search results for {`  "${typeOfGig}"`}
+            </span>
+          )}
           {/* Ensure full height and scroll */}
-          {filteredGigs.length === 0 && !gigsLoading && (
+          {filteredGigs.length === 0 && !typeOfGig && !gigsLoading && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -76,6 +103,26 @@ const Booked = () => {
               <p className="text-gray-400 max-w-md text-center">
                 Your booked gigs will appear here. Try adjusting filters or
                 check back later.
+              </p>
+            </motion.div>
+          )}
+          {filteredGigs.length === 0 && typeOfGig && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex flex-col items-center justify-center py-16 h-full min-h-[300px]" /* Add min height */
+            >
+              <div className="w-24 h-24 bg-red-500/20 rounded-full flex items-center justify-center mb-6">
+                <div className="w-16 h-16 bg-indigo-800/30 rounded-full flex items-center justify-center">
+                  <BanIcon className="text-red-400" size={32} />
+                </div>
+              </div>
+              <h1 className="text-white text-2xl font-bold mb-2">
+                No results found
+              </h1>
+              <p className="text-gray-400 max-w-md text-center">
+                Your booked gigs search will appear here. Try adjusting the
+                search
               </p>
             </motion.div>
           )}
