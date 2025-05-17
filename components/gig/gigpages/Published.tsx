@@ -10,6 +10,7 @@ import useSocket from "@/hooks/useSocket";
 import { GigProps } from "@/types/giginterface";
 import { filterGigs } from "@/utils";
 import { useAuth } from "@clerk/nextjs";
+import { AnimatePresence, motion } from "framer-motion";
 
 import React, { useEffect, useMemo, useState } from "react";
 
@@ -135,23 +136,64 @@ const Published = () => {
     sortOption,
   ]);
   const isLoading = gigsLoading;
-
+  const [showFilters, setShowFilters] = useState(false);
   return (
     <div className="flex flex-col min-h-screen w-full bg-gray-900">
       {/* Sticky Glass Header */}
-      <div className="sticky top-0 z-30 bg-gray-800/80 backdrop-blur-lg border-b border-gray-700 shadow-lg">
-        <Gigheader
-          typeOfGig={typeOfGig}
-          setTypeOfGig={setTypeOfGig}
-          category={category}
-          setCategory={setCategory}
-          location={location}
-          setLocation={setLocation}
-          myuser={user?.user}
-          scheduler={scheduler}
-          setScheduler={setScheduler}
-        />
+      <div className="flex justify-end max-w-7xl mx-auto p-4">
+        <button
+          onClick={() => setShowFilters((prev) => !prev)}
+          className="relative px-4 py-2 text-sm rounded-md text-white bg-gradient-to-r from-purple-600 via-pink-500 to-yellow-400 border border-pink-300 shadow-md hover:brightness-110 transition-all duration-300 overflow-hidden"
+        >
+          <span className="relative z-10">
+            {showFilters ? "Hide Filters" : "Show Filters"}
+          </span>
+
+          {/* Glitter shimmer layer */}
+          <div className="absolute top-0 left-0 w-full h-full z-0 pointer-events-none">
+            <div className="w-1/3 h-full bg-white opacity-20 blur-sm animate-[shine_2s_linear_infinite]" />
+          </div>
+
+          {/* Sparkles */}
+          <span className="absolute top-1 left-2 text-white opacity-75 animate-[sparkle1_3s_infinite] pointer-events-none">
+            ✨
+          </span>
+          <span className="absolute top-3 right-4 text-white opacity-50 animate-[sparkle2_4s_infinite] pointer-events-none">
+            ✨
+          </span>
+          <span className="absolute bottom-1 left-10 text-white opacity-60 animate-[sparkle3_3.5s_infinite] pointer-events-none">
+            ✨
+          </span>
+          <span className="absolute bottom-2 right-8 text-white opacity-40 animate-[sparkle2_4s_infinite] pointer-events-none">
+            ✨
+          </span>
+        </button>
       </div>
+
+      <AnimatePresence mode="wait">
+        {showFilters && (
+          <motion.div
+            key="gig-header"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.4, ease: [0.25, 0.8, 0.25, 1] }}
+            className="w-full max-w-7xl mx-auto mb-6"
+          >
+            <Gigheader
+              typeOfGig={typeOfGig}
+              setTypeOfGig={setTypeOfGig}
+              category={category}
+              setCategory={setCategory}
+              location={location}
+              setLocation={setLocation}
+              myuser={user?.user}
+              scheduler={scheduler}
+              setScheduler={setScheduler}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Main Content Area */}
       <main className="flex-1 overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800 p-4 md:p-8">
@@ -228,7 +270,7 @@ const Published = () => {
                     </span>
                   </div>
                   <p className="text-gray-400/90 text-[12px] font-mono mt-1 tracking-wider">
-                    Handpicked for quality and value 
+                    Handpicked for quality and value
                   </p>
                 </div>
                 <div className="flex items-center space-x-3">
@@ -258,7 +300,7 @@ const Published = () => {
                   {filteredGigs.map((gig: GigProps) => (
                     <div
                       key={gig?._id}
-                      className="border-gray-700 overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-amber-500/30 hover:-translate-y-1"
+                      className=" overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-amber-500/30 hover:-translate-y-1"
                     >
                       <AllGigsComponent gig={gig} />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
@@ -270,8 +312,8 @@ const Published = () => {
           )}
 
           {/* Featured Section */}
-          {(filteredGigs.length === 0 || filteredGigs.length < 4) &&
-            !isLoading && (
+          {/* {(filteredGigs.length === 0 || filteredGigs.length < 4) &&
+            isLoading && (
               <div className="max-w-7xl mx-auto mt-12 border-t border-gray-800 pt-12">
                 <h3 className="text-xl font-semibold text-white mb-6 px-4 flex items-center">
                   <svg
@@ -301,12 +343,12 @@ const Published = () => {
                   ))}
                 </div>
               </div>
-            )}
+            )} */}
         </div>
       </main>
 
       {/* Floating CTA */}
-      <div className="fixed bottom-6 right-6 z-20">
+      {/* <div className="fixed bottom-6 right-6 z-20">
         <button className="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full shadow-xl hover:from-amber-600 hover:to-amber-700 transition-all transform hover:scale-105 group">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -323,7 +365,7 @@ const Published = () => {
             />
           </svg>
         </button>
-      </div>
+      </div> */}
     </div>
   );
 };

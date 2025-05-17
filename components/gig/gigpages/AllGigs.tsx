@@ -112,9 +112,30 @@ const AllGigs = () => {
       <div className="flex justify-end max-w-7xl mx-auto p-4">
         <button
           onClick={() => setShowFilters((prev) => !prev)}
-          className="text-sm px-3 py-1.5 rounded-md text-gray-200 bg-gray-800 border border-gray-700 hover:bg-gray-700/70 transition-all"
+          className="relative px-4 py-1 text-sm rounded-md text-white bg-gradient-to-r from-purple-600 via-indigo-500 to-green-400 border border-pink-300 shadow-md hover:brightness-110 transition-all duration-300 overflow-hidden"
         >
-          {showFilters ? "Hide Filters" : "Show Filters"}
+          <span className="relative z-10">
+            {showFilters ? "Hide Filters" : "Show Filters"}
+          </span>
+
+          {/* Glitter shimmer layer */}
+          <div className="absolute top-0 left-0 w-full h-full z-0 pointer-events-none">
+            <div className="w-1/3 h-full bg-white opacity-20 blur-sm animate-[shine_2s_linear_infinite]" />
+          </div>
+
+          {/* Sparkles */}
+          <span className="absolute top-1 left-2 text-white opacity-45 animate-[sparkle1_3s_infinite] pointer-events-none">
+            ✨
+          </span>
+          <span className="absolute top-3 right-4 text-white opacity-30 animate-[sparkle2_4s_infinite] pointer-events-none">
+            ✨
+          </span>
+          <span className="absolute bottom-1 left-10 text-white opacity-30 animate-[sparkle3_3.5s_infinite] pointer-events-none">
+            ✨
+          </span>
+          <span className="absolute bottom-2 right-8 text-white opacity-30 animate-[sparkle2_4s_infinite] pointer-events-none">
+            ✨
+          </span>
         </button>
       </div>
 
@@ -232,11 +253,11 @@ const AllGigs = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1">
                 {filteredGigs.map((gig: GigProps) => (
                   <div
                     key={gig._id}
-                    className="overflow-hidden border border-gray-700 rounded-xl hover:border-amber-500/30 hover:-translate-y-1 transition-all duration-300"
+                    className="overflow-hidden  rounded-xl hover:border-amber-500/30 hover:-translate-y-1 transition-all duration-300"
                   >
                     <AllGigsComponent gig={gig} />
                   </div>
@@ -246,7 +267,7 @@ const AllGigs = () => {
           )}
 
           {/* Featured Fallback */}
-          {(filteredGigs.length === 0 || filteredGigs.length < 4) &&
+          {/* {(filteredGigs.length === 0 || filteredGigs.length < 4) &&
             !isLoading && (
               <div className="mt-12 border-t border-gray-800 pt-12">
                 <h3 className="text-xl font-semibold text-white mb-6 px-4 flex items-center">
@@ -276,7 +297,7 @@ const AllGigs = () => {
                   ))}
                 </div>
               </div>
-            )}
+            )} */}
         </div>
       </main>
     </div>
