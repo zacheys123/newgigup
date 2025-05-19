@@ -231,7 +231,6 @@ const Published = () => {
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <button
                     onClick={() => {
-                      setCategory("all");
                       setLocation("all");
                     }}
                     className="px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-gray-900 font-medium rounded-lg transition-all hover:shadow-lg hover:shadow-amber-500/20 hover:brightness-110"
@@ -295,8 +294,8 @@ const Published = () => {
                   </select>
                 </div>
               </div>
-              <div className="max-h-[60vh] sm:max-h-[65vh] md:max-h-[70vh] lg:max-h-[75vh] xl:max-h-[80vh] overflow-y-auto scrollbar-thin scrollbar-thumb-transparent scrollbar-track-gray-800 pr-2 pb-20">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1 pb-20">
+              <div className="max-h-[60vh] sm:max-h-[65vh] md:max-h-[70vh] lg:max-h-[75vh] xl:max-h-[80vh] overflow-y-auto scrollbar-thin scrollbar-thumb-transparent scrollbar-track-gray-800 pr-2 pb-[50px]">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1 pb-[50px]">
                   {filteredGigs.map((gig: GigProps) => (
                     <div
                       key={gig?._id}
