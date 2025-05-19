@@ -8,7 +8,7 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useDebounce } from "@/hooks/useDebounce";
 import useSocket from "@/hooks/useSocket";
 import { GigProps } from "@/types/giginterface";
-import { filterGigs } from "@/utils";
+import { dataCounties, filterGigs } from "@/utils";
 import { useAuth } from "@clerk/nextjs";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -237,7 +237,22 @@ const Published = () => {
                   >
                     Show All Listings
                   </button>
-                  <button className="px-6 py-3 border border-gray-600 text-gray-300 font-medium rounded-lg transition-all hover:bg-gray-700/50 hover:border-amber-500/30">
+                  <button
+                    className="px-6 py-3 border border-gray-600 text-gray-300 font-medium rounded-lg hover:bg-gray-700/50 hover:border-amber-500/30 transition-all"
+                    onClick={() => {
+                      const userCity = user?.user?.city;
+                      const otherCities = dataCounties.filter(
+                        (city) => city !== userCity
+                      );
+                      if (otherCities.length > 0) {
+                        const randomCity =
+                          otherCities[
+                            Math.floor(Math.random() * otherCities.length)
+                          ];
+                        setLocation!(randomCity);
+                      }
+                    }}
+                  >
                     View Featured
                   </button>
                 </div>

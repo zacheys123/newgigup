@@ -8,7 +8,7 @@ import { useAllGigs } from "@/hooks/useAllGigs";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useDebounce } from "@/hooks/useDebounce";
 import { GigProps } from "@/types/giginterface";
-import { filterGigs } from "@/utils";
+import { dataCounties, filterGigs } from "@/utils";
 import { useAuth } from "@clerk/nextjs";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
@@ -201,7 +201,23 @@ const AllGigs = () => {
                 >
                   Show All Listings
                 </button>
-                <button className="px-6 py-3 border border-gray-600 text-gray-300 font-medium rounded-lg hover:bg-gray-700/50 hover:border-amber-500/30 transition-all">
+                <button
+                  className="px-6 py-3 border border-gray-600 text-gray-300 font-medium rounded-lg hover:bg-gray-700/50 hover:border-amber-500/30 transition-all"
+                  onClick={() => {
+                    const userCity = user?.user?.city;
+                    const otherCities = dataCounties.filter(
+                      (city) => city !== userCity
+                    );
+                    if (otherCities.length > 0) {
+                      alert("hello");
+                      const randomCity =
+                        otherCities[
+                          Math.floor(Math.random() * otherCities.length)
+                        ];
+                      setLocation!(randomCity);
+                    }
+                  }}
+                >
                   View Featured
                 </button>
               </div>
