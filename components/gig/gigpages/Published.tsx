@@ -290,22 +290,14 @@ const Published = () => {
                 <div className="flex items-center space-x-3">
                   <span className="text-sm text-gray-400">Sort:</span>
                   <select
-                    className="text-sm bg-gray-800 border-gray-700 rounded-lg focus:ring-amber-500 focus:border-amber-500 text-white"
                     value={sortOption}
                     onChange={(e) => setSortOption(e.target.value)}
+                    className="text-sm bg-gray-600 border-gray-700 rounded-lg focus:ring-amber-500 focus:border-amber-500 text-white p-2"
                   >
-                    <option className="bg-gray-800" value="relevance">
-                      Relevance
-                    </option>
-                    <option className="bg-gray-800" value="newest">
-                      Newest First
-                    </option>
-                    <option className="bg-gray-800" value="highest">
-                      Highest Budget
-                    </option>
-                    <option className="bg-gray-800" value="popular">
-                      Most Viewed
-                    </option>
+                    <option value="relevance">Relevance</option>
+                    <option value="newest">Newest First</option>
+                    <option value="highest">Highest Budget</option>
+                    <option value="popular">Most Viewed</option>
                   </select>
                 </div>
               </div>

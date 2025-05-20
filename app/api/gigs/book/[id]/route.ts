@@ -38,11 +38,25 @@ export async function PUT(req: NextRequest) {
     // Decrement weekly count for users in bookCount who weren't selected
     // In the part where you decrement counts for unselected musicians:
     if (gig.bookCount && gig.bookCount.length > 0) {
+      console.log("Current week start:", currentWeekStart);
+      console.log("Processing bookCount of length:", gig.bookCount.length);
+
       for (const userMainID of gig.bookCount) {
+        console.log(`Processing user ID: ${userMainID}`);
         if (userMainID.toString() !== musicianId.toString()) {
+          console.log(
+            `User ${userMainID} was not selected - decrementing count`
+          );
           const user = await User.findById(userMainID);
+          console.log(
+            `User ${userMainID} current weekly count:`,
+            user?.gigsBookedThisWeek?.count
+          );
+
           if (user?.gigsBookedThisWeek?.weekStart) {
             const lastWeekStart = new Date(user.gigsBookedThisWeek.weekStart);
+            console.log(`User's last week start:`, lastWeekStart);
+            console.log(`Is same week?`, lastWeekStart >= currentWeekStart);
             if (lastWeekStart >= currentWeekStart) {
               // Only decrement if count is greater than 0
               await User.findByIdAndUpdate(userMainID, [
