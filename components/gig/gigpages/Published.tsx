@@ -178,7 +178,7 @@ const Published = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.4, ease: [0.25, 0.8, 0.25, 1] }}
-            className="w-full max-w-7xl mx-auto mb-6"
+            className="w-[89%] md:max-w-7xl mx-auto mb-6"
           >
             <Gigheader
               typeOfGig={typeOfGig}
