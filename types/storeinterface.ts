@@ -136,6 +136,8 @@ export const initialState = {
   IsProfileModalOpen: false,
   isDescriptionModal: false,
   showConfirmModal: false,
+  showConfirmation: false,
+  lastBookedGigId: "",
 };
 interface OnlineUser {
   userId: string;
@@ -175,6 +177,10 @@ export interface StoreState {
   onlineUsers: OnlineUser[];
   socket: Socket | null;
   unreadCounts: Record<string, number>; // { chatId: unreadCount }
+  showConfirmation: boolean;
+  lastBookedGigId: string | null;
+  setLastBookedGigId: (data: string | null) => void;
+  setShowConfirmation: (data: boolean) => void;
   setData: (data: DashboardData) => void;
   setLoadingPostId: (data: string) => void;
   setLoadPostId: (data: string) => void;

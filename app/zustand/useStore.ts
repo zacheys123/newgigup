@@ -8,7 +8,10 @@ import { create } from "zustand"; // Import SetState
 
 const useStore = create<StoreState>((set) => ({
   ...initialState,
-
+  setLastBookedGigId: (data: string | null) =>
+    set(() => ({ lastBookedGigId: data })),
+  setShowConfirmation: (data: boolean) =>
+    set(() => ({ showConfirmation: data })),
   setData: (data: DashboardData) => set(() => ({ subscriptiondata: data })),
   setLoadingPostId: (data: string) => set(() => ({ loadingPostId: data })),
   setIsProfileModalOpen: (data: boolean) =>

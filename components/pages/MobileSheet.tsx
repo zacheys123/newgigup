@@ -35,12 +35,12 @@ const MobileSheet = () => {
   return (
     <Sheet>
       <SheetTrigger>
-        <Menu className="text-white hover:text-teal-300 font-bold text-2xl transition-colors duration-200" />
+        <Menu className="text-white  z-50 hover:text-teal-300 font-bold text-2xl transition-colors duration-200" />
       </SheetTrigger>
 
       <SheetContent
         side="left"
-        className="w-[75%] sm:w-[60%] bg-zink-700  bg-opacity-25 px-6 py-3 flex flex-col gap-[17px] justify-start items-start rounded-br-[180px] shadow-3xl backdrop-blur-lg"
+        className="w-[75%]  z-50 sm:w-[60%] bg-zink-700  bg-opacity-25 px-6 py-3 flex flex-col gap-[17px] justify-start items-start rounded-br-[180px] shadow-3xl backdrop-blur-lg"
       >
         <SheetTitle className="text-2xl font-semibold text-white mb-6">
           Access More Info
