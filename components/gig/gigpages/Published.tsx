@@ -196,13 +196,13 @@ const Published = () => {
       </AnimatePresence>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800 p-4 md:p-8">
+      <main className="flex-1 overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800 p-4 md:p-8 ">
         {/* Premium Empty State */}{" "}
         <div className="flex-1 overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
           {filteredGigs.length === 0 && !isLoading && (
-            <div className="max-w-4xl mx-auto text-center py-16 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-4xl mx-auto text-center  md:py-16 px-4 sm:px-6 lg:px-8">
               <div className="bg-gray-800 p-8 md:p-12 rounded-xl shadow-2xl border border-gray-700">
-                <div className="inline-flex mb-6 p-3 bg-gray-700 rounded-full">
+                <div className="inline-flex p-3 bg-gray-700 rounded-full">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-10 w-10 text-amber-400"

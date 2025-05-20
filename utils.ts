@@ -490,15 +490,11 @@ export const canStillBookThisWeekDetailed = (
     oneMonthLater.setMonth(oneMonthLater.getMonth() + 1);
     const isFirstMonth = new Date() < oneMonthLater;
 
-    console.log("Signup date:", signupDate);
-    console.log("One month later:", oneMonthLater);
-    console.log("Is first month:", isFirstMonth);
-
     if (!isFirstMonth) {
       console.log("Free trial expired - must upgrade");
       return {
         canBook: false,
-        reason: "Upgrade to Pro to continue booking",
+        reason: "Free trial expired - must Upgrade to Pro",
         status: "pro-only",
         desc: "1 month trial is over",
       };

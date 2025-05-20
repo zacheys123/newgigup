@@ -49,8 +49,8 @@ const PrePendingComponent = () => {
   };
   console.log(showX);
   const [removingId, setRemovingId] = useState<string | null>(null);
-  const removeMusicianfrombookCount = async (id: string) => {
-    setRemovingId(id);
+  const removeMusicianfrombookCount = async (userid: string) => {
+    setRemovingId(userid);
     try {
       // Optimistically update the UI by removing the musician from local state
       const updatedGig = {
@@ -65,7 +65,7 @@ const PrePendingComponent = () => {
       const req = await fetch(`/api/gigs/remove-musician/${currentgig?._id}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ musicianId: id }),
+        body: JSON.stringify({ musicianId: userid }),
       });
 
       const data: { message: string } = await req.json();
