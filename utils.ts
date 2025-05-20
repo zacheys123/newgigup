@@ -531,7 +531,7 @@ export const canStillBookThisWeekDetailed = (
     if (weeklyBooking.count >= 2) {
       return {
         canBook: false,
-        reason: "Free limit reached (3 gigs/week)",
+        reason: "Free limit reached (2 gigs/week)",
         desc: "Upgrade to Pro",
         status: "free-limit",
       };

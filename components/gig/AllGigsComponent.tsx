@@ -516,12 +516,13 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
               </div>
             ) : (
               gig?.postedBy?._id !== myId &&
-              gig?.bookedBy?._id !== user?.user?._id && (
+              gig?.bookedBy?._id !== myId &&
+              gig?.isPending === false && (
                 <>
                   {isProOnlyForFreeUser ? (
                     <div className="text-center">
                       <p className="text-xs text-amber-300 mb-1 bg-gray-500 p-2">
-                        Pro members only for gigs over $10
+                        Pro members only for gigs over 10k KES
                       </p>
                       <ButtonComponent
                         variant="ghost"

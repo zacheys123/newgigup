@@ -238,7 +238,7 @@ const Published = () => {
                     Show All Listings
                   </button>
                   <button
-                    className="px-6 py-3 border border-gray-600 text-gray-300 font-medium rounded-lg hover:bg-gray-700/50 hover:border-amber-500/30 transition-all"
+                    className="px-6 py-3 border title border-gray-600 text-gray-300 font-medium rounded-lg hover:bg-gray-700/50 hover:border-amber-500/30 transition-all"
                     onClick={() => {
                       const userCity = user?.user?.city;
                       const otherCities = dataCounties.filter(
@@ -253,7 +253,7 @@ const Published = () => {
                       }
                     }}
                   >
-                    View Featured
+                    View Featured/Random Cities
                   </button>
                 </div>
               </div>

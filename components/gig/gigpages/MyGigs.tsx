@@ -339,8 +339,8 @@ const MyGigs = () => {
                     >
                       Show All Listings
                     </button>
-                    <button className="px-6 py-3 border border-gray-600 text-gray-300 font-medium rounded-lg transition-all hover:bg-gray-700/50 hover:border-amber-500/30">
-                      View Featured
+                    <button className="px-6 py-3 border border-gray-600 title text-gray-300 font-medium rounded-lg transition-all hover:bg-gray-700/50 hover:border-amber-500/30">
+                      View Featured/Random Cities
                     </button>
                   </div>
                 </div>

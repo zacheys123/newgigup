@@ -65,7 +65,7 @@ export async function PUT(req: NextRequest) {
         if (lastWeekStart >= currentWeekStart) {
           if (user.gigsBookedThisWeek.count >= 2) {
             return NextResponse.json(
-              { success: false, message: "Free limit reached (3 gigs/week)" },
+              { success: false, message: "Free limit reached (2 gigs/week)" },
               { status: 403 }
             );
           }
