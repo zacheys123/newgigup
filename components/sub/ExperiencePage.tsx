@@ -131,9 +131,9 @@ const ExperienceGigupPage = () => {
                 <strong> {`{"Book Now"} and you're already there`}</strong> .
               </p>
               <p>
-                Artists/Talent or Musicians can accept or decline requests.
-                You’ll receive instant notifications and manage all bookings in
-                your dashboard.
+                {`Artists/Talent or Musicians can accept or decline requests.
+                You'll receive instant notifications and manage all bookings in
+                your dashboard.`}
               </p>
               <p>
                 You can choose the gig but you cannot book yourself the client
@@ -177,6 +177,170 @@ const ExperienceGigupPage = () => {
               </div>
             )}
 
+            {/* Comprehensive Perks Section */}
+            <section className="mt-20">
+              <h2 className="text-3xl font-extrabold text-center mb-8 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-indigo-400">
+                Detailed Plan Benefits
+              </h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+                {/* Musician Perks */}
+                <div className="bg-gradient-to-br from-[#1e1b4b]/80 to-[#312e81]/80 p-6 rounded-2xl border border-indigo-400/20 shadow-xl">
+                  <h3 className="text-xl font-bold mb-4 text-indigo-200 flex items-center gap-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="w-5 h-5"
+                    >
+                      <path d="M9 18V5l12-2v13"></path>
+                      <circle cx="6" cy="18" r="3"></circle>
+                      <circle cx="18" cy="16" r="3"></circle>
+                    </svg>
+                    For Musicians
+                  </h3>
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-semibold text-sm text-indigo-300 mb-2">
+                        PRO TIER INCLUDES:
+                      </h4>
+                      <ul className="space-y-2">
+                        {[
+                          "Unlimited gig applications",
+                          "Featured profile in search",
+                          "Priority in client searches",
+                          "Advanced analytics dashboard",
+                          "Direct booking options",
+                          "Unlimited messaging",
+                          "Get discovered by top-tier clients",
+                          "Access to exclusive premium gigs",
+                          "Your own branded portfolio page",
+                          "Direct payments integration",
+                        ].map((perk, i) => (
+                          <li key={i} className="flex items-start gap-2">
+                            <CheckCircle className="flex-shrink-0 w-4 h-4 mt-0.5 text-emerald-400" />
+                            <span className="text-white/90 text-sm">
+                              {perk}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="pt-4 border-t border-indigo-400/20">
+                      <h4 className="font-semibold text-sm text-indigo-300 mb-2">
+                        FREE TIER INCLUDES:
+                      </h4>
+                      <ul className="space-y-2">
+                        {[
+                          "Book up to 2 gigs per week",
+                          "Limited messages (50/month)",
+                          "Basic performance analytics",
+                          "Access limited to 30 days",
+                        ].map((perk, i) => (
+                          <li key={i} className="flex items-start gap-2">
+                            <CheckCircle className="flex-shrink-0 w-4 h-4 mt-0.5 text-blue-300" />
+                            <span className="text-white/80 text-sm">
+                              {perk}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Client Perks */}
+                <div className="bg-gradient-to-br from-[#1e1b4b]/80 to-[#312e81]/80 p-6 rounded-2xl border border-purple-400/20 shadow-xl">
+                  <h3 className="text-xl font-bold mb-4 text-purple-200 flex items-center gap-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="w-5 h-5"
+                    >
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    For Clients
+                  </h3>
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-semibold text-sm text-purple-300 mb-2">
+                        PRO TIER INCLUDES:
+                      </h4>
+                      <ul className="space-y-2">
+                        {[
+                          "Unlimited gig postings",
+                          "Featured listing placement",
+                          "Advanced search filters",
+                          "Verified musician access",
+                          "Booking management tools",
+                          "Unlimited messaging",
+                          "Dedicated support",
+                          "Schedule gigs (automatic, recurring, and more)",
+                          "White-glove support with a dedicated agent",
+                          "Ability to schedule recurring gigs",
+                          "Access to premium-only verified musicians",
+                          "Performance-based artist recommendations",
+                        ].map((perk, i) => (
+                          <li key={i} className="flex items-start gap-2">
+                            <CheckCircle className="flex-shrink-0 w-4 h-4 mt-0.5 text-emerald-400" />
+                            <span className="text-white/90 text-sm">
+                              {perk}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="pt-4 border-t border-purple-400/20">
+                      <h4 className="font-semibold text-sm text-purple-300 mb-2">
+                        FREE TIER INCLUDES:
+                      </h4>
+                      <ul className="space-y-2">
+                        {[
+                          "Post up to 2 gigs per week",
+                          "Browse musician profiles and reviews",
+                          "Limited messages (50/month)",
+                          "Basic access for 30 days",
+                          "No scheduling of gigs",
+                        ].map((perk, i) => (
+                          <li key={i} className="flex items-start gap-2">
+                            <CheckCircle className="flex-shrink-0 w-4 h-4 mt-0.5 text-blue-300" />
+                            <span className="text-white/80 text-sm">
+                              {perk}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {!isPro && (
+                <div className="text-center mt-6">
+                  <Link
+                    href="/upgrade"
+                    className="inline-block px-8 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-bold rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
+                  >
+                    Upgrade Now for Full Benefits
+                  </Link>
+                </div>
+              )}
+            </section>
+
             {/* Pro-Only Perks */}
             <section className="mt-20">
               <h2 className="text-3xl font-extrabold text-center mb-8 bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 via-pink-400 to-purple-500">
@@ -215,7 +379,7 @@ const ExperienceGigupPage = () => {
                   {
                     name: "Carlos (Client)",
                     quote:
-                      "Having dedicated booking tools saves me so much time. I’ll never go back.",
+                      "Having dedicated booking tools saves me so much time. I'll never go back.",
                   },
                 ].map((t, i) => (
                   <div
@@ -224,7 +388,7 @@ const ExperienceGigupPage = () => {
                   >
                     <Quote className="w-6 h-6 text-teal-300 mb-4" />
                     <p className="text-white/80 italic text-base leading-relaxed">
-                      “{t.quote}”
+                      {`"${t.quote}"`}
                     </p>
                     <p className="mt-4 font-semibold text-sm text-yellow-300">
                       – {t.name}
