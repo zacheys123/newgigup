@@ -7,6 +7,7 @@ import { useUser } from "@clerk/nextjs";
 import { useAllGigs } from "@/hooks/useAllGigs"; // Assuming this is the hook to get gigs
 import { GigProps } from "@/types/giginterface";
 import CreateLimitOverlay from "./CreateLimitOverlay";
+import SubscriptionOverlay from "./SubscriptionOverlay";
 
 interface SubmitProps {
   onSubmit: (e: FormEvent<HTMLFormElement>) => void;
@@ -18,10 +19,6 @@ interface SubmitProps {
   isSchedulerOpen: boolean;
   setisSchedulerOpen: (isSchedulerOpen: boolean) => void;
 }
-
-type TypeProps = {
-  type: "automatic" | "regular" | "create";
-};
 
 const SchedulerComponent = ({
   onSubmit,
@@ -97,20 +94,6 @@ const SchedulerComponent = ({
     },
   };
 
-  const SubscriptionOverlay = (type: TypeProps) =>
-    !isSubscribed && (
-      <div className="absolute inset-0 bg-white bg-opacity-50 backdrop-blur-lg z-20 flex items-center justify-center rounded-xl text-center p-6">
-        <div className="bg-white bg-opacity-30 p-4 rounded-xl shadow-lg backdrop-blur-sm max-w-xs w-full">
-          <p className="text-sm font-semibold text-red-400">
-            Upgrade to Pro to {type.type} scheduling options.
-          </p>
-          <p className="text-xs text-white mt-2">
-            Unlock more features with a Pro subscription.
-          </p>
-        </div>
-      </div>
-    );
-
   const optionsToRender: ("automatic" | "regular" | "create")[] = [
     "automatic",
     "regular",
@@ -136,10 +119,14 @@ const SchedulerComponent = ({
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
           </div>
         )}
-
-        <CreateLimitOverlay showCreateLimitOverlay={showCreateLimitOverlay} />
-
-        {optionsToRender.map((type) => {
+        {!isSubscribed && !canCreateGig ? (
+          <CreateLimitOverlay showCreateLimitOverlay={showCreateLimitOverlay} />
+        ) : (
+          <div className="flex justify-center items-center h-full title opacity-30 text-neutral-500">
+            Loading
+          </div>
+        )}
+        {optionsToRender.map((type: "automatic" | "regular" | "create") => {
           const isActive = activeOption === type;
           const styles = schedulerStyles[type];
           const isDisabled =
@@ -286,7 +273,10 @@ const SchedulerComponent = ({
 
                 {isActive && commonButton}
                 {!isSubscribed && type !== "create" && (
-                  <SubscriptionOverlay type={type} />
+                  <SubscriptionOverlay
+                    type={type}
+                    isSubscribed={isSubscribed}
+                  />
                 )}
               </div>
             </div>

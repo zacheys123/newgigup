@@ -5,6 +5,9 @@ import { useUser } from "@clerk/nextjs";
 import { useEffect, useMemo } from "react";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import NotificationHandler from "@/components/NotificationHandler";
+import { TrialExpiredModal } from "@/components/sub/TrialExpired";
+import { TrialRemainingModal } from "@/components/sub/TrialRemainingComp";
+import { useCheckTrial } from "@/hooks/useCheckTrials";
 
 const MainLayout = ({
   contact,
@@ -15,6 +18,7 @@ const MainLayout = ({
 }>) => {
   const { user: myuser } = useCurrentUser();
   const { user } = useUser();
+  useCheckTrial(myuser?.user);
   const transformedUser = useMemo(() => {
     if (!user) return null;
     return {
@@ -28,6 +32,7 @@ const MainLayout = ({
   }, [user]);
   useEffect(() => {
     if (!user || !myuser) return;
+    localStorage.setItem("tier", JSON.stringify(myuser?.user?.tier));
 
     // Transform the user data as needed
     if (
@@ -68,7 +73,8 @@ const MainLayout = ({
         }}
       />
       <Nav />
-      <NotificationHandler />
+      <NotificationHandler /> <TrialExpiredModal />
+      <TrialRemainingModal />
       {contact}
       {children}
     </div>

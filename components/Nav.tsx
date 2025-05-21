@@ -8,17 +8,20 @@ import { useRouter } from "next/navigation";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { MdEmail } from "react-icons/md";
 import { Settings } from "react-feather";
+import { useCheckTrial } from "@/hooks/useCheckTrials";
+import MobileSheet from "./pages/MobileSheet";
 
 const Nav = () => {
   const { userId } = useAuth();
   const router = useRouter();
   const { user } = useCurrentUser();
-
+  const { isFirstMonthEnd } = useCheckTrial(user?.user);
+  console.log(isFirstMonthEnd);
   return (
     <nav className="sticky top-0 w-full bg-neutral-900 text-white shadow-md py-4 px-6 flex items-center justify-between  shadow-slate-700 ">
       {/* Logo on the left side */}
-      <div className="flex items-center">
-        <Logo />
+      <div className="flex items-center justify-between flex-1">
+        {isFirstMonthEnd ? <MobileSheet /> : <Logo />}
       </div>
       {/* Navigation items aligned to the right */}
       <div className="flex items-center gap-3 ml-auto">
@@ -31,16 +34,18 @@ const Nav = () => {
               <MdEmail size="21" />
               <span className="hidden md:inline">Gigs</span>
             </Link>
+
             {user?.user?.firstname && (
               <>
-                <Link
-                  href={"/profile"}
-                  className="flex items-center gap-2 p-3 rounded-full transition-all hover:bg-neutral-700 hover:scale-105"
-                >
-                  <User size="21" />
-                  <span className="hidden md:inline">Profile</span>
-                </Link>
-
+                {!isFirstMonthEnd && (
+                  <Link
+                    href={"/profile"}
+                    className="flex items-center gap-2 p-3 rounded-full transition-all hover:bg-neutral-700 hover:scale-105"
+                  >
+                    <User size="21" />
+                    <span className="hidden md:inline">Profile</span>
+                  </Link>
+                )}
                 <Link
                   href="/settings"
                   className="flex items-center gap-2 p-3 rounded-full transition-all hover:bg-neutral-700 hover:scale-105"

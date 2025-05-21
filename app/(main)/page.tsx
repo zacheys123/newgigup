@@ -17,6 +17,7 @@ import { colors, fonts } from "@/utils";
 import { SaveAll } from "lucide-react";
 
 import FloatingNotesLoader from "@/components/loaders/FloatingNotes";
+import useStore from "../zustand/useStore";
 
 export default function Home() {
   const { isLoaded, userId } = useAuth();
@@ -25,7 +26,7 @@ export default function Home() {
 
   const [showVideo, setShowVideo] = useState(false);
   const [isClientSide, setIsClientSide] = useState(false);
-
+  const { showTrialModal } = useStore();
   useEffect(() => {
     setIsClientSide(true);
     if (!isLoaded && !userId) {
@@ -198,25 +199,30 @@ export default function Home() {
           </div>
         </div>{" "}
         {user?.user?.firstname && (
-          <Link
-            className="absolute bottom-5 mt-6 px-6 py-1  text-gray-100 text-sm font-semibold rounded-xl  rounded-bl-xl roundedt-l-xl shadow-lg hover:bg-yellow-400 transition animate-bounce flex items-center"
-            style={{ fontFamily: fonts[24], backgroundColor: colors[15] }}
-            role="button"
-            href={getDynamicHref()}
-          >
-            <SaveAll
-              className="h-6 w-6 text-[15px] text-gray-200 hover:text-yellow-400 transition gap-2"
-              size="20"
-              style={{
-                animation: "pulse 2s infinite",
-                animationDirection: "normal",
-                animationDuration: "2s",
-                animationFillMode: "forwards",
-                animationIterationCount: "infinite",
-              }}
-            />{" "}
-            Open gigup
-          </Link>
+          <>
+            {" "}
+            {showTrialModal && (
+              <Link
+                className="absolute bottom-5 mt-6 px-6 py-1  text-gray-100 text-sm font-semibold rounded-xl  rounded-bl-xl roundedt-l-xl shadow-lg hover:bg-yellow-400 transition animate-bounce flex items-center"
+                style={{ fontFamily: fonts[24], backgroundColor: colors[15] }}
+                role="button"
+                href={getDynamicHref()}
+              >
+                <SaveAll
+                  className="h-6 w-6 text-[15px] text-gray-200 hover:text-yellow-400 transition gap-2"
+                  size="20"
+                  style={{
+                    animation: "pulse 2s infinite",
+                    animationDirection: "normal",
+                    animationDuration: "2s",
+                    animationFillMode: "forwards",
+                    animationIterationCount: "infinite",
+                  }}
+                />{" "}
+                Open gigup
+              </Link>
+            )}
+          </>
         )}
       </section>{" "}
       <ScrollToTopButton />

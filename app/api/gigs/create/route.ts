@@ -138,7 +138,7 @@ export async function POST(req: NextRequest) {
   if (!bussinesscat) {
     return NextResponse.json({
       gigstatus: "false",
-      message: "Business category is required",
+      message: "Category is required",
     });
   }
 

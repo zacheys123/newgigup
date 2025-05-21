@@ -56,6 +56,7 @@ import {
 import TalentModal from "./create/TalentModal";
 import SchedulerComponent from "./create/SchedulerComponent";
 import { cn } from "@/lib/utils";
+import { mutate } from "swr";
 
 const CreateGig = () => {
   // State Hooks
@@ -65,7 +66,7 @@ const CreateGig = () => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [imageUrl, setUrl] = useState<string>("");
   const [fileUrl, setFileUrl] = useState<string>("");
-  const { setRefetchData } = useStore();
+  const { setRefetchData, isSchedulerOpen, setisSchedulerOpen } = useStore();
   const { user } = useCurrentUser();
   const [activeTalentType, setActiveTalentType] = useState<TalentType>(null);
   const [showTalentModal, setShowTalentModal] = useState(false);
@@ -116,7 +117,6 @@ const CreateGig = () => {
   const [show, setShow] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
-  const [isSchedulerOpen, setisSchedulerOpen] = useState<boolean>(false);
   const [schedulingProcedure, setSchedulingProcedure] = useState({
     type: "",
     date: new Date(),
@@ -446,6 +446,7 @@ const CreateGig = () => {
         setUserInfo({ prefferences: [] });
         setBussinessCategory(null);
         setFieldErrors({});
+        mutate("/api/gigs/getgigs");
       }
       if (data.gigstatus === "false") {
         setEditMessage(data.message + " try again later");

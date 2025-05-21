@@ -138,6 +138,9 @@ export const initialState = {
   showConfirmModal: false,
   showConfirmation: false,
   lastBookedGigId: "",
+  isSchedulerOpen: false,
+  showTrialModal: false,
+  trialRemainingDays: 0,
 };
 interface OnlineUser {
   userId: string;
@@ -179,6 +182,13 @@ export interface StoreState {
   unreadCounts: Record<string, number>; // { chatId: unreadCount }
   showConfirmation: boolean;
   lastBookedGigId: string | null;
+  isSchedulerOpen: boolean;
+  showTrialModal: boolean;
+  trialRemainingDays: number | null;
+  setTrialRemainingDays: (days: number | null) => void;
+  setShowTrialModal: (data: boolean) => void;
+
+  setisSchedulerOpen: (data: boolean) => void;
   setLastBookedGigId: (data: string | null) => void;
   setShowConfirmation: (data: boolean) => void;
   setData: (data: DashboardData) => void;

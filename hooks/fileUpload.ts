@@ -49,6 +49,10 @@ export const fileupload = async (
   }
   const apiKey = process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY;
   if (!apiKey) {
+    console.error(
+      "API key is missing. Please check your environment variables.",
+      apiKey
+    );
     toast.error("API key is missing. Please check your environment variables.");
     return;
   }
@@ -87,29 +91,22 @@ export const fileupload = async (
     );
 
     const uploadResult = await uploadResponse.json();
+    console.error("Upload result", uploadResult);
     setRefetchData(true);
     if (uploadResponse.ok) {
       if (dep === "video") {
         updatefileFunc(uploadResult.secure_url);
-
-        console.log(
-          "Sending PUT request to:",
-          `/api/user/updateVideo/${user?._id}`
-        );
+        console.error("Upload result url", uploadResult.secure_url);
 
         console.log("Sending PUT request with url:", uploadResult.secure_url);
 
         if (user?._id && uploadResult.secure_url) {
           try {
             if (!user?._id) {
+              console.error("User ID is missing.", user);
               toast.error("User ID is missing.");
               return;
             }
-
-            console.log(
-              "Sending PUT request to:",
-              `/api/user/updateVideo/${user?._id}`
-            );
 
             const url = `/api/user/videoprofile/${user?._id}`;
             console.log("Fetching:", url);
@@ -146,10 +143,12 @@ export const fileupload = async (
           }
         }
       } else if (dep === "image") {
+        console.error("Image Upload successful.", uploadResult?.secure_url);
         toast.success("Image Upload successful.");
-        console.log(uploadResult?.secure_url);
+
         updatefileFunc(uploadResult.secure_url);
       } else {
+        console.error("Upload failed, please try again.");
         toast.error("Upload failed, please try again.");
         console.log(uploadResult);
       }

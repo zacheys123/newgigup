@@ -8,6 +8,12 @@ import { create } from "zustand"; // Import SetState
 
 const useStore = create<StoreState>((set) => ({
   ...initialState,
+
+  setTrialRemainingDays: (days: number | null) =>
+    set({ trialRemainingDays: days }),
+  setShowTrialModal: (data: boolean) => set({ showTrialModal: data }),
+
+  setisSchedulerOpen: (data: boolean) => set(() => ({ isSchedulerOpen: data })),
   setLastBookedGigId: (data: string | null) =>
     set(() => ({ lastBookedGigId: data })),
   setShowConfirmation: (data: boolean) =>
