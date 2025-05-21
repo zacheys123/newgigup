@@ -592,6 +592,15 @@ const CreateGig = () => {
     window.addEventListener("online", handleOnline);
     return () => window.removeEventListener("online", handleOnline);
   }, [isOnline]);
+  useEffect(() => {
+    if (!isOnline && showOfflineNotification) {
+      const timer = setTimeout(() => {
+        setShowOfflineNotification(false);
+      }, 5000); // Auto-dismiss after 5 seconds
+
+      return () => clearTimeout(timer);
+    }
+  }, [isOnline, showOfflineNotification]);
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
       {/* Add near the top of your return */}
@@ -666,29 +675,27 @@ const CreateGig = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className=" flex justify-betweenmb-2 md:mb-10 text-center -mt-4"
+          className=" mb-2 md:mb-10 text-center -mt-4"
         >
           <p className="text-gray-400 font-light">Create Your Gig</p>
-
-          {isOnline && !showOfflineNotification && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="fixed top-4 left-1/2 -translate-x-1/2 z-[9998]"
-            >
-              <div className="bg-emerald-500/90 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 backdrop-blur-sm text-sm">
-                <span>{`You're back online`}</span>
-                <button
-                  onClick={() => setShowOfflineNotification(true)}
-                  className="underline text-white/80 hover:text-white text-lg"
-                >
-                  &times;
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </motion.div>
-
+        </motion.div>{" "}
+        {isOnline && !showOfflineNotification && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="fixed top-4 left-1/2 -translate-x-1/2 z-[9998]"
+          >
+            <div className="bg-emerald-500/90 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 backdrop-blur-sm text-sm">
+              <span>{`You're back online`}</span>
+              <button
+                onClick={() => setShowOfflineNotification(true)}
+                className="underline text-white/80 hover:text-white text-lg"
+              >
+                &times;
+              </button>
+            </div>
+          </motion.div>
+        )}
         <motion.form
           className="space-y-2 md:space-y-10 flex-col"
           initial="hidden"
