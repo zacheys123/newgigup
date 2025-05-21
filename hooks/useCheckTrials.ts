@@ -7,7 +7,7 @@ import { useSubscription } from "./useSubscription";
 export const useCheckTrial = (user: UserProps | null) => {
   const { setShowTrialModal, setTrialRemainingDays } = useStore();
   const { subscription } = useSubscription(user?.clerkId as string);
-  const [isFirstMonthEnd, setisFirstMonEnd] = useState<boolean>();
+  const [isFirstMonthEnd, setisFirstMonthEnd] = useState<boolean>();
   const isPro = subscription?.subscription?.tier !== "free";
 
   useEffect(() => {
@@ -20,7 +20,7 @@ export const useCheckTrial = (user: UserProps | null) => {
 
     const oneMonthLater = new Date(signupDate);
     oneMonthLater.setMonth(signupDate.getMonth() + 1);
-    setisFirstMonEnd(now >= oneMonthLater);
+    setisFirstMonthEnd(now >= oneMonthLater);
 
     // Calculate the number of remaining full days (including today)
     const msInDay = 1000 * 60 * 60 * 24;
@@ -47,5 +47,5 @@ export const useCheckTrial = (user: UserProps | null) => {
       return () => clearTimeout(timeout);
     }
   }, [user, isPro]);
-  return { isFirstMonthEnd };
+  return { isFirstMonthEnd, setisFirstMonthEnd };
 };

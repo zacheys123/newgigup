@@ -169,7 +169,7 @@ const ExperienceGigupPage = () => {
             {!isPro && (
               <div className="text-center mt-10">
                 <Link
-                  href="/upgrade"
+                  href="/dashboard/billing"
                   className="inline-block px-6 py-4 bg-gradient-to-r from-pink-500 via-orange-400 to-yellow-400 text-white font-bold rounded-xl shadow-lg hover:scale-105 transition-transform duration-200"
                 >
                   Upgrade to Pro & Unlock More
@@ -332,7 +332,7 @@ const ExperienceGigupPage = () => {
               {!isPro && (
                 <div className="text-center mt-6">
                   <Link
-                    href="/upgrade"
+                    href="/dashboard/billing"
                     className="inline-block px-8 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-bold rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
                   >
                     Upgrade Now for Full Benefits

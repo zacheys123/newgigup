@@ -41,7 +41,7 @@ export const TrialExpiredModal = () => {
               Upgrade now to keep enjoying all premium features.
             </DialogDescription>
             <button
-              onClick={() => (window.location.href = "/upgrade")}
+              onClick={() => (window.location.href = "/dashboard/billing")}
               className="mt-4 px-6 py-2.5 text-white text-sm sm:text-base rounded-lg bg-gradient-to-r from-purple-600 via-pink-500 to-yellow-400 hover:brightness-110 transition-all"
             >
               Upgrade Now

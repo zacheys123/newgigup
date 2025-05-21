@@ -12,6 +12,8 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 import useStore from "@/app/zustand/useStore";
+import { useCheckTrial } from "@/hooks/useCheckTrials";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 interface Plan {
   name: string;
@@ -27,11 +29,12 @@ interface SubscriptionCardProps {
 
 export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
   const { user } = useUser();
+  const { user: myuser } = useCurrentUser();
   const { subscription, mutateSubscription } = useSubscription(user?.id || "");
   const [isMutating, setIsMutating] = useState(false);
   const { showConfirmModal, setShowConfirmModal } = useStore();
   const [pendingTier, setPendingTier] = useState<"free" | "pro">("free");
-
+  const { setisFirstMonthEnd } = useCheckTrial(myuser?.user);
   const handleSubscriptionChange = async (newTier: "free" | "pro") => {
     if (!user?.id) return;
 
@@ -80,6 +83,7 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
       setPendingTier("free");
       setShowConfirmModal(true);
     } else {
+      setisFirstMonthEnd(false);
       handleSubscriptionChange("pro");
     }
   };

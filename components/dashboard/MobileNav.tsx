@@ -210,7 +210,13 @@ export function MobileNav() {
                             group
                           `}
                             title={link.name}
-                            onClick={() => setIsOpen(false)}
+                            onClick={() => {
+                              if ((link.name = "Home")) {
+                                window.location.reload();
+                                window.location.href = "/";
+                              }
+                              setIsOpen(false);
+                            }}
                           >
                             <div
                               className={`
