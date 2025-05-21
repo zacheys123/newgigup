@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useState } from "react";
 import useStore from "@/app/zustand/useStore";
 import { UserProps } from "@/types/userinterfaces";

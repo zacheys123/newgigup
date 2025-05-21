@@ -1,4 +1,4 @@
-// hooks/useNetworkStatus.ts
+"use client";
 import { useEffect, useState } from "react";
 
 export const useNetworkStatus = () => {
