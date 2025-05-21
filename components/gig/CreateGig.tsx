@@ -68,6 +68,7 @@ import { OfflineNotification } from "../offline/OfflineNotification";
 const CreateGig = () => {
   // State Hooks
   const isOnline = useNetworkStatus();
+  const [showOfflineNotification, setShowOfflineNotification] = useState(false);
   const [hasOfflineDraft, setHasOfflineDraft] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [secretpass, setSecretPass] = useState<boolean>(false);
@@ -92,6 +93,11 @@ const CreateGig = () => {
       // Optionally: Auto-load draft with user confirmation
     }
   }, []);
+  useEffect(() => {
+    if (!isOnline) {
+      setShowOfflineNotification(true);
+    }
+  }, [isOnline]);
   // const [secretreturn] = useState<string>("");
   const [gigInputs, setGigs] = useState<GigInputs>({
     title: "",
@@ -589,8 +595,12 @@ const CreateGig = () => {
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
       {/* Add near the top of your return */}
-      {!isOnline && <OfflineNotification />}
 
+      {showOfflineNotification && !isOnline && (
+        <OfflineNotification
+          onClose={() => setShowOfflineNotification(false)}
+        />
+      )}
       {/* Add this near your form buttons */}
       {hasOfflineDraft && (
         <motion.div
@@ -651,15 +661,32 @@ const CreateGig = () => {
           </motion.div>
         )}
       </AnimatePresence>
-
       <div className="max-w-4xl mx-auto px-4 py-3 md:py-8">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="mb-2 md:mb-10 text-center -mt-4"
+          className=" flex justify-betweenmb-2 md:mb-10 text-center -mt-4"
         >
           <p className="text-gray-400 font-light">Create Your Gig</p>
+
+          {isOnline && !showOfflineNotification && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="fixed top-4 left-1/2 -translate-x-1/2 z-[9998]"
+            >
+              <div className="bg-emerald-500/90 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 backdrop-blur-sm text-sm">
+                <span>{`You're back online`}</span>
+                <button
+                  onClick={() => setShowOfflineNotification(true)}
+                  className="underline text-white/80 hover:text-white text-lg"
+                >
+                  &times;
+                </button>
+              </div>
+            </motion.div>
+          )}
         </motion.div>
 
         <motion.form
@@ -1512,7 +1539,6 @@ const CreateGig = () => {
           </motion.div>
         </motion.form>
       </div>
-
       {/* Modals */}
       <AnimatePresence>
         {showcustomization && (
@@ -1526,7 +1552,6 @@ const CreateGig = () => {
           />
         )}
       </AnimatePresence>
-
       <AnimatePresence>
         {activeTalentType && (
           <TalentModal
