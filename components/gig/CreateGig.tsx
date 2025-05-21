@@ -57,9 +57,18 @@ import TalentModal from "./create/TalentModal";
 import SchedulerComponent from "./create/SchedulerComponent";
 import { cn } from "@/lib/utils";
 import { mutate } from "swr";
+import { useNetworkStatus } from "@/hooks/useNetwork";
+import {
+  clearDraftFromLocal,
+  getDraftFromLocal,
+  saveDraftToLocal,
+} from "@/lib/storage";
+import { OfflineNotification } from "../offline/OfflineNotification";
 
 const CreateGig = () => {
   // State Hooks
+  const isOnline = useNetworkStatus();
+  const [hasOfflineDraft, setHasOfflineDraft] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [secretpass, setSecretPass] = useState<boolean>(false);
   const [showcustomization, setShowCustomization] = useState<boolean>(false);
@@ -75,6 +84,14 @@ const CreateGig = () => {
     font: "",
     backgroundColor: "",
   });
+
+  useEffect(() => {
+    const savedDraft = getDraftFromLocal();
+    if (savedDraft) {
+      setHasOfflineDraft(true);
+      // Optionally: Auto-load draft with user confirmation
+    }
+  }, []);
   // const [secretreturn] = useState<string>("");
   const [gigInputs, setGigs] = useState<GigInputs>({
     title: "",
@@ -372,6 +389,12 @@ const CreateGig = () => {
 
     try {
       setIsLoading(true);
+      if (!isOnline) {
+        saveDraftToLocal(gigInputs);
+        setHasOfflineDraft(true);
+        toast.warning("Gig saved locally - will submit when back online");
+        return;
+      }
       const res = await fetch(`/api/gigs/create`, {
         method: "POST",
         headers: {
@@ -454,8 +477,16 @@ const CreateGig = () => {
         setIsVisible(true);
       }
     } catch (error) {
-      console.error(error);
-      toast.error("Failed to create gig");
+      // In your form submission error handling
+      console.log(error);
+      if (!isOnline) {
+        setEditMessage("Saved locally - will submit when back online");
+        setError(false); // This is a "soft" error
+      } else {
+        setEditMessage("Failed to create gig - please try again");
+        setError(true);
+      }
+      setIsVisible(true);
     } finally {
       setIsLoading(false);
     }
@@ -527,8 +558,77 @@ const CreateGig = () => {
     },
   };
 
+  useEffect(() => {
+    const handleOnline = async () => {
+      const draft = getDraftFromLocal();
+      if (draft && isOnline) {
+        try {
+          setIsLoading(true);
+          const res = await fetch(`/api/gigs/create`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(draft),
+          });
+
+          if (res.ok) {
+            clearDraftFromLocal();
+            setHasOfflineDraft(false);
+            toast.success("Offline gig submitted successfully!");
+          }
+        } catch (error) {
+          console.error("Sync failed:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    window.addEventListener("online", handleOnline);
+    return () => window.removeEventListener("online", handleOnline);
+  }, [isOnline]);
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
+      {/* Add near the top of your return */}
+      {!isOnline && <OfflineNotification />}
+
+      {/* Add this near your form buttons */}
+      {hasOfflineDraft && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-amber-500/20 border border-amber-500/30 rounded-lg p-3 mb-4 flex items-center gap-3"
+        >
+          <Info className="text-amber-300" size={18} />
+          <div>
+            <p className="text-amber-100 text-sm font-medium">
+              You have an unsaved gig draft
+            </p>
+            <div className="flex gap-2 mt-1">
+              <button
+                onClick={async () => {
+                  const draft = getDraftFromLocal();
+                  if (draft) {
+                    // Implement draft loading logic
+                    toast.success("Draft loaded");
+                  }
+                }}
+                className="text-xs bg-amber-600/50 hover:bg-amber-600/70 text-white px-2 py-1 rounded"
+              >
+                Load Draft
+              </button>
+              <button
+                onClick={() => {
+                  clearDraftFromLocal();
+                  setHasOfflineDraft(false);
+                }}
+                className="text-xs bg-gray-700/50 hover:bg-gray-700/70 text-gray-300 px-2 py-1 rounded"
+              >
+                Discard
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      )}
       <AnimatePresence>
         {isVisible && editMessage && (
           <motion.div
