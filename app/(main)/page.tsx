@@ -17,7 +17,7 @@ import { colors, fonts } from "@/utils";
 import { SaveAll } from "lucide-react";
 
 import FloatingNotesLoader from "@/components/loaders/FloatingNotes";
-import useStore from "../zustand/useStore";
+import { useCheckTrial } from "@/hooks/useCheckTrials";
 
 export default function Home() {
   const { isLoaded, userId } = useAuth();
@@ -26,7 +26,7 @@ export default function Home() {
 
   const [showVideo, setShowVideo] = useState(false);
   const [isClientSide, setIsClientSide] = useState(false);
-  const { showTrialModal } = useStore();
+  const { isFirstMonthEnd } = useCheckTrial(user?.user);
   useEffect(() => {
     setIsClientSide(true);
     if (!isLoaded && !userId) {
@@ -201,7 +201,7 @@ export default function Home() {
         {user?.user?.firstname && (
           <>
             {" "}
-            {showTrialModal && (
+            {!isFirstMonthEnd && (
               <Link
                 className="absolute bottom-5 mt-6 px-6 py-1  text-gray-100 text-sm font-semibold rounded-xl  rounded-bl-xl roundedt-l-xl shadow-lg hover:bg-yellow-400 transition animate-bounce flex items-center"
                 style={{ fontFamily: fonts[24], backgroundColor: colors[15] }}
