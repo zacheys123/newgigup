@@ -19,9 +19,16 @@ interface ReactionsProps {
   success: boolean;
   message: string;
 }
-
-const reactionOptions = ["👍", "😀", "😂", "🔥", "😢", "🎉", "😨", "😡"];
-
+const reactionOptions = [
+  { emoji: "👍", name: "Thumbs Up" },
+  { emoji: "😀", name: "Grinning Face" },
+  { emoji: "😂", name: "Tears of Joy" },
+  { emoji: "🔥", name: "Fire" },
+  { emoji: "😢", name: "Crying Face" },
+  { emoji: "🎉", name: "Party Popper" },
+  { emoji: "😨", name: "Fearful Face" },
+  { emoji: "😡", name: "Angry Face" },
+];
 const ChatPage: React.FC<ChatPageProps> = ({ chatId, otherUserTyping }) => {
   const { messages, fetchMessages, updateMessageReaction } = useStore();
 
@@ -108,10 +115,10 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId, otherUserTyping }) => {
     );
 
   return (
-    <div className="flex-1 flex flex-col p-4   rounded-sm relative">
+    <div className="flex-1 flex flex-col p-2 sm:p-4 rounded-sm relative h-full">
       {messages && messages?.length === 0 && (
-        <div className="flex p-2 h-[70%] justify-center items-center bg-inherit">
-          <p className="text-md font-semibold text-neutral-500">
+        <div className="flex p-2 h-[70vh] justify-center items-center bg-inherit">
+          <p className="text-sm sm:text-md font-semibold text-neutral-500 text-center">
             Send a message to start a chat.
           </p>
         </div>
@@ -119,24 +126,22 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId, otherUserTyping }) => {
 
       <div
         ref={messagesContainerRef}
-        className="h-[430px] overflow-y-auto px-3"
+        className="h-[calc(100vh-180px)] sm:h-[calc(100vh-160px)] overflow-y-auto px-1 sm:px-3"
         style={{
-          scrollbarWidth: "none", // Firefox
-          msOverflowStyle: "none", // IE/Edge
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
         }}
       >
         {chatMessages
           .filter((msg: MessageProps) => msg.chatId === chatId)
           .map((msg: MessageProps, index, arr) => {
             const isLastMessage = index === arr.length - 1;
-            // const key = msg._id || msg.tempId || uuidv4();
-            // console.log("Rendering message with key:", key); // Log the key
             return (
               <div
                 key={msg._id || msg.tempId || uuidv4()}
                 className={`flex items-end relative ${
                   msg.sender?._id === user?.user?._id ||
-                  msg.tempId === user?.user?._id // Ensure compatibility with different message structures
+                  msg.tempId === user?.user?._id
                     ? "justify-end"
                     : "justify-start"
                 }`}
@@ -144,61 +149,100 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId, otherUserTyping }) => {
               >
                 {showReaction?.success === true &&
                   messageReactions[msg._id || ""] && (
-                    <div className="absolute top-[12px] z-50 right-0 px-3 py-1 bg-gray-800 text-white text-xs rounded-md shadow-md animate-fadeIn">
+                    <div className="absolute top-[8px] sm:top-[12px] z-50 right-0 px-2 sm:px-3 py-1 bg-gray-800 text-white text-[10px] sm:text-xs rounded-md shadow-md animate-fadeIn">
                       {showReaction?.message
                         ? `'${showReaction?.message}'`
-                        : `Reacted with ${reactionOptions[0]}`}
+                        : `Reacted with ${reactionOptions[0].emoji}`}
                     </div>
                   )}
                 <div
-                  className={`relative max-w-xs md:max-w-sm px-4 py-3 text-sm md:text-base rounded-2xl shadow-xl transition-all duration-300 transform my-3 ${
+                  className={`relative max-w-[85%] xs:max-w-xs sm:max-w-md px-2 sm:px-3 py-1 sm:py-2 text-xs sm:text-sm md:text-base rounded-lg my-1 ${
                     msg.sender?._id === user?.user?._id
-                      ? "bg-gradient-to-bl from-green-900 via-gray-600 to-blue-700 text-white rounded-br-md self-end"
-                      : "bg-gradient-to-r from-amber-900 via-zinc-600  to-amber-400 text-white rounded-bl-md self-start"
+                      ? "bg-[#D9FDD3] ml-auto rounded-tr-none"
+                      : "bg-white mr-auto rounded-tl-none"
                   }`}
+                  style={{
+                    boxShadow: "0 1px 0.5px rgba(0,0,0,0.13)",
+                    wordBreak: "break-word",
+                  }}
                 >
-                  <span className="block">{msg.content}</span>
+                  <span className="block text-neutral-600">{msg.content}</span>
 
-                  {/* Timestamp */}
-                  <span className="text-[11px] text-gray-300 dark:text-gray-400 mt-1 block text-right">
-                    {moment(msg?.createdAt || new Date()).calendar(null, {
-                      sameDay: "[Today at] h:mm A",
-                      lastDay: "[Yesterday at] h:mm A",
-                      lastWeek: "dddd [at] h:mm A",
-                      sameElse: "MMMM D [at] h:mm A",
-                    })}
-                  </span>
+                  <div className="flex justify-end items-center mt-0.5 sm:mt-1 space-x-1">
+                    <span className="text-[10px] sm:text-xs text-gray-500 opacity-80">
+                      {moment(msg?.createdAt || new Date()).format("h:mm A")}
+                    </span>
+                    {msg.sender?._id === user?.user?._id && (
+                      <span
+                        className={`text-[10px] sm:text-xs ${
+                          !msg.read ? "text-gray-500" : "text-blue-500"
+                        }`}
+                      >
+                        ✓✓
+                      </span>
+                    )}
+                  </div>
 
-                  {/* Reaction Button */}
-                  <div className="absolute -bottom-4 right-1">
+                  <div className="absolute -bottom-2.5 sm:-bottom-3 right-0 flex items-center">
                     <button
-                      className="text-lg hover:scale-110 transition"
+                      className={`text-xs sm:text-sm rounded-full p-0.5 sm:p-1 transition-all duration-200 ${
+                        reactionPopup === msg._id
+                          ? "bg-gray-200 dark:bg-gray-700 scale-110"
+                          : "bg-white dark:bg-gray-800 shadow-sm hover:scale-110"
+                      }`}
                       onClick={() =>
                         setReactionPopup(
                           reactionPopup === msg._id ? "" : msg?._id || ""
                         )
                       }
                     >
-                      {msg?.reactions && msg?.sender?._id !== user?.user?._id
-                        ? msg?.reactions
-                        : messageReactions[msg._id || ""] ||
-                          (msg.reactions ?? [])[0] ||
-                          "💗"}
+                      {msg?.reactions ? (
+                        <span className="flex items-center justify-center w-4 h-4 sm:w-5 sm:h-5">
+                          {msg.reactions}
+                        </span>
+                      ) : (
+                        <span className="text-gray-500 text-[10px] sm:text-xs">
+                          •••
+                        </span>
+                      )}
                     </button>
                   </div>
 
-                  {/* Reaction Popup */}
                   {reactionPopup === msg._id && (
-                    <div className="absolute bottom-[37px] right-2 bg-white dark:bg-gray-800 shadow-md p-2 rounded-lg flex w-full space-x-2 z-50 overflow-x-auto">
-                      {reactionOptions.map((emoji) => (
-                        <button
-                          key={emoji}
-                          onClick={() => handleReaction(msg._id || "", emoji)}
-                          className="text-lg hover:scale-125 transition"
-                        >
-                          {emoji}
-                        </button>
-                      ))}
+                    <div className="absolute bottom-6 sm:bottom-8 right-0 bg-white dark:bg-gray-800 shadow-xl rounded-full flex px-1 sm:px-2 py-0.5 sm:py-1 z-50 border border-gray-100 dark:border-gray-600">
+                      <div className="flex space-x-0.5 sm:space-x-1">
+                        {reactionOptions.map(({ emoji, name }) => (
+                          <button
+                            key={emoji}
+                            onClick={() => {
+                              handleReaction(msg._id || "", emoji);
+                              setReactionPopup("");
+                            }}
+                            className={`text-lg sm:text-xl w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center rounded-full transition-all duration-100 ${
+                              msg.reactions === emoji ||
+                              messageReactions[msg._id || ""] === emoji
+                                ? "bg-blue-100 dark:bg-blue-900 scale-110 sm:scale-125"
+                                : "hover:bg-gray-100 dark:hover:bg-gray-700 hover:scale-105 sm:hover:scale-110"
+                            }`}
+                            title={name}
+                            aria-label={`React with ${name}`}
+                          >
+                            {emoji}
+                            {(msg.reactions === emoji ||
+                              messageReactions[msg._id || ""] === emoji) && (
+                              <span className="absolute -bottom-1 text-[8px] sm:text-[10px] text-blue-500 dark:text-blue-300">
+                                ✓
+                              </span>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                      <button
+                        className="ml-1 sm:ml-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xs sm:text-sm"
+                        onClick={() => setReactionPopup("")}
+                      >
+                        ×
+                      </button>
                     </div>
                   )}
                 </div>
@@ -206,15 +250,6 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId, otherUserTyping }) => {
             );
           })}
 
-        {/* Typing Indicator */}
-        {/* {isTyping && !otherUserTyping && (
-          <div className="flex items-center space-x-1 text-gray-200 bg-neutral-300 rounded-full w-fit px-2">
-            <span className="animate-bounce">•</span>
-            <span className="animate-bounce delay-100">•</span>
-            <span className="animate-bounce delay-200">•</span>
-          </div>
-        )}
-         */}
         {otherUserTyping && (
           <motion.div
             initial={{ y: 10, opacity: 0, scale: 0.9 }}
@@ -237,41 +272,41 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatId, otherUserTyping }) => {
             className="flex justify-start mb-2"
           >
             <div className="relative">
-              {/* Speech bubble tip */}
-              <div className="absolute -left-1 bottom-0 w-3 h-3 bg-gray-700 transform -skew-x-12" />
-
-              {/* Bubble body */}
+              <div className="absolute -left-1 bottom-0 w-2 h-2 sm:w-3 sm:h-3 bg-gray-700 transform -skew-x-12" />
               <motion.div
-                className="bg-gradient-to-r from-purple-600 via-cyan-500 to-yellow-500 text-green-500 px-4 py-2 rounded-xl rounded-bl-none shadow-lg"
+                className="bg-gradient-to-r from-purple-600 via-cyan-500 to-yellow-500 px-3 py-1 sm:px-4 sm:py-2 rounded-xl rounded-bl-none shadow-lg"
                 whileHover={{ scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 400 }}
               >
-                <div className="flex space-x-1.5">
+                <div className="flex space-x-1 sm:space-x-1.5">
                   <motion.span
-                    animate={{ y: [0, -4, 0] }}
+                    animate={{ y: [0, -3, 0] }}
                     transition={{ repeat: Infinity, duration: 0.8 }}
-                    className="block w-2 h-2 rounded-full bg-white"
+                    className="block w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white"
                   />
                   <motion.span
-                    animate={{ y: [0, -4, 0] }}
-                    transition={{ repeat: Infinity, duration: 0.8, delay: 0.2 }}
-                    className="block w-2 h-2 rounded-full bg-white"
+                    animate={{ y: [0, -3, 0] }}
+                    transition={{
+                      repeat: Infinity,
+                      duration: 0.8,
+                      delay: 0.2,
+                    }}
+                    className="block w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white"
                   />
                   <motion.span
-                    animate={{ y: [0, -4, 0] }}
-                    transition={{ repeat: Infinity, duration: 0.8, delay: 0.4 }}
-                    className="block w-2 h-2 rounded-full bg-white"
+                    animate={{ y: [0, -3, 0] }}
+                    transition={{
+                      repeat: Infinity,
+                      duration: 0.8,
+                      delay: 0.4,
+                    }}
+                    className="block w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white"
                   />
                 </div>
               </motion.div>
             </div>
           </motion.div>
         )}
-        {/* {otherUserTyping && (
-          <div className="text-xs text-gray-400 italic">typing...</div>
-        )} */}
-
-        {/* Auto-scroll reference */}
       </div>
       <style jsx>{`
         .overflow-y-auto::-webkit-scrollbar {

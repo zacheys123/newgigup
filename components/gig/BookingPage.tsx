@@ -10,8 +10,6 @@ import React, { useEffect, useState } from "react";
 import Modal from "../Modal";
 import { UserProps } from "@/types/userinterfaces";
 import { ChatBubbleOvalLeftIcon } from "@heroicons/react/24/solid";
-import useSocket from "@/hooks/useSocket";
-import { toast } from "sonner";
 import { GigProps } from "@/types/giginterface";
 import MusicWaveLoader from "../loaders/MusicWaver";
 import { motion } from "framer-motion";
@@ -27,7 +25,6 @@ const BookingPage = ({ currentGig }: BookingProps) => {
   const { loading, forgetBookings } = useForgetBookings();
   const { user } = useCurrentUser();
   const router = useRouter();
-  const { socket } = useSocket();
   const forget = () =>
     forgetBookings(user?.user?._id as string, currentgig, userId as string);
 
@@ -84,26 +81,6 @@ const BookingPage = ({ currentGig }: BookingProps) => {
   const handleOpenX = () => {
     setShowX(false);
   };
-
-  useEffect(() => {
-    if (socket) {
-      socket.on("musicianBooked", ({ gigId, message }) => {
-        console.log(gigId);
-        toast.success(message);
-      });
-
-      socket.on("updateGigStatus", ({ gigId, isTaken }) => {
-        if (isTaken && gigId && currentgig?.bookedBy !== user?.user?._id) {
-          router.push(`/gigs/${userId}`);
-        }
-      });
-
-      return () => {
-        socket.off("musicianBooked");
-        socket.off("updateGigStatus");
-      };
-    }
-  }, [socket, currentgig, userId, router, user?.user?._id]);
 
   if (!currentgig?.title || !user?.user?.firstname) {
     return (

@@ -74,12 +74,14 @@ const Published = () => {
   }, [socket, updateGigStatus]);
 
   const [sortOption, setSortOption] = useState<string>("popular");
+  const [timelineOption, setTimelineOption] = useState<string>("once");
   const filteredGigs = useMemo(() => {
     const filtered = filterGigs(gigs, {
       searchQuery: debouncedSearch,
       category,
       location,
       scheduler,
+      timelineOption,
     });
 
     // Additional filtering for user-specific conditions
@@ -106,6 +108,7 @@ const Published = () => {
           const priceB = parseFloat(b.price || "0") || 0;
           return priceB - priceA;
         });
+
         break;
       case "popular":
         result.sort(
@@ -134,6 +137,7 @@ const Published = () => {
     scheduler,
     userId,
     sortOption,
+    timelineOption,
   ]);
   const isLoading = gigsLoading;
   const [showFilters, setShowFilters] = useState(false);
@@ -288,16 +292,27 @@ const Published = () => {
                   </p>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <span className="text-sm text-gray-400">Sort:</span>
+                  <div className="flex items-center space-x-3">
+                    <span className="text-xs text-gray-400">Sort:</span>
+                    <select
+                      value={sortOption}
+                      onChange={(e) => setSortOption(e.target.value)}
+                      className="text-xs bg-gray-600 border-gray-700 rounded-lg focus:ring-amber-500 focus:border-amber-500 text-white p-2"
+                    >
+                      <option value="relevance">Relevance</option>
+                      <option value="newest">Newest First</option>
+                      <option value="highest">Highest Budget</option>
+                      <option value="popular">Most Viewed</option>{" "}
+                    </select>
+                  </div>
                   <select
-                    value={sortOption}
-                    onChange={(e) => setSortOption(e.target.value)}
-                    className="text-sm bg-gray-600 border-gray-700 rounded-lg focus:ring-amber-500 focus:border-amber-500 text-white p-2"
+                    value={timelineOption}
+                    onChange={(e) => setTimelineOption(e.target.value)}
+                    className="text-xs bg-gray-600 border-gray-700 rounded-lg focus:ring-amber-500 focus:border-amber-500 text-white p-2"
                   >
-                    <option value="relevance">Relevance</option>
-                    <option value="newest">Newest First</option>
-                    <option value="highest">Highest Budget</option>
-                    <option value="popular">Most Viewed</option>
+                    <option value="once">Once Gigs/Functions</option>
+                    <option value="weekly">Weekly Gigs</option>
+                    <option value="other">Other Timeline </option>
                   </select>
                 </div>
               </div>

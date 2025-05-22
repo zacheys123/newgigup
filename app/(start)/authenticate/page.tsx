@@ -52,6 +52,7 @@ const Authenticate = () => {
                           if (!myuser?.user?.firstname) {
                             router.push(`/roles/${user?.id}`);
                           } else {
+                            window.location.reload();
                             router.push("/");
                           }
                         }

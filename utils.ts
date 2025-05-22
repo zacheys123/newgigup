@@ -8,6 +8,7 @@ interface SearchOptions {
   category?: string;
   location?: string;
   scheduler?: "all" | "notPending" | "pending" | string; // Hybrid approach
+  timelineOption: "once" | "weekly" | "other" | string; // Hybrid approach
 }
 function gigme(query: string, gig: GigProps): boolean {
   const lowerQuery = query.toLowerCase();
@@ -41,6 +42,7 @@ export const filterGigs = (
     category = "all",
     location = "all",
     scheduler = "all",
+    timelineOption = "once",
   } = options;
 
   return data.filter((gig) => {
@@ -50,6 +52,15 @@ export const filterGigs = (
       if (scheduler === "notPending") {
         return gig?.isPending === false && gig?.isTaken === false;
       }
+    }
+    if (timelineOption.trim() !== "once") {
+      if (timelineOption === "weekly") {
+        return gig?.gigtimeline.trim() === "weekly";
+      }
+      if (timelineOption === "other") {
+        return gig?.gigtimeline.trim() === "other";
+      }
+      return gig?.gigtimeline.trim() === "once";
     }
     // Handle search query if present
     if (searchQuery?.trim() && !gigme(searchQuery, gig)) {

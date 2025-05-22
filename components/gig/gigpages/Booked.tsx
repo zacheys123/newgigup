@@ -11,14 +11,20 @@ import { BanIcon, Video } from "lucide-react";
 
 import GigCard from "./GigCard";
 import { Search } from "react-feather";
+import { UserProps } from "@/types/userinterfaces";
+import ChatModal from "./ChatModal";
 
 const Booked = () => {
   const { loading: gigsLoading, gigs } = useAllGigs();
 
+  const [modal, setModal] = useState<{
+    type: "chat" | "video";
+    user: UserProps;
+  } | null>(null);
   const [typeOfGig, setTypeOfGig] = useState<string>("");
   const debouncedSearch = useDebounce(typeOfGig, 300);
 
-  const { showVideo, setShowVideo, currentgig } = useStore();
+  const { showVideo, setShowVideo, currentgig, currentUser: user } = useStore();
 
   const filterGigs = (gigs: GigProps[], searchquery?: string) => {
     let sortedData = gigs;
@@ -45,11 +51,19 @@ const Booked = () => {
     const filtered = filterGigs(gigs, debouncedSearch);
     return (
       filtered?.filter(
-        (gig: GigProps) => gig?.isTaken === true && gig?.isPending === false
+        (gig: GigProps) =>
+          gig?.isTaken === true &&
+          gig?.isPending === false &&
+          gig?.bookedBy?._id === user?._id
       ) || []
     );
   }, [gigs, debouncedSearch]);
 
+  const [showX, setShowX] = useState(false);
+  console.log(showX);
+  const handleOpenX = () => {
+    setShowX(false);
+  };
   return (
     <div className="flex flex-col h-[calc(100vh-100px)] w-full bg-gradient-to-br from-gray-900 to-gray-800">
       {/* Main Content Area */}
@@ -144,9 +158,32 @@ const Booked = () => {
                   transition={{ duration: 0.3 }}
                   className="relative bg-gray-800/50 backdrop-blur-sm rounded-xl overflow-hidden border border-gray-700/50 hover:border-indigo-500/50 transition-all duration-300 shadow-lg hover:shadow-indigo-500/10"
                 >
-                  <GigCard gig={gig} />
+                  <GigCard
+                    gig={gig}
+                    onOpenChat={(type, user) => setModal({ type, user })}
+                  />
                 </motion.div>
               ))}
+            </div>
+          )}
+          {modal && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+              {/* Backdrop with smooth transition */}
+              <div
+                className="absolute inset-0 bg-gray-900/80 backdrop-blur-md transition-opacity duration-300 ease-in-out"
+                onClick={() => setModal(null)}
+              />
+
+              {/* Modal container with subtle scale animation */}
+              <div className="relative transform transition-all duration-300 ease-out sm:scale-100 scale-95">
+                <ChatModal
+                  onClose={() => setModal(null)}
+                  modal={modal}
+                  user={user}
+                  onOpenX={handleOpenX}
+                  className=""
+                />
+              </div>
             </div>
           )}
         </div>

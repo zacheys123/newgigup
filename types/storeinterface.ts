@@ -141,6 +141,7 @@ export const initialState = {
   isSchedulerOpen: false,
   showTrialModal: false,
   trialRemainingDays: 0,
+  showOfflineNotification: false,
 };
 interface OnlineUser {
   userId: string;
@@ -185,6 +186,9 @@ export interface StoreState {
   isSchedulerOpen: boolean;
   showTrialModal: boolean;
   trialRemainingDays: number | null;
+  showOfflineNotification: boolean;
+  setShowOfflineNotification: (data: boolean) => void;
+
   setTrialRemainingDays: (days: number | null) => void;
   setShowTrialModal: (data: boolean) => void;
 

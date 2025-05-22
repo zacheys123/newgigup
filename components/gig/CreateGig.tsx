@@ -68,7 +68,7 @@ import { OfflineNotification } from "../offline/OfflineNotification";
 const CreateGig = () => {
   // State Hooks
   const isOnline = useNetworkStatus();
-  const [showOfflineNotification, setShowOfflineNotification] = useState(false);
+
   const [hasOfflineDraft, setHasOfflineDraft] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [secretpass, setSecretPass] = useState<boolean>(false);
@@ -76,7 +76,13 @@ const CreateGig = () => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [imageUrl, setUrl] = useState<string>("");
   const [fileUrl, setFileUrl] = useState<string>("");
-  const { setRefetchData, isSchedulerOpen, setisSchedulerOpen } = useStore();
+  const {
+    setRefetchData,
+    isSchedulerOpen,
+    setisSchedulerOpen,
+    showOfflineNotification,
+    setShowOfflineNotification,
+  } = useStore();
   const { user } = useCurrentUser();
   const [activeTalentType, setActiveTalentType] = useState<TalentType>(null);
   const [showTalentModal, setShowTalentModal] = useState(false);
@@ -679,23 +685,6 @@ const CreateGig = () => {
         >
           <p className="text-gray-400 font-light">Create Your Gig</p>
         </motion.div>{" "}
-        {isOnline && !showOfflineNotification && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="fixed top-4 left-1/2 -translate-x-1/2 z-[9998]"
-          >
-            <div className="bg-emerald-500/90 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 backdrop-blur-sm text-sm">
-              <span>{`You're back online`}</span>
-              <button
-                onClick={() => setShowOfflineNotification(true)}
-                className="underline text-white/80 hover:text-white text-lg"
-              >
-                &times;
-              </button>
-            </div>
-          </motion.div>
-        )}
         <motion.form
           className="space-y-2 md:space-y-10 flex-col"
           initial="hidden"

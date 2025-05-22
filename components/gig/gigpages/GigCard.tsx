@@ -18,13 +18,14 @@ import { MapPin, RefreshCcw } from "react-feather";
 import { useVideoActions } from "@/hooks/useVideoActions";
 import { toast } from "sonner";
 import CountUp from "react-countup";
-import Chat from "@/components/chat/Chat";
+
 import { ChatBubbleLeftIcon } from "@heroicons/react/24/solid";
 
 interface AllGigsComponentProps {
   gig: GigProps;
+  onOpenChat: (type: "chat", user: UserProps) => void;
 }
-const GigCard = ({ gig }: AllGigsComponentProps) => {
+const GigCard = ({ gig, onOpenChat }: AllGigsComponentProps) => {
   const { userId } = useAuth();
   const { setShowVideo, setCurrentGig } = useStore();
   const [loadingGig, setLoadingGig] = useState<string>("");
@@ -50,15 +51,10 @@ const GigCard = ({ gig }: AllGigsComponentProps) => {
   const [showVideoModal, setShowVideoModal] = useState(false);
 
   const postedByUser = gig?.postedBy;
-  const [showX, setShowX] = useState(false);
-  console.log(showX);
-  const handleOpenX = () => {
-    setShowX(false);
+
+  const handleOpenChat = () => {
+    onOpenChat("chat", postedByUser);
   };
-  const [modal, setModal] = useState<{
-    type: "chat" | "video";
-    user: UserProps;
-  } | null>(null);
   return (
     <motion.div
       key={gig?._id}
@@ -90,7 +86,6 @@ const GigCard = ({ gig }: AllGigsComponentProps) => {
         <p className="text-gray-300 text-sm leading-relaxed mb-5 line-clamp-3 capitalize">
           {gig.description}
         </p>
-
         {/* Price and Engagement Metrics */}
         <div className="flex items-center justify-between mb-5 flex-col space-y-3">
           <div className="flex items-center space-x-1">
@@ -112,16 +107,15 @@ const GigCard = ({ gig }: AllGigsComponentProps) => {
               <RefreshCcw className="w-3.5 h-3.5 mr-1.5" />
               Refresh
             </button>
-            <button
-              onClick={() => {
-                setShowX(true);
-                setModal({ type: "chat", user: postedByUser });
-              }}
-              className="p-2.5 bg-gray-700 hover:bg-gray-600 rounded-full text-yellow-400 hover:text-yellow-300 transition-all duration-200 shadow"
-              aria-label="Chat"
-            >
-              <ChatBubbleLeftIcon className="w-4 h-4" />
-            </button>
+            {testfilteredvids.length === 0 && (
+              <button
+                onClick={handleOpenChat}
+                className="p-2.5 bg-gray-700 hover:bg-gray-600 rounded-full text-yellow-400 hover:text-yellow-300 transition-all duration-200 shadow"
+                aria-label="Chat"
+              >
+                <ChatBubbleLeftIcon className="w-4 h-4" />
+              </button>
+            )}
           </div>{" "}
           <div className="flex items-center gap-2">
             <span className="text-xs font-medium text-gray-400">
@@ -132,7 +126,6 @@ const GigCard = ({ gig }: AllGigsComponentProps) => {
             </span>
           </div>
         </div>
-
         {/* Progress Indicator */}
         {testfilteredvids && (
           <div className="mb-4">
@@ -172,19 +165,23 @@ const GigCard = ({ gig }: AllGigsComponentProps) => {
                 <span className="text-sm">Add Content</span>
               </button>
             )}
-            <button
-              onClick={() => forget(gig)}
-              className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-rose-600/90 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white py-2.5 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-rose-500/20"
-            >
-              {loadingGig === gig._id ? (
-                <CircularProgress size={16} className="text-white" />
-              ) : (
-                <>
-                  <Trash2 className="w-4 h-4" />
-                  <span className="text-sm">Cancel</span>
-                </>
-              )}
-            </button>
+
+            {/* Only show cancel button if no videos have been added */}
+            {testfilteredvids.length === 0 && (
+              <button
+                onClick={() => forget(gig)}
+                className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-rose-600/90 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white py-2.5 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-rose-500/20"
+              >
+                {loadingGig === gig._id ? (
+                  <CircularProgress size={16} className="text-white" />
+                ) : (
+                  <>
+                    <Trash2 className="w-4 h-4" />
+                    <span className="text-sm">Cancel</span>
+                  </>
+                )}
+              </button>
+            )}
           </div>
         ) : (
           <div className="animate-pulse flex space-x-4">
@@ -224,22 +221,15 @@ const GigCard = ({ gig }: AllGigsComponentProps) => {
       <VideoModal
         isOpen={showVideoModal}
         title={`${gig?.title} Content`}
-        onClose={() => setShowVideoModal(false)}
+        onClose={() => {
+          setRefetch((prev) => !prev);
+          setShowVideoModal(false);
+        }}
         videos={testfilteredvids}
         dep="videos"
         validUserId={validUserId}
         setRefetch={setRefetch}
       />
-      {modal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-          <ChatModal
-            onClose={() => setModal(null)}
-            modal={modal}
-            user={user?.user}
-            onOpenX={handleOpenX}
-          />
-        </div>
-      )}
     </motion.div>
   );
 };
@@ -418,41 +408,3 @@ const VideoModal = ({
     </>
   );
 };
-
-interface ModalProps {
-  onOpenX: () => void;
-  onClose: () => void;
-  modal: {
-    type: string;
-    user: UserProps;
-  };
-  user: UserProps;
-}
-
-const ChatModal: React.FC<ModalProps> = ({ onClose, modal, user, onOpenX }) => (
-  <motion.div
-    initial={{ scale: 0.8, opacity: 0 }}
-    animate={{ scale: 1, opacity: 1 }}
-    transition={{ duration: 0.3 }}
-    className=" rounded-lg p-6 shadow-lg max-w-md w-full text-white relative flex  h-[100%] justify-center items-center"
-  >
-    <div className="h-[70%] ">
-      <h2 className="text-xl font-bold mb-4">
-        {modal.type === "chat" && (
-          <Chat
-            onClose={onClose}
-            modal={modal}
-            myuser={user}
-            onOpenX={onOpenX}
-          />
-        )}
-      </h2>
-      <button
-        onClick={onClose}
-        className="absolute top-8 right-12 text-gray-200 hover:text-white transition-all"
-      >
-        ✕
-      </button>
-    </div>
-  </motion.div>
-);

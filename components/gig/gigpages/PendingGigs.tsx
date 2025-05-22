@@ -27,6 +27,8 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { CircularProgress } from "@mui/material";
 import { Button } from "@/components/ui/button";
 import { Briefcase } from "react-feather";
+import useSocket from "@/hooks/useSocket";
+import { toast } from "sonner";
 
 const PendingGigs = () => {
   const { userId } = useAuth();
@@ -124,6 +126,39 @@ const PendingGigs = () => {
     router.refresh();
   };
 
+  const { socket } = useSocket();
+  // notification for the user who booked a gig...their pagee reffreshes
+  useEffect(() => {
+    if (socket) {
+      socket.on("musicianBooked", ({ gigId, message }) => {
+        console.log(gigId);
+        toast.success(message);
+        // Refresh the gigs data
+        router.refresh();
+      });
+
+      socket.on("updateGigStatus", ({ gigId, isTaken }) => {
+        if (isTaken) {
+          // Filter out the taken gig from local state
+          setLocalGigs((prevGigs) =>
+            prevGigs.filter((gig) => gig._id !== gigId)
+          );
+          // Also update the pending count
+          setPendingGigsCount(localGigs?.length - 1);
+
+          // Optionally redirect if needed
+          // if (userId) {
+          //   router.push(`/gigs/${userId}`);
+          // }
+        }
+      });
+
+      return () => {
+        socket.off("musicianBooked");
+        socket.off("updateGigStatus");
+      };
+    }
+  }, [socket, userId, router, setPendingGigsCount, localGigs]);
   const renderCategorySpecificContent = (gig: GigProps) => {
     switch (gig.bussinesscat?.toLowerCase()) {
       case "DJ":
