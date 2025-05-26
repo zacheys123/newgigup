@@ -13,15 +13,16 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const dbUser = await User.findOne({ clerkId: userId });
+    const dbUser = await User.findOne({ clerkId: userId }).select(
+      "isAdmin adminRole adminPermissions"
+    );
 
     if (!dbUser?.isAdmin) {
       return NextResponse.json({ message: "Forbidden" }, { status: 403 });
     }
 
     return NextResponse.json({
-      isAdmin: dbUser?.isAdmin,
-      adminRole: dbUser?.adminRole,
+      dbUser,
     });
   } catch (error) {
     console.error("Admin verification error:", error);

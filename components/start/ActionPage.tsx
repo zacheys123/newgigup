@@ -220,33 +220,44 @@ const ActionPage = () => {
       organization,
     ]
   );
+  const [modal, setModal] = useState(false);
+
+  const [adminRole, setAdminRoles] = useState("");
 
   const [adminLoad, setAdminLoad] = useState(false);
   const connectAsAdmin = useCallback(async () => {
     setAdminLoad(true);
     try {
-      const success = await registerUser(true);
-      if (success) {
-        setMoreInfo(false);
-        toast.success(
-          `${
-            roleType === "instrumentalist"
-              ? "Successfully Registered as an Instrumentalist"
-              : roleType === "dj"
-              ? "Successfully Registered as a Dj"
-              : roleType === "mc"
-              ? "Successfully Registered as a EMcee"
-              : roleType === "vocalist"
-              ? "Successfully Registered as a Vocalist"
-              : ""
-          }`
-        );
-        router.push("/dashboard"); // Unified dashboard redirect
-      }
+      if (!city) toast.error("City is required");
+
+      if (!adminRole) toast.error("City is required");
+      const res = await fetch(`/api/admin/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          city,
+          tier: "pro",
+          adminRole,
+          adminEmail: transformedUser?.emailAddresses[0]?.emailAddress,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Registration failed");
+
+      window.localStorage.setItem("user", JSON.stringify(data.results));
+      setModal(false);
+      toast.success("Successfully Registered you as Admin");
+      router.push("/admin/dashboard"); // Unified dashboard redirect
+    } catch (err) {
+      console.error(err);
+      toast.error("Registration failed");
+      return false;
     } finally {
       setAdminLoad(false);
     }
-  }, [registerUser, router, roleType]);
+  }, [router, city, transformedUser]);
 
   const connectAsMusician = useCallback(async () => {
     setMusicianLoad(true);
@@ -309,9 +320,6 @@ const ActionPage = () => {
     },
     [myuser]
   );
-  const [modal, setModal] = useState(false);
-
-  const [adminRole, setAdminRoles] = useState("");
 
   const handleModal = () => {
     setModal(true);
@@ -336,7 +344,7 @@ const ActionPage = () => {
   const renderAdminModal = () => {
     return (
       <Modal
-        isOpen={!modal}
+        isOpen={modal}
         onClose={handleOnClose}
         title="Welcome to Admin Portal"
         description="Register as Admin"
@@ -627,7 +635,7 @@ const ActionPage = () => {
         )}
       </AnimatePresence>
       <AnimatePresence>
-        {!modal && (
+        {modal && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -704,7 +712,7 @@ const ActionPage = () => {
               accent: "emerald",
               description: "Register as Admin",
               buttonText: "Admin Initiallization",
-              onClick: () => handleModal,
+              onClick: () => handleModal(),
               disabled: false,
             },
           ].map((card) => (

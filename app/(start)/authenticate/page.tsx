@@ -51,6 +51,8 @@ const Authenticate = () => {
                         if (isLoaded) {
                           if (!myuser?.user?.firstname) {
                             router.push(`/roles/${user?.id}`);
+                          } else if (myuser?.user?.isAdmin) {
+                            router.push(`/admin/dashboard`);
                           } else {
                             window.location.reload();
                             router.push("/");
