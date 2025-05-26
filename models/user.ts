@@ -75,11 +75,25 @@ interface IUser extends Document {
   lastBookingDate?: Date;
   createdAt: Date;
   updatedAt: Date;
+  isAdmin: boolean;
+  adminRole?: "super" | "content" | "support" | "analytics";
+  adminPermissions?: string[];
+  lastAdminAction?: Date;
+  adminNotes?: string;
 }
 
 // Define Mongoose Schema
 const userSchema = new Schema<IUser>(
   {
+    isAdmin: { type: Boolean, default: false },
+    adminRole: {
+      type: String,
+      enum: ["super", "content", "support", "analytics"],
+      default: undefined,
+    },
+    adminPermissions: { type: [String], default: [] },
+    lastAdminAction: Date,
+    adminNotes: String,
     clerkId: { type: String, required: true, unique: true },
     picture: String,
     firstname: { type: String, lowercase: true },

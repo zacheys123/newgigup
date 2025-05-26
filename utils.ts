@@ -148,6 +148,11 @@ export const postedBy = {
   onboardingComplete: false,
   lastActive: new Date(),
   createdAt: new Date(),
+  isAdmin: false,
+  adminRole: "",
+  adminPermissions: [""],
+  lastAdminAction: new Date(),
+  adminNotes: "",
 };
 
 export const instruments = [

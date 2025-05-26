@@ -70,6 +70,11 @@ const VideoProfile = () => {
               lastActive: new Date(),
               year: "",
               createdAt: new Date(),
+              isAdmin: false,
+              adminRole: "super",
+              adminPermissions: [""],
+              lastAdminAction: new Date(),
+              adminNotes: "",
             },
           });
         }

@@ -21,7 +21,7 @@ const Authenticate = () => {
   const { isLoaded } = useAuth();
   const LoadingPage = useCallback(() => {
     setfirstloader(true);
-
+    console.log("my data", myuser);
     // Store timeouts in refs
     timeoutRefs.current.push(
       setTimeout(() => {

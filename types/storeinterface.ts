@@ -78,6 +78,11 @@ export const initialState = {
     onboardingComplete: false,
     lastActive: new Date(),
     createdAt: new Date(),
+    isAdmin: false,
+    adminRole: "super",
+    adminPermissions: [""],
+    lastAdminAction: new Date(),
+    adminNotes: "",
   },
   currentgig: {
     _id: "",

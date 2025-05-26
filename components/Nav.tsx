@@ -16,7 +16,9 @@ const Nav = () => {
   const router = useRouter();
   const { user } = useCurrentUser();
   const { isFirstMonthEnd } = useCheckTrial(user?.user);
-  console.log(isFirstMonthEnd);
+
+  const isAdmin = user?.user?.isAdmin;
+
   return (
     <nav className="sticky top-0 w-full bg-neutral-900 text-white shadow-md py-4 px-6 flex items-center justify-between  shadow-slate-700 ">
       {/* Logo on the left side */}
@@ -53,6 +55,11 @@ const Nav = () => {
                   <Settings size="21" />
                   <span className="hidden md:inline">FAQ</span>
                 </Link>
+                {isAdmin && (
+                  <Link href="/admin" className="text-sm font-medium">
+                    Admin
+                  </Link>
+                )}
               </>
             )}
             <UserButton afterSignOutUrl="/" />

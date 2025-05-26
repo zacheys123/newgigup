@@ -235,6 +235,40 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+/* styles/globals.css */
+
+/* Navbar styles */
+.sticky-nav {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  border-bottom: 1px solid hsl(var(--border));
+  background-color: hsl(var(--background) / 0.95);
+  backdrop-filter: blur(20px);
+}
+
+@supports (backdrop-filter: blur(20px)) {
+  .sticky-nav {
+    background-color: hsl(var(--background) / 0.6);
+  }
+}
+
+/* Mobile nav scroll */
+.mobile-nav-scroll {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.mobile-nav-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Active nav item highlight */
+.nav-item-active {
+  background-color: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
+}
 .title {
   font-family: cursive;
 }

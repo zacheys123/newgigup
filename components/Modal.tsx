@@ -30,10 +30,12 @@ const Modal: React.FC<ModalProps> = ({ onClose, modal, user, onOpenX }) => (
           />
         ) : (
           <section className="h-[500px] w-full">
-            {modal?.user?.videosProfile?.length > 0 && (
-              <header className="my-3">{`${modal?.user?.firstname}'s Videos`}</header>
-            )}
-            {modal?.user?.videosProfile.length > 0 ? (
+            {modal?.user?.videosProfile &&
+              modal?.user?.videosProfile?.length > 0 && (
+                <header className="my-3">{`${modal?.user?.firstname}'s Videos`}</header>
+              )}
+            {modal?.user?.videosProfile &&
+            modal?.user?.videosProfile.length > 0 ? (
               <div className="overflow-y-scroll h-full ">
                 {modal?.user?.videosProfile.map((video: VideoProfileProps) => (
                   <video

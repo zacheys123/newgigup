@@ -6,10 +6,11 @@ import { useRouter } from "next/navigation";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { motion, AnimatePresence } from "framer-motion";
 import { experiences, instruments } from "@/data";
-import { MusicIcon, UsersIcon } from "lucide-react";
+import { MusicIcon, Settings, UsersIcon } from "lucide-react";
 import { HiSwitchHorizontal } from "react-icons/hi";
 import { IoArrowBack } from "react-icons/io5";
 import { useUser } from "@clerk/nextjs";
+import Modal from "../gig/create/Modal";
 
 // interface UserEmail {
 //   emailAddress: string;
@@ -38,9 +39,16 @@ type RoleSteps = {
   mc: string[];
   vocalist: string[];
   client: string[];
+
   default: string[];
 };
 
+// Helper function to safely check email against whitelist
+// function isWhitelistedAdmin(email?: string | null): boolean {
+//   if (!email) return false;
+//   const whitelist = process.env.ADMIN_WHITELIST?.split(",") || [];
+//   return whitelist.includes(email.trim().toLowerCase());
+// }
 // Define a type for valid role types
 type RoleType = keyof Omit<RoleSteps, "default">; // 'instrumentalist' | 'dj' | 'mc'
 
@@ -116,6 +124,7 @@ const ActionPage = () => {
     vocalistGenre,
   ]);
 
+  // const regAsAdmin = isWhitelistedAdmin(user?.emailAddresses[0]?.emailAddress);
   const validateClientFields = useCallback(() => {
     const errors: string[] = [];
     if (!city) errors.push("City is required");
@@ -175,6 +184,8 @@ const ActionPage = () => {
               organization,
               onboardingComplete: false,
               lastActive: new Date(),
+
+              lastAdminAction: new Date(),
             }),
           }),
         });
@@ -209,6 +220,33 @@ const ActionPage = () => {
       organization,
     ]
   );
+
+  const [adminLoad, setAdminLoad] = useState(false);
+  const connectAsAdmin = useCallback(async () => {
+    setAdminLoad(true);
+    try {
+      const success = await registerUser(true);
+      if (success) {
+        setMoreInfo(false);
+        toast.success(
+          `${
+            roleType === "instrumentalist"
+              ? "Successfully Registered as an Instrumentalist"
+              : roleType === "dj"
+              ? "Successfully Registered as a Dj"
+              : roleType === "mc"
+              ? "Successfully Registered as a EMcee"
+              : roleType === "vocalist"
+              ? "Successfully Registered as a Vocalist"
+              : ""
+          }`
+        );
+        router.push("/dashboard"); // Unified dashboard redirect
+      }
+    } finally {
+      setAdminLoad(false);
+    }
+  }, [registerUser, router, roleType]);
 
   const connectAsMusician = useCallback(async () => {
     setMusicianLoad(true);
@@ -271,13 +309,71 @@ const ActionPage = () => {
     },
     [myuser]
   );
-  console.log(roleType);
-  console.log(vocalistGenre);
-  console.log(experience);
-  console.log(talentbio);
-  const [currentStep, setCurrentStep] = useState(0);
-  console.log(roles.client);
+  const [modal, setModal] = useState(false);
 
+  const [adminRole, setAdminRoles] = useState("");
+
+  const handleModal = () => {
+    setModal(true);
+  };
+  const handleOnClose = () => {
+    setModal(false);
+  };
+
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const baseStyles = `
+  relative overflow-hidden rounded-xl border border-transparent
+  transition-all duration-300 hover:shadow-xl
+`;
+
+  const accentStyles = {
+    orange: "hover:border-orange-500/30 hover:shadow-orange-500/10",
+    cyan: "hover:border-blue-500/30 hover:shadow-blue-500/10",
+    default: "hover:border-gray-500/30",
+  };
+
+  const renderAdminModal = () => {
+    return (
+      <Modal
+        isOpen={!modal}
+        onClose={handleOnClose}
+        title="Welcome to Admin Portal"
+        description="Register as Admin"
+        dep="admin"
+      >
+        <div className="flex flex-col gap-4 ">
+          <input
+            type="text"
+            placeholder="Your City"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            className="w-full p-2 rounded bg-gray-700 text-[12px] text-white"
+          />
+          <select
+            value={adminRole}
+            onChange={(e) => setAdminRoles(e.target.value)}
+            className="w-full p-2 rounded bg-gray-700 text-[12px] text-white"
+          >
+            <option value="" className="text-neutral-300" disabled>
+              Admin Roles
+            </option>{" "}
+            <option value="super">Super</option>{" "}
+            <option value="content">Content</option>
+            <option value="support">Support</option>{" "}
+            <option value="analytics">Analytics</option>
+          </select>{" "}
+          <button
+            onClick={() => connectAsAdmin()}
+            className="w-[80%] mx-auto py-2 bg-amber-700 rounded hover:bg-orange-600 text-white text-[13px]"
+            disabled={adminLoad || clientload}
+          >
+            {adminLoad ? "Processing..." : "Complete Registration"}
+          </button>
+        </div>
+      </Modal>
+    );
+  };
   // More Information Modal starts here
   const renderMoreInfoModal = () => {
     const roleSteps: RoleSteps = {
@@ -295,7 +391,6 @@ const ActionPage = () => {
       : roleSteps.default;
     const handleNext = () => setCurrentStep((prev) => prev + 1);
     const handleBack = () => setCurrentStep((prev) => prev - 1);
-
     if (!myuser) {
       return (
         <div className="h-full w-full bg-black">
@@ -531,7 +626,18 @@ const ActionPage = () => {
           </motion.div>
         )}
       </AnimatePresence>
-
+      <AnimatePresence>
+        {!modal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+          >
+            {renderAdminModal()}
+          </motion.div>
+        )}
+      </AnimatePresence>
       <div className="relative z-10 w-full max-w-6xl mx-auto">
         {/* Header with animated underline */}
         <div className="mb-16 text-center">
@@ -592,21 +698,29 @@ const ActionPage = () => {
               buttonText: "Coming Soon",
               disabled: true,
             },
+            {
+              role: "admin",
+              title: "Admin Role",
+              accent: "emerald",
+              description: "Register as Admin",
+              buttonText: "Admin Initiallization",
+              onClick: () => handleModal,
+              disabled: false,
+            },
           ].map((card) => (
             <div
               key={card.role}
-              className={`
-        relative overflow-hidden rounded-xl border border-transparent
-        transition-all duration-300 hover:shadow-xl
-        ${card.disabled ? "opacity-80" : "hover:-translate-y-1"}
-        ${
-          card.accent === "orange"
-            ? "hover:border-orange-500/30 hover:shadow-orange-500/10"
-            : card.accent === "cyan"
-            ? "hover:border-blue-500/30 hover:shadow-blue-500/10"
-            : "hover:border-gray-500/30"
-        }
-      `}
+              className={
+                card.role === "admin"
+                  ? `${baseStyles} 
+                      ${card.disabled ? "opacity-80" : "hover:-translate-y-1"} 
+                      ${
+                        accentStyles[
+                          card.accent as keyof typeof accentStyles
+                        ] || accentStyles.default
+                      }`
+                  : "hidden"
+              }
               onClick={!card.disabled ? card.onClick : undefined}
             >
               {/* Gradient border effect */}
@@ -660,6 +774,8 @@ const ActionPage = () => {
                       <UsersIcon className="h-5 w-5" />
                     ) : card.accent === "blue" ? (
                       <MusicIcon className="h-5 w-5" />
+                    ) : card.accent === "emerald" ? (
+                      <Settings className="h-5 w-5" />
                     ) : (
                       <HiSwitchHorizontal className="h-5 w-5" />
                     )}
@@ -688,6 +804,8 @@ const ActionPage = () => {
                 ? "bg-orange-600 text-white hover:bg-orange-700"
                 : card.accent === "blue"
                 ? "bg-blue-600 text-white hover:bg-blue-700"
+                : card.accent === "emerald"
+                ? "bg-emerald-600 text-white hover:bg-orange-700"
                 : "bg-neutral-800 text-neutral-400"
             }
           `}

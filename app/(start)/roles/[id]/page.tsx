@@ -14,6 +14,7 @@ const Actions = () => {
     "loading" | "unregistered" | "registered" | "no-user"
   >("loading");
 
+  console.log("my userdata here", user);
   useEffect(() => {
     // Only proceed when auth and user data are fully loaded
     if (!isAuthLoaded || loading) return;
@@ -48,8 +49,15 @@ const Actions = () => {
     ) {
       setStatus("registered");
 
+      if (user?.user?.isAdmin) {
+        router.push("/admin/dashboard");
+      }
       // Handle first login onboarding
-      if (user?.user?.firstLogin && !user?.user?.onboardingComplete) {
+      if (
+        user?.user?.firstLogin &&
+        !user?.user?.onboardingComplete &&
+        !user?.user?.isAdmin
+      ) {
         router.push("/dashboard");
       } else {
         router.push("/");

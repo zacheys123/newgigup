@@ -45,7 +45,12 @@ interface UserInput {
   isMusician: boolean;
   earnings: number; //
   organization: string; //
-  onboardingComplete: boolean; //
+  onboardingComplete: boolean; //  isAdmin: boolean;
+  isAdmin: boolean;
+  adminRole?: "super" | "content" | "support" | "analytics";
+  adminPermissions?: string[];
+  lastAdminAction?: Date;
+  adminNotes?: string;
 }
 
 export async function POST(req: NextRequest) {
@@ -61,54 +66,57 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    const userEmail = transformedUser.emailAddresses[0]?.emailAddress;
+    const adminWhitelist = process.env.ADMIN_WHITELIST?.split(",") || [];
+    const isAdmin = adminWhitelist.includes(userEmail);
+
+    const userData = {
+      firstname: transformedUser.firstName,
+      lastname: transformedUser.lastName,
+      picture: transformedUser.imageUrl,
+      email: userEmail,
+      username: transformedUser.username,
+      phone: transformedUser.phoneNumbers[0]?.phoneNumber,
+      verification: transformedUser.emailAddresses[0]?.verification?.status,
+      isClient: isAdmin ? false : body.isClient, // Admins shouldn't be clients/musicians
+      isMusician: isAdmin ? false : body.isMusician,
+      city: body.city,
+      instrument: body.instrument,
+      experience: body.experience,
+      roleType: body.roleType,
+      djGenre: body.djGenre,
+      djEquipment: body.djEquipment,
+      mcType: body.mcType,
+      mcLanguages: body.mcLanguages,
+      talentbio: body.talentbio,
+      vocalistGenre: body.vocalistGenre,
+      tier: body.tier,
+      nextBillingDate: body.nextBillingDate,
+      monthlyGigsPosted: body.monthlyGigsPosted,
+      gigsBookedThisWeek: body.gigsBookedThisWeek, // Track weekly bookings
+      lastBookingDate: body.lastBookingDate, // To track weekly reset
+      monthlyMessages: body.monthlyMessages,
+      monthlyGigsBooked: body.monthlyGigsBooked,
+      firstLogin: body.firstLogin,
+      totalSpent: body.totalSpent,
+      earnings: body.earnings, //
+      organization: body.organization, //
+      onboardingComplete: body.onboardingComplete, //
+    };
     await connectDb();
-
-    await User.findOneAndUpdate(
-      { clerkId: userId },
-
-      {
-        firstname: transformedUser.firstName,
-        lastname: transformedUser.lastName,
-        picture: transformedUser.imageUrl,
-        email: transformedUser.emailAddresses[0]?.emailAddress,
-        username: transformedUser.username,
-        phone: transformedUser.phoneNumbers[0]?.phoneNumber,
-        verification: transformedUser.emailAddresses[0]?.verification?.status,
-        isClient: body.isClient,
-        isMusician: body.isMusician,
-        city: body.city,
-        instrument: body.instrument,
-        experience: body.experience,
-        roleType: body.roleType,
-        djGenre: body.djGenre,
-        djEquipment: body.djEquipment,
-        mcType: body.mcType,
-        mcLanguages: body.mcLanguages,
-        talentbio: body.talentbio,
-        vocalistGenre: body.vocalistGenre,
-        tier: body.tier,
-        nextBillingDate: body.nextBillingDate,
-        monthlyGigsPosted: body.monthlyGigsPosted,
-        gigsBookedThisWeek: body.gigsBookedThisWeek, // Track weekly bookings
-        lastBookingDate: body.lastBookingDate, // To track weekly reset
-        monthlyMessages: body.monthlyMessages,
-        monthlyGigsBooked: body.monthlyGigsBooked,
-        firstLogin: body.firstLogin,
-        totalSpent: body.totalSpent,
-        earnings: body.earnings, //
-        organization: body.organization, //
-        onboardingComplete: body.onboardingComplete, //
-      },
-      { upsert: true, new: true }
-    );
+    await User.findOneAndUpdate({ clerkId: userId }, userData, {
+      upsert: true,
+      new: true,
+    });
 
     return NextResponse.json({
       success: true,
-      redirectUrl: "/dashboard", // Force dashboard redirect
+      redirectUrl: isAdmin ? "/admin/dashboard" : "/dashboard",
+      message:
+        "Successfully Registered,Welcome to gigUp" + transformedUser?.firstName,
     });
   } catch (error) {
     console.error("Error processing request:", error);
-
     return NextResponse.json({
       userstatus: "error",
       message: error instanceof Error ? error.message : String(error),
