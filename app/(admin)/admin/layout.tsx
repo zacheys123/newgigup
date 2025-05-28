@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { useUser, useClerk } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import AdminNavbar from "@/components/admin/AdminNavBar";
-import { UserProps } from "@/types/userinterfaces";
 import { Spinner } from "@/components/admin/Spinner";
+import { AdminNavbarProps } from "@/types/admininterfaces";
 
 export default function AdminLayout({
   children,
@@ -15,7 +15,7 @@ export default function AdminLayout({
   const { isLoaded } = useUser();
   const { signOut } = useClerk();
   const router = useRouter();
-  const [dbUser, setDbUser] = useState<UserProps>();
+  const [dbUser, setDbUser] = useState<AdminNavbarProps>();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,13 +25,13 @@ export default function AdminLayout({
       try {
         setLoading(true);
         const response = await fetch("/api/admin/verify-admin");
-        const data = await response.json();
+        const { dbUser } = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.message || "Failed to verify admin status");
+          throw new Error(dbUser.message || "Failed to verify admin status");
         }
 
-        setDbUser(data.user);
+        setDbUser(dbUser);
       } catch (error) {
         console.error("Admin verification failed:", error);
         signOut(() => router.push("/sign-in"));
@@ -43,17 +43,7 @@ export default function AdminLayout({
     fetchUserData();
   }, [isLoaded, router, signOut]);
 
-  const [isAdmin, setIsAdmin] = useState(false);
-
-  useEffect(() => {
-    const checkAdmin = async () => {
-      const res = await fetch("/api/admin/verify-admin");
-      const { isAdmin } = await res.json();
-      setIsAdmin(isAdmin);
-    };
-    checkAdmin();
-  }, []);
-
+  console.log("my dbUser", dbUser);
   if (!isLoaded || loading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -61,7 +51,7 @@ export default function AdminLayout({
       </div>
     );
   }
-  if (!isAdmin) return null;
+  if (!dbUser?.isAdmin) return null;
 
   if (!dbUser?.isAdmin) {
     return (
@@ -84,7 +74,7 @@ export default function AdminLayout({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <AdminNavbar adminRole={dbUser.adminRole} />
+      <AdminNavbar user={dbUser} />
       <div className="px-4 py-6 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">{children}</div>
       </div>

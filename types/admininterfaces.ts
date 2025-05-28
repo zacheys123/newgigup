@@ -19,3 +19,13 @@ export interface NavItem {
 }
 
 export type UserRole = "super" | "content" | "support" | "analytics" | "admin";
+
+export interface AdminNavbarProps {
+  isAdmin: boolean;
+  adminRole: string;
+  adminPermissions: string[];
+  firstname?: string;
+  lastname?: string;
+  email?: string;
+  picture?: string;
+}

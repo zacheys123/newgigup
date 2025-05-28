@@ -9,7 +9,9 @@ export async function POST(req: NextRequest) {
     await connectDb(); // Ensure database connection
 
     const { userId } = getAuth(req);
-    const { adminEmail, city, adminRole } = await req.json();
+    const { transformedUser, city, adminRole } = await req.json();
+    const adminEmail = transformedUser?.emailAddresses[0]?.emailAddress;
+
     console.log(adminRole, city, adminEmail);
     // Validate requesting user
     const requestingUser = await User.findOne({ clerkId: userId });
@@ -37,6 +39,12 @@ export async function POST(req: NextRequest) {
       isClient: false, // Ensure admin isn't a client
       isMusician: false, // Ensure admin isn't a musician
       city,
+      firstLogin: false,
+      onboardingComplete: true,
+      firstname: transformedUser?.firstname,
+      lastname: transformedUser?.lastname,
+      email: transformedUser?.emailAddresses[0].emailAddress,
+      picture: transformedUser?.imageUrl,
     };
 
     await User.findOneAndUpdate({ clerkId: userId }, updateData, {

@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { User } from "@clerk/nextjs/server";
+
 import {
   Home,
   Users,
@@ -24,15 +24,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { AdminNavbarProps } from "@/types/admininterfaces";
 
-interface AdminNavbarProps {
-  adminRole?: string;
-  user?: User;
+interface NavbarProps {
+  user: AdminNavbarProps;
 }
-
-const AdminNavbar = ({ adminRole, user }: AdminNavbarProps) => {
+const AdminNavbar = ({ user }: NavbarProps) => {
   const pathname = usePathname();
-
+  console.log("admin user", user);
   const router = useRouter();
   // Navigation items based on admin role
   const navItems = [
@@ -82,7 +81,7 @@ const AdminNavbar = ({ adminRole, user }: AdminNavbarProps) => {
 
   // Filter nav items based on user role
   const filteredNavItems = navItems.filter((item) =>
-    item.allowedRoles.includes(adminRole || "")
+    item.allowedRoles.includes(user?.adminRole || "")
   );
 
   return (
@@ -124,12 +123,12 @@ const AdminNavbar = ({ adminRole, user }: AdminNavbarProps) => {
               <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                 <Avatar className="h-8 w-8">
                   <AvatarImage
-                    src={user?.imageUrl}
-                    alt={user?.fullName as string}
+                    src={user?.picture}
+                    alt={user?.firstname as string}
                   />
                   <AvatarFallback>
-                    {user?.firstName?.charAt(0)}
-                    {user?.lastName?.charAt(0)}
+                    {user?.firstname?.charAt(0)}
+                    {user?.lastname?.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
               </Button>
@@ -138,10 +137,11 @@ const AdminNavbar = ({ adminRole, user }: AdminNavbarProps) => {
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-medium leading-none">
-                    {user?.fullName}
+                    {user?.firstname}
+                    {user?.lastname}
                   </p>
                   <p className="text-xs leading-none text-muted-foreground">
-                    {user?.primaryEmailAddress?.emailAddress}
+                    {user?.email}
                   </p>
                 </div>
               </DropdownMenuLabel>

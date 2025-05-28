@@ -230,18 +230,13 @@ const ActionPage = () => {
     try {
       if (!city) toast.error("City is required");
 
-      if (!adminRole) toast.error("City is required");
+      if (!adminRole) toast.error("Admin Role is required");
       const res = await fetch(`/api/admin/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          city,
-          tier: "pro",
-          adminRole,
-          adminEmail: transformedUser?.emailAddresses[0]?.emailAddress,
-        }),
+        body: JSON.stringify({ transformedUser, city, tier: "pro", adminRole }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Registration failed");

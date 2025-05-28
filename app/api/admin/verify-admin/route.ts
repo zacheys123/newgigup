@@ -13,9 +13,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const dbUser = await User.findOne({ clerkId: userId }).select(
-      "isAdmin adminRole adminPermissions"
-    );
+    const dbUser = await User.findOne({ clerkId: userId });
 
     if (!dbUser?.isAdmin) {
       return NextResponse.json({ message: "Forbidden" }, { status: 403 });

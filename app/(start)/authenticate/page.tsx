@@ -48,11 +48,12 @@ const Authenticate = () => {
                     timeoutRefs.current.push(
                       setTimeout(() => {
                         setMainloader(false);
-                        if (isLoaded) {
+                        if (myuser?.user?.isAdmin) {
+                          router.push(`/admin/dashboard`);
+                        }
+                        if (isLoaded && !myuser?.user?.isAdmin) {
                           if (!myuser?.user?.firstname) {
                             router.push(`/roles/${user?.id}`);
-                          } else if (myuser?.user?.isAdmin) {
-                            router.push(`/admin/dashboard`);
                           } else {
                             window.location.reload();
                             router.push("/");

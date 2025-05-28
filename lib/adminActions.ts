@@ -31,7 +31,7 @@ export async function getAdminStats(): Promise<AdminStats> {
     User.countDocuments({ createdAt: { $gte: oneWeekAgo } }),
     User.countDocuments({ lastActive: { $gte: oneWeekAgo } }),
     Gig.countDocuments(),
-    Gig.countDocuments({ status: "booked" }),
+    Gig.countDocuments({ bookedBy: { $exists: true, $ne: null } }), // Modified this line
     User.aggregate([
       { $match: { tier: "pro" } },
       { $group: { _id: null, total: { $sum: "$earnings" } } },
