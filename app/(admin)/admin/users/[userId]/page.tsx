@@ -228,6 +228,10 @@ export default async function UserDetailPage({
                   <p>{user.organization}</p>
                 </div>
               )}
+              <div className="flex items-center gap-2">
+                <Disc className="h-4 w-4" />
+                <span>Bio:{user?.talentbio}</span>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
