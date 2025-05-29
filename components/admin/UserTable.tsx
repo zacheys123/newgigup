@@ -79,24 +79,27 @@ export default function UsersTable({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 p-2 sm:p-4">
       {/* Search and Filter Controls */}
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-        <form onSubmit={handleSearch} className="w-full md:w-auto">
+      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+        <form
+          onSubmit={handleSearch}
+          className="w-full sm:w-auto flex-1 sm:flex-none"
+        >
           <div className="relative">
             <Input
               name="query"
               placeholder="Search users..."
               defaultValue={query}
-              className="pl-8 w-full md:w-64"
+              className="pl-8 w-full sm:w-64"
             />
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           </div>
         </form>
 
-        <div className="flex items-center gap-2 w-full md:w-auto">
+        <div className="w-full sm:w-auto">
           <Select value={role} onValueChange={handleRoleChange}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Filter by role" />
             </SelectTrigger>
             <SelectContent>
@@ -111,15 +114,17 @@ export default function UsersTable({
       </div>
 
       {/* Users Table */}
-      <div className="rounded-md border">
-        <Table>
+      <div className="rounded-md border overflow-auto">
+        <Table className="min-w-[600px]">
           <TableHeader>
             <TableRow>
-              <TableHead>User</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="min-w-[150px]">User</TableHead>
+              <TableHead className="min-w-[150px]">Email</TableHead>
+              <TableHead className="min-w-[120px]">Role</TableHead>
+              <TableHead className="min-w-[100px]">Status</TableHead>
+              <TableHead className="text-right min-w-[100px]">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -162,19 +167,21 @@ function UserTableRow({ user }: { user: UserProps }) {
               height={32}
             />
           )}
-          <div>
-            <div>
+          <div className="whitespace-nowrap overflow-hidden text-ellipsis">
+            <div className="truncate">
               {user.firstname} {user.lastname}
             </div>
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-muted-foreground truncate">
               @{user.username}
             </div>
           </div>
         </div>
       </TableCell>
-      <TableCell>{user.email}</TableCell>
+      <TableCell className="whitespace-nowrap overflow-hidden text-ellipsis">
+        {user.email}
+      </TableCell>
       <TableCell>
-        <div className="flex gap-1">
+        <div className="flex flex-wrap gap-1">
           {user.isAdmin && <Badge variant="destructive">Admin</Badge>}
           {user.isMusician && <Badge variant="outline">Musician</Badge>}
           {user.isClient && <Badge variant="secondary">Client</Badge>}
@@ -185,7 +192,12 @@ function UserTableRow({ user }: { user: UserProps }) {
       </TableCell>
       <TableCell className="text-right">
         <Link href={`/admin/users/${user._id}`} passHref legacyBehavior>
-          <Button asChild size="sm" variant="outline">
+          <Button
+            asChild
+            size="sm"
+            variant="outline"
+            className="whitespace-nowrap"
+          >
             <a>Manage</a>
           </Button>
         </Link>
@@ -208,8 +220,8 @@ function PaginationControls({
   if (totalPages <= 1) return null;
 
   return (
-    <div className="flex items-center justify-between px-2">
-      <div className="text-sm text-muted-foreground">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-2">
+      <div className="text-sm text-muted-foreground text-center sm:text-left">
         Showing{" "}
         <span className="font-medium">{(currentPage - 1) * 10 + 1}</span> to{" "}
         <span className="font-medium">
@@ -217,7 +229,7 @@ function PaginationControls({
         </span>{" "}
         of <span className="font-medium">{totalUsers}</span> users
       </div>
-      <div className="flex items-center space-x-6 lg:space-x-8">
+      <div className="flex items-center space-x-2 sm:space-x-6 lg:space-x-8">
         <div className="flex items-center space-x-2">
           <Button
             variant="outline"
@@ -237,7 +249,7 @@ function PaginationControls({
             <span className="sr-only">Go to previous page</span>
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <div className="text-sm font-medium">
+          <div className="text-sm font-medium whitespace-nowrap">
             Page {currentPage} of {totalPages}
           </div>
           <Button
