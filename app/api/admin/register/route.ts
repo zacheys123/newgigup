@@ -4,15 +4,28 @@ import { getAuth } from "@clerk/nextjs/server";
 import User from "@/models/user";
 import connectDb from "@/lib/connectDb"; // Make sure you have this
 
+interface Body {
+  transformedUser: {
+    firstName: string;
+    lastName: string;
+    emailAddresses: [{ emailAddress: string }];
+    imageUrl: string;
+    username: string;
+  };
+  tier: string;
+  adminCity: string;
+  adminRole: string;
+}
 export async function POST(req: NextRequest) {
   try {
     await connectDb(); // Ensure database connection
 
     const { userId } = getAuth(req);
-    const { transformedUser, city, adminRole } = await req.json();
+    const { transformedUser, tier, adminCity, adminRole } =
+      (await req.json()) as Body;
     const adminEmail = transformedUser?.emailAddresses[0]?.emailAddress;
 
-    console.log(adminRole, city, adminEmail);
+    console.log(adminRole, adminCity, adminEmail, tier);
     // Validate requesting user
     const requestingUser = await User.findOne({ clerkId: userId });
     if (requestingUser?.isAdmin) {
@@ -31,6 +44,7 @@ export async function POST(req: NextRequest) {
 
     // Update user with admin privileges
     const updateData = {
+      username: transformedUser?.username,
       isAdmin: true,
       adminRole: adminRole
         ? adminRole
@@ -38,13 +52,14 @@ export async function POST(req: NextRequest) {
       adminPermissions: ["view-dashboard", "manage-users"],
       isClient: false, // Ensure admin isn't a client
       isMusician: false, // Ensure admin isn't a musician
-      city,
+      adminCity,
       firstLogin: false,
       onboardingComplete: true,
-      firstname: transformedUser?.firstname,
-      lastname: transformedUser?.lastname,
+      firstname: transformedUser?.firstName,
+      lastname: transformedUser?.lastName,
       email: transformedUser?.emailAddresses[0].emailAddress,
       picture: transformedUser?.imageUrl,
+      tier,
     };
 
     await User.findOneAndUpdate({ clerkId: userId }, updateData, {
@@ -55,11 +70,17 @@ export async function POST(req: NextRequest) {
       success: true,
       message: `${adminEmail} upgraded to admin successfully`,
     });
-  } catch (error) {
-    console.error("Admin registration error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    console.log(error);
+
+    // Type guard to check if it's a MongoDB duplicate key error
+    if (error instanceof Error && "code" in error && error.code === 11000) {
+      return NextResponse.json(
+        { error: "Username already exists" },
+        { status: 400 }
+      );
+    }
+
+    throw error;
   }
 }

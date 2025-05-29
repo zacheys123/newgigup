@@ -31,7 +31,6 @@ interface NavbarProps {
 }
 const AdminNavbar = ({ user }: NavbarProps) => {
   const pathname = usePathname();
-  console.log("admin user", user);
   const router = useRouter();
   // Navigation items based on admin role
   const navItems = [
@@ -78,7 +77,7 @@ const AdminNavbar = ({ user }: NavbarProps) => {
       allowedRoles: ["super"],
     },
   ];
-
+  console.log("admin data now", user.adminRole);
   // Filter nav items based on user role
   const filteredNavItems = navItems.filter((item) =>
     item.allowedRoles.includes(user?.adminRole || "")
@@ -90,7 +89,7 @@ const AdminNavbar = ({ user }: NavbarProps) => {
         {/* Logo and Main Nav */}
         <div className="flex items-center gap-8">
           <Link href="/admin/dashboard" className="flex items-center gap-2">
-            <span className="text-lg font-semibold">GigAdmin</span>
+            <span className="text-lg font-semibold mx-3">GigAdmin</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-1">
@@ -120,7 +119,10 @@ const AdminNavbar = ({ user }: NavbarProps) => {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+              <Button
+                variant="ghost"
+                className="relative h-8 w-8 rounded-full mx-3"
+              >
                 <Avatar className="h-8 w-8">
                   <AvatarImage
                     src={user?.picture}

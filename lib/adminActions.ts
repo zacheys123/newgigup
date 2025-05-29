@@ -131,3 +131,21 @@ export async function getUserById(id: string) {
     _id: user._id.toString(),
   };
 }
+export async function getCurrentUserRole(id: string) {
+  await connectDb();
+
+  if (!Types.ObjectId.isValid(id)) {
+    throw new Error("Invalid user ID");
+  }
+
+  const user = await User.findById(id).lean();
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  return {
+    ...user,
+    _id: user._id.toString(),
+  };
+}

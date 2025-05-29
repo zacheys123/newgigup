@@ -78,6 +78,7 @@ export const initialState = {
     onboardingComplete: false,
     lastActive: new Date(),
     createdAt: new Date(),
+    updatedAt: new Date(),
     isAdmin: false,
     adminRole: "super",
     adminPermissions: [""],

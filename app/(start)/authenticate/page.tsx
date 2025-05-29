@@ -50,13 +50,14 @@ const Authenticate = () => {
                         setMainloader(false);
                         if (myuser?.user?.isAdmin) {
                           router.push(`/admin/dashboard`);
-                        }
-                        if (isLoaded && !myuser?.user?.isAdmin) {
-                          if (!myuser?.user?.firstname) {
-                            router.push(`/roles/${user?.id}`);
-                          } else {
-                            window.location.reload();
-                            router.push("/");
+                        } else {
+                          if (isLoaded && !myuser?.user?.isAdmin) {
+                            if (!myuser?.user?.firstname) {
+                              router.push(`/roles/${user?.id}`);
+                            } else {
+                              window.location.reload();
+                              router.push("/");
+                            }
                           }
                         }
                       }, 5000)

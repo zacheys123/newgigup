@@ -8,11 +8,25 @@ const isPublicRoute = createRouteMatcher([
   "/roles/:userId(.*)",
 ]);
 
+// Define admin-only routes
+const isAdminRoute = createRouteMatcher(["/admin(.*)", "/api/admin(.*)"]);
+
 export default clerkMiddleware(async (auth, request) => {
   // Check if the route is public
   if (!isPublicRoute(request)) {
     // If the route is not public, protect it with Clerk authentication
     await auth.protect();
+
+    // Check if it's an admin route
+    if (isAdminRoute(request)) {
+      // Get the user's session claims
+      const sessionClaims = auth().sessionClaims;
+
+      // Check if the user has admin role (using custom claims)
+      if (sessionClaims?.metadata?.role !== "admin") {
+        return Response.redirect(new URL("/unauthorized", request.url));
+      }
+    }
   }
 
   // Redirect authenticated users from auth pages to the dashboard
@@ -26,7 +40,6 @@ export default clerkMiddleware(async (auth, request) => {
   }
 });
 
-// Define the matcher for API routes and all other routes except static and internal Next.js files
 export const config = {
   matcher: [
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",

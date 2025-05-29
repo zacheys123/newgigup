@@ -224,19 +224,26 @@ const ActionPage = () => {
 
   const [adminRole, setAdminRoles] = useState("");
 
+  const [adminCity, setAdminCity] = useState("");
+
   const [adminLoad, setAdminLoad] = useState(false);
   const connectAsAdmin = useCallback(async () => {
     setAdminLoad(true);
-    try {
-      if (!city) toast.error("City is required");
+    if (!adminCity) error.push("Your City is required");
 
-      if (!adminRole) toast.error("Admin Role is required");
+    if (!adminRole) error.push("Admin Role is required");
+    try {
       const res = await fetch(`/api/admin/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ transformedUser, city, tier: "pro", adminRole }),
+        body: JSON.stringify({
+          transformedUser,
+          adminCity,
+          tier: "pro",
+          adminRole,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Registration failed");
@@ -252,7 +259,7 @@ const ActionPage = () => {
     } finally {
       setAdminLoad(false);
     }
-  }, [router, city, transformedUser]);
+  }, [router, transformedUser, adminCity, adminRole, error]);
 
   const connectAsMusician = useCallback(async () => {
     setMusicianLoad(true);
@@ -349,8 +356,8 @@ const ActionPage = () => {
           <input
             type="text"
             placeholder="Your City"
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
+            value={adminCity}
+            onChange={(e) => setAdminCity(e.target.value)}
             className="w-full p-2 rounded bg-gray-700 text-[12px] text-white"
           />
           <select
@@ -366,6 +373,13 @@ const ActionPage = () => {
             <option value="support">Support</option>{" "}
             <option value="analytics">Analytics</option>
           </select>{" "}
+          {error.length > 0 && (
+            <div className="mt-4 text-red-400 text-sm">
+              {error.map((err, index) => (
+                <div key={index}>{err}</div>
+              ))}
+            </div>
+          )}
           <button
             onClick={() => connectAsAdmin()}
             className="w-[80%] mx-auto py-2 bg-amber-700 rounded hover:bg-orange-600 text-white text-[13px]"

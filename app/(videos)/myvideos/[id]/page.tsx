@@ -68,6 +68,7 @@ const VideoProfile = () => {
               firstLogin: true,
               onboardingComplete: false,
               lastActive: new Date(),
+              updatedAt: new Date(),
               year: "",
               createdAt: new Date(),
               isAdmin: false,

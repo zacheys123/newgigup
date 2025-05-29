@@ -57,6 +57,7 @@ export interface UserProps {
   onboardingComplete?: boolean;
   lastActive?: Date;
   createdAt?: Date;
+  updatedAt: Date;
   isAdmin?: boolean;
   adminRole?: "super" | "content" | "support" | "analytics";
   adminPermissions?: string[];
