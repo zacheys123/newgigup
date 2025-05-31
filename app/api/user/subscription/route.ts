@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Initiate M-Pesa payment
-      const amount = subscriber?.isClient ? "2000" : "1500"; // Your subscription amount in KES
+      const amount = subscriber?.isClient ? "2" : "1"; // Your subscription amount in KES
       const accountReference = `sub_${clerkId}`;
       const description = "Pro subscription";
 

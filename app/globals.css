@@ -253,7 +253,20 @@ body {
     background-color: hsl(var(--background) / 0.6);
   }
 }
+@keyframes confettiFall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
 
+.animate-confetti {
+  animation: confettiFall 3s linear forwards;
+}
 /* Mobile nav scroll */
 .mobile-nav-scroll {
   -webkit-overflow-scrolling: touch;

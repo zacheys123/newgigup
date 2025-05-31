@@ -14,6 +14,8 @@ import {
 import useStore from "@/app/zustand/useStore";
 import { useCheckTrial } from "@/hooks/useCheckTrials";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { MpesaPaymentDialog } from "./mpesa/MpesaPaymentDialog";
+import { PaymentSuccessModal } from "./mpesa/PaymentSuccessModal";
 
 interface Plan {
   name: string;
@@ -35,6 +37,8 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
   const { showConfirmModal, setShowConfirmModal } = useStore();
   const [pendingTier, setPendingTier] = useState<"free" | "pro">("free");
   const { setisFirstMonthEnd } = useCheckTrial(myuser?.user);
+
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const handleSubscriptionChange = async (newTier: "free" | "pro") => {
     if (!user?.id) return;
 
@@ -83,84 +87,93 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
       setPendingTier("free");
       setShowConfirmModal(true);
     } else {
-      try {
-        setIsMutating(true);
-
-        // Prompt for phone number (replace with a proper modal in production)
-        const phoneNumber = prompt(
-          "Enter your M-Pesa phone number (format: 2547XXXXXXXX):"
-        );
-        if (!phoneNumber) {
-          setIsMutating(false);
-          return;
-        }
-
-        // Initiate payment
-        const response = await fetch(
-          `/api/user/subscription?clerkId=${user?.id} `,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              phoneNumber,
-              tier: "pro",
-            }),
-          }
-        );
-
-        const result = await response.json();
-
-        if (result.success) {
-          // Poll for payment confirmation
-          const checkPayment = async (checkoutRequestId: string) => {
-            try {
-              const verification = await fetch("/api/verify-payment", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ checkoutRequestId }),
-              });
-
-              const verificationResult = await verification.json();
-
-              if (verificationResult.success) {
-                // Payment confirmed, update UI
-                setisFirstMonthEnd(false);
-                handleSubscriptionChange("pro");
-              } else if (verificationResult.retry) {
-                // Still processing, check again after delay
-                setTimeout(() => checkPayment(checkoutRequestId), 3000);
-              } else {
-                // Payment failed
-                alert("Payment failed. Please try again.");
-                setIsMutating(false);
-              }
-            } catch (error) {
-              console.error("Payment verification error:", error);
-              setIsMutating(false);
-            }
-          };
-
-          // Start polling
-          checkPayment(result.checkoutRequestId);
-        } else {
-          alert(
-            result.message || "Failed to initiate payment. Please try again."
-          );
-          setIsMutating(false);
-        }
-      } catch (error) {
-        console.error("Subscription error:", error);
-        setIsMutating(false);
-      }
+      setShowPaymentDialog(true);
     }
   };
 
+  const handlePaymentInitiated = async (phoneNumber: string) => {
+    try {
+      setIsMutating(true);
+
+      const response = await fetch(
+        `/api/user/subscription?clerkId=${user?.id}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            phoneNumber,
+            tier: "pro",
+          }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Poll for payment confirmation
+        const checkPayment = async (checkoutRequestId: string) => {
+          try {
+            const verification = await fetch("/api/verify-payment", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ checkoutRequestId }),
+            });
+
+            const verificationResult = await verification.json();
+
+            if (verificationResult.success) {
+              // Payment confirmed, update UI
+              setisFirstMonthEnd(false);
+              handleSubscriptionChange("pro");
+            } else if (verificationResult.retry) {
+              // Still processing, check again after delay
+              setTimeout(() => checkPayment(checkoutRequestId), 3000);
+            } else {
+              // Payment failed
+              alert("Payment failed. Please try again.");
+              setIsMutating(false);
+            }
+          } catch (error) {
+            console.error("Payment verification error:", error);
+            setIsMutating(false);
+          }
+        };
+
+        // Start polling
+        checkPayment(result.checkoutRequestId);
+      } else {
+        alert(
+          result.message || "Failed to initiate payment. Please try again."
+        );
+        setIsMutating(false);
+      }
+    } catch (error) {
+      console.error("Subscription error:", error);
+      setIsMutating(false);
+    }
+  };
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+
+  // After successful payment
+  setPaymentSuccess(true);
   return (
     <>
+      <MpesaPaymentDialog
+        open={showPaymentDialog}
+        onOpenChange={setShowPaymentDialog}
+        onPaymentInitiated={handlePaymentInitiated}
+        isProcessing={isMutating}
+      />
+      <PaymentSuccessModal
+        open={paymentSuccess}
+        onClose={() => setPaymentSuccess(false)}
+        amount={1000}
+        phoneNumber="254712345678"
+      />
       <div
         onClick={onPlanClick}
         className={cn(
