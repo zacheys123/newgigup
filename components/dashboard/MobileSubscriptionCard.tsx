@@ -39,6 +39,8 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
   const { setisFirstMonthEnd } = useCheckTrial(myuser?.user);
 
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+
   const handleSubscriptionChange = async (newTier: "free" | "pro") => {
     if (!user?.id) return;
 
@@ -127,6 +129,8 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
 
             if (verificationResult.success) {
               // Payment confirmed, update UI
+              // After successful payment
+              setPaymentSuccess(true);
               setisFirstMonthEnd(false);
               handleSubscriptionChange("pro");
             } else if (verificationResult.retry) {
@@ -156,10 +160,7 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
       setIsMutating(false);
     }
   };
-  const [paymentSuccess, setPaymentSuccess] = useState(false);
 
-  // After successful payment
-  setPaymentSuccess(true);
   return (
     <>
       <MpesaPaymentDialog
@@ -171,8 +172,8 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
       <PaymentSuccessModal
         open={paymentSuccess}
         onClose={() => setPaymentSuccess(false)}
-        amount={1000}
-        phoneNumber="254712345678"
+        amount={1500}
+        phoneNumber={"0721324354"}
       />
       <div
         onClick={onPlanClick}
