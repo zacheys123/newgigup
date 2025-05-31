@@ -191,7 +191,7 @@ function UserTableRow({ user }: { user: UserProps }) {
         <Badge variant="default">Active</Badge>
       </TableCell>
       <TableCell className="text-right">
-        <Link href={`/admin/users/${user._id}`} passHref legacyBehavior>
+        <Link href={`/admin/users/${user?._id}`} passHref legacyBehavior>
           <Button
             asChild
             size="sm"
