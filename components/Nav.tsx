@@ -2,7 +2,7 @@
 import { UserButton, useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 import Logo from "./Logo";
-import { User } from "lucide-react";
+import { User, User2Icon } from "lucide-react";
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
@@ -56,8 +56,12 @@ const Nav = () => {
                   <span className="hidden md:inline">FAQ</span>
                 </Link>
                 {isAdmin && (
-                  <Link href="/admin" className="text-sm font-medium">
-                    Admin
+                  <Link
+                    href="/admin/dashboard"
+                    className="text-sm font-medium flex items-center  bg-rose-300 bg-opacity-50 rounded-xl p-2"
+                  >
+                    <User2Icon size={15} />
+                    <span className="title">Admin</span>
                   </Link>
                 )}
               </>

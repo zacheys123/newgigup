@@ -184,7 +184,9 @@ const ActionPage = () => {
               organization,
               onboardingComplete: false,
               lastActive: new Date(),
-
+              isBanned: false,
+              banReason: "",
+              bannedAt: new Date(),
               lastAdminAction: new Date(),
             }),
           }),

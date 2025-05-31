@@ -55,7 +55,7 @@ export async function getUsers(
   query: string = "",
   role: RoleType,
   page: number = 1,
-  limit: number = 10
+  limit: number = 5
 ) {
   await connectDb();
 

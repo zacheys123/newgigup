@@ -70,6 +70,7 @@ interface IUser extends Document {
   monthlyMessages: number;
   monthlyGigsBooked: number;
   firstLogin: boolean;
+  isBanned: boolean;
   onboardingComplete: boolean;
   lastActive: Date;
   lastBookingDate?: Date;
@@ -80,6 +81,10 @@ interface IUser extends Document {
   adminPermissions?: string[];
   lastAdminAction?: Date;
   adminNotes?: string;
+  banReason: string;
+  bannedAt: Date;
+  banExpiresAt: Date; // New field for temporary bans
+  banReference: string; // New fiel
 }
 
 // Define Mongoose Schema
@@ -185,6 +190,11 @@ const userSchema = new Schema<IUser>(
       weekStart: { type: Date, default: null },
     },
     lastBookingDate: Date,
+    isBanned: { type: Boolean, default: false },
+    banReason: { type: String, lowercase: true },
+    bannedAt: { type: Date, default: new Date() },
+    banExpiresAt: { type: Date }, // New field for temporary bans
+    banReference: { type: String }, // New fiel
   },
 
   { timestamps: true }

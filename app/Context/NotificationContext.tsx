@@ -5,6 +5,7 @@ import { UserProps } from "@/types/userinterfaces";
 import { createContext, useContext, useState } from "react";
 
 // contexts/NotificationContext.tsx
+
 export // contexts/NotificationContext.tsx
 interface AppNotification {
   id: string;

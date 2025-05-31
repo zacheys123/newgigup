@@ -79,11 +79,16 @@ export const initialState = {
     lastActive: new Date(),
     createdAt: new Date(),
     updatedAt: new Date(),
+    isBanned: false,
+    banReason: "",
+    bannedAt: new Date(),
     isAdmin: false,
     adminRole: "super",
     adminPermissions: [""],
     lastAdminAction: new Date(),
     adminNotes: "",
+    banExpiresAt: new Date(), // New field for temporary ban
+    banReference: "", // New fiel
   },
   currentgig: {
     _id: "",

@@ -50,6 +50,8 @@ const Authenticate = () => {
                         setMainloader(false);
                         if (myuser?.user?.isAdmin) {
                           router.push(`/admin/dashboard`);
+                        } else if (myuser?.user?.isAdmin) {
+                          router.push("/banned");
                         } else {
                           if (isLoaded && !myuser?.user?.isAdmin) {
                             if (!myuser?.user?.firstname) {
@@ -82,11 +84,21 @@ const Authenticate = () => {
   }, []);
 
   useEffect(() => {
+    if (myuser?.user?.isBanned) {
+      // Clear all timeouts if user is banned
+      timeoutRefs.current.forEach(clearTimeout);
+      timeoutRefs.current = [];
+      // Redirect to banned page immediately
+      router.push("/banned");
+      return;
+    }
+
     LoadingPage();
+  }, [myuser]);
 
-    console.log("User data not available or not signed in.");
-  }, []);
-
+  if (myuser?.user?.isBanned) {
+    return null; // or a loading state while redirect happens
+  }
   if (!isLoaded) {
     return (
       <div className="flex h-[100vh] flex-col items-center justify-center">

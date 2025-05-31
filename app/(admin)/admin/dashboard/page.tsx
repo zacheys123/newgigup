@@ -6,7 +6,7 @@ export default async function AdminDashboard() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
+      <h1 className="text-2xl font-bold mb-6 text-white">Admin Dashboard</h1>
       <StatsCards stats={stats} />
       <div className="mt-8">{/* <RecentActivities /> */}</div>
     </div>

@@ -14,53 +14,53 @@ const Actions = () => {
     "loading" | "unregistered" | "registered" | "no-user"
   >("loading");
 
-  console.log("my userdata here", user);
+  console.log("my userdata here", user?.user);
   useEffect(() => {
     // Only proceed when auth and user data are fully loaded
     if (!isAuthLoaded || loading) return;
-
-    // Case 1: No userId means not logged in (should be caught by middleware)
-    if (!userId) {
-      router.push("/sign-in");
-      return;
-    }
-
-    // Case 2: We have a userId but no user record in MongoDB
-    if (!user?.user?.firstname) {
-      setStatus("unregistered");
-      return;
-    }
-
-    // Case 3: User exists but hasn't completed registration (missing roles)
-    if (
-      user?.user &&
-      (user.user?.isMusician === undefined ||
-        user?.user?.isClient === undefined ||
-        (user?.user?.isMusician === false && user?.user?.isClient === false))
-    ) {
-      setStatus("unregistered");
-      return;
-    }
-
-    // Case 4: User has completed registration
-    if (
-      typeof user?.user?.isMusician === "boolean" &&
-      typeof user?.user?.isClient === "boolean"
-    ) {
-      setStatus("registered");
-
-      if (user?.user?.isAdmin) {
-        router.push("/admin/dashboard");
+    if (user?.user?.isAdmin) {
+      router.push("/admin/dashboard");
+    } else {
+      // Case 1: No userId means not logged in (should be caught by middleware)
+      if (!userId) {
+        router.push("/sign-in");
+        return;
       }
-      // Handle first login onboarding
+
+      // Case 2: We have a userId but no user record in MongoDB
+      if (!user?.user?.firstname) {
+        setStatus("unregistered");
+        return;
+      }
+
+      // Case 3: User exists but hasn't completed registration (missing roles)
       if (
-        user?.user?.firstLogin &&
-        !user?.user?.onboardingComplete &&
-        !user?.user?.isAdmin
+        user?.user &&
+        (user.user?.isMusician === undefined ||
+          user?.user?.isClient === undefined ||
+          (user?.user?.isMusician === false && user?.user?.isClient === false))
       ) {
-        router.push("/dashboard");
-      } else {
-        router.push("/");
+        setStatus("unregistered");
+        return;
+      }
+
+      // Case 4: User has completed registration
+      if (
+        typeof user?.user?.isMusician === "boolean" &&
+        typeof user?.user?.isClient === "boolean"
+      ) {
+        setStatus("registered");
+
+        // Handle first login onboarding
+        if (
+          user?.user?.firstLogin &&
+          !user?.user?.onboardingComplete &&
+          !user?.user?.isAdmin
+        ) {
+          router.push("/dashboard");
+        } else {
+          router.push("/");
+        }
       }
       return;
     }

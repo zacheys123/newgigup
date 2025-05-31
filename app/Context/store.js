@@ -2,6 +2,8 @@
 import React from "react";
 import { authReducer } from "../../reducers/authReducers";
 import { createContext, useContext, useMemo, useReducer } from "react";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useRouter } from "next/navigation";
 
 export const initialState = {
   toggle: false,
@@ -21,6 +23,11 @@ export const GlobalProvider = ({ children }) => {
     return { userState, setUserState };
   }, [userState]);
 
+  const { user } = useCurrentUser();
+  const router = useRouter();
+  if (user?.isbanned) {
+    router.push("/authenticate");
+  }
   return (
     <GlobalContext.Provider value={value}>{children}</GlobalContext.Provider>
   );

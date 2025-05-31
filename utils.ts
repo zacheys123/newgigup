@@ -149,11 +149,16 @@ export const postedBy = {
   lastActive: new Date(),
   createdAt: new Date(),
   updatedAt: new Date(),
+  banReason: "",
+  bannedAt: new Date(),
   isAdmin: false,
   adminRole: "",
   adminPermissions: [""],
   lastAdminAction: new Date(),
   adminNotes: "",
+  isBanned: false,
+  banExpiresAt: new Date(), // New field for temporary ban
+  banReference: "", // New fiel
 };
 
 export const instruments = [

@@ -76,6 +76,11 @@ const VideoProfile = () => {
               adminPermissions: [""],
               lastAdminAction: new Date(),
               adminNotes: "",
+              isBanned: false,
+              banReason: "",
+              bannedAt: new Date(),
+              banExpiresAt: new Date(), // New field for temporary ban
+              banReference: "", // New fiel
             },
           });
         }

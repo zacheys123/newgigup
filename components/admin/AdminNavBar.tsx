@@ -28,6 +28,8 @@ import { AdminNavbarProps } from "@/types/admininterfaces";
 
 interface NavbarProps {
   user: AdminNavbarProps;
+  isDarkMode: boolean;
+  toggleDarkMode: () => void;
 }
 const AdminNavbar = ({ user }: NavbarProps) => {
   const pathname = usePathname();

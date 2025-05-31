@@ -8,6 +8,7 @@ import NotificationHandler from "@/components/NotificationHandler";
 import { TrialExpiredModal } from "@/components/sub/TrialExpired";
 import { TrialRemainingModal } from "@/components/sub/TrialRemainingComp";
 import { useCheckTrial } from "@/hooks/useCheckTrials";
+import { useBannedRedirect } from "@/hooks/useBannedRefirect";
 
 const MainLayout = ({
   contact,
@@ -16,6 +17,7 @@ const MainLayout = ({
   children: React.ReactNode;
   contact: React.ReactNode;
 }>) => {
+  useBannedRedirect();
   const { user: myuser } = useCurrentUser();
   const { user } = useUser();
   useCheckTrial(myuser?.user);

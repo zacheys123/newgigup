@@ -63,6 +63,11 @@ export interface UserProps {
   adminPermissions?: string[];
   lastAdminAction?: Date;
   adminNotes?: string;
+  isBanned: boolean;
+  banReason: string;
+  bannedAt: Date;
+  banExpiresAt: Date; // New field for temporary ban
+  banReference: string; // New fiel
 }
 export interface Users {
   users: UserProps[]; // Optional}
@@ -108,7 +113,9 @@ export type UserFilter = {
   tier?: "free" | "pro";
   roleType?: string | { $in: string[] };
   createdAt?: { $gte?: Date; $lte?: Date };
+  updatedAt?: { $gte?: Date; $lte?: Date };
   lastActive?: { $gte?: Date };
+
   // Add any other fields you might filter on
   // For array fields:
   musiciangenres?: { $in: string[] };
