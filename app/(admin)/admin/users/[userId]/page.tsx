@@ -23,10 +23,12 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { BanUserButton } from "@/components/admin/BanButton";
-interface PageProps {
+
+export default async function UserDetailPage({
+  params,
+}: {
   params: { userId: string };
-}
-export default async function UserDetailPage({ params }: PageProps) {
+}) {
   const { userId } = params;
   const user = await getUserById(userId);
 

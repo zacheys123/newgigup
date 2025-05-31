@@ -58,48 +58,90 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function PUT(request: NextRequest) {
+import { mpesaService } from "@/services/mpesa.service";
+import { getAuth } from "@clerk/nextjs/server";
+
+export async function POST(request: NextRequest) {
+  const { userId: clerkId } = getAuth(request);
   try {
     await connectDb();
 
-    const { clerkId, tier } = await request.json();
-    console.log("clerkId", clerkId);
-    console.log("tier", tier);
+    const { tier, phoneNumber } = await request.json();
+
     if (!clerkId || !tier) {
       return NextResponse.json(
         { error: "User ID and tier are required" },
         { status: 400 }
       );
     }
+    console.log(tier, phoneNumber);
+    // For free tier, process immediately
+    if (tier === "free") {
+      const updateData = {
+        tier,
+        nextBillingDate: null,
+      };
 
-    const updateData: { tier: string; nextBillingDate: Date | null } = {
-      tier,
-      nextBillingDate: null,
-    };
+      const user = await User.findOneAndUpdate({ clerkId }, updateData, {
+        new: true,
+      }).select(["tier", "nextBillingDate"]);
 
+      if (!user) {
+        return NextResponse.json({ error: "User not found" }, { status: 404 });
+      }
+
+      return NextResponse.json({
+        tier: user.tier,
+        nextBillingDate: user.nextBillingDate,
+        isPro: false, // Immediately reflect free tier
+      });
+    }
+    const subscriber = await User.findOne({ clerkId });
+    // For pro tier, initiate M-Pesa payment
     if (tier === "pro") {
+      if (!phoneNumber) {
+        return NextResponse.json(
+          { error: "Phone number is required for Pro subscription" },
+          { status: 400 }
+        );
+      }
+
+      // Initiate M-Pesa payment
+      const amount = subscriber?.isClient ? "2000" : "1500"; // Your subscription amount in KES
+      const accountReference = `sub_${clerkId}`;
+      const description = "Pro subscription";
+
+      console.log("Route payload", {
+        phoneNumber,
+        amount,
+        accountReference,
+        description,
+      });
+      const stkResponse = await mpesaService.initiateSTKPush(
+        phoneNumber,
+        amount,
+        accountReference,
+        description
+      );
+
+      // Return optimistic update response while payment processes
       const nextBillingDate = new Date();
       nextBillingDate.setMonth(nextBillingDate.getMonth() + 1);
-      updateData.nextBillingDate = nextBillingDate;
-    } else {
-      updateData.nextBillingDate = null;
+
+      return NextResponse.json({
+        tier: "pro",
+        nextBillingDate,
+        isPro: true,
+        paymentInitiated: true,
+        checkoutRequestId: stkResponse.CheckoutRequestID,
+        message: "Payment initiated - subscription will be confirmed shortly",
+      });
     }
 
-    const user = await User.findOneAndUpdate({ clerkId }, updateData, {
-      new: true,
-    }).select(["tier", "nextBillingDate"]);
-
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-    console.log("user.tier", user?.tier);
-    return NextResponse.json({
-      tier: user.tier,
-      nextBillingDate: user.nextBillingDate,
-      isPro:
-        user.tier === "pro" &&
-        (!user.nextBillingDate || new Date(user.nextBillingDate) > new Date()),
-    });
+    return NextResponse.json(
+      { error: "Invalid tier specified" },
+      { status: 400 }
+    );
   } catch (error) {
     console.error("Failed to update subscription:", error);
     return NextResponse.json(

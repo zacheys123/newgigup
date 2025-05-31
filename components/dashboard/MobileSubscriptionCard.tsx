@@ -74,8 +74,8 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
       setIsMutating(false);
     }
   };
-
-  const onPlanClick = () => {
+  // Update the onPlanClick function in your MobileSubscriptionCard component
+  const onPlanClick = async () => {
     const newTier = plan.name === "Pro Tier" ? "pro" : "free";
     if (plan.current) return;
 
@@ -83,8 +83,79 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
       setPendingTier("free");
       setShowConfirmModal(true);
     } else {
-      setisFirstMonthEnd(false);
-      handleSubscriptionChange("pro");
+      try {
+        setIsMutating(true);
+
+        // Prompt for phone number (replace with a proper modal in production)
+        const phoneNumber = prompt(
+          "Enter your M-Pesa phone number (format: 2547XXXXXXXX):"
+        );
+        if (!phoneNumber) {
+          setIsMutating(false);
+          return;
+        }
+
+        // Initiate payment
+        const response = await fetch(
+          `/api/user/subscription?clerkId=${user?.id} `,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              phoneNumber,
+              tier: "pro",
+            }),
+          }
+        );
+
+        const result = await response.json();
+
+        if (result.success) {
+          // Poll for payment confirmation
+          const checkPayment = async (checkoutRequestId: string) => {
+            try {
+              const verification = await fetch("/api/verify-payment", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ checkoutRequestId }),
+              });
+
+              const verificationResult = await verification.json();
+
+              if (verificationResult.success) {
+                // Payment confirmed, update UI
+                setisFirstMonthEnd(false);
+                handleSubscriptionChange("pro");
+              } else if (verificationResult.retry) {
+                // Still processing, check again after delay
+                setTimeout(() => checkPayment(checkoutRequestId), 3000);
+              } else {
+                // Payment failed
+                alert("Payment failed. Please try again.");
+                setIsMutating(false);
+              }
+            } catch (error) {
+              console.error("Payment verification error:", error);
+              setIsMutating(false);
+            }
+          };
+
+          // Start polling
+          checkPayment(result.checkoutRequestId);
+        } else {
+          alert(
+            result.message || "Failed to initiate payment. Please try again."
+          );
+          setIsMutating(false);
+        }
+      } catch (error) {
+        console.error("Subscription error:", error);
+        setIsMutating(false);
+      }
     }
   };
 

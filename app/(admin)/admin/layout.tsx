@@ -59,7 +59,7 @@ export default function AdminLayout({
     if (dbUser?.isAdmin) {
       const timer = setTimeout(() => {
         setShowWelcome(false);
-      }, 5000);
+      }, 10000);
       return () => clearTimeout(timer);
     }
   }, [dbUser]);
