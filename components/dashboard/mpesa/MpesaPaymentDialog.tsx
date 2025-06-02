@@ -24,88 +24,59 @@ export function MpesaPaymentDialog({
   onPaymentInitiated,
   isProcessing,
 }: MpesaPaymentDialogProps) {
-  const [rawInput, setRawInput] = useState("");
-  const [formattedNumber, setFormattedNumber] = useState("");
+  const [inputValue, setInputValue] = useState("");
   const [error, setError] = useState("");
   const [isValid, setIsValid] = useState(false);
 
   // Format the phone number for display and validation
   useEffect(() => {
     // Remove all non-digit characters
-    const numericValue = rawInput.replace(/\D/g, "");
+    const digitsOnly = inputValue.replace(/\D/g, "");
 
-    let formatted = numericValue;
-
-    // Auto-format based on different input patterns
-    if (numericValue.startsWith("0") && numericValue.length === 10) {
-      formatted = "254" + numericValue.substring(1);
-    } else if (numericValue.startsWith("7") && numericValue.length === 9) {
-      formatted = "254" + numericValue;
-    } else if (numericValue.startsWith("254") && numericValue.length > 3) {
-      formatted = numericValue;
-    } else if (numericValue.length > 0) {
-      formatted = "254" + numericValue;
+    // Convert to Safaricom format (254 + 9 digits)
+    let formattedNumber = "";
+    if (digitsOnly.startsWith("0") && digitsOnly.length === 10) {
+      formattedNumber = "254" + digitsOnly.substring(1);
+    } else if (digitsOnly.length === 9) {
+      formattedNumber = "254" + digitsOnly;
+    } else if (digitsOnly.startsWith("254") && digitsOnly.length === 12) {
+      formattedNumber = digitsOnly;
+    } else {
+      formattedNumber = "254" + digitsOnly;
     }
 
-    // Limit to 12 digits (254 + 9 digits)
-    if (formatted.length > 12) {
-      formatted = formatted.substring(0, 12);
-    }
+    // Trim to max 12 digits (254 + 9)
+    formattedNumber = formattedNumber.substring(0, 12);
 
-    setFormattedNumber(formatted);
-
-    // Validate the number
-    const regex = /^254[17]\d{8}$/;
-    const valid = regex.test(formatted) && formatted.length === 12;
+    // Validate - must be exactly 254 followed by 9 digits starting with 7 or 1
+    const valid = /^254[17]\d{8}$/.test(formattedNumber);
     setIsValid(valid);
 
-    if (formatted.length > 0 && !valid) {
-      setError(
-        "Please enter a valid Safaricom number (e.g., 0712345678 or 254712345678)"
-      );
+    if (inputValue && !valid) {
+      setError("Please enter a valid 9-digit Safaricom number");
     } else {
       setError("");
     }
-  }, [rawInput]);
+  }, [inputValue]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setRawInput(e.target.value);
+    const value = e.target.value.replace(/\D/g, ""); // Remove non-digits
+    if (value.length <= 9) {
+      // Only allow up to 9 digits (after 254)
+      setInputValue(value);
+    }
   };
-  const formatDisplayNumber = (number: string): string => {
-    if (!number) return "";
 
-    // For numbers starting with 254 and having at least 3 more digits
-    if (number.startsWith("254") && number.length > 3) {
-      const prefix = number.substring(0, 3); // "254"
-      const mainPart = number.substring(3);
-
-      // Format as 254 XXX XXX XXX
-      if (mainPart.length <= 3) return `${prefix} ${mainPart}`;
-      if (mainPart.length <= 6)
-        return `${prefix} ${mainPart.substring(0, 3)} ${mainPart.substring(3)}`;
-      return `${prefix} ${mainPart.substring(0, 3)} ${mainPart.substring(
-        3,
-        6
-      )} ${mainPart.substring(6)}`;
-    }
-
-    // For numbers starting with 0 (local format)
-    if (number.startsWith("0") && number.length > 1) {
-      const prefix = number.substring(0, 1); // "0"
-      const mainPart = number.substring(1);
-
-      // Format as 0XXX XXX XXX
-      if (mainPart.length <= 3) return `${prefix}${mainPart}`;
-      if (mainPart.length <= 6)
-        return `${prefix}${mainPart.substring(0, 3)} ${mainPart.substring(3)}`;
-      return `${prefix}${mainPart.substring(0, 3)} ${mainPart.substring(
-        3,
-        6
-      )} ${mainPart.substring(6)}`;
-    }
-
-    // For other cases (partial numbers being typed)
-    return number;
+  const formatDisplayNumber = (digits: string) => {
+    if (!digits) return "";
+    // Format as XXX XXX XXX
+    if (digits.length <= 3) return digits;
+    if (digits.length <= 6)
+      return `${digits.substring(0, 3)} ${digits.substring(3)}`;
+    return `${digits.substring(0, 3)} ${digits.substring(
+      3,
+      6
+    )} ${digits.substring(6)}`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -115,7 +86,9 @@ export function MpesaPaymentDialog({
       return;
     }
     setError("");
-    await onPaymentInitiated(formattedNumber);
+    await onPaymentInitiated(
+      "254" + inputValue.replace(/\D/g, "").substring(0, 9)
+    );
   };
 
   return (
@@ -156,15 +129,17 @@ export function MpesaPaymentDialog({
               Phone Number
             </Label>
             <div className="relative">
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-300">
+                +254
+              </div>
               <Input
                 id="phone"
                 type="tel"
-                placeholder={formatDisplayNumber("254712345678")}
-                value={rawInput}
+                placeholder="712 345 678"
+                value={formatDisplayNumber(inputValue)}
                 onChange={handleInputChange}
-                className="bg-green-700 border-green-600 text-white placeholder-green-300 focus:ring-2 focus:ring-green-400 pl-4 pr-10"
+                className="bg-green-700 border-green-600 text-white placeholder-green-300 focus:ring-2 focus:ring-green-400 pl-14 pr-10"
                 inputMode="numeric"
-                pattern="[0-9]*"
               />
               <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-300">
                 <svg
@@ -184,7 +159,7 @@ export function MpesaPaymentDialog({
             </div>
             {error && <p className="text-red-300 text-sm">{error}</p>}
             <p className="text-green-200 text-xs">
-              Accepted formats: 0712345678 or 254712345678
+              Enter your 9-digit Safaricom number
             </p>
           </div>
 
@@ -192,12 +167,10 @@ export function MpesaPaymentDialog({
             <div className="flex justify-between text-green-100 text-sm">
               <span>Full Number:</span>
               <span className="font-mono font-bold">
-                {formattedNumber ? (
-                  <>
-                    <span className="text-green-300">
-                      {formatDisplayNumber(formattedNumber)}
-                    </span>
-                  </>
+                {inputValue ? (
+                  <span className="text-green-300">
+                    +254 {formatDisplayNumber(inputValue)}
+                  </span>
                 ) : (
                   "________________"
                 )}

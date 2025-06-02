@@ -24,12 +24,19 @@ import {
 import Link from "next/link";
 import { BanUserButton } from "@/components/admin/BanButton";
 
-export default async function UserDetailPage({
-  params,
-}: {
-  params: { userid: string };
-}) {
-  const { userid } = params;
+interface PageProps {
+  searchParams: {
+    userid?: string;
+  };
+}
+
+export default async function UserDetailPage({ searchParams }: PageProps) {
+  const userid = searchParams.userid;
+
+  if (!userid) {
+    return notFound(); // or handle gracefully
+  }
+
   const user = await getUserById(userid);
 
   if (!user) {
