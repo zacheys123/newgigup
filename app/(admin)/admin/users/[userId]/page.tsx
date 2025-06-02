@@ -27,10 +27,10 @@ import { BanUserButton } from "@/components/admin/BanButton";
 export default async function UserDetailPage({
   params,
 }: {
-  params: { userId: string };
+  params: { userid: string };
 }) {
-  const { userId } = params;
-  const user = await getUserById(userId);
+  const { userid } = params;
+  const user = await getUserById(userid);
 
   if (!user) {
     return notFound();
