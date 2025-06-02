@@ -104,6 +104,7 @@ export async function getUsers(
     isMusician: user.isMusician,
     isClient: user.isClient,
     isAdmin: user.isAdmin,
+    createdAt: user?.createdAt,
   }));
 
   return {
