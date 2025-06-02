@@ -1,7 +1,9 @@
-import UsersTable from "@/components/admin/UserTable";
-import { getUsers, RoleType } from "@/lib/adminActions";
+import UserDetailPage from "@/components/admin/UserDetailPage";
+import UsersTable from "@/components/admin/UserTable"; // 👈 Make sure this exists
+import { getUsers, getUserById, RoleType } from "@/lib/adminActions";
 import { checkEnvironment } from "@/utils";
 import { cookies } from "next/headers";
+import { notFound } from "next/navigation";
 
 async function getCurrentUserRole() {
   try {
@@ -9,8 +11,7 @@ async function getCurrentUserRole() {
       headers: {
         Cookie: cookies().toString(),
       },
-      // Add caching control (optional)
-      next: { revalidate: 3600 }, // Revalidate every hour
+      next: { revalidate: 3600 },
     });
 
     if (!res.ok) {
@@ -29,13 +30,16 @@ async function getCurrentUserRole() {
 export default async function AdminUsersPage({
   searchParams = {},
 }: {
-  searchParams?: { query?: string; role?: RoleType; page?: string };
+  searchParams?: {
+    query?: string;
+    role?: RoleType;
+    page?: string;
+    userid?: string;
+  };
 }) {
-  // Check user role
   const userRole = await getCurrentUserRole();
   const allowedRoles = ["super", "support"];
 
-  // Improved role validation
   if (typeof userRole !== "string" || !allowedRoles.includes(userRole)) {
     return (
       <div className="p-4 text-center">
@@ -48,22 +52,40 @@ export default async function AdminUsersPage({
     );
   }
 
-  const query = searchParams.query || "";
-  const role = searchParams.role || "all";
-  const page = parseInt(searchParams.page || "1");
+  const { userid, query = "", role = "all", page = "1" } = searchParams;
 
-  const { users, totalPages, totalUsers } = await getUsers(query, role, page);
+  // ✅ If a specific user is requested, show the user detail page
+  if (userid) {
+    const user = await getUserById(userid);
+    if (!user) return notFound();
+
+    return (
+      <div className="p-4">
+        <UserDetailPage user={user} />
+      </div>
+    );
+  }
+
+  // ✅ Otherwise, render the full user table
+  const currentPage = parseInt(page, 10);
+  const { users, totalPages, totalUsers } = await getUsers(
+    query,
+    role,
+    currentPage
+  );
 
   return (
-    <div>
+    <div className="p-4">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">User Management</h1>
       </div>
       <UsersTable
         users={users}
-        currentPage={page}
+        currentPage={currentPage}
         totalPages={totalPages}
         totalUsers={totalUsers}
+        initialQuery={query}
+        initialRole={role}
       />
     </div>
   );

@@ -10,7 +10,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { UserProps } from "@/types/userinterfaces";
 import {
   ChevronLeft,
   ChevronRight,
@@ -29,11 +28,27 @@ import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import Link from "next/link";
 
+// types/adminUsers.ts
+export interface AdminTableUser {
+  _id: string;
+  clerkId: string;
+  picture?: string | null;
+  firstname?: string;
+  lastname?: string;
+  email?: string;
+  username: string;
+  isMusician?: boolean;
+  isClient?: boolean;
+  isAdmin?: boolean;
+  // Only include fields actually used in the table
+}
 interface UsersTableProps {
-  users: UserProps[];
+  users: AdminTableUser[];
   currentPage: number;
   totalPages: number;
   totalUsers: number;
+  initialQuery?: string;
+  initialRole?: string;
 }
 
 const roleOptions = [
@@ -48,11 +63,13 @@ export default function UsersTable({
   currentPage,
   totalPages,
   totalUsers,
+  initialQuery,
+  initialRole,
 }: UsersTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const query = searchParams.get("query") || "";
-  const role = searchParams.get("role") || "all";
+  const query = searchParams.get("query") || initialQuery || "";
+  const role = searchParams.get("role") || initialRole || "all";
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -153,7 +170,7 @@ export default function UsersTable({
 }
 
 // Extracted components for better organization
-function UserTableRow({ user }: { user: UserProps }) {
+function UserTableRow({ user }: { user: AdminTableUser }) {
   return (
     <TableRow>
       <TableCell className="font-medium">

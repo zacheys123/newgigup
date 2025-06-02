@@ -3,6 +3,8 @@ import { Types } from "mongoose";
 import connectDb from "./connectDb";
 import Gig from "@/models/gigs";
 import { UserFilter } from "@/types/userinterfaces";
+import { PageProps } from "@/components/admin/UserDetailPage";
+import { isUserValid } from "./typeGuard";
 
 interface AdminStats {
   totalUsers: number;
@@ -90,20 +92,18 @@ export async function getUsers(
     User.countDocuments(filter),
   ]);
 
-  const transformObjectId = (id: Types.ObjectId) => id?.toString() || null;
-
+  // In your getUsers function:
   const transformedUsers = users.map((user) => ({
-    ...user,
     _id: user._id.toString(),
-    followers: user.followers?.map(transformObjectId) || [],
-    followings: user.followings?.map(transformObjectId) || [],
-    refferences: user.refferences?.map(transformObjectId) || [],
-    allreviews: user.allreviews || [],
-    myreviews: user.myreviews || [],
-    videosProfile: user.videosProfile || [],
-    musicianhandles: user.musicianhandles || [],
-    musiciangenres: user.musiciangenres || [],
-    adminPermissions: user.adminPermissions || [],
+    clerkId: user.clerkId,
+    picture: user.picture,
+    firstname: user.firstname,
+    lastname: user.lastname,
+    email: user.email,
+    username: user.username,
+    isMusician: user.isMusician,
+    isClient: user.isClient,
+    isAdmin: user.isAdmin,
   }));
 
   return {
@@ -113,7 +113,9 @@ export async function getUsers(
   };
 }
 
-export async function getUserById(id: string) {
+// actions/getUserById.ts
+
+export async function getUserById(id: string): Promise<PageProps["user"]> {
   await connectDb();
 
   if (!Types.ObjectId.isValid(id)) {
@@ -122,13 +124,20 @@ export async function getUserById(id: string) {
 
   const user = await User.findById(id).lean();
 
-  if (!user) {
-    throw new Error("User not found");
+  if (!user || !isUserValid(user)) {
+    throw new Error("User not found or data is invalid");
   }
 
+  // Convert MongoDB-specific types
   return {
     ...user,
     _id: user._id.toString(),
+    bannedAt: user.bannedAt ? new Date(user.bannedAt) : undefined,
+    banExpiresAt: user.banExpiresAt ? new Date(user.banExpiresAt) : undefined,
+    createdAt: new Date(user.createdAt).toISOString(),
+    // Handle potential array fields
+    musiciangenres: user.musiciangenres || [],
+    adminPermissions: user.adminPermissions || [],
   };
 }
 export async function getCurrentUserRole(id: string) {

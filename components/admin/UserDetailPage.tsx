@@ -1,5 +1,4 @@
-import { notFound } from "next/navigation";
-import { getUserById } from "@/lib/adminActions";
+"use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,26 +22,49 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { BanUserButton } from "@/components/admin/BanButton";
+import { useSubscription } from "@/hooks/useSubscription";
+import { useAuth } from "@clerk/nextjs";
 
-interface PageProps {
-  searchParams: {
-    userid?: string;
+export interface PageProps {
+  user: {
+    _id: string;
+    picture?: string;
+    firstname?: string;
+    lastname?: string;
+    roleType?: string;
+    instrument?: string;
+
+    isAdmin?: boolean;
+    isClient?: boolean;
+    username: string;
+    email: string;
+    phone: string;
+    city: string;
+    talentbio: string;
+    date: string;
+    month: string;
+    year: string;
+    createdAt: string;
+    isBanned: boolean;
+    bannedAt?: Date;
+    banReason?: string;
+    banExpiresAt?: Date;
+    banReference?: string;
+    address?: string;
+    isMusician: boolean;
+    vocalistGenre?: string;
+    djGenre?: string;
+    musiciangenres?: string[];
+    organization?: string;
+    adminRole?: string;
+    lastAdminAction?: string;
+    adminPermissions?: string[];
   };
 }
 
-export default async function UserDetailPage({ searchParams }: PageProps) {
-  const userid = searchParams.userid;
-
-  if (!userid) {
-    return notFound(); // or handle gracefully
-  }
-
-  const user = await getUserById(userid);
-
-  if (!user) {
-    return notFound();
-  }
-
+export default function UserDetailPage({ user }: PageProps) {
+  const { userId } = useAuth();
+  const { subscription } = useSubscription(userId as string);
   return (
     <div className="flex flex-col h-screen bg-neutral-600 dark:bg-gray-900 overflow-hidden">
       {/* Scrollable content container */}
@@ -74,16 +96,18 @@ export default async function UserDetailPage({ searchParams }: PageProps) {
             <div className="flex flex-col md:flex-row gap-6 items-start">
               {/* Avatar Section */}
               <div className="flex flex-col items-center gap-4 w-full md:w-auto">
-                <Avatar className="h-20 w-20 sm:h-24 sm:w-24 border-2 border-primary/20 dark:border-primary/30 group hover:border-primary/50 transition-all duration-300">
-                  <AvatarImage
-                    src={user.picture}
-                    className="group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <AvatarFallback className="bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary/80 font-medium">
-                    {user.firstname?.charAt(0)}
-                    {user.lastname?.charAt(0)}
-                  </AvatarFallback>
-                </Avatar>
+                {user?.picture && (
+                  <Avatar className="h-20 w-20 sm:h-24 sm:w-24 border-2 border-primary/20 dark:border-primary/30 group hover:border-primary/50 transition-all duration-300">
+                    <AvatarImage
+                      src={user.picture}
+                      className="group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <AvatarFallback className="bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary/80 font-medium">
+                      {user.firstname?.charAt(0)}
+                      {user.lastname?.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                )}
                 <div className="flex flex-wrap gap-2 justify-center">
                   {user.isAdmin && (
                     <Badge
@@ -120,12 +144,12 @@ export default async function UserDetailPage({ searchParams }: PageProps) {
                   )}
                   <Badge
                     className={`px-2.5 py-1 ${
-                      user.tier === "pro"
+                      subscription?.user.tier === "pro"
                         ? "bg-gradient-to-r from-purple-500/10 to-indigo-500/10 dark:from-purple-900/30 dark:to-indigo-900/30 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-700/50"
                         : "bg-gray-200/50 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600/50"
                     }`}
                   >
-                    {user.tier.toUpperCase()}
+                    {subscription?.user.tier.toUpperCase()}
                   </Badge>
                 </div>
               </div>
@@ -252,13 +276,15 @@ export default async function UserDetailPage({ searchParams }: PageProps) {
                     <h4 className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wider mb-2">
                       Member Since
                     </h4>
-                    <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300">
-                      {new Date(user.createdAt).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </p>
+                    {user.createdAt && (
+                      <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300">
+                        {new Date(user.createdAt).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}
+                      </p>
+                    )}
                   </div>
                 </div>
               </CardContent>
@@ -279,10 +305,12 @@ export default async function UserDetailPage({ searchParams }: PageProps) {
                 {user.isBanned ? (
                   <div className="space-y-4">
                     <div className="p-4 bg-red-50 dark:bg-red-900/10 rounded-lg">
-                      <p className="text-sm text-red-600 dark:text-red-400">
-                        ⚠️ This user was banned on{" "}
-                        {new Date(user.bannedAt).toLocaleString()}
-                      </p>
+                      {user.bannedAt && (
+                        <p className="text-sm text-red-600 dark:text-red-400">
+                          ⚠️ This user was banned on{" "}
+                          {new Date(user.bannedAt).toLocaleString()}
+                        </p>
+                      )}
                       {user.banReason && (
                         <p className="mt-2 text-sm">
                           <span className="font-medium">Reason:</span>{" "}
@@ -366,7 +394,8 @@ export default async function UserDetailPage({ searchParams }: PageProps) {
                         Genres
                       </h4>
                       <div className="flex flex-wrap gap-2">
-                        {user.musiciangenres?.length > 0 ? (
+                        {user.musiciangenres?.length &&
+                        user.musiciangenres?.length > 0 ? (
                           user.musiciangenres.map((genre) => (
                             <Badge
                               key={genre}

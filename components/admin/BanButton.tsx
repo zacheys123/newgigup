@@ -6,19 +6,9 @@ import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { useSocketContext } from "@/app/Context/socket";
+import { PageProps } from "./UserDetailPage";
 
-export function BanUserButton({
-  user,
-}: {
-  user: {
-    _id: string;
-    isBanned: boolean;
-    banReason: string;
-    bannedAt: Date;
-    banExpiresAt?: Date;
-    banReference?: string;
-  };
-}) {
+export function BanUserButton({ user }: PageProps) {
   const { sendBanUpdate } = useSocketContext();
   const [isLoading, setIsLoading] = useState(false);
   const [banReason, setBanReason] = useState("");
@@ -90,10 +80,12 @@ export function BanUserButton({
                 {user.banReference}
               </p>
             )}
-            <p className="text-sm">
-              <span className="font-semibold">Banned on:</span>{" "}
-              {format(new Date(user.bannedAt), "PPpp")}
-            </p>
+            {user?.bannedAt && (
+              <p className="text-sm">
+                <span className="font-semibold">Banned on:</span>{" "}
+                {format(new Date(user.bannedAt), "PPpp")}
+              </p>
+            )}
             {user.banExpiresAt && (
               <p className="text-sm">
                 <span className="font-semibold">Expires on:</span>{" "}
