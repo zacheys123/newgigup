@@ -150,7 +150,7 @@ export function PaymentSuccessModal({
                   className="w-full bg-yellow-400 hover:bg-yellow-500 text-green-900 font-bold py-6 text-lg rounded-xl shadow-lg relative overflow-hidden"
                 >
                   <PartyPopper className="w-5 h-5 mr-2" />
-                  <span>Done</span>
+
                   <motion.div
                     initial={{ x: -100, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}

@@ -84,6 +84,7 @@ export const initialState = {
     bannedAt: new Date(),
     isAdmin: false,
     adminRole: "super",
+    tierStatus: "",
     adminPermissions: [""],
     lastAdminAction: new Date(),
     adminNotes: "",

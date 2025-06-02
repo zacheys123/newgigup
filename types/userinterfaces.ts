@@ -60,6 +60,7 @@ export interface UserProps {
   updatedAt: Date;
   isAdmin?: boolean;
   adminRole?: "super" | "content" | "support" | "analytics";
+  tierStatus?: "active" | "pending" | "canceled" | "expired";
   adminPermissions?: string[];
   lastAdminAction?: Date;
   adminNotes?: string;

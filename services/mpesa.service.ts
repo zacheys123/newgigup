@@ -68,47 +68,55 @@ export class MpesaService {
     this.callbackUrl = getCallbackUrl();
   }
 
-  private async authenticate(): Promise<void> {
-    console.log("Env vars:", {
-      consumerKey: this.consumerKey,
-      consumerSecret: this.consumerSecret ? "exists" : "missing",
-      shortCode: this.shortCode,
-      passkey: this.passkey ? "exists" : "missing",
-    });
-    try {
-      const auth = Buffer.from(
-        `${this.consumerKey}:${this.consumerSecret}`
-      ).toString("base64");
+  private async authenticate(maxRetries = 3): Promise<void> {
+    let attempts = 0;
+    let lastError: Error | null = null;
 
-      // Debug auth header
-      console.log("Auth header:", `Basic ${auth.substring(0, 10)}...`);
+    while (attempts < maxRetries) {
+      attempts++;
+      try {
+        const auth = Buffer.from(
+          `${this.consumerKey}:${this.consumerSecret}`
+        ).toString("base64");
 
-      const response = await axios.get<AuthResponse>(
-        "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials",
-        {
-          headers: {
-            Authorization: `Basic ${auth}`,
-            "Content-Type": "application/json",
-          },
-          timeout: 5000, // Add timeout
+        const response = await axios.get<AuthResponse>(
+          "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials",
+          {
+            headers: {
+              Authorization: `Basic ${auth}`,
+              "Content-Type": "application/json",
+            },
+            timeout: 15000,
+          }
+        );
+
+        if (!response.data.access_token) {
+          throw new Error("No token in response");
         }
-      );
 
-      if (!response.data.access_token) {
-        throw new Error("No token in response");
+        this.authToken = response.data.access_token;
+        this.tokenExpiry = new Date(
+          Date.now() + response.data.expires_in * 1000
+        );
+        return;
+      } catch (error) {
+        if (error instanceof Error) {
+          lastError = error;
+        } else {
+          lastError = new Error(String(error));
+        }
+        console.log(`Authentication attempt ${attempts} failed:`, lastError);
+        if (attempts < maxRetries) {
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+        }
       }
-
-      this.authToken = response.data.access_token;
-      this.tokenExpiry = new Date(Date.now() + response.data.expires_in * 1000);
-
-      console.log("New token generated:", {
-        token: this.authToken.substring(0, 10) + "...",
-        expiresIn: response.data.expires_in,
-      });
-    } catch (error) {
-      console.log(error);
-      throw new Error(`M-Pesa auth failed: ${error}`);
     }
+
+    throw new Error(
+      `M-Pesa auth failed after ${maxRetries} attempts: ${
+        lastError?.message || "Unknown error"
+      }`
+    );
   }
 
   async initiateSTKPush(
@@ -169,44 +177,62 @@ export class MpesaService {
   }
 
   async verifyTransaction(
-    checkoutRequestID: string
+    checkoutRequestID: string,
+    maxRetries = 3
   ): Promise<STKPushQueryResponse> {
-    await this.authenticate();
+    let attempts = 0;
+    let lastError: Error | null = null;
 
-    if (!this.authToken) {
-      throw new Error("Authentication failed");
-    }
+    while (attempts < maxRetries) {
+      attempts++;
+      try {
+        await this.authenticate();
 
-    const timestamp = generateMpesaTimestamp();
-    const password = generateMpesaPassword(
-      this.shortCode,
-      this.passkey,
-      timestamp
-    );
+        const timestamp = generateMpesaTimestamp();
+        const password = generateMpesaPassword(
+          this.shortCode,
+          this.passkey,
+          timestamp
+        );
 
-    const payload = {
-      BusinessShortCode: this.shortCode,
-      Password: password,
-      Timestamp: timestamp,
-      CheckoutRequestID: checkoutRequestID,
-    };
+        const payload = {
+          BusinessShortCode: this.shortCode,
+          Password: password,
+          Timestamp: timestamp,
+          CheckoutRequestID: checkoutRequestID,
+        };
 
-    try {
-      const response = await axios.post<STKPushQueryResponse>(
-        `${process.env.NEXT_PUBLIC_MPESA_API_URL}/stkpushquery/v1/query`,
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${this.authToken}`,
-            "Content-Type": "application/json",
-          },
+        const response = await axios.post<STKPushQueryResponse>(
+          `${process.env.NEXT_PUBLIC_MPESA_API_URL}/stkpushquery/v1/query`,
+          payload,
+          {
+            headers: {
+              Authorization: `Bearer ${this.authToken}`,
+              "Content-Type": "application/json",
+            },
+            timeout: 15000,
+          }
+        );
+
+        return response.data;
+      } catch (error) {
+        if (error instanceof Error) {
+          lastError = error;
+        } else {
+          lastError = new Error(String(error));
         }
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Transaction verification error:", error);
-      throw new Error("Failed to verify transaction");
+        console.log(`Verification attempt ${attempts} failed:`, lastError);
+        if (attempts < maxRetries) {
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+        }
+      }
     }
+
+    throw new Error(
+      `Transaction verification failed after ${maxRetries} attempts: ${
+        lastError?.message || "Unknown error"
+      }`
+    );
   }
 }
 

@@ -95,6 +95,32 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
 
   const handlePaymentInitiated = async (phoneNumber: string) => {
     try {
+      await mutateSubscription(
+        async () => {
+          const response = await fetch(
+            `/api/user/subscription?clerkId=${user?.id}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ phoneNumber, tier: "pro" }),
+            }
+          );
+          return await response.json();
+        },
+        {
+          optimisticData: {
+            tier: "pro",
+            tierStatus: "pending",
+            isPro: false,
+            nextBillingDate: new Date(
+              new Date().setMonth(new Date().getMonth() + 1)
+            ),
+          },
+          rollbackOnError: true,
+          populateCache: true,
+          revalidate: false,
+        }
+      );
       setIsMutating(true);
 
       const response = await fetch(
@@ -112,11 +138,18 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
       );
 
       const result = await response.json();
-
-      if (result.success) {
+      console.log(result);
+      if (result.checkoutRequestId) {
         // Poll for payment confirmation
-        const checkPayment = async (checkoutRequestId: string) => {
+        const checkPayment = async (checkoutRequestId: string, attempt = 1) => {
           try {
+            if (attempt > 10) {
+              // Limit retries
+              alert("Payment verification timed out. Please contact support.");
+              setIsMutating(false);
+              return;
+            }
+
             const verification = await fetch("/api/verify-payment", {
               method: "POST",
               headers: {
@@ -126,19 +159,23 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
             });
 
             const verificationResult = await verification.json();
+            console.log(`Attempt ${attempt}:`, verificationResult);
 
             if (verificationResult.success) {
-              // Payment confirmed, update UI
-              // After successful payment
               setPaymentSuccess(true);
               setisFirstMonthEnd(false);
               handleSubscriptionChange("pro");
             } else if (verificationResult.retry) {
-              // Still processing, check again after delay
-              setTimeout(() => checkPayment(checkoutRequestId), 3000);
+              setTimeout(
+                () => checkPayment(checkoutRequestId, attempt + 1),
+                3000
+              );
             } else {
-              // Payment failed
-              alert("Payment failed. Please try again.");
+              alert(
+                `Payment failed: ${
+                  verificationResult.errorMessage || "Unknown error"
+                }`
+              );
               setIsMutating(false);
             }
           } catch (error) {
@@ -160,7 +197,7 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
       setIsMutating(false);
     }
   };
-
+  console.log(myuser, subscription);
   return (
     <>
       <MpesaPaymentDialog
@@ -171,7 +208,12 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
       />
       <PaymentSuccessModal
         open={paymentSuccess}
-        onClose={() => setPaymentSuccess(false)}
+        onClose={() => {
+          setPaymentSuccess(false);
+          setTimeout(() => {
+            window.location.reload();
+          }, 3000);
+        }}
         amount={1500}
         phoneNumber={"0721324354"}
       />

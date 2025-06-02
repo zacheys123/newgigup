@@ -98,6 +98,7 @@ export async function POST(request: NextRequest) {
     }
     const subscriber = await User.findOne({ clerkId });
     // For pro tier, initiate M-Pesa payment
+    // For pro tier, initiate M-Pesa payment
     if (tier === "pro") {
       if (!phoneNumber) {
         return NextResponse.json(
@@ -106,17 +107,23 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Initiate M-Pesa payment
-      const amount = subscriber?.isClient ? "2" : "1"; // Your subscription amount in KES
+      // First update the user with pending status
+      const nextBillingDate = new Date();
+      nextBillingDate.setMonth(nextBillingDate.getMonth() + 1);
+
+      const updateData = {
+        tier: "pro",
+        tierStatus: "pending", // Add this field to track payment status
+        nextBillingDate,
+      };
+
+      await User.findOneAndUpdate({ clerkId }, updateData);
+
+      // Then initiate payment
+      const amount = subscriber?.isClient ? "2" : "1";
       const accountReference = `sub_${clerkId}`;
       const description = "Pro subscription";
 
-      console.log("Route payload", {
-        phoneNumber,
-        amount,
-        accountReference,
-        description,
-      });
       const stkResponse = await mpesaService.initiateSTKPush(
         phoneNumber,
         amount,
@@ -124,14 +131,10 @@ export async function POST(request: NextRequest) {
         description
       );
 
-      // Return optimistic update response while payment processes
-      const nextBillingDate = new Date();
-      nextBillingDate.setMonth(nextBillingDate.getMonth() + 1);
-
       return NextResponse.json({
         tier: "pro",
         nextBillingDate,
-        isPro: true,
+        isPro: false, // Set to false until payment confirmed
         paymentInitiated: true,
         checkoutRequestId: stkResponse.CheckoutRequestID,
         message: "Payment initiated - subscription will be confirmed shortly",

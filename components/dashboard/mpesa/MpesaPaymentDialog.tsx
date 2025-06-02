@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 interface MpesaPaymentDialogProps {
   open: boolean;
@@ -27,7 +28,7 @@ export function MpesaPaymentDialog({
   const [inputValue, setInputValue] = useState("");
   const [error, setError] = useState("");
   const [isValid, setIsValid] = useState(false);
-
+  const { user } = useCurrentUser();
   // Format the phone number for display and validation
   useEffect(() => {
     // Remove all non-digit characters
@@ -178,7 +179,9 @@ export function MpesaPaymentDialog({
             </div>
             <div className="flex justify-between text-green-100 text-sm mt-2">
               <span>Amount:</span>
-              <span className="font-bold">KES 100</span>
+              <span className="font-bold">
+                {user?.isClient ? "KES 2000" : "KES 1500"}
+              </span>
             </div>
           </div>
 

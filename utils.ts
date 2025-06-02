@@ -159,6 +159,7 @@ export const postedBy = {
   isBanned: false,
   banExpiresAt: new Date(), // New field for temporary ban
   banReference: "", // New fiel
+  tierStatus: "",
 };
 
 export const instruments = [

@@ -78,6 +78,7 @@ interface IUser extends Document {
   updatedAt: Date;
   isAdmin: boolean;
   adminRole?: "super" | "content" | "support" | "analytics";
+  tierStatus?: "active" | "pending" | "canceled" | "expired";
   adminPermissions?: string[];
   lastAdminAction?: Date;
   adminNotes?: string;
@@ -195,6 +196,11 @@ const userSchema = new Schema<IUser>(
     bannedAt: { type: Date, default: new Date() },
     banExpiresAt: { type: Date }, // New field for temporary bans
     banReference: { type: String }, // New fiel
+    tierStatus: {
+      type: String,
+      enum: ["active", "pending", "canceled"],
+      default: undefined,
+    },
   },
 
   { timestamps: true }
