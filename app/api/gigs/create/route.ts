@@ -74,12 +74,6 @@ export async function POST(req: NextRequest) {
   console.log(day);
   console.log(currency);
 
-  if (!logo) {
-    return NextResponse.json({
-      gigstatus: "false",
-      message: "logo is required",
-    });
-  }
   if (!title) {
     return NextResponse.json({
       gigstatus: "false",

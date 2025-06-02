@@ -47,7 +47,7 @@ interface AdminTableUser {
   isMusician?: boolean;
   isClient?: boolean;
   isAdmin?: boolean;
-  createdAt?: string;
+  createdAt?: Date;
   status?: "active" | "banned" | "pending";
 }
 
