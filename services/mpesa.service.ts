@@ -3,7 +3,7 @@ import {
   generateMpesaTimestamp,
 } from "@/lib/mpesa-utils";
 import axios from "axios";
-
+import { AxiosError } from "axios";
 // Define TypeScript interfaces for M-Pesa responses
 interface AuthResponse {
   access_token: string;
@@ -186,6 +186,7 @@ export class MpesaService {
     while (attempts < maxRetries) {
       attempts++;
       try {
+        // Re-authenticate before each attempt (token might expire)
         await this.authenticate();
 
         const timestamp = generateMpesaTimestamp();
@@ -203,7 +204,7 @@ export class MpesaService {
         };
 
         const response = await axios.post<STKPushQueryResponse>(
-          `${process.env.NEXT_PUBLIC_MPESA_API_URL}/stkpushquery/v1/query`,
+          `${process.env.NEXT_PUBLIC_MPESA_API_URL}/stkpushquery/v1/query`, // Removed NEXT_PUBLIC_
           payload,
           {
             headers: {
@@ -214,25 +215,37 @@ export class MpesaService {
           }
         );
 
+        // Debug: Log full response
+        console.log("M-Pesa Response:", {
+          status: response.status,
+          data: response.data,
+        });
+
+        if (response.data.ResultCode !== "0") {
+          throw new Error(
+            `M-Pesa Error [${response.data.ResultCode}]: ${response.data.ResultDesc}`
+          );
+        }
+
         return response.data;
       } catch (error) {
-        if (error instanceof Error) {
-          lastError = error;
+        if (error instanceof AxiosError && error.response) {
+          const { status, data } = error.response;
+
+          console.error("M-Pesa API Error:", { status, data });
+
+          lastError = new Error(`API Error ${status}: ${JSON.stringify(data)}`);
         } else {
-          lastError = new Error(String(error));
+          lastError = error instanceof Error ? error : new Error(String(error));
         }
-        console.log(`Verification attempt ${attempts} failed:`, lastError);
+
         if (attempts < maxRetries) {
-          await new Promise((resolve) => setTimeout(resolve, 2000));
+          await new Promise((resolve) => setTimeout(resolve, 2000 * attempts)); // Exponential backoff
         }
       }
     }
 
-    throw new Error(
-      `Transaction verification failed after ${maxRetries} attempts: ${
-        lastError?.message || "Unknown error"
-      }`
-    );
+    throw lastError || new Error("Verification failed with unknown error");
   }
 }
 

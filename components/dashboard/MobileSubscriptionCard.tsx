@@ -95,7 +95,14 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
 
   const handlePaymentInitiated = async (phoneNumber: string) => {
     try {
-      await mutateSubscription(
+      // First validate the phone number format if needed
+      if (!phoneNumber || !phoneNumber.startsWith("254")) {
+        throw new Error(
+          "Please enter a valid Kenyan phone number (starts with 254)"
+        );
+      }
+
+      const result = await mutateSubscription(
         async () => {
           const response = await fetch(
             `/api/user/subscription?clerkId=${user?.id}`,
@@ -105,6 +112,14 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
               body: JSON.stringify({ phoneNumber, tier: "pro" }),
             }
           );
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(
+              errorData.error || "Failed to initiate subscription"
+            );
+          }
+
           return await response.json();
         },
         {
@@ -121,24 +136,10 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
           revalidate: false,
         }
       );
+
       setIsMutating(true);
-
-      const response = await fetch(
-        `/api/user/subscription?clerkId=${user?.id}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            phoneNumber,
-            tier: "pro",
-          }),
-        }
-      );
-
-      const result = await response.json();
       console.log(result);
+
       if (result.checkoutRequestId) {
         // Poll for payment confirmation
         const checkPayment = async (checkoutRequestId: string, attempt = 1) => {
@@ -194,6 +195,11 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
       }
     } catch (error) {
       console.error("Subscription error:", error);
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Failed to initiate subscription"
+      );
       setIsMutating(false);
     }
   };

@@ -11,7 +11,7 @@ export async function updateSubscription(
 ) {
   try {
     const response = await fetch(`/api/user/subscription?clerkId=${clerkId}`, {
-      method: "PUT",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
