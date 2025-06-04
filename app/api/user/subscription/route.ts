@@ -2,6 +2,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDb from "@/lib/connectDb";
 import User from "@/models/user";
+import { mpesaService } from "@/services/mpesa.service";
+import { getAuth } from "@clerk/nextjs/server";
+import { PendingPayment } from "@/models/pendingPayment";
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,12 +17,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "User ID required" }, { status: 400 });
     }
 
-    const userdata = await User.findOne({ clerkId: clerkId });
+    const userdata = await User.findOne({ clerkId });
     if (!userdata) {
-      return NextResponse.json(
-        { error: "Userdata not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     return NextResponse.json({
@@ -32,17 +32,14 @@ export async function GET(request: NextRequest) {
         onboardingComplete: userdata.onboardingComplete,
         gigsPosted: userdata?.monthlyGigsPosted,
         gigsBooked: userdata.monthlyGigsBooked,
-
-        gigsBookedThisWeek: userdata?.gigsBookedThisWeek, // Track weekly bookings
+        gigsBookedThisWeek: userdata?.gigsBookedThisWeek,
         totalSpent: userdata.totalSpent,
-        userearnings: userdata.earnings,
         createdAt: userdata?.createdAt,
       },
       subscription: {
         tier: userdata.tier,
         nextBillingDate: userdata.nextBillingDate,
-        lastBookingDate: userdata?.lastBookingDate, // To track weekly reset
-
+        lastBookingDate: userdata?.lastBookingDate,
         isPro:
           userdata.tier === "pro" &&
           (!userdata.nextBillingDate ||
@@ -50,16 +47,13 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Failed to fetch subscription:", error);
+    console.error("GET /subscription failed:", error);
     return NextResponse.json(
-      { error: "Failed to fetch subscription" },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }
 }
-
-import { mpesaService } from "@/services/mpesa.service";
-import { getAuth } from "@clerk/nextjs/server";
 
 export async function POST(request: NextRequest) {
   const { userId: clerkId } = getAuth(request);
@@ -69,7 +63,6 @@ export async function POST(request: NextRequest) {
 
     const { tier, phoneNumber } = await request.json();
 
-    // Basic validation
     if (!clerkId || !tier) {
       return NextResponse.json(
         { error: "User ID and tier are required" },
@@ -77,8 +70,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate phone number for pro tier
+    const user = await User.findOne({ clerkId });
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    if (tier === "free") {
+      const updatedUser = await User.findOneAndUpdate(
+        { clerkId },
+        { tier: "free", nextBillingDate: null },
+        { new: true }
+      ).select(["tier", "nextBillingDate"]);
+
+      return NextResponse.json({
+        tier: updatedUser?.tier,
+        nextBillingDate: updatedUser?.nextBillingDate,
+        isPro: false,
+      });
+    }
+
     if (tier === "pro") {
+      // Validate phone number
       if (
         !phoneNumber ||
         !phoneNumber.startsWith("254") ||
@@ -91,76 +103,40 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       }
-    }
 
-    const subscriber = await User.findOne({ clerkId });
-    if (!subscriber) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
+      // Calculate amount
+      const amount = user.isClient ? "2" : "1";
+      const accountReference = `sub_${clerkId}`;
+      const description = "Pro subscription";
 
-    // Free tier - update immediately
-    if (tier === "free") {
-      const updateData = {
-        tier,
-        nextBillingDate: null,
-      };
+      // Initiate STK push
+      const stkResponse = await mpesaService.initiateSTKPush(
+        phoneNumber,
+        amount,
+        accountReference,
+        description
+      );
 
-      const user = await User.findOneAndUpdate({ clerkId }, updateData, {
-        new: true,
-      }).select(["tier", "nextBillingDate"]);
-
-      if (!user) {
-        return NextResponse.json(
-          { error: "User not found or update failed" },
-          { status: 404 }
-        );
+      const checkoutRequestId = stkResponse?.CheckoutRequestID;
+      if (!checkoutRequestId) {
+        throw new Error("M-Pesa did not return a CheckoutRequestID");
       }
+
+      // Save PendingPayment
+      await PendingPayment.create({
+        clerkId,
+        checkoutRequestId,
+        amount,
+        tier,
+        status: "pending",
+        phoneNumber,
+        username: user.username,
+      });
 
       return NextResponse.json({
-        tier: user.tier,
-        nextBillingDate: user.nextBillingDate,
-        isPro: false,
+        checkoutRequestId,
+        message: "Payment initiated - awaiting confirmation",
       });
-    }
-
-    // Pro tier - handle payment first
-    if (tier === "pro") {
-      if (!phoneNumber) {
-        return NextResponse.json(
-          { error: "Phone number is required for Pro subscription" },
-          { status: 400 }
-        );
-      }
-
-      // 1. Attempt STK push FIRST (no DB update yet)
-      try {
-        const amount = subscriber?.isClient ? "2" : "1";
-        const accountReference = `sub_${clerkId}`;
-        const description = "Pro subscription";
-
-        const stkResponse = await mpesaService.initiateSTKPush(
-          phoneNumber,
-          amount,
-          accountReference,
-          description
-        );
-
-        if (!stkResponse.CheckoutRequestID) {
-          throw new Error("M-Pesa did not return a CheckoutRequestID");
-        }
-
-        // 2. Return checkoutRequestId (but DO NOT update user yet)
-        return NextResponse.json({
-          checkoutRequestId: stkResponse.CheckoutRequestID,
-          message: "Payment initiated - awaiting confirmation",
-        });
-      } catch (error) {
-        console.error("STK Push failed:", error);
-        return NextResponse.json(
-          { error: "Failed to initiate payment. Please try again." },
-          { status: 500 }
-        );
-      }
     }
 
     return NextResponse.json(
@@ -168,7 +144,7 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
   } catch (error) {
-    console.error("Failed to update subscription:", error);
+    console.error("POST /subscription failed:", error);
     return NextResponse.json(
       { error: "Failed to process subscription" },
       { status: 500 }

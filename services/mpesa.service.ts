@@ -28,18 +28,9 @@ interface STKPushQueryResponse {
 }
 
 function getCallbackUrl(): string {
-  if (process.env.NODE_ENV === "development") {
-    // Use ngrok URL for development
-    return (
-      process.env.MPESA_CALLBACK_URL ||
-      "https://f7a4-41-81-189-87.ngrok-free.app/api/mpesa-callback"
-    );
-  } else {
-    // Use production URL (your Vercel domain)
-    return process.env.NEXT_PUBLIC_URL
-      ? `${process.env.NEXT_PUBLIC_URL}/api/mpesa-callback`
-      : "https://newgigup.vercel.app/api/mpesa-callback";
-  }
+  return process.env.NODE_ENV === "development"
+    ? "https://5d66-2c0f-fe38-2327-909d-f845-dd91-2bf7-242b.ngrok-free.app/api/stkcallback"
+    : "https://newgigup.vercel.app/api/stkcallback";
 }
 export class MpesaService {
   private consumerKey: string;
@@ -65,7 +56,7 @@ export class MpesaService {
     this.consumerSecret = process.env.MPESA_CONSUMER_SECRET;
     this.shortCode = process.env.MPESA_BUSINESS_SHORTCODE;
     this.passkey = process.env.MPESA_PASSKEY;
-    this.callbackUrl = getCallbackUrl();
+    this.callbackUrl = getCallbackUrl().trim();
   }
 
   private async authenticate(maxRetries = 3): Promise<void> {
@@ -166,11 +157,11 @@ export class MpesaService {
       );
       return response.data;
     } catch (error) {
-      // console.error("STK Push failed:", {
-      //   message: error.message,
-      //   data: error.response?.data,
-      //   requestPayload: payload,
-      // });
+      console.error("STK Push failed:", {
+        message: error instanceof Error ? error.message : undefined,
+        data: error instanceof Error ? error : undefined,
+        requestPayload: payload,
+      });
 
       throw error; // Re-throw to preserve original error
     }
@@ -179,14 +170,17 @@ export class MpesaService {
   async verifyTransaction(
     checkoutRequestID: string,
     maxRetries = 3
-  ): Promise<STKPushQueryResponse> {
+  ): Promise<{
+    success: boolean;
+    message: string;
+    data?: STKPushQueryResponse;
+  }> {
     let attempts = 0;
-    let lastError: Error | null = null;
+    let lastErrorMessage = "";
 
     while (attempts < maxRetries) {
       attempts++;
       try {
-        // Re-authenticate before each attempt (token might expire)
         await this.authenticate();
 
         const timestamp = generateMpesaTimestamp();
@@ -204,7 +198,7 @@ export class MpesaService {
         };
 
         const response = await axios.post<STKPushQueryResponse>(
-          `${process.env.NEXT_PUBLIC_MPESA_API_URL}/stkpushquery/v1/query`, // Removed NEXT_PUBLIC_
+          `${process.env.NEXT_PUBLIC_MPESA_API_URL}/stkpushquery/v1/query`,
           payload,
           {
             headers: {
@@ -215,37 +209,60 @@ export class MpesaService {
           }
         );
 
-        // Debug: Log full response
         console.log("M-Pesa Response:", {
           status: response.status,
           data: response.data,
         });
 
-        if (response.data.ResultCode !== "0") {
-          throw new Error(
-            `M-Pesa Error [${response.data.ResultCode}]: ${response.data.ResultDesc}`
-          );
+        if (response.data.ResultCode === "0") {
+          return {
+            success: true,
+            message: "Payment successful.",
+            data: response.data,
+          };
         }
 
-        return response.data;
-      } catch (error) {
-        if (error instanceof AxiosError && error.response) {
-          const { status, data } = error.response;
-
-          console.error("M-Pesa API Error:", { status, data });
-
-          lastError = new Error(`API Error ${status}: ${JSON.stringify(data)}`);
+        if (
+          response.data.ResultCode === "500.001.1001" ||
+          response.data.ResultDesc?.toLowerCase().includes("being processed")
+        ) {
+          lastErrorMessage = "Transaction is still being processed.";
+          console.log(`Attempt ${attempts}: still processing...`);
         } else {
-          lastError = error instanceof Error ? error : new Error(String(error));
+          lastErrorMessage = `M-Pesa Error [${response.data.ResultCode}]: ${response.data.ResultDesc}`;
+          break; // Don't retry on other errors
         }
+      } catch (error) {
+        if (
+          error instanceof AxiosError &&
+          error.response?.data?.errorMessage?.includes("being processed")
+        ) {
+          lastErrorMessage = "Transaction is still being processed.";
+          console.log(`Attempt ${attempts}: M-Pesa still processing...`);
+        } else if (error instanceof AxiosError && error.response) {
+          const { status, data } = error.response;
+          console.error("M-Pesa API Error:", { status, data });
+          lastErrorMessage = `API Error ${status}: ${
+            data?.errorMessage || "Unknown error"
+          }`;
+          break;
+        } else {
+          lastErrorMessage =
+            error instanceof Error ? error.message : String(error);
+          break;
+        }
+      }
 
-        if (attempts < maxRetries) {
-          await new Promise((resolve) => setTimeout(resolve, 2000 * attempts)); // Exponential backoff
-        }
+      // Delay before next retry
+      if (attempts < maxRetries) {
+        await new Promise((resolve) => setTimeout(resolve, 2000 * attempts));
       }
     }
 
-    throw lastError || new Error("Verification failed with unknown error");
+    return {
+      success: false,
+      message: lastErrorMessage || "Verification failed with unknown error",
+    };
   }
 }
 

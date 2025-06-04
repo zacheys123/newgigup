@@ -67,6 +67,13 @@ const AdminNavbar = ({ user }: NavbarProps) => {
       allowedRoles: ["super", "analytics"],
     },
     {
+      href: "/admin/mpesa-transactions",
+      icon: FileText, // optionally use a custom M-Pesa icon
+      label: "M-Pesa Transactions",
+      allowedRoles: ["super", "support"],
+      isMpesa: true, // 🔑 add a flag for special styling
+    },
+    {
       href: "/admin/content",
       icon: FileText,
       label: "Content",
@@ -86,29 +93,40 @@ const AdminNavbar = ({ user }: NavbarProps) => {
   );
 
   return (
-    <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-40 border-b bg-zinc-700 ">
       <div className="container flex h-16 items-center justify-between">
         {/* Logo and Main Nav */}
         <div className="flex items-center gap-8">
           <Link href="/admin/dashboard" className="flex items-center gap-2">
-            <span className="text-lg font-semibold mx-3">GigAdmin</span>
+            <span className="text-lg font-semibold mx-3 text-white">
+              GigAdmin
+            </span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-1">
-            {filteredNavItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                  pathname.startsWith(item.href)
-                    ? "bg-accent text-accent-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <item.icon className="h-4 w-4" />
-                <span>{item.label}</span>
-              </Link>
-            ))}
+            {filteredNavItems.map((item) => {
+              const isActive = pathname.startsWith(item.href);
+              const isMpesa = item.isMpesa;
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors
+        ${
+          isMpesa
+            ? "bg-[#1C8F45] text-white hover:bg-[#157A38]"
+            : isActive
+            ? "bg-accent text-accent-foreground shadow-sm ring-1 ring-accent"
+            : "text-muted-foreground hover:text-primary hover:bg-muted"
+        }
+      `}
+                >
+                  <item.icon className="h-[18px] w-[18px]" />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
           </nav>
         </div>
 
@@ -177,21 +195,30 @@ const AdminNavbar = ({ user }: NavbarProps) => {
 
       {/* Mobile Nav (for smaller screens) */}
       <div className="md:hidden border-t">
-        <nav className="container flex overflow-x-auto py-2">
-          {filteredNavItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex flex-col items-center px-4 py-2 text-xs rounded-md transition-colors ${
-                pathname.startsWith(item.href)
-                  ? "bg-accent text-accent-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <item.icon className="h-4 w-4" />
-              <span className="mt-1">{item.label}</span>
-            </Link>
-          ))}
+        <nav className="container flex overflow-x-auto py-2 space-x-2">
+          {filteredNavItems.map((item) => {
+            const isActive = pathname.startsWith(item.href);
+            const isMpesa = item.isMpesa;
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex whitespace-nowrap flex-col items-center justify-center px-4 py-2 rounded-md transition-all duration-200
+        ${
+          isMpesa
+            ? "bg-[#1C8F45] text-white hover:bg-[#157A38]"
+            : isActive
+            ? "bg-accent text-accent-foreground shadow ring-1 ring-accent"
+            : "text-muted-foreground hover:text-primary hover:bg-muted"
+        }
+      `}
+              >
+                <item.icon className="h-5 w-5 mb-1" />
+                <span className="text-[11px] font-medium">{item.label}</span>
+              </Link>
+            );
+          })}
         </nav>
       </div>
     </header>

@@ -136,7 +136,9 @@ export function PaymentSuccessModal({
                 </div>
                 <div className="flex justify-between">
                   <span className="text-green-200">Phone Number:</span>
-                  <span className="font-mono text-white">{formattedPhone}</span>
+                  <span className="font-mono text-white blur-md">
+                    {formattedPhone}
+                  </span>
                 </div>
               </div>
 

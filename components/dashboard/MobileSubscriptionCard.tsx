@@ -12,11 +12,11 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 import useStore from "@/app/zustand/useStore";
-import { useCheckTrial } from "@/hooks/useCheckTrials";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { MpesaPaymentDialog } from "./mpesa/MpesaPaymentDialog";
 import { PaymentSuccessModal } from "./mpesa/PaymentSuccessModal";
-
+import toast from "react-hot-toast";
+import { usePaymentVerification } from "@/hooks/usePaymentVerification";
 interface Plan {
   name: string;
   price: string;
@@ -36,10 +36,18 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
   const [isMutating, setIsMutating] = useState(false);
   const { showConfirmModal, setShowConfirmModal } = useStore();
   const [pendingTier, setPendingTier] = useState<"free" | "pro">("free");
-  const { setisFirstMonthEnd } = useCheckTrial(myuser?.user);
 
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
-  const [paymentSuccess, setPaymentSuccess] = useState(false);
+
+  const {
+    checkPayment,
+    cancelVerification,
+    isMutating: isVerifyingPayment,
+    paymentSuccess,
+    setPaymentSuccess,
+  } = usePaymentVerification({
+    onSuccess: () => handleSubscriptionChange("pro"), // optional callback
+  });
 
   const handleSubscriptionChange = async (newTier: "free" | "pro") => {
     if (!user?.id) return;
@@ -88,6 +96,7 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
     if (newTier === "free") {
       setPendingTier("free");
       setShowConfirmModal(true);
+      mutateSubscription();
     } else {
       setShowPaymentDialog(true);
     }
@@ -95,12 +104,14 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
 
   const handlePaymentInitiated = async (phoneNumber: string) => {
     try {
-      // First validate the phone number format if needed
       if (!phoneNumber || !phoneNumber.startsWith("254")) {
-        throw new Error(
+        toast.error(
           "Please enter a valid Kenyan phone number (starts with 254)"
         );
+        return;
       }
+
+      const toastId = toast.loading("Initiating payment...");
 
       const result = await mutateSubscription(
         async () => {
@@ -138,64 +149,19 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
       );
 
       setIsMutating(true);
-      console.log(result);
+      toast.success("STK push sent to your phone", { id: toastId });
 
       if (result.checkoutRequestId) {
-        // Poll for payment confirmation
-        const checkPayment = async (checkoutRequestId: string, attempt = 1) => {
-          try {
-            if (attempt > 10) {
-              // Limit retries
-              alert("Payment verification timed out. Please contact support.");
-              setIsMutating(false);
-              return;
-            }
-
-            const verification = await fetch("/api/verify-payment", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ checkoutRequestId }),
-            });
-
-            const verificationResult = await verification.json();
-            console.log(`Attempt ${attempt}:`, verificationResult);
-
-            if (verificationResult.success) {
-              setPaymentSuccess(true);
-              setisFirstMonthEnd(false);
-              handleSubscriptionChange("pro");
-            } else if (verificationResult.retry) {
-              setTimeout(
-                () => checkPayment(checkoutRequestId, attempt + 1),
-                3000
-              );
-            } else {
-              alert(
-                `Payment failed: ${
-                  verificationResult.errorMessage || "Unknown error"
-                }`
-              );
-              setIsMutating(false);
-            }
-          } catch (error) {
-            console.error("Payment verification error:", error);
-            setIsMutating(false);
-          }
-        };
-
-        // Start polling
         checkPayment(result.checkoutRequestId);
       } else {
-        alert(
-          result.message || "Failed to initiate payment. Please try again."
-        );
+        toast.error(result.message || "Failed to initiate payment", {
+          id: toastId,
+        });
         setIsMutating(false);
       }
     } catch (error) {
       console.error("Subscription error:", error);
-      alert(
+      toast.error(
         error instanceof Error
           ? error.message
           : "Failed to initiate subscription"
@@ -203,9 +169,16 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
       setIsMutating(false);
     }
   };
+
   console.log(myuser, subscription);
   return (
     <>
+      {isVerifyingPayment && (
+        <Button variant="ghost" onClick={cancelVerification}>
+          Cancel Verification
+        </Button>
+      )}
+
       <MpesaPaymentDialog
         open={showPaymentDialog}
         onOpenChange={setShowPaymentDialog}
@@ -220,7 +193,7 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
             window.location.reload();
           }, 3000);
         }}
-        amount={1500}
+        amount={myuser?.isClient ? 2000 : 1500}
         phoneNumber={"0721324354"}
       />
       <div
