@@ -16,7 +16,7 @@ export function PaymentSuccessModal({
   open: boolean;
   onClose: () => void;
   amount: number;
-  phoneNumber: string;
+  phoneNumber: string | null;
 }) {
   const [confetti, setConfetti] = useState<ConfettiPiece[]>([]);
 
@@ -41,10 +41,9 @@ export function PaymentSuccessModal({
     return () => clearTimeout(timer);
   }, [open]);
 
-  const formattedPhone = phoneNumber.replace(
-    /(\d{3})(\d{3})(\d{3})(\d{3})/,
-    "$1 $2 $3 $4"
-  );
+  const formattedPhone =
+    phoneNumber &&
+    phoneNumber.replace(/(\d{3})(\d{3})(\d{3})(\d{3})/, "$1 $2 $3 $4");
 
   return (
     <AnimatePresence>

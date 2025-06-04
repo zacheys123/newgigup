@@ -47,7 +47,7 @@ export function usePaymentVerification(
       if (verificationResult.success) {
         toast.dismiss("payment-verification");
         toast.success("Payment confirmed! You’re now Pro 🎉");
-        setPaymentSuccess(true);
+        setPaymentSuccess(true); // ✅ triggers modal
         setisFirstMonthEnd(false);
         setIsMutating(false);
         options?.onSuccess?.();

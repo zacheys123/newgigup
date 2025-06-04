@@ -36,6 +36,7 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
   const [isMutating, setIsMutating] = useState(false);
   const { showConfirmModal, setShowConfirmModal } = useStore();
   const [pendingTier, setPendingTier] = useState<"free" | "pro">("free");
+  const [mpesaPhoneNumber, setMpesaPhoneNumber] = useState<string | null>(null);
 
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
 
@@ -46,7 +47,11 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
     paymentSuccess,
     setPaymentSuccess,
   } = usePaymentVerification({
-    onSuccess: () => handleSubscriptionChange("pro"), // optional callback
+    onSuccess: () => {
+      setPaymentSuccess(true); // ✅ show success modal
+      setShowPaymentDialog(false); // ✅ hide mpesa dialog if still open
+      setIsMutating(false);
+    },
   });
 
   const handleSubscriptionChange = async (newTier: "free" | "pro") => {
@@ -101,7 +106,6 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
       setShowPaymentDialog(true);
     }
   };
-
   const handlePaymentInitiated = async (phoneNumber: string) => {
     try {
       if (!phoneNumber || !phoneNumber.startsWith("254")) {
@@ -110,6 +114,8 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
         );
         return;
       }
+
+      setMpesaPhoneNumber(phoneNumber); // track for modal
 
       const toastId = toast.loading("Initiating payment...");
 
@@ -148,11 +154,11 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
         }
       );
 
-      setIsMutating(true);
       toast.success("STK push sent to your phone", { id: toastId });
 
       if (result.checkoutRequestId) {
-        checkPayment(result.checkoutRequestId);
+        setShowPaymentDialog(false); // ✅ close M-Pesa dialog
+        checkPayment(result.checkoutRequestId); // triggers verification
       } else {
         toast.error(result.message || "Failed to initiate payment", {
           id: toastId,
@@ -160,7 +166,6 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
         setIsMutating(false);
       }
     } catch (error) {
-      console.error("Subscription error:", error);
       toast.error(
         error instanceof Error
           ? error.message
@@ -189,12 +194,9 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
         open={paymentSuccess}
         onClose={() => {
           setPaymentSuccess(false);
-          setTimeout(() => {
-            window.location.reload();
-          }, 3000);
         }}
         amount={myuser?.isClient ? 2000 : 1500}
-        phoneNumber={"0721324354"}
+        phoneNumber={mpesaPhoneNumber}
       />
       <div
         onClick={onPlanClick}

@@ -211,10 +211,11 @@ export function MobileNav() {
                           `}
                             title={link.name}
                             onClick={() => {
-                              if ((link.name = "Home")) {
+                              if (link.name === "Home") {
                                 window.location.reload();
                                 window.location.href = "/";
                               }
+
                               setIsOpen(false);
                             }}
                           >
