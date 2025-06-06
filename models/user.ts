@@ -206,7 +206,82 @@ const userSchema = new Schema<IUser>(
   { timestamps: true }
 );
 
-// Define Mongoose Model
+// ========== INDEXES ========== //
+
+// 📌 Unique Constraints
+userSchema.index({ clerkId: 1 }, { unique: true });
+userSchema.index({ email: 1 }, { unique: true });
+userSchema.index(
+  { username: 1 },
+  {
+    unique: true,
+    collation: { locale: "en", strength: 2 }, // Case-insensitive
+  }
+);
+
+// 📌 Search Index
+userSchema.index(
+  {
+    firstname: "text",
+    lastname: "text",
+    username: "text",
+    email: "text",
+    city: "text",
+    instrument: "text",
+  },
+  {
+    weights: {
+      username: 5,
+      email: 3,
+      firstname: 2,
+      lastname: 2,
+      city: 1,
+      instrument: 1,
+    },
+    name: "user_search_index",
+  }
+);
+
+// 📌 Tier & Billing
+userSchema.index({ tier: 1 });
+userSchema.index({ tierStatus: 1 });
+userSchema.index({ tier: 1, tierStatus: 1 });
+userSchema.index({ nextBillingDate: 1 });
+
+// 📌 Performance & Filtering
+userSchema.index({ isMusician: 1 });
+userSchema.index({ isClient: 1 });
+userSchema.index({ lastActive: -1 });
+userSchema.index({ createdAt: -1 });
+userSchema.index({ updatedAt: -1 });
+userSchema.index({ isBanned: 1 });
+userSchema.index({ isBanned: 1, banExpiresAt: 1 });
+userSchema.index({ isMusician: 1, city: 1 }); // Example compound index
+
+// 📌 Admin Operations
+userSchema.index({ isAdmin: 1, adminRole: 1 });
+
+// 📌 Reviews & Relations
+userSchema.index({ "allreviews.postedBy": 1 });
+userSchema.index({ "allreviews.postedTo": 1 });
+userSchema.index({ followers: 1 });
+userSchema.index({ followings: 1 });
+
+// ========== INDEX CREATION STRATEGY ========== //
+
+// Mongoose will automatically create indexes unless disabled.
+// You can enforce creation during startup like this:
+if (process.env.NODE_ENV === "production") {
+  userSchema.set("autoIndex", false); // Performance boost in prod
+
+  mongoose
+    .model<IUser>("User", userSchema)
+    .syncIndexes()
+    .then(() => console.log("✅ User indexes synced"))
+    .catch((err) => console.error("❌ Index sync failed:", err));
+}
+
+// Final export
 const User: Model<IUser> =
   models.User || mongoose.model<IUser>("User", userSchema);
 

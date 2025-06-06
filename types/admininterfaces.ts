@@ -29,3 +29,39 @@ export interface AdminNavbarProps {
   email?: string;
   picture?: string;
 }
+
+export interface PageProps {
+  _id: string;
+  picture?: string;
+  firstname?: string;
+  lastname?: string;
+  roleType?: string;
+  instrument?: string;
+
+  isAdmin?: boolean;
+  isClient?: boolean;
+  username: string;
+  email: string;
+  phone: string;
+  city: string;
+  talentbio: string;
+  date: string;
+  month: string;
+  year: string;
+  createdAt: string;
+  isBanned: boolean;
+  bannedAt?: Date;
+  banReason?: string;
+  banExpiresAt?: Date;
+  banReference?: string;
+  address?: string;
+  isMusician: boolean;
+  vocalistGenre?: string;
+  djGenre?: string;
+  musiciangenres?: string[];
+  organization?: string;
+  adminRole?: string;
+  lastAdminAction?: string;
+  adminPermissions?: string[];
+  status?: "active" | "banned" | "pending";
+}

@@ -36,23 +36,21 @@ import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import Link from "next/link";
 
-interface AdminTableUser {
-  _id: string;
-  clerkId: string;
-  picture?: string | null;
-  firstname?: string;
-  lastname?: string;
-  email?: string;
-  username: string;
-  isMusician?: boolean;
-  isClient?: boolean;
-  isAdmin?: boolean;
-  createdAt?: Date;
-  status?: "active" | "banned" | "pending";
-}
-
 interface UsersTableProps {
-  users: AdminTableUser[];
+  users: {
+    _id: string;
+    clerkId: string;
+    picture?: string;
+    firstname?: string;
+    lastname?: string;
+    email: string;
+    username: string;
+    isMusician: boolean;
+    isClient: boolean;
+    isAdmin: boolean;
+    createdAt: Date;
+    status?: "active" | "banned" | "pending";
+  }[];
   currentPage: number;
   totalPages: number;
   totalUsers: number;
@@ -217,7 +215,24 @@ export default function UsersTable({
 }
 
 // User row
-function UserTableRow({ user }: { user: AdminTableUser }) {
+function UserTableRow({
+  user,
+}: {
+  user: {
+    _id: string;
+    clerkId: string;
+    picture?: string;
+    firstname?: string;
+    lastname?: string;
+    email: string;
+    username: string;
+    isMusician: boolean;
+    isClient: boolean;
+    isAdmin: boolean;
+    createdAt: Date;
+    status?: "active" | "banned" | "pending";
+  };
+}) {
   const statusVariantMap: Record<
     string,
     | "default"
@@ -238,10 +253,10 @@ function UserTableRow({ user }: { user: AdminTableUser }) {
       <TableCell>
         <div className="flex items-center gap-3">
           <div className="relative flex-shrink-0">
-            {user.picture && user.firstname ? (
+            {user?.picture && user?.firstname ? (
               <Image
-                src={user.picture}
-                alt={user.firstname.split("")[0]}
+                src={user?.picture}
+                alt={user?.firstname.split("")[0]}
                 className="rounded-full"
                 width={40}
                 height={40}
@@ -254,10 +269,10 @@ function UserTableRow({ user }: { user: AdminTableUser }) {
           </div>
           <div>
             <div className="font-medium text-white">
-              {user.firstname} {user.lastname}
+              {user?.firstname} {user?.lastname}
             </div>
             <div className="text-sm text-muted-foreground">
-              @{user.username}
+              @{user?.username}
             </div>
           </div>
         </div>
@@ -266,23 +281,23 @@ function UserTableRow({ user }: { user: AdminTableUser }) {
         <div className="flex items-center gap-2">
           <Mail className="h-4 w-4 text-muted-foreground" />
           <span className="truncate max-w-[180px] text-neutral-400">
-            {user.email}
+            {user?.email}
           </span>
         </div>
       </TableCell>
       <TableCell>
         <div className="flex flex-wrap gap-1">
-          {user.isAdmin && (
+          {user?.isAdmin && (
             <Badge variant="destructive" className="gap-1">
               <Shield className="h-3 w-3" /> Admin
             </Badge>
           )}
-          {user.isMusician && (
+          {user?.isMusician && (
             <Badge variant="default" className="gap-1">
               <Music className="h-3 w-3" /> Musician
             </Badge>
           )}
-          {user.isClient && (
+          {user?.isClient && (
             <Badge variant="secondary" className="gap-1">
               <Briefcase className="h-3 w-3" /> Client
             </Badge>
@@ -296,13 +311,13 @@ function UserTableRow({ user }: { user: AdminTableUser }) {
       </TableCell>
       <TableCell>
         <div className="text-sm text-muted-foreground">
-          {user.createdAt
-            ? new Date(user.createdAt).toLocaleDateString()
+          {user?.createdAt
+            ? new Date(user?.createdAt).toLocaleDateString()
             : "N/A"}
         </div>
       </TableCell>
       <TableCell className="text-right">
-        <Link href={`/admin/users?userid=${user._id}`}>
+        <Link href={`/admin/users?userid=${user?._id}`}>
           <Button size="sm" variant="outline" className="h-8 w-8 p-0">
             <MoreVertical className="h-4 w-4" />
             <span className="sr-only">Manage user</span>

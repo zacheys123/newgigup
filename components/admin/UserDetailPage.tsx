@@ -24,45 +24,12 @@ import Link from "next/link";
 import { BanUserButton } from "@/components/admin/BanButton";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useAuth } from "@clerk/nextjs";
+import { PageProps } from "@/types/admininterfaces";
 
-export interface PageProps {
-  user: {
-    _id: string;
-    picture?: string;
-    firstname?: string;
-    lastname?: string;
-    roleType?: string;
-    instrument?: string;
-
-    isAdmin?: boolean;
-    isClient?: boolean;
-    username: string;
-    email: string;
-    phone: string;
-    city: string;
-    talentbio: string;
-    date: string;
-    month: string;
-    year: string;
-    createdAt: string;
-    isBanned: boolean;
-    bannedAt?: Date;
-    banReason?: string;
-    banExpiresAt?: Date;
-    banReference?: string;
-    address?: string;
-    isMusician: boolean;
-    vocalistGenre?: string;
-    djGenre?: string;
-    musiciangenres?: string[];
-    organization?: string;
-    adminRole?: string;
-    lastAdminAction?: string;
-    adminPermissions?: string[];
-  };
+interface MyPageProps {
+  user: PageProps;
 }
-
-export default function UserDetailPage({ user }: PageProps) {
+export default function UserDetailPage({ user }: MyPageProps) {
   const { userId } = useAuth();
   const { subscription } = useSubscription(userId as string);
   return (
