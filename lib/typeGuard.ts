@@ -1,14 +1,92 @@
 // utils/typeGuards.ts
-import { PageProps } from "@/components/admin/UserDetailPage";
 
-type UserCandidate = Partial<PageProps["user"]> & {
+import { PageProps } from "@/types/admininterfaces";
+
+type UserCandidate = Partial<PageProps[]> & {
+  // Core Identification
   _id: unknown;
+  clerkId: unknown;
   username: unknown;
   email: unknown;
-  // Add all other fields you need to check
+  phone: unknown;
+
+  // Personal Information
+  picture: unknown;
+  firstname: unknown;
+  lastname: unknown;
+  city: unknown;
+  address: unknown;
+  date: unknown;
+  month: unknown;
+  year: unknown;
+
+  // Professional Details
+  instrument: unknown;
+  experience: unknown;
+  organization: unknown;
+  bio: unknown;
+  talentbio: unknown;
+  roleType: unknown;
+  djGenre: unknown;
+  djEquipment: unknown;
+  mcType: unknown;
+  mcLanguages: unknown;
+  vocalistGenre: unknown;
+  verification: unknown;
+
+  // Social & Relationships
+  followers: unknown;
+  followings: unknown;
+  refferences: unknown;
+  musicianhandles: unknown;
+  musiciangenres: unknown;
+  videosProfile: unknown;
+
+  // Reviews
+  allreviews: unknown;
+  myreviews: unknown;
+
+  // Status Flags
+  isMusician: unknown;
+  isClient: unknown;
+  isBanned: unknown;
+  isAdmin: unknown;
+  firstLogin: unknown;
+  onboardingComplete: unknown;
+
+  // Admin Specific
+  adminRole: unknown;
+  adminPermissions: unknown;
+  adminNotes: unknown;
+  lastAdminAction: unknown;
+
+  // Ban Information
+  banReason: unknown;
+  bannedAt: unknown;
+  banExpiresAt: unknown;
+  banReference: unknown;
+
+  // Subscription & Billing
+  tier: unknown;
+  tierStatus: unknown;
+  nextBillingDate: unknown;
+  earnings: unknown;
+  totalSpent: unknown;
+
+  // Activity Tracking
+  monthlyGigsPosted: unknown;
+  monthlyMessages: unknown;
+  monthlyGigsBooked: unknown;
+  lastActive: unknown;
+  lastBookingDate: unknown;
+  gigsBookedThisWeek: unknown;
+
+  // Timestamps
+  createdAt: unknown;
+  updatedAt: unknown;
 };
 
-export function isUserValid(user: unknown): user is PageProps["user"] {
+export function isUserValid(user: unknown): user is PageProps[] {
   if (typeof user !== "object" || user === null) return false;
 
   const u = user as UserCandidate;

@@ -3,8 +3,9 @@ import { Types } from "mongoose";
 import connectDb from "./connectDb";
 import Gig from "@/models/gigs";
 import { UserFilter } from "@/types/userinterfaces";
-import { PageProps } from "@/components/admin/UserDetailPage";
+
 import { isUserValid } from "./typeGuard";
+import { PageProps } from "@/types/admininterfaces";
 
 interface AdminStats {
   totalUsers: number;
@@ -116,7 +117,7 @@ export async function getUsers(
 
 // actions/getUserById.ts
 
-export async function getUserById(id: string): Promise<PageProps["user"]> {
+export async function getUserById(id: string): Promise<PageProps> {
   await connectDb();
 
   if (!Types.ObjectId.isValid(id)) {

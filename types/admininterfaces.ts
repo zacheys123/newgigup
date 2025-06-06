@@ -40,14 +40,15 @@ export interface PageProps {
 
   isAdmin?: boolean;
   isClient?: boolean;
-  username: string;
-  email: string;
-  phone: string;
-  city: string;
-  talentbio: string;
-  date: string;
-  month: string;
-  year: string;
+  username?: string;
+  email?: string;
+  phone?: string;
+  city?: string;
+  talentbio?: string;
+  date?: string;
+  month?: string;
+  year?: string;
+
   createdAt: string;
   isBanned: boolean;
   bannedAt?: Date;
@@ -61,7 +62,7 @@ export interface PageProps {
   musiciangenres?: string[];
   organization?: string;
   adminRole?: string;
-  lastAdminAction?: string;
+  lastAdminAction?: Date;
   adminPermissions?: string[];
   status?: "active" | "banned" | "pending";
 }
