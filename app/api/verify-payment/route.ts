@@ -1,63 +1,72 @@
 import { NextRequest, NextResponse } from "next/server";
 import { mpesaService } from "@/services/mpesa.service";
-import { getAuth } from "@clerk/nextjs/server";
-import User from "@/models/user";
 import connectDb from "@/lib/connectDb";
-import { updateUserToPro } from "@/lib/subscription/updateUsertoPro";
+
+import { PendingPayment } from "@/models/pendingPayment";
 // import { sendConfirmationEmail } from "@/lib/subscription/sendConfirmationEmail";
 
+// In your verification endpoint
+// In your verification endpoint (/api/verify-payment)
 export async function POST(req: NextRequest) {
-  const { checkoutRequestId } = await req.json();
+  const { checkoutRequestId, attempt = 1 } = await req.json(); // 👈 Add attempt with default 1
 
   try {
     await connectDb();
+
+    // Check if payment is already successful
+    const pendingPayment = await PendingPayment.findOne({ checkoutRequestId });
+    if (pendingPayment?.status === "success") {
+      return NextResponse.json({ success: true });
+    }
 
     const verification = await mpesaService.verifyTransaction(
       checkoutRequestId
     );
 
     if (verification.success) {
-      // Successful payment
-      const { userId: clerkId } = getAuth(req);
-      const user = await User.findOne({ clerkId }).select(
-        "email username nextBillingDate"
+      // Update user and payment status
+
+      await PendingPayment.updateOne(
+        { checkoutRequestId },
+        { status: "success" }
       );
-
-      if (!user) {
-        throw new Error("User not found");
-      }
-
-      await updateUserToPro(clerkId as string);
-
-      // Optionally send confirmation email here if you want
-
       return NextResponse.json({ success: true });
     }
 
-    // If not success, handle specific M-Pesa codes from data if available
-    const resultCode = verification.data?.ResultCode;
-
-    if (resultCode === "1032") {
-      // Possibly retryable state
+    // Handle timeout specifically
+    if (
+      verification.data?.ResultCode === "1032" ||
+      verification.data?.ResultCode === "17" ||
+      verification.data?.ResultDesc?.toLowerCase().includes("timeout")
+    ) {
       return NextResponse.json({
         success: false,
-        retry: true,
-        message: verification.message,
+        retry: attempt < 10, // 👈 Only retry if under 10 attempts
+        shouldCancel: attempt >= 10, // 👈 Cancel after 10 attempts
+        message: `Payment verification timed out (attempt ${attempt}/10)`,
       });
     }
 
+    // For other errors, mark as failed
+    await PendingPayment.updateOne(
+      { checkoutRequestId },
+      { status: "failed", error: verification.message }
+    );
+
     return NextResponse.json({
       success: false,
-      errorCode: resultCode || "UNKNOWN",
+      errorCode: verification.data?.ResultCode || "UNKNOWN",
       errorMessage: verification.message || "Payment verification failed",
+      shouldCancel: true, // 👈 Don't retry on other errors
     });
   } catch (error: unknown) {
     console.error("Verification error:", error);
-    const errorMessage =
-      error instanceof Error ? error.message : "Verification failed";
-
     return NextResponse.json(
-      { success: false, error: errorMessage },
+      {
+        success: false,
+        error: error instanceof Error ? error.message : "Verification failed",
+        shouldCancel: true,
+      },
       { status: 500 }
     );
   }

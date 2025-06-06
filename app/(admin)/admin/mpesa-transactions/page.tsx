@@ -96,87 +96,89 @@ export default function M_PesaTransactionsAdmin() {
     }
 
     return (
-      <div className="overflow-auto rounded-lg border border-border bg-muted/10">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Phone</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead>Checkout ID</TableHead>
-              <TableHead>Clerk ID</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Created</TableHead>
-              <TableHead className="text-center">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {list.map((p) => (
-              <TableRow key={p._id}>
-                <TableCell>{p.phoneNumber}</TableCell>
-                <TableCell className="font-medium text-green-600">
-                  KES {p.amount}
-                </TableCell>
-                <TableCell>{p.checkoutRequestId}</TableCell>
-                <TableCell>{p.clerkId}</TableCell>
-                <TableCell
-                  className={clsx("capitalize", {
-                    "text-yellow-500": p.status === "pending",
-                    "text-green-600": p.status === "success",
-                    "text-red-600": p.status === "failed",
-                    "text-orange-500": p.status === "error",
-                  })}
-                >
-                  {p.status}
-                </TableCell>
-                <TableCell className="text-sm text-muted-foreground">
-                  {new Date(p.createdAt).toLocaleString()}
-                </TableCell>
-                <TableCell className="flex flex-wrap gap-2 justify-center py-2">
-                  {p.status === "pending" && (
-                    <>
+      <div className="rounded-lg border border-border bg-muted/10 ">
+        <div className="overflow-auto max-h-[calc(100vh-250px)] mb-15">
+          <Table>
+            <TableHeader className="sticky top-0 bg-background z-10">
+              <TableRow>
+                <TableHead>Phone</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Checkout ID</TableHead>
+                <TableHead>Clerk ID</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Created</TableHead>
+                <TableHead className="text-center">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {list.map((p) => (
+                <TableRow key={p._id}>
+                  <TableCell>{p.phoneNumber}</TableCell>
+                  <TableCell className="font-medium text-green-600">
+                    KES {p.amount}
+                  </TableCell>
+                  <TableCell>{p.checkoutRequestId}</TableCell>
+                  <TableCell>{p.clerkId}</TableCell>
+                  <TableCell
+                    className={clsx("capitalize", {
+                      "text-yellow-500": p.status === "pending",
+                      "text-green-600": p.status === "success",
+                      "text-red-600": p.status === "failed",
+                      "text-orange-500": p.status === "error",
+                    })}
+                  >
+                    {p.status}
+                  </TableCell>
+                  <TableCell className="text-sm text-muted-foreground">
+                    {new Date(p.createdAt).toLocaleString()}
+                  </TableCell>
+                  <TableCell className="flex flex-wrap gap-2 justify-center py-2">
+                    {p.status === "pending" && (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() =>
+                            updatePaymentStatus(p.checkoutRequestId, "success")
+                          }
+                        >
+                          Mark Success
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() =>
+                            updatePaymentStatus(p.checkoutRequestId, "failed")
+                          }
+                        >
+                          Mark Failed
+                        </Button>
+                      </>
+                    )}
+                    {(p.status === "failed" || p.status === "error") && (
                       <Button
                         size="sm"
                         variant="outline"
                         onClick={() =>
-                          updatePaymentStatus(p.checkoutRequestId, "success")
+                          updatePaymentStatus(p.checkoutRequestId, "pending")
                         }
                       >
-                        Mark Success
+                        Retry
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() =>
-                          updatePaymentStatus(p.checkoutRequestId, "failed")
-                        }
-                      >
-                        Mark Failed
-                      </Button>
-                    </>
-                  )}
-                  {(p.status === "failed" || p.status === "error") && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() =>
-                        updatePaymentStatus(p.checkoutRequestId, "pending")
-                      }
-                    >
-                      Retry
-                    </Button>
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     );
   };
 
   return (
-    <div className="px-6 py-8 bg-background text-foreground rounded-md shadow-xl space-y-6 max-w-screen-xl mx-auto">
-      <header className="space-y-1">
+    <div className="px-6 py-8 bg-background text-foreground rounded-md shadow-xl space-y-6 max-w-screen-xl mx-auto h-[calc(100vh-100px)] overflow-y-auto">
+      <header className="space-y-1 sticky top-0 bg-background pb-4 z-10">
         <h2 className="text-2xl font-bold tracking-tight">
           M-Pesa Transaction Management
         </h2>
@@ -191,7 +193,7 @@ export default function M_PesaTransactionsAdmin() {
         onValueChange={(val) => setActiveTab(val as PaymentStatus)}
         className="space-y-4"
       >
-        <TabsList className="w-full flex justify-start gap-2 bg-muted/20 p-2 rounded-lg">
+        <TabsList className="w-full flex justify-start gap-2  p-2 rounded-lg sticky top-[120px] bg-background z-10">
           {["pending", "success", "failed", "error"].map((tab) => (
             <TabsTrigger key={tab} value={tab} className="capitalize">
               {tab}

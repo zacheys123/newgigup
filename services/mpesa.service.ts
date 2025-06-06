@@ -29,7 +29,7 @@ interface STKPushQueryResponse {
 
 function getCallbackUrl(): string {
   return process.env.NODE_ENV === "development"
-    ? "https://5d66-2c0f-fe38-2327-909d-f845-dd91-2bf7-242b.ngrok-free.app/api/stkcallback"
+    ? "https://f539-105-29-165-231.ngrok-free.app/api/stkcallback"
     : "https://newgigup.vercel.app/api/stkcallback";
 }
 export class MpesaService {
@@ -144,6 +144,14 @@ export class MpesaService {
     };
     console.log("STK Push Payload:", payload); // 👈 Debug this
 
+    console.log("Final STK Push Request:", {
+      url: `${process.env.NEXT_PUBLIC_MPESA_API_URL}/stkpush/v1/processrequest`,
+      payload,
+      headers: {
+        Authorization: `Bearer ${this.authToken}`,
+        "Content-Type": "application/json",
+      },
+    });
     try {
       const response = await axios.post<STKPushResponse>(
         `${process.env.NEXT_PUBLIC_MPESA_API_URL}/stkpush/v1/processrequest`,

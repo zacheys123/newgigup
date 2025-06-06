@@ -17,6 +17,9 @@ import { MpesaPaymentDialog } from "./mpesa/MpesaPaymentDialog";
 import { PaymentSuccessModal } from "./mpesa/PaymentSuccessModal";
 import toast from "react-hot-toast";
 import { usePaymentVerification } from "@/hooks/usePaymentVerification";
+import { motion } from "framer-motion";
+import { Check, ChevronRight, Zap, Sparkles } from "lucide-react";
+
 interface Plan {
   name: string;
   price: string;
@@ -37,8 +40,8 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
   const { showConfirmModal, setShowConfirmModal } = useStore();
   const [pendingTier, setPendingTier] = useState<"free" | "pro">("free");
   const [mpesaPhoneNumber, setMpesaPhoneNumber] = useState<string | null>(null);
-
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   const {
     checkPayment,
@@ -48,8 +51,8 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
     setPaymentSuccess,
   } = usePaymentVerification({
     onSuccess: () => {
-      setPaymentSuccess(true); // ✅ show success modal
-      setShowPaymentDialog(false); // ✅ hide mpesa dialog if still open
+      setPaymentSuccess(true);
+      setShowPaymentDialog(false);
       setIsMutating(false);
     },
   });
@@ -60,7 +63,6 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
     setIsMutating(true);
     setShowConfirmModal(false);
 
-    // Create optimistic data for both tiers
     const optimisticData = {
       tier: newTier,
       isPro: newTier === "pro",
@@ -69,14 +71,13 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
           ? new Date(new Date().setMonth(new Date().getMonth() + 1))
           : null,
     };
-    console.log("Optimistic update data:", optimisticData);
+
     try {
       await mutateSubscription(
         async () => {
           const result = await updateSubscription(user.id, newTier);
           return {
             ...optimisticData,
-            // Include any additional fields from the actual response
             ...result,
           };
         },
@@ -93,19 +94,7 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
       setIsMutating(false);
     }
   };
-  // Update the onPlanClick function in your MobileSubscriptionCard component
-  const onPlanClick = async () => {
-    const newTier = plan.name === "Pro Tier" ? "pro" : "free";
-    if (plan.current) return;
 
-    if (newTier === "free") {
-      setPendingTier("free");
-      setShowConfirmModal(true);
-      mutateSubscription();
-    } else {
-      setShowPaymentDialog(true);
-    }
-  };
   const handlePaymentInitiated = async (phoneNumber: string) => {
     try {
       if (!phoneNumber || !phoneNumber.startsWith("254")) {
@@ -115,50 +104,32 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
         return;
       }
 
-      setMpesaPhoneNumber(phoneNumber); // track for modal
+      setMpesaPhoneNumber(phoneNumber);
+      setIsMutating(true);
 
       const toastId = toast.loading("Initiating payment...");
 
-      const result = await mutateSubscription(
-        async () => {
-          const response = await fetch(
-            `/api/user/subscription?clerkId=${user?.id}`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ phoneNumber, tier: "pro" }),
-            }
-          );
-
-          if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(
-              errorData.error || "Failed to initiate subscription"
-            );
-          }
-
-          return await response.json();
-        },
+      const response = await fetch(
+        `/api/user/subscription?clerkId=${user?.id}`,
         {
-          optimisticData: {
-            tier: "pro",
-            tierStatus: "pending",
-            isPro: false,
-            nextBillingDate: new Date(
-              new Date().setMonth(new Date().getMonth() + 1)
-            ),
-          },
-          rollbackOnError: true,
-          populateCache: true,
-          revalidate: false,
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phoneNumber, tier: "pro" }),
         }
       );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to initiate subscription");
+      }
+
+      const result = await response.json();
 
       toast.success("STK push sent to your phone", { id: toastId });
 
       if (result.checkoutRequestId) {
-        setShowPaymentDialog(false); // ✅ close M-Pesa dialog
-        checkPayment(result.checkoutRequestId); // triggers verification
+        setShowPaymentDialog(false);
+        checkPayment(result.checkoutRequestId);
       } else {
         toast.error(result.message || "Failed to initiate payment", {
           id: toastId,
@@ -175,12 +146,38 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
     }
   };
 
-  console.log(myuser, subscription);
+  const onPlanClick = async () => {
+    const newTier = plan.name === "Pro Tier" ? "pro" : "free";
+    if (plan.current) return;
+
+    if (newTier === "free") {
+      setPendingTier("free");
+      setShowConfirmModal(true);
+      mutateSubscription();
+    } else {
+      setPaymentSuccess(false);
+      setShowPaymentDialog(true);
+    }
+  };
+
   return (
     <>
       {isVerifyingPayment && (
-        <Button variant="ghost" onClick={cancelVerification}>
-          Cancel Verification
+        <Button
+          onClick={(e) => {
+            e.stopPropagation();
+            cancelVerification();
+          }}
+          disabled={isMutating || plan.current || isVerifyingPayment}
+          className={cn(
+            "w-full py-2 text-sm font-semibold rounded-md transition",
+            plan.current
+              ? "bg-gray-100 text-gray-600 cursor-default"
+              : "bg-blue-600 hover:bg-blue-700 text-white",
+            isMutating || isVerifyingPayment ? "opacity-70 cursor-wait" : ""
+          )}
+        >
+          {isMutating || isVerifyingPayment ? "Processing..." : plan.cta}
         </Button>
       )}
 
@@ -198,64 +195,183 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
         amount={myuser?.isClient ? 2000 : 1500}
         phoneNumber={mpesaPhoneNumber}
       />
-      <div
+
+      <motion.div
         onClick={onPlanClick}
+        onHoverStart={() => setIsHovered(true)}
+        onHoverEnd={() => setIsHovered(false)}
+        whileHover={{ y: -5 }}
+        whileTap={{ scale: 0.98 }}
         className={cn(
-          "flex flex-col justify-between border rounded-xl p-5 w-full h-[420px] max-w-xs mx-auto transition-all",
+          "flex flex-col justify-between border rounded-xl p-6 w-full h-[420px] max-w-xs mx-auto transition-all relative overflow-hidden",
           plan.current
-            ? "border-orange-500 bg-orange-900/10"
-            : "border-gray-700 bg-gray-900 hover:border-blue-500"
+            ? "border-orange-400 bg-gradient-to-br from-orange-900/20 to-orange-900/10 shadow-lg shadow-orange-500/10"
+            : "border-gray-700 bg-gray-900 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/10"
         )}
       >
-        <div>
-          <h3 className="text-xl font-bold text-white">{plan.name}</h3>
-          <p className="text-2xl font-semibold my-2 text-white">{plan.price}</p>
+        {/* Glow effect */}
+        {plan.current && (
+          <motion.div
+            animate={{
+              opacity: [0, 0.3, 0],
+              scale: [1, 1.5, 1],
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            className="absolute inset-0 bg-orange-500 rounded-xl pointer-events-none"
+          />
+        )}
 
-          <ul className="space-y-2 mb-4">
+        {/* Current plan badge */}
+        {plan.current && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="absolute top-4 right-4 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full"
+          >
+            Current Plan
+          </motion.div>
+        )}
+
+        {/* Sparkles for Pro tier */}
+        {plan.name === "Pro Tier" && !plan.current && (
+          <motion.div
+            animate={{
+              opacity: isHovered ? 1 : 0.5,
+            }}
+            className="absolute top-4 right-4"
+          >
+            <Sparkles className="w-5 h-5 text-yellow-400" />
+          </motion.div>
+        )}
+
+        <div>
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-bold text-white">{plan.name}</h3>
+            {plan.name === "Pro Tier" && !plan.current && (
+              <motion.div
+                animate={{
+                  x: isHovered ? [0, 5, 0] : 0,
+                }}
+                transition={{
+                  repeat: isHovered ? Infinity : 0,
+                  duration: 1.5,
+                }}
+              >
+                <Zap className="w-5 h-5 text-yellow-400 fill-yellow-400/20" />
+              </motion.div>
+            )}
+          </div>
+
+          <motion.p
+            animate={{
+              scale: isHovered && !plan.current ? 1.05 : 1,
+            }}
+            className="text-2xl font-semibold my-4 text-white"
+          >
+            {plan.price}
+          </motion.p>
+
+          <ul className="space-y-3 mb-4">
             {plan.features.map((feature, idx) => (
-              <li key={idx} className="flex items-start text-sm">
-                <svg
-                  className="w-4 h-4 text-green-500 mt-1 mr-2"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
+              <motion.li
+                key={idx}
+                whileHover={{ x: 5 }}
+                className="flex items-start text-sm group"
+              >
+                <motion.div
+                  animate={{
+                    rotate: isHovered ? [0, 10, -10, 0] : 0,
+                  }}
                 >
-                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
-                </svg>
-                <span className="text-gray-300">{feature}</span>
-              </li>
+                  <Check className="w-4 h-4 text-green-500 mt-1 mr-2 flex-shrink-0" />
+                </motion.div>
+                <span className="text-gray-300 group-hover:text-white transition-colors">
+                  {feature}
+                </span>
+              </motion.li>
             ))}
           </ul>
         </div>
 
-        <Button
-          onClick={(e) => {
-            e.stopPropagation();
-            onPlanClick();
-          }}
-          disabled={isMutating || plan.current}
-          className={cn(
-            "w-full py-2 text-sm font-semibold rounded-md transition",
-            plan.current
-              ? "bg-gray-100 text-gray-600 cursor-default"
-              : "bg-blue-600 hover:bg-blue-700 text-white",
-            isMutating ? "opacity-70 cursor-wait" : ""
-          )}
-        >
-          {isMutating ? "Processing..." : plan.cta}
-        </Button>
+        <div className="mt-auto">
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                onPlanClick();
+              }}
+              disabled={isMutating || plan.current}
+              className={cn(
+                "w-full py-3 text-sm font-semibold rounded-lg transition-all flex items-center justify-center gap-2",
+                plan.current
+                  ? "bg-gray-100 text-gray-600 cursor-default"
+                  : plan.name === "Pro Tier"
+                  ? "bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white shadow-lg shadow-blue-500/20"
+                  : "bg-gray-700 hover:bg-gray-600 text-white",
+                isMutating ? "opacity-70 cursor-wait" : ""
+              )}
+            >
+              {isMutating ? (
+                <>
+                  <svg
+                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Processing...
+                </>
+              ) : (
+                <>
+                  {plan.cta}
+                  {!plan.current && (
+                    <motion.span
+                      animate={{
+                        x: isHovered ? [0, 5, 0] : 0,
+                      }}
+                      transition={{
+                        repeat: isHovered ? Infinity : 0,
+                        duration: 1.5,
+                      }}
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </motion.span>
+                  )}
+                </>
+              )}
+            </Button>
+          </motion.div>
 
-        {plan.current && (
-          <p className="mt-2 text-xs text-green-500 text-center">
-            Your current plan
-            {subscription?.nextBillingDate && (
-              <span className="block text-[10px] text-gray-400">
-                Renews on{" "}
-                {new Date(subscription.nextBillingDate).toLocaleDateString()}
-              </span>
-            )}
-          </p>
-        )}
-      </div>
+          {plan.current && subscription?.nextBillingDate && (
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-3 text-xs text-center text-gray-400"
+            >
+              Renews on{" "}
+              {new Date(subscription.nextBillingDate).toLocaleDateString()}
+            </motion.p>
+          )}
+        </div>
+      </motion.div>
 
       <Dialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
         <DialogContent className="w-[90%] max-w-md bg-gray-900 border border-gray-700 rounded-lg p-6">
