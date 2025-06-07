@@ -11,6 +11,10 @@ interface SearchParams {
   page?: string;
   userid?: string;
 }
+
+interface AdminUsersPageProps {
+  searchParams: SearchParams;
+}
 async function getCurrentUserRole() {
   try {
     const res = await fetch(`${checkEnvironment()}/api/admin/verify-role`, {
@@ -33,11 +37,10 @@ async function getCurrentUserRole() {
   }
 }
 
+// Then update your component definition
 export default async function AdminUsersPage({
-  searchParams = {},
-}: {
-  searchParams: SearchParams;
-}) {
+  searchParams = { query: "", role: "all", page: "1" },
+}: AdminUsersPageProps) {
   const userRole = await getCurrentUserRole();
   const allowedRoles = ["super", "support"];
 

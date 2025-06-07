@@ -26,10 +26,10 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { useAuth } from "@clerk/nextjs";
 import { PageProps } from "@/types/admininterfaces";
 
-interface MyPageProps {
+interface UserDetailPageProps {
   user: PageProps;
 }
-export default function UserDetailPage({ user }: MyPageProps) {
+export default function UserDetailPage({ user }: UserDetailPageProps) {
   const { userId } = useAuth();
   const { subscription } = useSubscription(userId as string);
   console.log(subscription);
