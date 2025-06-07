@@ -1,7 +1,7 @@
 // app/api/users/[userId]/appeals/route.ts
 import connectDb from "@/lib/connectDb";
 import Appeal from "@/models/appeal";
-import { getAuth } from "@clerk/nextjs/dist/types/server";
+import { getAuth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
