@@ -60,23 +60,18 @@ export function isUserValid(user: unknown): user is PageProps {
   // ✅ Optional strings: must be undefined or non-empty strings
   const optionalStrings = [
     "clerkId",
-    "phone",
     "picture",
     "firstname",
     "lastname",
     "city",
-    "address",
     "date",
     "month",
     "year",
     "instrument",
     "experience",
-    "organization",
     "bio",
     "talentbio",
     "roleType",
-    "djGenre",
-    "djEquipment",
     "mcType",
     "mcLanguages",
     "vocalistGenre",
@@ -86,13 +81,17 @@ export function isUserValid(user: unknown): user is PageProps {
     "banReference",
     "tier",
     "tierStatus",
-    "nextBillingDate",
-    "earnings",
-    "totalSpent",
+
+    "phone",
+    "address",
+    "organization",
+    "djGenre",
+    "djEquipment",
   ];
+
   for (const key of optionalStrings) {
     const val = u[key as keyof typeof u];
-    if (val !== undefined && (typeof val !== "string" || val.trim() === "")) {
+    if (val !== undefined && val !== null && typeof val !== "string") {
       console.log(`⛔️ Invalid optional string ${key}:`, val);
       return false;
     }
@@ -130,22 +129,26 @@ export function isUserValid(user: unknown): user is PageProps {
   }
 
   // ✅ Optional arrays of strings
-  const optionalStringArrays = [
-    "adminPermissions",
-    "musiciangenres",
-    "musicianhandles",
-    "followers",
-    "followings",
-    "refferences",
+  // ✅ Optional arrays of ObjectId strings
+  // ✅ Optional arrays of ObjectIds
+  const optionalObjectIdArrays = [
+    "someObjectIdArrayField1",
+    "someObjectIdArrayField2",
+    // add your keys here that should be arrays of ObjectIds
   ];
-  for (const key of optionalStringArrays) {
+
+  for (const key of optionalObjectIdArrays) {
     const val = u[key as keyof typeof u];
     if (
       val !== undefined &&
       (!Array.isArray(val) ||
-        !val.every((v) => typeof v === "string" && v.trim() !== ""))
+        !val.every(
+          (v) =>
+            (typeof v === "string" && mongoose.Types.ObjectId.isValid(v)) ||
+            v instanceof mongoose.Types.ObjectId
+        ))
     ) {
-      console.log(`⛔️ Invalid array of strings ${key}:`, val);
+      console.log(`⛔️ Invalid array of ObjectIds ${key}:`, val);
       return false;
     }
   }
@@ -174,7 +177,7 @@ export function isUserValid(user: unknown): user is PageProps {
     }
   }
 
-  // ✅ Optional Date objects
+  // ✅ Optional Date objects (allowing null)
   const optionalDates = [
     "createdAt",
     "updatedAt",
@@ -182,10 +185,11 @@ export function isUserValid(user: unknown): user is PageProps {
     "banExpiresAt",
     "lastActive",
     "lastBookingDate",
+    "nextBillingDate",
   ];
   for (const key of optionalDates) {
     const val = u[key as keyof typeof u];
-    if (val !== undefined && !(val instanceof Date)) {
+    if (val !== undefined && val !== null && !(val instanceof Date)) {
       console.log(`⛔️ Invalid date ${key}:`, val);
       return false;
     }
