@@ -8,6 +8,7 @@ import NotificationHandler from "@/components/NotificationHandler";
 import { TrialExpiredModal } from "@/components/sub/TrialExpired";
 import { TrialRemainingModal } from "@/components/sub/TrialRemainingComp";
 import { useCheckTrial } from "@/hooks/useCheckTrials";
+import { useInitialBanCheck } from "@/hooks/useInitialBanStatus";
 import { useBannedRedirect } from "@/hooks/useBannedRefirect";
 
 const MainLayout = ({
@@ -17,6 +18,10 @@ const MainLayout = ({
   children: React.ReactNode;
   contact: React.ReactNode;
 }>) => {
+  // Check ban status immediately on first render
+  useInitialBanCheck();
+
+  // Then set up ongoing ban status monitoring
   useBannedRedirect();
   const { user: myuser } = useCurrentUser();
   const { user } = useUser();

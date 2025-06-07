@@ -357,10 +357,10 @@ function PaginationControls({
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4">
       <div className="text-sm text-muted-foreground">
-        Showing{" "}
-        <span className="font-medium">{(currentPage - 1) * 10 + 1}</span> to{" "}
+        Showing <span className="font-medium">{(currentPage - 1) * 5 + 1}</span>{" "}
+        to{" "}
         <span className="font-medium">
-          {Math.min(currentPage * 10, totalUsers)}
+          {Math.min(currentPage * 5, totalUsers)}
         </span>{" "}
         of <span className="font-medium">{totalUsers}</span> users
       </div>

@@ -95,6 +95,9 @@ const ClientSearchComponent = () => {
               adminPermissions: [""],
               lastAdminAction: new Date(),
               adminNotes: "",
+              banExpiresAt: new Date(), // New field for temporary ban
+              banReference: "", // New fiel
+              theme: "lightMode",
             },
           });
         }

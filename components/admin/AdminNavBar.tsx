@@ -1,7 +1,4 @@
 "use client";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-
 import {
   Home,
   Users,
@@ -13,6 +10,7 @@ import {
   HelpCircle,
   LogOut,
   User as UserIcon,
+  Ban,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -23,17 +21,38 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
+
 import { AdminNavbarProps } from "@/types/admininterfaces";
+import { cn } from "@/lib/utils";
+import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
+import { Button } from "../ui/button";
+import { useTheme } from "@/hooks/useTheme";
+import { ThemeToggle } from "./theme/ThemeToggler";
 
 interface NavbarProps {
   user: AdminNavbarProps;
-  isDarkMode: boolean;
-  toggleDarkMode: () => void;
 }
+
 const AdminNavbar = ({ user }: NavbarProps) => {
   const pathname = usePathname();
   const router = useRouter();
+
+  const { theme, resolvedTheme, isMounted, toggleTheme, useSystemTheme } =
+    useTheme();
+
+  if (!isMounted) {
+    return (
+      <header className="sticky top-0 z-40 border-b bg-white dark:bg-gray-900">
+        {/* Loading skeleton */}
+        <div className="container flex h-16 items-center justify-between">
+          <div className="h-8 w-24 rounded bg-gray-200 dark:bg-gray-700" />
+          <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700" />
+        </div>
+      </header>
+    );
+  }
+
   // Navigation items based on admin role
   const navItems = [
     {
@@ -68,10 +87,10 @@ const AdminNavbar = ({ user }: NavbarProps) => {
     },
     {
       href: "/admin/mpesa-transactions",
-      icon: FileText, // optionally use a custom M-Pesa icon
+      icon: FileText,
       label: "M-Pesa Transactions",
       allowedRoles: ["super", "support"],
-      isMpesa: true, // 🔑 add a flag for special styling
+      isMpesa: true,
     },
     {
       href: "/admin/content",
@@ -85,20 +104,38 @@ const AdminNavbar = ({ user }: NavbarProps) => {
       label: "Settings",
       allowedRoles: ["super"],
     },
+    {
+      href: "/admin/banned-users",
+      icon: Ban,
+      label: "Banned Users",
+      allowedRoles: ["super"],
+    },
   ];
-  console.log("admin data now", user.adminRole);
+
   // Filter nav items based on user role
   const filteredNavItems = navItems.filter((item) =>
     item.allowedRoles.includes(user?.adminRole || "")
   );
 
   return (
-    <header className="sticky top-0 z-40 border-b bg-zinc-700 ">
+    <header
+      className={cn(
+        "sticky top-0 z-40 border-b transition-colors duration-300",
+        resolvedTheme === "dark"
+          ? "bg-gray-900 border-gray-800"
+          : "bg-white border-gray-200"
+      )}
+    >
       <div className="container flex h-16 items-center justify-between">
         {/* Logo and Main Nav */}
         <div className="flex items-center gap-8">
           <Link href="/admin/dashboard" className="flex items-center gap-2">
-            <span className="text-lg font-semibold mx-3 text-white">
+            <span
+              className={cn(
+                "text-lg font-semibold mx-3",
+                resolvedTheme === "dark" ? "text-white" : "text-gray-900"
+              )}
+            >
               GigAdmin
             </span>
           </Link>
@@ -112,15 +149,18 @@ const AdminNavbar = ({ user }: NavbarProps) => {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors
-        ${
-          isMpesa
-            ? "bg-[#1C8F45] text-white hover:bg-[#157A38]"
-            : isActive
-            ? "bg-accent text-accent-foreground shadow-sm ring-1 ring-accent"
-            : "text-muted-foreground hover:text-primary hover:bg-muted"
-        }
-      `}
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors",
+                    isMpesa
+                      ? "bg-[#1C8F45] text-white hover:bg-[#157A38]"
+                      : isActive
+                      ? resolvedTheme === "dark"
+                        ? "bg-gray-800 text-white shadow-sm ring-1 ring-gray-700"
+                        : "bg-accent text-accent-foreground shadow-sm ring-1 ring-accent"
+                      : resolvedTheme === "dark"
+                      ? "text-gray-300 hover:text-white hover:bg-gray-800"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                  )}
                 >
                   <item.icon className="h-[18px] w-[18px]" />
                   <span>{item.label}</span>
@@ -130,13 +170,27 @@ const AdminNavbar = ({ user }: NavbarProps) => {
           </nav>
         </div>
 
-        {/* User Dropdown */}
+        {/* Right Side Controls */}
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" className="rounded-full">
+          {/* Dark Mode Toggle */}
+          <ThemeToggle
+            theme={theme}
+            resolvedTheme={resolvedTheme}
+            toggleTheme={toggleTheme}
+            useSystemTheme={useSystemTheme}
+          />
+
+          {/* Help Button */}
+          <Button
+            variant={resolvedTheme === "dark" ? "ghost" : "outline"}
+            size="icon"
+            className="rounded-full"
+          >
             <HelpCircle className="h-4 w-4" />
             <span className="sr-only">Help</span>
           </Button>
 
+          {/* User Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -155,34 +209,95 @@ const AdminNavbar = ({ user }: NavbarProps) => {
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="end" forceMount>
+            <DropdownMenuContent
+              className={cn(
+                "w-56",
+                resolvedTheme === "dark"
+                  ? "bg-gray-800 border-gray-700"
+                  : "bg-white border-gray-200"
+              )}
+              align="end"
+              forceMount
+            >
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">
-                    {user?.firstname}
-                    {user?.lastname}
+                  <p
+                    className={cn(
+                      "text-sm font-medium leading-none",
+                      resolvedTheme === "dark" ? "text-white" : "text-gray-900"
+                    )}
+                  >
+                    {user?.firstname} {user?.lastname}
                   </p>
-                  <p className="text-xs leading-none text-muted-foreground">
+                  <p
+                    className={cn(
+                      "text-xs leading-none",
+                      resolvedTheme === "dark"
+                        ? "text-gray-400"
+                        : "text-gray-500"
+                    )}
+                  >
                     {user?.email}
                   </p>
                 </div>
               </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
+              <DropdownMenuSeparator
+                className={
+                  resolvedTheme === "dark" ? "bg-gray-700" : "bg-gray-200"
+                }
+              />
+              <DropdownMenuItem
+                className={cn(
+                  "cursor-pointer",
+                  resolvedTheme === "dark"
+                    ? "hover:bg-gray-700 focus:bg-gray-700"
+                    : "hover:bg-gray-100 focus:bg-gray-100"
+                )}
+                asChild
+              >
                 <Link href="/admin/settings/profile">
                   <UserIcon className="mr-2 h-4 w-4" />
-                  Profile
+                  <span
+                    className={
+                      resolvedTheme === "dark" ? "text-white" : "text-gray-900"
+                    }
+                  >
+                    Profile
+                  </span>
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
+              <DropdownMenuItem
+                className={cn(
+                  "cursor-pointer",
+                  resolvedTheme === "dark"
+                    ? "hover:bg-gray-700 focus:bg-gray-700"
+                    : "hover:bg-gray-100 focus:bg-gray-100"
+                )}
+                asChild
+              >
                 <Link href="/admin/settings/account">
                   <Settings className="mr-2 h-4 w-4" />
-                  Settings
+                  <span
+                    className={
+                      resolvedTheme === "dark" ? "text-white" : "text-gray-900"
+                    }
+                  >
+                    Settings
+                  </span>
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
+              <DropdownMenuSeparator
+                className={
+                  resolvedTheme === "dark" ? "bg-gray-700" : "bg-gray-200"
+                }
+              />
               <DropdownMenuItem
-                className="text-red-600 focus:text-red-600"
+                className={cn(
+                  "text-red-600 focus:text-red-600 cursor-pointer",
+                  resolvedTheme === "dark"
+                    ? "hover:bg-gray-700"
+                    : "hover:bg-gray-100"
+                )}
                 onClick={() => router.push("/sign-out")}
               >
                 <LogOut className="mr-2 h-4 w-4" />
@@ -193,8 +308,13 @@ const AdminNavbar = ({ user }: NavbarProps) => {
         </div>
       </div>
 
-      {/* Mobile Nav (for smaller screens) */}
-      <div className="md:hidden border-t">
+      {/* Mobile Nav */}
+      <div
+        className={cn(
+          "md:hidden border-t",
+          resolvedTheme === "dark" ? "border-gray-800" : "border-gray-200"
+        )}
+      >
         <nav className="container flex overflow-x-auto py-2 space-x-2">
           {filteredNavItems.map((item) => {
             const isActive = pathname.startsWith(item.href);
@@ -204,15 +324,18 @@ const AdminNavbar = ({ user }: NavbarProps) => {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex whitespace-nowrap flex-col items-center justify-center px-4 py-2 rounded-md transition-all duration-200
-        ${
-          isMpesa
-            ? "bg-[#1C8F45] text-white hover:bg-[#157A38]"
-            : isActive
-            ? "bg-accent text-accent-foreground shadow ring-1 ring-accent"
-            : "text-muted-foreground hover:text-primary hover:bg-muted"
-        }
-      `}
+                className={cn(
+                  "flex whitespace-nowrap flex-col items-center justify-center px-4 py-2 rounded-md transition-all duration-200",
+                  isMpesa
+                    ? "bg-[#1C8F45] text-white hover:bg-[#157A38]"
+                    : isActive
+                    ? resolvedTheme === "dark"
+                      ? "bg-gray-800 text-white shadow ring-1 ring-gray-700"
+                      : "bg-accent text-accent-foreground shadow ring-1 ring-accent"
+                    : resolvedTheme === "dark"
+                    ? "text-gray-300 hover:text-white hover:bg-gray-800"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                )}
               >
                 <item.icon className="h-5 w-5 mb-1" />
                 <span className="text-[11px] font-medium">{item.label}</span>

@@ -90,6 +90,7 @@ export const initialState = {
     adminNotes: "",
     banExpiresAt: new Date(), // New field for temporary ban
     banReference: "", // New fiel
+    theme: "lightMode",
   },
   currentgig: {
     _id: "",
@@ -242,6 +243,7 @@ export interface StoreState {
   sendMessage: (message: MessageProps) => Promise<void>;
   // listenForMessages: () => void;
   setOnlineUsers: (onlineuser: []) => void;
+
   //   connectSocket: (user: UserProps) => void;
   //   disconnectSocket: () => void;
   updateMessageReaction: (

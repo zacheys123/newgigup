@@ -1,158 +1,195 @@
 // utils/typeGuards.ts
 
 import { PageProps } from "@/types/admininterfaces";
+import mongoose from "mongoose";
 
 type UserCandidate = Partial<PageProps[]> & {
-  // Core Identification
-  _id: unknown;
-  clerkId: unknown;
-  username: unknown;
-  email: unknown;
-  phone: unknown;
-
-  // Personal Information
-  picture: unknown;
-  firstname: unknown;
-  lastname: unknown;
-  city: unknown;
-  address: unknown;
-  date: unknown;
-  month: unknown;
-  year: unknown;
-
-  // Professional Details
-  instrument: unknown;
-  experience: unknown;
-  organization: unknown;
-  bio: unknown;
-  talentbio: unknown;
-  roleType: unknown;
-  djGenre: unknown;
-  djEquipment: unknown;
-  mcType: unknown;
-  mcLanguages: unknown;
-  vocalistGenre: unknown;
-  verification: unknown;
-
-  // Social & Relationships
-  followers: unknown;
-  followings: unknown;
-  refferences: unknown;
-  musicianhandles: unknown;
-  musiciangenres: unknown;
-  videosProfile: unknown;
-
-  // Reviews
-  allreviews: unknown;
-  myreviews: unknown;
-
-  // Status Flags
-  isMusician: unknown;
-  isClient: unknown;
-  isBanned: unknown;
-  isAdmin: unknown;
-  firstLogin: unknown;
-  onboardingComplete: unknown;
-
-  // Admin Specific
-  adminRole: unknown;
-  adminPermissions: unknown;
-  adminNotes: unknown;
-  lastAdminAction: unknown;
-
-  // Ban Information
-  banReason: unknown;
-  bannedAt: unknown;
-  banExpiresAt: unknown;
-  banReference: unknown;
-
-  // Subscription & Billing
-  tier: unknown;
-  tierStatus: unknown;
-  nextBillingDate: unknown;
-  earnings: unknown;
-  totalSpent: unknown;
-
-  // Activity Tracking
-  monthlyGigsPosted: unknown;
-  monthlyMessages: unknown;
-  monthlyGigsBooked: unknown;
-  lastActive: unknown;
-  lastBookingDate: unknown;
-  gigsBookedThisWeek: unknown;
-
-  // Timestamps
-  createdAt: unknown;
-  updatedAt: unknown;
+  [key: string]: unknown;
 };
 
-export function isUserValid(user: unknown): user is PageProps[] {
-  if (typeof user !== "object" || user === null) return false;
+function isValidDateString(dateStr: unknown): boolean {
+  if (typeof dateStr !== "string") return false;
+  const d = new Date(dateStr);
+  return !isNaN(d.getTime());
+}
+
+function isGigsBookedThisWeek(
+  obj: unknown
+): obj is { count: number; weekStart: Date | string | null } {
+  if (typeof obj !== "object" || obj === null) return false;
+
+  const o = obj as Record<string, unknown>;
+
+  const countValid = typeof o.count === "number";
+  const weekStartValid =
+    o.weekStart === null ||
+    o.weekStart instanceof Date ||
+    isValidDateString(o.weekStart);
+
+  return countValid && weekStartValid;
+}
+
+export function isUserValid(user: unknown): user is PageProps {
+  if (typeof user !== "object" || user === null) {
+    console.log("⛔️ Not an object or null");
+    return false;
+  }
 
   const u = user as UserCandidate;
 
-  // Required strings (non-empty)
-  if (typeof u._id !== "string" || u._id.trim() === "") return false;
-  if (typeof u.username !== "string" || u.username.trim() === "") return false;
-  if (typeof u.email !== "string" || u.email.trim() === "") return false;
-  if (typeof u.phone !== "string" || u.phone.trim() === "") return false;
-  if (typeof u.city !== "string" || u.city.trim() === "") return false;
-  if (typeof u.talentbio !== "string") return false;
-  if (typeof u.date !== "string") return false;
-  if (typeof u.month !== "string") return false;
-  if (typeof u.year !== "string") return false;
-  if (typeof u.createdAt !== "string") return false;
-
-  // Required booleans
-  if (typeof u.isBanned !== "boolean") return false;
-  if (typeof u.isMusician !== "boolean") return false;
-
-  // Optional strings
+  // _id validation
   if (
-    u.picture !== undefined &&
-    (typeof u.picture !== "string" || u.picture.trim() === "")
-  )
+    typeof u._id !== "string" &&
+    !(u._id instanceof mongoose.Types.ObjectId) &&
+    !mongoose.Types.ObjectId.isValid(String(u._id))
+  ) {
+    console.log("⛔️ Invalid _id:", u._id);
     return false;
-  if (u.firstname !== undefined && typeof u.firstname !== "string")
-    return false;
-  if (u.lastname !== undefined && typeof u.lastname !== "string") return false;
-  if (u.roleType !== undefined && typeof u.roleType !== "string") return false;
-  if (u.instrument !== undefined && typeof u.instrument !== "string")
-    return false;
-  if (u.vocalistGenre !== undefined && typeof u.vocalistGenre !== "string")
-    return false;
-  if (u.djGenre !== undefined && typeof u.djGenre !== "string") return false;
-  if (u.address !== undefined && typeof u.address !== "string") return false;
-  if (u.organization !== undefined && typeof u.organization !== "string")
-    return false;
-  if (u.adminRole !== undefined && typeof u.adminRole !== "string")
-    return false;
-  if (u.lastAdminAction !== undefined && typeof u.lastAdminAction !== "string")
-    return false;
-  if (u.banReason !== undefined && typeof u.banReason !== "string")
-    return false;
-  if (u.banReference !== undefined && typeof u.banReference !== "string")
-    return false;
+  }
 
-  // Optional arrays
+  // ✅ Required non-empty strings
+  const requiredStrings = ["username", "email"];
+  for (const key of requiredStrings) {
+    const val = u[key as keyof typeof u];
+    if (typeof val !== "string" || val.trim() === "") {
+      console.log(`⛔️ Invalid required string ${key}:`, val);
+      return false;
+    }
+  }
+
+  // ✅ Optional strings: must be undefined or non-empty strings
+  const optionalStrings = [
+    "clerkId",
+    "phone",
+    "picture",
+    "firstname",
+    "lastname",
+    "city",
+    "address",
+    "date",
+    "month",
+    "year",
+    "instrument",
+    "experience",
+    "organization",
+    "bio",
+    "talentbio",
+    "roleType",
+    "djGenre",
+    "djEquipment",
+    "mcType",
+    "mcLanguages",
+    "vocalistGenre",
+    "lastAdminAction",
+    "adminRole",
+    "banReason",
+    "banReference",
+    "tier",
+    "tierStatus",
+    "nextBillingDate",
+    "earnings",
+    "totalSpent",
+  ];
+  for (const key of optionalStrings) {
+    const val = u[key as keyof typeof u];
+    if (val !== undefined && (typeof val !== "string" || val.trim() === "")) {
+      console.log(`⛔️ Invalid optional string ${key}:`, val);
+      return false;
+    }
+  }
+
+  // Validate gigsBookedThisWeek as object with count and weekStart
   if (
-    u.musiciangenres !== undefined &&
-    (!Array.isArray(u.musiciangenres) ||
-      !u.musiciangenres.every((g) => typeof g === "string"))
-  )
+    u.gigsBookedThisWeek !== undefined &&
+    !isGigsBookedThisWeek(u.gigsBookedThisWeek)
+  ) {
+    console.log("⛔️ Invalid gigsBookedThisWeek:", u.gigsBookedThisWeek);
     return false;
+  }
 
-  if (
-    u.adminPermissions !== undefined &&
-    (!Array.isArray(u.adminPermissions) ||
-      !u.adminPermissions.every((p) => typeof p === "string"))
-  )
+  // ✅ Required boolean
+  if (typeof u.isMusician !== "boolean") {
+    console.log("⛔️ Invalid isMusician:", u.isMusician);
     return false;
+  }
 
-  // Optional dates
-  if (u.bannedAt !== undefined && !(u.bannedAt instanceof Date)) return false;
-  if (u.banExpiresAt !== undefined && !(u.banExpiresAt instanceof Date))
-    return false;
+  // ✅ Optional booleans
+  const optionalBooleans = [
+    "isBanned",
+    "isClient",
+    "isAdmin",
+    "firstLogin",
+    "onboardingComplete",
+  ];
+  for (const key of optionalBooleans) {
+    const val = u[key as keyof typeof u];
+    if (val !== undefined && typeof val !== "boolean") {
+      console.log(`⛔️ Invalid boolean ${key}:`, val);
+      return false;
+    }
+  }
+
+  // ✅ Optional arrays of strings
+  const optionalStringArrays = [
+    "adminPermissions",
+    "musiciangenres",
+    "musicianhandles",
+    "followers",
+    "followings",
+    "refferences",
+  ];
+  for (const key of optionalStringArrays) {
+    const val = u[key as keyof typeof u];
+    if (
+      val !== undefined &&
+      (!Array.isArray(val) ||
+        !val.every((v) => typeof v === "string" && v.trim() !== ""))
+    ) {
+      console.log(`⛔️ Invalid array of strings ${key}:`, val);
+      return false;
+    }
+  }
+
+  // ✅ Optional arrays of objects
+  const optionalObjectArrays = ["videosProfile", "allreviews", "myreviews"];
+  for (const key of optionalObjectArrays) {
+    const val = u[key as keyof typeof u];
+    if (val !== undefined && !Array.isArray(val)) {
+      console.log(`⛔️ Invalid object array ${key}:`, val);
+      return false;
+    }
+  }
+
+  // ✅ Optional numbers
+  const optionalNumbers = [
+    "monthlyGigsPosted",
+    "monthlyMessages",
+    "monthlyGigsBooked",
+  ];
+  for (const key of optionalNumbers) {
+    const val = u[key as keyof typeof u];
+    if (val !== undefined && typeof val !== "number") {
+      console.log(`⛔️ Invalid number ${key}:`, val);
+      return false;
+    }
+  }
+
+  // ✅ Optional Date objects
+  const optionalDates = [
+    "createdAt",
+    "updatedAt",
+    "bannedAt",
+    "banExpiresAt",
+    "lastActive",
+    "lastBookingDate",
+  ];
+  for (const key of optionalDates) {
+    const val = u[key as keyof typeof u];
+    if (val !== undefined && !(val instanceof Date)) {
+      console.log(`⛔️ Invalid date ${key}:`, val);
+      return false;
+    }
+  }
 
   return true;
 }

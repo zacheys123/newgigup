@@ -120,28 +120,41 @@ export async function getUsers(
 export async function getUserById(id: string): Promise<PageProps> {
   await connectDb();
 
+  console.log("🔍 Checking ObjectId validity:", id);
   if (!Types.ObjectId.isValid(id)) {
+    console.error("❌ Invalid ObjectId format");
     throw new Error("Invalid user ID");
   }
 
+  console.log("📡 Fetching user from DB...");
   const user = await User.findById(id).lean();
 
-  if (!user || !isUserValid(user)) {
-    throw new Error("User not found or data is invalid");
+  if (!user) {
+    console.error("❌ No user found in DB with ID:", id);
+    throw new Error("User not found");
   }
 
-  // Convert MongoDB-specific types
-  return {
+  const isValid = isUserValid(user);
+
+  if (!isValid) {
+    throw new Error("User data is invalid");
+  }
+
+  const finalUser: PageProps = {
     ...user,
     _id: user._id.toString(),
     bannedAt: user.bannedAt ? new Date(user.bannedAt) : undefined,
     banExpiresAt: user.banExpiresAt ? new Date(user.banExpiresAt) : undefined,
-    createdAt: new Date(user.createdAt).toISOString(),
-    // Handle potential array fields
+    createdAt: user.createdAt && new Date(user.createdAt),
     musiciangenres: user.musiciangenres || [],
     adminPermissions: user.adminPermissions || [],
   };
+
+  console.log("✅ Final formatted user:", finalUser);
+
+  return finalUser;
 }
+
 export async function getCurrentUserRole(id: string) {
   await connectDb();
 

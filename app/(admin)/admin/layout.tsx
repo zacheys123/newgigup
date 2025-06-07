@@ -59,16 +59,10 @@ export default function AdminLayout({
     if (dbUser?.isAdmin) {
       const timer = setTimeout(() => {
         setShowWelcome(false);
-      }, 10000);
+      }, 5000);
       return () => clearTimeout(timer);
     }
   }, [dbUser]);
-
-  const toggleDarkMode = () => {
-    const newMode = !isDarkMode;
-    setIsDarkMode(newMode);
-    localStorage.setItem("theme", newMode ? "dark" : "light");
-  };
 
   if (!isLoaded || loading) {
     return (
@@ -115,11 +109,7 @@ export default function AdminLayout({
         isDarkMode ? "bg-gray-900" : "bg-gray-50"
       } transition-colors duration-300`}
     >
-      <AdminNavbar
-        user={dbUser}
-        isDarkMode={isDarkMode}
-        toggleDarkMode={toggleDarkMode}
-      />
+      <AdminNavbar user={dbUser} />
 
       <AnimatePresence>
         {showWelcome && (

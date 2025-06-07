@@ -21,6 +21,7 @@ export interface NavItem {
 export type UserRole = "super" | "content" | "support" | "analytics" | "admin";
 
 export interface AdminNavbarProps {
+  _id: string;
   isAdmin: boolean;
   adminRole: string;
   adminPermissions: string[];
@@ -49,7 +50,7 @@ export interface PageProps {
   month?: string;
   year?: string;
 
-  createdAt: string;
+  createdAt: Date;
   isBanned: boolean;
   bannedAt?: Date;
   banReason?: string;
@@ -63,6 +64,8 @@ export interface PageProps {
   organization?: string;
   adminRole?: string;
   lastAdminAction?: Date;
+  lastActive?: Date;
   adminPermissions?: string[];
   status?: "active" | "banned" | "pending";
+  theme: "lightMode" | "darkMode" | "system";
 }

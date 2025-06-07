@@ -6,9 +6,13 @@ import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { useSocketContext } from "@/app/Context/socket";
-import { PageProps } from "./UserDetailPage";
+import { PageProps } from "@/types/admininterfaces";
 
-export function BanUserButton({ user }: PageProps) {
+interface BanUserButtonProps {
+  user: PageProps;
+}
+
+export function BanUserButton({ user }: BanUserButtonProps) {
   const { sendBanUpdate } = useSocketContext();
   const [isLoading, setIsLoading] = useState(false);
   const [banReason, setBanReason] = useState("");

@@ -56,14 +56,22 @@ export default async function AdminUsersPage({
 
   // ✅ If a specific user is requested, show the user detail page
   if (userid) {
-    const user = await getUserById(userid);
-    if (!user) return notFound();
-
-    return (
-      <div className="p-4">
-        <UserDetailPage user={user} />
-      </div>
-    );
+    try {
+      const user = await getUserById(userid);
+      const plainUser = JSON.parse(JSON.stringify(user));
+      if (!user) return notFound();
+      return (
+        <div className="p-4">
+          <UserDetailPage user={plainUser} />
+        </div>
+      );
+    } catch (err) {
+      return (
+        <div className="p-4 text-red-600">
+          Failed to load user details: {(err as Error).message}
+        </div>
+      );
+    }
   }
 
   // ✅ Otherwise, render the full user table

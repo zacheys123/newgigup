@@ -19,89 +19,236 @@ export default function BannedPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [isClient, setIsClient] = useState(false);
+
+  // Set client flag and check localStorage on mount
+  useEffect(() => {
+    setIsClient(true);
+    // Always set banned status if user is banned
+    if (user?.isBanned) {
+      localStorage.setItem("isBanned", "true");
+      localStorage.setItem(
+        "banData",
+        JSON.stringify({
+          reason: user.banReason,
+          reference: user.banReference,
+          expiresAt: user.banExpiresAt,
+        })
+      );
+    }
+  }, [user]);
 
   // Enhanced redirect and security logic
   useEffect(() => {
-    if (!user) {
-      const timer = setTimeout(() => {
-        if (!user?.isBanned) {
-          router.push("/");
-        }
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
+    if (!isClient) return;
 
-    if (!user?.isBanned) {
+    const localBan = localStorage.getItem("isBanned") === "true";
+
+    // Only redirect if both server and client agree user is not banned
+    if (user && !user.isBanned && !localBan) {
       router.push("/");
       return;
     }
-  }, [user, router, signOut]);
+
+    // If server says not banned but localStorage says banned, wait for confirmation
+    if (user && !user.isBanned && localBan) {
+      // Optionally add a delay here to confirm with server
+      const timer = setTimeout(() => {
+        localStorage.removeItem("isBanned");
+        localStorage.removeItem("banData");
+        router.push("/");
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [user, router, isClient]);
+
+  // Prevent going back and force refresh if somehow bypassed
+  useEffect(() => {
+    if (!isClient) return;
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (user?.isBanned || localStorage.getItem("isBanned") === "true") {
+        e.preventDefault();
+        return (e.returnValue =
+          "You are currently banned. Any unsaved appeal data will be lost.");
+      }
+    };
+
+    const handlePopState = () => {
+      if (user?.isBanned || localStorage.getItem("isBanned") === "true") {
+        window.history.pushState(null, "", "/banned");
+        window.location.reload();
+      }
+    };
+
+    window.history.pushState(null, "", "/banned");
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [user, isClient]);
 
   const handleForceLogout = async () => {
     try {
+      localStorage.removeItem("isBanned");
+      localStorage.removeItem("banData");
       await signOut();
+      router.push("/");
     } catch (error) {
       console.error("Error during sign out:", error);
     }
   };
 
-  // Additional security: prevent going back
-  useEffect(() => {
-    const handleBackButton = () => {
-      window.history.pushState(null, "", window.location.pathname);
-      router.push("/banned");
-    };
-
-    window.history.pushState(null, "", window.location.pathname);
-    window.addEventListener("popstate", handleBackButton);
-
-    return () => {
-      window.removeEventListener("popstate", handleBackButton);
-    };
-  }, [router]);
-
   const handleAppealSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting || !user) return;
+
     setIsSubmitting(true);
     setSubmitError("");
 
     try {
-      // Simulate API call to submit appeal
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const appealData = {
+        userId: user._id,
+        clerkId: user.clerkId,
+        email: user.email,
+        banReference: user.banReference || "N/A",
+        message: appealMessage,
+        user: user._id,
+        clientData: {
+          ip: window.location.hostname,
+          userAgent: navigator.userAgent,
+          timestamp: new Date().toISOString(),
+        },
+      };
 
-      // In a real app, you would call your backend API here
-      // await submitAppeal({
-      //   userId: user.id,
-      //   message: appealMessage,
-      //   reference: user.banReference
-      // });
+      const response = await fetch("/api/ban/appeals/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Appeal-Signature": await generateAppealSignature(appealData),
+        },
+        body: JSON.stringify(appealData),
+      }).then((res) => res.json());
+
+      if (!response.success) {
+        throw new Error(response.error || "Failed to submit appeal");
+      }
 
       setSubmitSuccess(true);
       setAppealMessage("");
-      setTimeout(() => setSubmitSuccess(false), 5000);
+      localStorage.setItem("lastAppealSubmission", new Date().toISOString());
+
+      setTimeout(() => {
+        setSubmitSuccess(false);
+        setIsAppealFormOpen(false);
+      }, 5000);
     } catch (error) {
-      setSubmitError("Failed to submit appeal. Please try again later.");
+      const errorMessage =
+        error instanceof Error ? error.message : "An unknown error occurred";
+      setSubmitError(
+        errorMessage.startsWith("Unexpected")
+          ? "Retry sending an appeal"
+          : "Try later"
+      );
       console.error("Appeal submission error:", error);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (!user?.isBanned) {
+  // Generate a simple signature for appeal verification
+  // Generate a secure signature for appeal verification
+  const generateAppealSignature = async (data: {
+    userId: string;
+    clerkId: string;
+    email: string;
+    banReference: string;
+    message: string;
+    clientData: {
+      ip: string;
+      userAgent: string;
+      timestamp: string;
+    };
+  }): Promise<string> => {
+    try {
+      // Validate required environment variable
+      if (!process.env.NEXT_PUBLIC_APPEAL_SECRET) {
+        throw new Error("Appeal secret key not configured");
+      }
+
+      const encoder = new TextEncoder();
+
+      // Create a salt to prevent rainbow table attacks
+      const salt = crypto.getRandomValues(new Uint8Array(16));
+
+      // Prepare the data to be signed (data + salt)
+      const dataToSign = {
+        ...data,
+        salt: Array.from(salt)
+          .map((b) => b.toString(16).padStart(2, "0"))
+          .join(""),
+      };
+
+      // Create HMAC key
+      const secretKey = await crypto.subtle.importKey(
+        "raw",
+        encoder.encode(process.env.NEXT_PUBLIC_APPEAL_SECRET),
+        { name: "HMAC", hash: "SHA-256" },
+        false,
+        ["sign"]
+      );
+
+      // Generate signature
+      const signature = await crypto.subtle.sign(
+        "HMAC",
+        secretKey,
+        encoder.encode(JSON.stringify(dataToSign))
+      );
+
+      // Convert to hex string
+      const signatureArray = Array.from(new Uint8Array(signature));
+      const signatureHex = signatureArray
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+
+      // Combine salt and signature for verification
+      return `${Array.from(salt)
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("")}:${signatureHex}`;
+    } catch (error) {
+      console.error("Signature generation failed:", error);
+      throw new Error("Failed to generate security signature");
+    }
+  };
+  // Show loading state if no user data yet but localStorage says banned
+  if (!isClient || (!user && localStorage.getItem("isBanned") === "true")) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-lg font-medium">
-            Checking your account status...
+            Verifying your account status...
           </h2>
-          <p className="mt-2 text-gray-600">
-            Please wait while we verify your information.
-          </p>
         </div>
       </div>
     );
   }
 
+  // If not banned according to both server and client
+  if (!user?.isBanned && localStorage.getItem("isBanned") !== "true") {
+    return null; // Will redirect
+  }
+
+  // Get ban data from either user or localStorage
+  const banData = user?.isBanned
+    ? {
+        reason: user.banReason,
+        reference: user.banReference,
+        expiresAt: user.banExpiresAt,
+      }
+    : JSON.parse(localStorage.getItem("banData") || "{}");
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50 dark:bg-gray-900">
       <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
@@ -113,9 +260,9 @@ export default function BannedPage() {
               SERIOUS VIOLATION
             </span>
           </div>
-          {user?.banReason && (
+          {banData.reason && (
             <p className="mt-2 text-red-100 text-sm">
-              Reason: {user.banReason}
+              Reason: {banData.reason}
             </p>
           )}
         </div>

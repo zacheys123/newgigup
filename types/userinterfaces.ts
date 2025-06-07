@@ -59,8 +59,8 @@ export interface UserProps {
   createdAt?: Date;
   updatedAt: Date;
   isAdmin?: boolean;
-  adminRole?: "super" | "content" | "support" | "analytics";
-  tierStatus?: "active" | "pending" | "canceled" | "expired";
+  adminRole?: "super" | "content" | "support" | "analytics" | string;
+  tierStatus?: "active" | "pending" | "canceled" | "expired" | string;
   adminPermissions?: string[];
   lastAdminAction?: Date;
   adminNotes?: string;
@@ -69,6 +69,7 @@ export interface UserProps {
   bannedAt: Date;
   banExpiresAt: Date; // New field for temporary ban
   banReference: string; // New fiel
+  theme: "lightMode" | "darkMode" | "system" | string;
 }
 export interface Users {
   users: UserProps[]; // Optional}

@@ -188,6 +188,7 @@ const ActionPage = () => {
               banReason: "",
               bannedAt: new Date(),
               lastAdminAction: new Date(),
+              theme: "lightMode",
             }),
           }),
         });

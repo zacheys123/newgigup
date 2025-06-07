@@ -86,6 +86,7 @@ interface IUser extends Document {
   bannedAt: Date;
   banExpiresAt: Date; // New field for temporary bans
   banReference: string; // New fiel
+  theme: "lightMode" | "darkMode" | "system";
 }
 
 // Define Mongoose Schema
@@ -201,23 +202,13 @@ const userSchema = new Schema<IUser>(
       enum: ["active", "pending", "canceled"],
       default: undefined,
     },
+    theme: { type: String, default: "lightMode" },
   },
 
   { timestamps: true }
 );
 
 // ========== INDEXES ========== //
-
-// 📌 Unique Constraints
-userSchema.index({ clerkId: 1 }, { unique: true });
-userSchema.index({ email: 1 }, { unique: true });
-userSchema.index(
-  { username: 1 },
-  {
-    unique: true,
-    collation: { locale: "en", strength: 2 }, // Case-insensitive
-  }
-);
 
 // 📌 Search Index
 userSchema.index(

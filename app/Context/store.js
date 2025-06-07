@@ -2,8 +2,8 @@
 import React from "react";
 import { authReducer } from "../../reducers/authReducers";
 import { createContext, useContext, useMemo, useReducer } from "react";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { useRouter } from "next/navigation";
+import { useBannedRedirect } from "@/hooks/useBannedRefirect";
+import { useInitialBanCheck } from "@/hooks/useInitialBanStatus";
 
 export const initialState = {
   toggle: false,
@@ -18,18 +18,20 @@ export const initialState = {
 const GlobalContext = createContext(initialState);
 
 export const GlobalProvider = ({ children }) => {
+  // Check ban status immediately on first render
+  useInitialBanCheck();
+
+  // Then set up ongoing ban status monitoring
+  useBannedRedirect();
+
   const [userState, setUserState] = useReducer(authReducer, initialState);
   const value = useMemo(() => {
     return { userState, setUserState };
   }, [userState]);
 
-  const { user } = useCurrentUser();
-  const router = useRouter();
-  if (user?.isbanned) {
-    router.push("/authenticate");
-  }
   return (
     <GlobalContext.Provider value={value}>{children}</GlobalContext.Provider>
   );
 };
+
 export const useGlobalContext = () => useContext(GlobalContext);
