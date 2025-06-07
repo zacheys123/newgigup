@@ -5,6 +5,12 @@ import { checkEnvironment } from "@/utils";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 
+interface SearchParams {
+  query?: string;
+  role?: RoleType;
+  page?: string;
+  userid?: string;
+}
 async function getCurrentUserRole() {
   try {
     const res = await fetch(`${checkEnvironment()}/api/admin/verify-role`, {
@@ -30,12 +36,7 @@ async function getCurrentUserRole() {
 export default async function AdminUsersPage({
   searchParams = {},
 }: {
-  searchParams?: {
-    query?: string;
-    role?: RoleType;
-    page?: string;
-    userid?: string;
-  };
+  searchParams: SearchParams;
 }) {
   const userRole = await getCurrentUserRole();
   const allowedRoles = ["super", "support"];
