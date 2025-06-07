@@ -8,11 +8,12 @@ import { format } from "date-fns";
 import Link from "next/link";
 
 export default function BannedPage() {
-  const { user: myuser } = useCurrentUser();
+  const { user: myuser, loading: isUserLoading } = useCurrentUser();
+  const user = myuser?.user;
   const router = useRouter();
   const { signOut } = useClerk();
-  const user = myuser?.user;
 
+  console.log("myuser", myuser);
   // State for appeal form
   const [isAppealFormOpen, setIsAppealFormOpen] = useState(false);
   const [appealMessage, setAppealMessage] = useState("");
@@ -20,12 +21,25 @@ export default function BannedPage() {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [isClient, setIsClient] = useState(false);
-
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
   // Set client flag and check localStorage on mount
+
+  useEffect(() => {
+    console.log("User object:", user);
+    console.log("Is banned:", user?.isBanned);
+    console.log("LocalStorage isBanned:", localStorage.getItem("isBanned"));
+  }, [user]);
+
+  useEffect(() => {
+    if (!isUserLoading) {
+      setIsLoadingUser(false);
+    }
+  }, [isUserLoading]);
   useEffect(() => {
     setIsClient(true);
-    // Always set banned status if user is banned
-    if (user?.isBanned) {
+
+    // Only set banned status if we have user data AND user is banned
+    if (user && user.isBanned) {
       localStorage.setItem("isBanned", "true");
       localStorage.setItem(
         "banData",
@@ -35,32 +49,32 @@ export default function BannedPage() {
           expiresAt: user.banExpiresAt,
         })
       );
-    }
-  }, [user]);
-
-  // Enhanced redirect and security logic
-  useEffect(() => {
-    if (!isClient) return;
-
-    const localBan = localStorage.getItem("isBanned") === "true";
-
-    // Only redirect if both server and client agree user is not banned
-    if (user && !user.isBanned && !localBan) {
+    } else if (user && !user.isBanned) {
+      // Clear banned status if user exists but isn't banned
+      localStorage.removeItem("isBanned");
+      localStorage.removeItem("banData");
       router.push("/");
-      return;
     }
+  }, [user]); // Only re-run when user changes
 
-    // If server says not banned but localStorage says banned, wait for confirmation
-    if (user && !user.isBanned && localBan) {
-      // Optionally add a delay here to confirm with server
-      const timer = setTimeout(() => {
-        localStorage.removeItem("isBanned");
-        localStorage.removeItem("banData");
-        router.push("/");
-      }, 3000);
-      return () => clearTimeout(timer);
+  useEffect(() => {
+    if (!isClient || isUserLoading) return;
+
+    const localIsBanned = localStorage.getItem("isBanned");
+    const banDataRaw = localStorage.getItem("banData");
+    const parsedBanData = banDataRaw ? JSON.parse(banDataRaw) : null;
+
+    const isLocallyNotBanned =
+      localIsBanned === null ||
+      localIsBanned === "false" ||
+      localIsBanned === undefined;
+    const isBanDataEmpty =
+      !parsedBanData || Object.keys(parsedBanData).length === 0;
+
+    if (user?.isBanned === false && isLocallyNotBanned && isBanDataEmpty) {
+      router.push("/");
     }
-  }, [user, router, isClient]);
+  }, [user, isClient, isUserLoading, router]);
 
   // Prevent going back and force refresh if somehow bypassed
   useEffect(() => {
@@ -224,7 +238,11 @@ export default function BannedPage() {
     }
   };
   // Show loading state if no user data yet but localStorage says banned
-  if (!isClient || (!user && localStorage.getItem("isBanned") === "true")) {
+  if (
+    !isClient ||
+    (!user && localStorage.getItem("isBanned") === "true") ||
+    isLoadingUser
+  ) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -249,6 +267,7 @@ export default function BannedPage() {
         expiresAt: user.banExpiresAt,
       }
     : JSON.parse(localStorage.getItem("banData") || "{}");
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50 dark:bg-gray-900">
       <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">

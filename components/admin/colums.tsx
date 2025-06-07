@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { BannedUserTableItem } from "@/types/appeal";
 import Link from "next/link";
 import toast from "react-hot-toast";
-
+import { mutate } from "swr";
 export const columns: ColumnDef<BannedUserTableItem>[] = [
   {
     id: "select",
@@ -115,49 +115,76 @@ export const columns: ColumnDef<BannedUserTableItem>[] = [
   {
     id: "actions",
     header: () => <span className="font-semibold">Actions</span>,
-    cell: ({ row }) => (
-      <div className="flex gap-2">
-        <Link
-          href="/admin/appeals"
-          className="h-8 px-3 text-sm whitespace-nowrap flex items-center justify-center bg-gray-500 text-primary title hover:text-warning "
-        >
-          View Appeals
-        </Link>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-8 px-3 text-sm text-primary hover:text-destructive title   bg-emerald-500"
-          onClick={async () => {
-            try {
-              const response = await fetch(
-                `/api/admin/users/${row.original._id}/ban`,
-                {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    action: "unban",
-                    reason: "",
-                    duration: "",
-                  }),
-                }
-              );
+    cell: ({ row }) => {
+      const handleUnban = async (userId: string) => {
+        try {
+          const response = await fetch(`/api/admin/users/${userId}/ban`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: "unban",
+              reason: "",
+              duration: "",
+            }),
+          });
 
-              if (!response.ok) throw new Error(await response.text());
+          if (!response.ok) throw new Error(await response.text());
 
-              // Send realtime ban update
+          // Optimistically update the SWR cache
+          mutate(
+            "/api/admin/users",
+            (currentData: BannedUserTableItem[] | undefined) =>
+              currentData?.map((user: BannedUserTableItem) =>
+                user._id === userId
+                  ? { ...user, isBanned: false, banData: null }
+                  : user
+              ),
+            false
+          );
 
-              toast.success("User has been unbanned");
-            } catch (error) {
-              toast.error(
-                error instanceof Error ? error.message : "Action failed"
-              );
+          // Update localStorage if needed
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("isbanned");
+            localStorage.removeItem("banData");
+            const usersData = JSON.parse(
+              localStorage.getItem("usersData") || "{}"
+            );
+            if (usersData[userId]) {
+              usersData[userId] = {
+                ...usersData[userId],
+                isBanned: false,
+                banData: null,
+              };
+              localStorage.setItem("usersData", JSON.stringify(usersData));
             }
-          }}
-        >
-          Unban
-        </Button>
-      </div>
-    ),
+          }
+
+          toast.success("User has been unbanned");
+        } catch (error) {
+          toast.error(error instanceof Error ? error.message : "Action failed");
+        }
+      };
+
+      return (
+        // Added return statement here
+        <div className="flex gap-2">
+          <Link
+            href="/admin/appeals"
+            className="h-8 px-3 text-sm whitespace-nowrap flex items-center justify-center bg-gray-500 text-primary title hover:text-warning"
+          >
+            View Appeals
+          </Link>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 px-3 text-sm text-primary hover:text-destructive title bg-emerald-500"
+            onClick={() => handleUnban(row.original._id)} // Fixed onClick handler
+          >
+            Unban
+          </Button>
+        </div>
+      );
+    },
     size: 180, // Fixed width for actions column
   },
 ];
