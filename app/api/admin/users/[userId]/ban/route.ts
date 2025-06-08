@@ -1,16 +1,42 @@
-// app/api/admin/users/[userId]/ban/route.ts
 import connectDb from "@/lib/connectDb";
 import User from "@/models/user";
 import { getAuth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-  const userId = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
-
   try {
-    const { action, reason, duration } = await req.json();
+    const userId = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
 
-    // Verify admin
+    const body = await req.json();
+    const { action, reason, duration } = body;
+
+    // Validate action
+    if (!["ban", "unban"].includes(action)) {
+      return new NextResponse("Invalid action. Must be 'ban' or 'unban'.", {
+        status: 400,
+      });
+    }
+
+    // Validate ban inputs
+    if (action === "ban") {
+      if (!reason || typeof reason !== "string" || reason.trim() === "") {
+        return new NextResponse("Ban reason is required.", { status: 400 });
+      }
+      if (
+        duration === undefined ||
+        isNaN(parseInt(duration)) ||
+        parseInt(duration) <= 0
+      ) {
+        return new NextResponse(
+          "Invalid duration. Must be a positive number.",
+          {
+            status: 400,
+          }
+        );
+      }
+    }
+
+    // Auth check
     const { userId: clerkId } = getAuth(req);
     if (!clerkId) return new NextResponse("Unauthorized", { status: 401 });
 
@@ -21,20 +47,19 @@ export async function POST(req: NextRequest) {
       return new NextResponse("Unauthorized", { status: 403 });
     }
 
-    // Calculate ban expiration if temporary ban
+    // Compute ban expiration date
     let banExpiresAt = null;
-    if (action === "ban" && duration) {
+    if (action === "ban") {
       const now = new Date();
       now.setDate(now.getDate() + parseInt(duration));
       banExpiresAt = now;
     }
 
-    // Handle both ban/unban
     const updateData =
       action === "ban"
         ? {
             isBanned: true,
-            banReason: reason || "No reason provided",
+            banReason: reason.trim(),
             bannedAt: new Date(),
             banExpiresAt,
             banReference: `BAN-${Date.now()}-${Math.random()
@@ -57,10 +82,8 @@ export async function POST(req: NextRequest) {
       return new NextResponse("User not found", { status: 404 });
     }
 
-    // Prepare response data
     const responseData = {
       ...updatedUser.toObject(),
-      // Include admin info for logging/notification purposes
       adminAction: {
         adminId: adminUser._id,
         adminName: adminUser.firstname,
