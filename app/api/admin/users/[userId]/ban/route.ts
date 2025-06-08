@@ -4,12 +4,10 @@ import User from "@/models/user";
 import { getAuth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { userId: string } }
-) {
+export async function POST(req: NextRequest) {
+  const userId = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
+
   try {
-    const { userId } = params;
     const { action, reason, duration } = await req.json();
 
     // Verify admin
