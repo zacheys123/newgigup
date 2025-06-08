@@ -6,9 +6,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+
 ) {
   try {
+         const myUserId = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
+
     // Authentication check
     const { userId: clerkId } = getAuth(request);
     if (!clerkId) {
@@ -17,7 +19,7 @@ export async function GET(
 
     await connectDb();
 
-    const appeals = await Appeal.find({ userId: params.userId })
+    const appeals = await Appeal.find({ userId:myUserId })
       .sort({ createdAt: -1 })
       .lean();
 
