@@ -1,50 +1,94 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+
 import UserDetailPage from "@/components/admin/UserDetailPage";
-import UsersTable from "@/components/admin/UserTable"; // 👈 Make sure this exists
-import { getUsers, getUserById, RoleType } from "@/lib/adminActions";
-import { checkEnvironment } from "@/utils";
-import { cookies } from "next/headers";
-import { notFound } from "next/navigation";
+import UsersTable, { UserProps } from "@/components/admin/UserTable";
+import { RoleType } from "@/lib/adminActions";
+import { PageProps } from "@/types/admininterfaces";
 
-interface SearchParams {
-  query?: string;
-  role?: RoleType;
-  page?: string;
-  userid?: string;
-}
+export default function AdminUsersPage() {
+  const searchParams = useSearchParams();
+  const userid = searchParams.get("userid") || undefined;
+  const query = searchParams.get("query") || "";
+  const role = (searchParams.get("role") as RoleType) || "all";
+  const page = searchParams.get("page") || "1";
 
-interface AdminUsersPageProps {
-  searchParams: SearchParams;
-}
-async function getCurrentUserRole() {
-  try {
-    const res = await fetch(`${checkEnvironment()}/api/admin/verify-role`, {
-      headers: {
-        Cookie: cookies().toString(),
-      },
-      next: { revalidate: 3600 },
-    });
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [user, setUser] = useState<PageProps | null>(null);
+  const [users, setUsers] = useState<UserProps[]>([]);
 
-    if (!res.ok) {
-      console.error("API Error:", await res.text());
-      throw new Error(`HTTP error! status: ${res.status}`);
-    }
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [totalUsers, setTotalUsers] = useState<number>(0);
+  const [error, setError] = useState<string | null>(null);
 
-    const data = await res.json();
-    return data.role;
-  } catch (error) {
-    console.error("Error fetching user role:", error);
-    return null;
-  }
-}
-
-// Then update your component definition
-export default async function AdminUsersPage({
-  searchParams = { query: "", role: "all", page: "1" },
-}: AdminUsersPageProps) {
-  const userRole = await getCurrentUserRole();
   const allowedRoles = ["super", "support"];
 
-  if (typeof userRole !== "string" || !allowedRoles.includes(userRole)) {
+  useEffect(() => {
+    // Get role
+    const fetchRole = async () => {
+      try {
+        const res = await fetch("/api/admin/verify-role");
+        const data = await res.json();
+        setUserRole(data.role);
+      } catch (err) {
+        console.error("Failed to fetch role", err);
+        setUserRole(null);
+      }
+    };
+
+    fetchRole();
+  }, []);
+
+  useEffect(() => {
+    if (!userRole || !allowedRoles.includes(userRole)) return;
+
+    const fetchData = async () => {
+      try {
+        if (userid) {
+          const res = await fetch(`/api/admin/user/${userid}`);
+          const data = await res.json();
+          setUser(data);
+        } else {
+          const res = await fetch(
+            `/api/admin/users?query=${query}&role=${role}&page=${page}`
+          );
+          const data = await res.json();
+
+          // Transform to match UserProps
+          const transformedUsers: UserProps[] = data.users.map(
+            (u: PageProps) => ({
+              _id: u._id,
+              clerkId: u.clerkId,
+              picture: u.picture,
+              firstname: u.firstname,
+              lastname: u.lastname,
+              email: u.email ?? "no-email@example.com", // fallback
+              username: u.username ?? "unknown",
+              isMusician: u.isMusician ?? false,
+              isClient: u.isClient ?? false,
+              isAdmin: u.isAdmin ?? false,
+              createdAt: new Date(u.createdAt),
+              status: u.status,
+            })
+          );
+
+          setUsers(transformedUsers);
+
+          setTotalPages(data.totalPages);
+          setTotalUsers(data.totalUsers);
+        }
+      } catch (err) {
+        console.error(err);
+        setError("Failed to fetch data.");
+      }
+    };
+
+    fetchData();
+  }, [userRole, userid, query, role, page]);
+
+  if (userRole && !allowedRoles.includes(userRole)) {
     return (
       <div className="p-4 text-center">
         <h1 className="text-2xl font-bold">Access Denied</h1>
@@ -56,35 +100,17 @@ export default async function AdminUsersPage({
     );
   }
 
-  const { userid, query = "", role = "all", page = "1" } = searchParams;
-
-  // ✅ If a specific user is requested, show the user detail page
-  if (userid) {
-    try {
-      const user = await getUserById(userid);
-      const plainUser = JSON.parse(JSON.stringify(user));
-      if (!user) return notFound();
-      return (
-        <div className="p-4">
-          <UserDetailPage user={plainUser} />
-        </div>
-      );
-    } catch (err) {
-      return (
-        <div className="p-4 text-red-600">
-          Failed to load user details: {(err as Error).message}
-        </div>
-      );
-    }
+  if (error) {
+    return <div className="p-4 text-red-600">{error}</div>;
   }
 
-  // ✅ Otherwise, render the full user table
-  const currentPage = parseInt(page, 10);
-  const { users, totalPages, totalUsers } = await getUsers(
-    query,
-    role,
-    currentPage
-  );
+  if (userid && user) {
+    return (
+      <div className="p-4">
+        <UserDetailPage user={user} />
+      </div>
+    );
+  }
 
   return (
     <div className="p-4">
@@ -93,7 +119,7 @@ export default async function AdminUsersPage({
       </div>
       <UsersTable
         users={users}
-        currentPage={currentPage}
+        currentPage={parseInt(page)}
         totalPages={totalPages}
         totalUsers={totalUsers}
         initialQuery={query}

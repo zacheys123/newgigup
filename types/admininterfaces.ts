@@ -33,6 +33,7 @@ export interface AdminNavbarProps {
 
 export interface PageProps {
   _id: string;
+  clerkId: string;
   picture?: string;
   firstname?: string;
   lastname?: string;

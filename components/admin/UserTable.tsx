@@ -36,21 +36,23 @@ import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import Link from "next/link";
 
+export interface UserProps {
+  _id: string;
+  clerkId: string;
+  picture?: string;
+  firstname?: string;
+  lastname?: string;
+  email: string;
+  username: string;
+  isMusician: boolean;
+  isClient: boolean;
+  isAdmin: boolean;
+  createdAt: Date;
+  status?: "active" | "banned" | "pending";
+}
+
 interface UsersTableProps {
-  users: {
-    _id: string;
-    clerkId: string;
-    picture?: string;
-    firstname?: string;
-    lastname?: string;
-    email: string;
-    username: string;
-    isMusician: boolean;
-    isClient: boolean;
-    isAdmin: boolean;
-    createdAt: Date;
-    status?: "active" | "banned" | "pending";
-  }[];
+  users: UserProps[];
   currentPage: number;
   totalPages: number;
   totalUsers: number;
@@ -317,12 +319,14 @@ function UserTableRow({
         </div>
       </TableCell>
       <TableCell className="text-right">
-        <Link href={`/admin/users?userid=${user?._id}`}>
-          <Button size="sm" variant="outline" className="h-8 w-8 p-0">
-            <MoreVertical className="h-4 w-4" />
-            <span className="sr-only">Manage user</span>
-          </Button>
-        </Link>
+        {user?._id && (
+          <Link href={`/admin/users?userid=${encodeURIComponent(user._id)}`}>
+            <Button size="sm" variant="outline" className="h-8 w-8 p-0">
+              <MoreVertical className="h-4 w-4" />
+              <span className="sr-only">Manage user</span>
+            </Button>
+          </Link>
+        )}
       </TableCell>
     </TableRow>
   );
