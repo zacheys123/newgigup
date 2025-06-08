@@ -58,7 +58,7 @@ export default function AdminUsersPage() {
 
           // Transform to match UserProps
           const transformedUsers: UserProps[] = data.users.map(
-            (u: PageProps) => ({
+            (u: UserProps) => ({
               _id: u._id,
               clerkId: u.clerkId,
               picture: u.picture,
