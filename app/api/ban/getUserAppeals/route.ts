@@ -9,7 +9,7 @@ export async function GET(
 
 ) {
   try {
-         const myUserId = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
+         const myUserId = request.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
 
     // Authentication check
     const { userId: clerkId } = getAuth(request);
