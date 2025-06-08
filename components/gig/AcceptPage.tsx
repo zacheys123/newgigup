@@ -20,7 +20,6 @@ const AcceptPage = ({
   postedBy,
   viewCount,
   isTaken,
-  isPending,
   bookCount,
 }: GigProps) => {
   const { userId } = useAuth();
@@ -39,10 +38,12 @@ const AcceptPage = ({
       : 0
   );
   const [comm] = useState<string>(
-    bookedBy?.allreviews
-      .filter((review: { gigId: string }) => review.gigId === _id)
-      ?.map((review: { comment: string }) => review.comment)
-      .join(" ") || ""
+    (bookedBy?.allreviews &&
+      bookedBy?.allreviews
+        .filter((review: { gigId: string }) => review.gigId === _id)
+        ?.map((review: { comment: string }) => review.comment)
+        .join(" ")) ||
+      ""
   );
 
   const router = useRouter();
@@ -53,10 +54,13 @@ const AcceptPage = ({
   };
 
   useEffect(() => {
-    if (isTaken === false && bookCount?.length > 0) {
+    if (typeof isTaken !== "boolean") return; // avoid running on undefined
+    if (isTaken) return; // do nothing if gig is taken
+
+    if (bookCount?.length > 0) {
       router.push(`/gigs/${userId}`);
     }
-  }, [isTaken, isPending, userId, router, bookCount]);
+  }, [isTaken, bookCount, userId, router]);
 
   const handleRatingChange = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -96,9 +100,9 @@ const AcceptPage = ({
         toast.success(data?.message || "Review submitted successfully");
         setRating(0);
         setComment("");
-        setTimeout(() => {
-          router.push(`/gigs/${userId}`);
-        }, 2000);
+        // setTimeout(() => {
+        //   router.push(`/gigs/${userId}`);
+        // }, 2000);
       } else {
         toast.error(
           data?.message || "There was an issue submitting the review"
