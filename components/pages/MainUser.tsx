@@ -65,14 +65,18 @@ const MainUser = ({
 
     if (isMusician) {
       // Only calculate rating for musicians
-      setRating(
-        calculateRating(
-          bookedGigs.flatMap(
-            (bookedBy: UserProps) => bookedBy.allreviews || []
-          ),
-          bookedGigs.length
-        )
-      );
+setRating(
+  calculateRating(
+    bookedGigs.flatMap((gig: GigProps) => {
+      // Explicitly check if allreviews exists and is the correct type
+      if (gig.bookedBy?.allreviews && Array.isArray(gig.bookedBy.allreviews)) {
+        return gig.bookedBy.allreviews;
+      }
+      return [];
+    }),
+    bookedGigs.length
+  )
+);
     }
   }, [_id, isMusician, gigs, gigsLoading]);
 
