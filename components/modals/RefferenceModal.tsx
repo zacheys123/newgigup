@@ -77,12 +77,14 @@ const RefferenceModal: React.FC<ProfileModalProps> = ({ user, getReviews }) => {
                     <MdInsertComment
                       className="text-[24px] text-yellow-400"
                       style={{ fontSize: "24px" }}
-                      onClick={(ev) => {
-                        ev.stopPropagation();
-                        setRefferenceModalOpen(false);
-                        setReviewModalOpen(true);
-                        getReviews(myreviews);
-                      }}
+            onClick={(ev) => {
+  ev.stopPropagation();
+  setRefferenceModalOpen(false);
+  setReviewModalOpen(true);
+  if (myreviews) {
+    getReviews(myreviews);
+  }
+}}
                     />
                   </div>
                 </div>

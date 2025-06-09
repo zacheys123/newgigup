@@ -82,6 +82,7 @@ const VideoProfile = () => {
               bannedAt: new Date(),
               banExpiresAt: new Date(), // New field for temporary ban
               banReference: "", // New fiel
+              theme:"light"
             },
           });
         }

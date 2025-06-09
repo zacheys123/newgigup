@@ -21,8 +21,9 @@ async function adminMiddleware(userId: string) {
 }
 export async function GET(
   req: NextRequest,
-  { params }: { params: { userId: string } }
+
 ) {
+  
   const { userId } = getAuth(req);
   const res = await adminMiddleware(userId as string);
   if (res instanceof NextResponse) return res;
@@ -30,7 +31,9 @@ export async function GET(
   await connectDb();
 
   try {
-    const user = await User.findById(params.userId);
+        const myUserId = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
+
+    const user = await User.findById(myUserId);
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
@@ -47,7 +50,7 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { userId: string } }
+
 ) {
   const { userId } = getAuth(req);
   const res = await adminMiddleware(userId as string);
@@ -56,8 +59,10 @@ export async function PUT(
   await connectDb();
 
   try {
+         const myUserId = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
+
     const body = await req.json();
-    const user = await User.findByIdAndUpdate(params.userId, body, {
+    const user = await User.findByIdAndUpdate(myUserId, body, {
       new: true,
     });
 
