@@ -24,7 +24,7 @@ const FollowButton = ({
     const userId = user?.user?._id;
     if (!userId || !followers) return false;
 
-    return followers.some((follower) =>
+    return followers?.some((follower) =>
       typeof follower === "string"
         ? follower === userId
         : follower._id === userId
