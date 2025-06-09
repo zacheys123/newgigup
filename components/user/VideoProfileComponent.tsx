@@ -135,11 +135,11 @@ const VideoProfileComponent = ({
             >
               &times;
             </button>
-            {user?.videosProfile?.length < 3 && addedVideos.length < 3 && (
-              <h2 className="text-center text-white text-xl font-semibold mb-4">
-                Upload Your Video
-              </h2>
-            )}
+         {(user?.videosProfile?.length || 0) < 3 && addedVideos.length < 3 && (
+  <h2 className="text-center text-white text-xl font-semibold mb-4">
+    Upload Your Video
+  </h2>
+)}
             {user?.videosProfile?.length < 3 && addedVideos.length < 3 ? (
               <div className="flex flex-col items-center gap-4">
                 {addedVideos.length < 3 && (
