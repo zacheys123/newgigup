@@ -140,7 +140,7 @@ const VideoProfileComponent = ({
     Upload Your Video
   </h2>
 )}
-            {user?.videosProfile?.length < 3 && addedVideos.length < 3 ? (
+            {user?.videosProfile?.length && user?.videosProfile?.length < 3 && addedVideos.length < 3 ? (
               <div className="flex flex-col items-center gap-4">
                 {addedVideos.length < 3 && (
                   <>
