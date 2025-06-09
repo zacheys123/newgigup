@@ -12,7 +12,7 @@ const FollowButton = ({
   myid,
 }: {
   _id: string;
-  followers: string[] | UserProps[];
+  followers?: string[] | UserProps[];
   myid?: string;
 }) => {
   const { user } = useCurrentUser();
@@ -128,16 +128,16 @@ const FollowButton = ({
   //   console.log("Followers array:", followers);
   //   console.log("Current User ID:", user?.user?._id);
   // }, [optimisticFollow, followers, user]);
-  const isFollowing = (() => {
-    const userId = user?.user?._id;
-    if (!userId || !followers) return false;
+const isFollowing = (() => {
+  const userId = user?.user?._id;
+  if (!userId) return false;
 
-    return followers.some((follower) =>
-      typeof follower === "string"
-        ? follower === userId
-        : follower._id === userId
-    );
-  })();
+  return followers.some((follower) =>
+    typeof follower === "string"
+      ? follower === userId
+      : follower._id === userId
+  );
+})();
   return (
     <div>
       {/* Conditional rendering based on optimistic follow state */}{" "}
