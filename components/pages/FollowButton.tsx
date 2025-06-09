@@ -132,7 +132,7 @@ const isFollowing = (() => {
   const userId = user?.user?._id;
   if (!userId) return false;
 
-  return followers.some((follower) =>
+  return followers?.some((follower) =>
     typeof follower === "string"
       ? follower === userId
       : follower._id === userId
