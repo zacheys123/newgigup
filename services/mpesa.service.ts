@@ -47,7 +47,7 @@ export class MpesaService {
       !process.env.MPESA_CONSUMER_SECRET ||
       !process.env.MPESA_BUSINESS_SHORTCODE ||
       !process.env.MPESA_PASSKEY ||
-      !process.env.MPESA_CALLBACK_URL
+      !getCallbackUrl().trim()
     ) {
       throw new Error("Missing M-Pesa environment variables");
     }
