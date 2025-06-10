@@ -36,7 +36,11 @@ export async function GET(req: NextRequest) {
     filter.isMusician = true;
   }
 
-  const users = await User.find(filter).skip(skip).limit(limit).lean();
+  const users = await User.find(filter)
+    .skip(skip)
+    .limit(limit)
+    .select("firstname email isAdmin isClient isMusician createdAt")
+    .lean();
   const totalUsers = await User.countDocuments(filter);
   const totalPages = Math.ceil(totalUsers / limit);
 

@@ -240,8 +240,10 @@ userSchema.index({ tier: 1, tierStatus: 1 });
 userSchema.index({ nextBillingDate: 1 });
 
 // 📌 Performance & Filtering
-userSchema.index({ isMusician: 1 });
+userSchema.index({ isAdmin: 1 });
 userSchema.index({ isClient: 1 });
+userSchema.index({ isMusician: 1 });
+
 userSchema.index({ lastActive: -1 });
 userSchema.index({ createdAt: -1 });
 userSchema.index({ updatedAt: -1 });

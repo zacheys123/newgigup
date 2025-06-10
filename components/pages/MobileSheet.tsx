@@ -91,32 +91,25 @@ const MobileSheet = () => {
       <SheetTrigger>
         <Menu
           className={cn(
-            "text-3xl hover:text-teal-300 transition-colors duration-200",
-            resolvedTheme === "dark"
-              ? "text-white"
-              : resolvedTheme === "light"
-              ? "text-gray-900"
-              : "text-gray-200"
+            "text-3xl transition-colors duration-200 hover:text-teal-300",
+            "text-gray-900 dark:text-white"
           )}
         />
       </SheetTrigger>
       <SheetContent
         side="left"
         className={cn(
-          "w-[80%] sm:w-[60%] md:w-[40%] h-full backdrop-blur-2xl border-r px-6 py-6 flex flex-col gap-4 z-[999] rounded-br-[120px] shadow-2xl",
-          resolvedTheme === "dark"
-            ? "bg-gray-900/80 border-gray-800"
-            : "bg-white/80 border-gray-200"
+          "w-[80%] sm:w-[60%] md:w-[40%] h-full",
+          "backdrop-blur-2xl border-r px-6 py-6 flex flex-col gap-4 z-[999]",
+          "rounded-br-[120px] shadow-2xl",
+          "bg-white/80 dark:bg-gray-900/90",
+          "border-gray-200 dark:border-gray-700",
+          "transition-colors duration-200 ease-in-out"
         )}
       >
         {!isFirstMonthEnd ? (
           <>
-            <SheetTitle
-              className={cn(
-                "text-2xl font-bold mb-4",
-                resolvedTheme === "dark" ? "text-white" : "text-gray-900"
-              )}
-            >
+            <SheetTitle className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
               Access More Info
             </SheetTitle>
             {navLinks(userId as string, user?.user)
@@ -127,40 +120,22 @@ const MobileSheet = () => {
                   href={link.href}
                   className={cn(
                     "flex items-center gap-4 w-full px-4 py-3 rounded-lg transition-all duration-200",
-                    resolvedTheme === "dark"
-                      ? "text-white bg-gray-800 hover:bg-teal-600"
-                      : "text-gray-900 bg-gray-100 hover:bg-teal-500 hover:text-white"
+                    "bg-gray-100 text-gray-900 hover:bg-teal-500 hover:text-white",
+                    "dark:bg-gray-800 dark:text-white dark:hover:bg-teal-600"
                   )}
                 >
-                  <span
-                    className={
-                      resolvedTheme === "dark" ? "text-white" : "text-gray-900"
-                    }
-                  >
+                  <span className="text-gray-900 dark:text-white">
                     {link.icon}
                   </span>
-                  <span
-                    className={cn(
-                      "md:text-lg font-medium title",
-                      resolvedTheme === "dark"
-                        ? "text-neutral-300"
-                        : "text-gray-700"
-                    )}
-                  >
+                  <span className="md:text-lg font-medium text-gray-700 dark:text-neutral-300">
                     {link.label}
                   </span>
                 </Link>
               ))}
-            <div
-              className={cn(
-                "mt-6 p-2 w-fit text-sm rounded-md font-semibold shadow-md",
-                resolvedTheme === "dark"
-                  ? "bg-gradient-to-br from-purple-400 via-emerald-400 to-orange-500 text-white"
-                  : "bg-gradient-to-br from-purple-600 via-emerald-600 to-orange-600 text-white"
-              )}
-            >
+            <div className="mt-6 p-2 w-fit text-sm rounded-md font-semibold shadow-md text-white bg-gradient-to-br from-purple-600 via-emerald-600 to-orange-600 dark:from-purple-400 dark:via-emerald-400 dark:to-orange-500">
               {tier} Version
-            </div>{" "}
+            </div>
+
             <ThemeToggle
               theme={theme}
               resolvedTheme={resolvedTheme}
@@ -170,12 +145,7 @@ const MobileSheet = () => {
           </>
         ) : (
           <>
-            <SheetTitle
-              className={cn(
-                "text-2xl font-bold mb-4",
-                resolvedTheme === "dark" ? "text-white" : "text-gray-900"
-              )}
-            >
+            <SheetTitle className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
               Try Gigup Now!!!!
             </SheetTitle>
             <div className="flex h-[80%] my-auto flex-col justify-between">
@@ -188,50 +158,22 @@ const MobileSheet = () => {
                     : "text-gray-900 bg-gray-100 hover:bg-teal-500 hover:text-white"
                 )}
               >
-                <span
-                  className={
-                    resolvedTheme === "dark" ? "text-white" : "text-gray-900"
-                  }
-                >
+                <span className="">
                   <Video />
                 </span>
-                <div
-                  className={cn(
-                    "p-3 rounded-lg shadow-lg",
-                    resolvedTheme === "dark"
-                      ? "bg-gradient-to-r from-gray-900 via-indigo-900 to-green-800"
-                      : "bg-gradient-to-r from-gray-200 via-indigo-200 to-green-200"
-                  )}
-                >
-                  <span
-                    className={cn(
-                      "md:text-lg font-semibold bg-clip-text drop-shadow-md",
-                      resolvedTheme === "dark"
-                        ? "bg-gradient-to-r from-cyan-400 via-purple-400 to-yellow-300 text-transparent"
-                        : "bg-gradient-to-r from-cyan-600 via-purple-600 to-yellow-500 text-transparent"
-                    )}
-                  >
+                <div className="p-3 rounded-lg shadow-lg bg-gradient-to-r from-gray-200 via-indigo-200 to-green-200 dark:from-gray-900 dark:via-indigo-900 dark:to-green-800">
+                  <span className="md:text-lg font-semibold bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 via-purple-600 to-yellow-500 dark:from-cyan-400 dark:via-purple-400 dark:to-yellow-300">
                     Experience GiGup
                   </span>
                 </div>
               </Link>
 
               {/* New informational text */}
-              <p
-                className={cn(
-                  "text-sm mt-4 mb-2 px-2 leading-relaxed",
-                  resolvedTheme === "dark" ? "text-gray-300" : "text-gray-600"
-                )}
-              >
+              <p className="text-sm mt-4 mb-2 px-2 leading-relaxed text-gray-600 dark:text-gray-300">
                 Unlock the full potential of GiGup with premium features such
                 as:
               </p>
-              <ul
-                className={cn(
-                  "list-disc list-inside text-sm mb-4 px-4 space-y-1",
-                  resolvedTheme === "dark" ? "text-gray-400" : "text-gray-500"
-                )}
-              >
+              <ul className="list-disc list-inside text-sm mb-4 px-4 space-y-1 text-gray-500 dark:text-gray-400">
                 <li>Unlimited gigs & chats</li>
                 <li>Advanced analytics & insights</li>
                 <li>Priority support</li>
@@ -256,10 +198,10 @@ const MobileSheet = () => {
               <Link
                 href="/dashboard/billing"
                 className={cn(
-                  "mt-4 inline-block w-full text-center px-6 py-3 text-sm font-semibold rounded-lg hover:brightness-110 transition duration-200",
-                  resolvedTheme === "dark"
-                    ? "bg-gradient-to-r from-purple-600 via-pink-500 to-yellow-400"
-                    : "bg-gradient-to-r from-purple-700 via-pink-600 to-yellow-500 text-white"
+                  "mt-4 inline-block w-full text-center px-6 py-3 text-sm font-semibold rounded-lg",
+                  "transition duration-200 hover:brightness-110",
+                  "bg-gradient-to-r from-purple-700 via-pink-600 to-yellow-500 text-white",
+                  "dark:from-purple-600 dark:via-pink-500 dark:to-yellow-400"
                 )}
               >
                 Upgrade Now
