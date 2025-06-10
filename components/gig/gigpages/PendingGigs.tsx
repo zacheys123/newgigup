@@ -127,7 +127,7 @@ const PendingGigs = () => {
   };
 
   const { socket } = useSocket();
-  // notification for the user who booked a gig...their pagee reffreshes
+  // notification for the user who booked a gig?...their pagee reffreshes
   useEffect(() => {
     if (socket) {
       socket.on("musicianBooked", ({ gigId, message }) => {
@@ -141,7 +141,7 @@ const PendingGigs = () => {
         if (isTaken) {
           // Filter out the taken gig from local state
           setLocalGigs((prevGigs) =>
-            prevGigs.filter((gig) => gig._id !== gigId)
+            prevGigs.filter((gig) => gig?._id !== gigId)
           );
           // Also update the pending count
           setPendingGigsCount(localGigs?.length - 1);
@@ -160,7 +160,7 @@ const PendingGigs = () => {
     }
   }, [socket, userId, router, setPendingGigsCount, localGigs]);
   const renderCategorySpecificContent = (gig: GigProps) => {
-    switch (gig.bussinesscat?.toLowerCase()) {
+    switch (gig?.bussinesscat?.toLowerCase()) {
       case "DJ":
         return (
           <div className="mt-3 space-y-2">
@@ -171,7 +171,7 @@ const PendingGigs = () => {
               </span>
             </div>
             <div className="flex flex-wrap gap-2">
-              {gig.djGenre?.split(",").map((genre, idx) => (
+              {gig?.djGenre?.split(",").map((genre, idx) => (
                 <span
                   key={idx}
                   className="px-2 py-1 text-xs rounded-full bg-purple-900/50 text-purple-200"
@@ -180,7 +180,7 @@ const PendingGigs = () => {
                 </span>
               ))}
             </div>
-            {gig.djEquipment && (
+            {gig?.djEquipment && (
               <div className="mt-2">
                 <div className="flex items-center gap-2">
                   <Mic2 size={16} className="text-amber-400" />
@@ -188,7 +188,7 @@ const PendingGigs = () => {
                     Equipment:
                   </span>
                 </div>
-                <p className="text-sm text-amber-200">{gig.djEquipment}</p>
+                <p className="text-sm text-amber-200">{gig?.djEquipment}</p>
               </div>
             )}
           </div>
@@ -201,14 +201,14 @@ const PendingGigs = () => {
               <span className="text-sm font-medium text-blue-300">
                 MC Type:
               </span>
-              <span className="text-sm text-blue-200">{gig.mcType}</span>
+              <span className="text-sm text-blue-200">{gig?.mcType}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-blue-300">
                 Languages:
               </span>
               <div className="flex flex-wrap gap-2">
-                {gig.mcLanguages?.split(",").map((lang, idx) => (
+                {gig?.mcLanguages?.split(",").map((lang, idx) => (
                   <span
                     key={idx}
                     className="px-2 py-1 text-xs rounded-full bg-blue-900/50 text-blue-200"
@@ -230,7 +230,7 @@ const PendingGigs = () => {
               </span>
             </div>
             <div className="flex flex-wrap gap-2">
-              {[...new Set(gig.vocalistGenre)].map((genre, idx) => (
+              {[...new Set(gig?.vocalistGenre)].map((genre, idx) => (
                 <span
                   key={idx}
                   className="px-2 py-1 text-xs rounded-full bg-rose-900/50 text-rose-200 animate-pulse"
@@ -247,13 +247,13 @@ const PendingGigs = () => {
   };
 
   const renderTimelineInfo = (gig: GigProps) => {
-    switch (gig.gigtimeline) {
+    switch (gig?.gigtimeline) {
       case "once":
         return (
           <div className="flex items-center gap-2 mt-2">
             <CalendarCheck size={16} className="text-green-400" />
             <span className="text-sm text-green-300">
-              One-time event on {formatDate(gig.date)}
+              One-time event on {formatDate(gig?.date)}
             </span>
           </div>
         );
@@ -261,15 +261,15 @@ const PendingGigs = () => {
         return (
           <div className="flex items-center gap-2 mt-2">
             <RefreshCw size={16} className="text-blue-400" />
-            <span className="text-sm text-blue-300">Weekly on {gig.day}</span>
+            <span className="text-sm text-blue-300">Weekly on {gig?.day}</span>
           </div>
         );
       case "other":
-        return gig.otherTimeline ? (
+        return gig?.otherTimeline ? (
           <div className="flex items-center gap-2 mt-2">
             <Calendar size={16} className="text-purple-400" />
             <span className="text-sm text-purple-300">
-              Custom schedule: {gig.otherTimeline}
+              Custom schedule: {gig?.otherTimeline}
             </span>
           </div>
         ) : null;
@@ -389,10 +389,10 @@ const PendingGigs = () => {
                       <div className="flex justify-between items-start">
                         <div>
                           <h3 className="text-xl font-bold text-white mb-1">
-                            {gig.title}
+                            {gig?.title}
                           </h3>
                           <p className="text-sm text-gray-300 line-clamp-2">
-                            {gig.description}
+                            {gig?.description}
                           </p>
                         </div>
                         <span className="px-3 py-1 text-xs rounded-full bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md">
@@ -404,7 +404,7 @@ const PendingGigs = () => {
                         <div className="flex items-center gap-2">
                           <MapPin size={16} className="text-amber-400" />
                           <span className="text-sm text-amber-200">
-                            {gig.location}
+                            {gig?.location}
                           </span>
                         </div>
                         {renderTimelineInfo(gig)}
@@ -412,7 +412,7 @@ const PendingGigs = () => {
                         <div className="flex items-center gap-2">
                           <Clock size={16} className="text-indigo-400" />
                           <span className="text-sm text-indigo-200">
-                            {gig.time?.from} - {gig.time?.to}
+                            {gig?.time?.from} - {gig?.time?.to}
                           </span>
                         </div>
                       </div>
@@ -439,7 +439,7 @@ const PendingGigs = () => {
                         <motion.button
                           whileHover={{ scale: 1.03 }}
                           whileTap={{ scale: 0.97 }}
-                          onClick={() => router.push(`/execute/${gig._id}`)}
+                          onClick={() => router.push(`/execute/${gig?._id}`)}
                           className="px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-lg text-[10px] font-medium shadow-lg hover:shadow-cyan-500/20 transition-all"
                         >
                           View Gig

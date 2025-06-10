@@ -81,7 +81,7 @@ export const useTheme = () => {
 
     try {
       // Sync with server if logged in
-      if (user?._id) {
+      if (user?.user?._id) {
         await fetch("/api/user/theme", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },

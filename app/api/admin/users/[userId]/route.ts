@@ -17,41 +17,28 @@ async function adminMiddleware(userId: string) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  return NextResponse.next();
+  return admin;
 }
-export async function GET(
-  req: NextRequest,
 
-) {
-  
-  const { userId } = getAuth(req);
-  const res = await adminMiddleware(userId as string);
-  if (res instanceof NextResponse) return res;
+// app/api/admin/users/[userId]/route.ts
 
+export async function GET(req: NextRequest) {
   await connectDb();
+  const userId = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
 
   try {
-        const myUserId = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
-
-    const user = await User.findById(myUserId);
-    if (!user) {
+    const user = await User.findById(userId).lean();
+    if (!user)
       return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
 
     return NextResponse.json(user);
-  } catch (error) {
-    console.log(error);
-    return NextResponse.json(
-      { error: "Failed to fetch user" },
-      { status: 500 }
-    );
+  } catch (err) {
+    console.log(err);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
 
-export async function PUT(
-  req: NextRequest,
-
-) {
+export async function PUT(req: NextRequest) {
   const { userId } = getAuth(req);
   const res = await adminMiddleware(userId as string);
   if (res instanceof NextResponse) return res;
@@ -59,7 +46,7 @@ export async function PUT(
   await connectDb();
 
   try {
-         const myUserId = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
+    const myUserId = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
 
     const body = await req.json();
     const user = await User.findByIdAndUpdate(myUserId, body, {

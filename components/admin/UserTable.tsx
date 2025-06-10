@@ -15,8 +15,6 @@ import { Badge } from "@/components/ui/badge";
 import {
   ChevronLeft,
   ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
   Search,
   MoreVertical,
   User,
@@ -333,6 +331,8 @@ function UserTableRow({
 }
 
 // Pagination controls
+// components/admin/PaginationControls.tsx
+
 function PaginationControls({
   currentPage,
   totalPages,
@@ -344,106 +344,29 @@ function PaginationControls({
   totalUsers: number;
   goToPage: (page: number) => void;
 }) {
-  const pageNumbers = [];
-  const maxVisiblePages = 5;
-
-  let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-  const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
-  if (endPage - startPage + 1 < maxVisiblePages) {
-    startPage = Math.max(1, endPage - maxVisiblePages + 1);
-  }
-
-  for (let i = startPage; i <= endPage; i++) {
-    pageNumbers.push(i);
-  }
-
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4">
-      <div className="text-sm text-muted-foreground">
-        Showing <span className="font-medium">{(currentPage - 1) * 5 + 1}</span>{" "}
-        to{" "}
-        <span className="font-medium">
-          {Math.min(currentPage * 5, totalUsers)}
-        </span>{" "}
-        of <span className="font-medium">{totalUsers}</span> users
-      </div>
-
-      <div className="flex items-center gap-1">
+    <div className="flex justify-between items-center px-4">
+      <p className="text-sm text-muted-foreground">
+        Page {currentPage} of {totalPages} — {totalUsers} users
+      </p>
+      <div className="flex gap-2">
         <Button
           variant="outline"
           size="sm"
-          onClick={() => goToPage(1)}
-          disabled={currentPage === 1}
-          className="hidden sm:flex"
+          onClick={() => goToPage(currentPage - 1)}
+          disabled={currentPage <= 1}
         >
-          <ChevronsLeft className="h-4 w-4" />
+          <ChevronLeft className="w-4 h-4" />
+          Previous
         </Button>
         <Button
           variant="outline"
           size="sm"
-          onClick={() => goToPage(Math.max(1, currentPage - 1))}
-          disabled={currentPage === 1}
+          onClick={() => goToPage(currentPage + 1)}
+          disabled={currentPage >= totalPages}
         >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-
-        {startPage > 1 && (
-          <>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => goToPage(1)}
-              className="w-10 h-10 p-0"
-            >
-              1
-            </Button>
-            {startPage > 2 && <span className="px-2">...</span>}
-          </>
-        )}
-
-        {pageNumbers.map((page) => (
-          <Button
-            key={page}
-            variant={currentPage === page ? "default" : "outline"}
-            size="sm"
-            onClick={() => goToPage(page)}
-            className="w-10 h-10 p-0"
-          >
-            {page}
-          </Button>
-        ))}
-
-        {endPage < totalPages && (
-          <>
-            {endPage < totalPages - 1 && <span className="px-2">...</span>}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => goToPage(totalPages)}
-              className="w-10 h-10 p-0"
-            >
-              {totalPages}
-            </Button>
-          </>
-        )}
-
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => goToPage(Math.min(totalPages, currentPage + 1))}
-          disabled={currentPage === totalPages}
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => goToPage(totalPages)}
-          disabled={currentPage === totalPages}
-          className="hidden sm:flex"
-        >
-          <ChevronsRight className="h-4 w-4" />
+          Next
+          <ChevronRight className="w-4 h-4" />
         </Button>
       </div>
     </div>

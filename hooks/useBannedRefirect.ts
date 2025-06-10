@@ -13,7 +13,7 @@ export const useBannedRedirect = () => {
 
     // If either server or client indicates banned status
     if (
-      (user?.isBanned || isBannedLocal) &&
+      (user?.user?.isBanned || isBannedLocal) &&
       !window.location.pathname.startsWith("/banned")
     ) {
       // Update LocalStorage to persist the banned state

@@ -5,8 +5,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const userId = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
+    const pathParts = req.nextUrl.pathname.split("/");
+    const userId = pathParts[pathParts.length - 2]; // This will give you the actual userId
 
+    console.log(userId);
     const body = await req.json();
     const { action, reason, duration } = body;
 

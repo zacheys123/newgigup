@@ -47,7 +47,7 @@ export class MpesaService {
       !process.env.MPESA_CONSUMER_SECRET ||
       !process.env.MPESA_BUSINESS_SHORTCODE ||
       !process.env.MPESA_PASSKEY ||
-      !getCallbackUrl().trim()
+      !process.env.NEXT_PUBLIC_MPESA_CALLBACK_URL
     ) {
       throw new Error("Missing M-Pesa environment variables");
     }
@@ -144,14 +144,6 @@ export class MpesaService {
     };
     console.log("STK Push Payload:", payload); // 👈 Debug this
 
-    console.log("Final STK Push Request:", {
-      url: `${process.env.NEXT_PUBLIC_MPESA_API_URL}/stkpush/v1/processrequest`,
-      payload,
-      headers: {
-        Authorization: `Bearer ${this.authToken}`,
-        "Content-Type": "application/json",
-      },
-    });
     try {
       const response = await axios.post<STKPushResponse>(
         `${process.env.NEXT_PUBLIC_MPESA_API_URL}/stkpush/v1/processrequest`,

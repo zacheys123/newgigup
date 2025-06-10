@@ -50,8 +50,6 @@ const Authenticate = () => {
                         setMainloader(false);
                         if (myuser?.user?.isAdmin) {
                           router.push(`/admin/dashboard`);
-                        } else if (myuser?.user?.isAdmin) {
-                          router.push("/banned");
                         } else {
                           if (isLoaded && !myuser?.user?.isAdmin) {
                             if (!myuser?.user?.firstname) {
