@@ -165,3 +165,16 @@ const Authenticate = () => {
 };
 
 export default Authenticate;
+
+// //     if (myuser?.user?.isAdmin) {
+//   router.push(`/admin/dashboard`);
+// } else {
+//   if (isLoaded && !myuser?.user?.isAdmin) {
+//     if (!myuser?.user?.firstname) {
+//       router.push(`/roles/${user?.id}`);
+//     } else {
+//       window.location.reload();
+//       router.push("/");
+//     }
+//   }
+// }
