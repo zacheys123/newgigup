@@ -94,44 +94,49 @@ export function MpesaPaymentDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-sm bg-gradient-to-b from-green-600 to-green-800 border-green-700 rounded-lg p-6 text-white">
-        <DialogHeader>
-          <div className="flex items-center justify-center mb-4">
-            <div className="bg-white rounded-full p-2 mr-3">
+      <DialogContent className="w-[70vw] max-w-sm bg-white dark:bg-gray-900 rounded-xl shadow-xl p-5 animate-in fade-in-90 slide-in-from-bottom-10">
+        {/* Header with floating M-Pesa icon */}
+        <DialogHeader className="relative">
+          <div className="absolute -top-12 left-1/2 transform -translate-x-1/2">
+            <div className="bg-gradient-to-br from-green-600 to-green-800 p-3 rounded-full shadow-lg border-4 border-white dark:border-gray-900 transition-all duration-300 hover:rotate-12">
               <svg
                 width="24"
                 height="24"
                 viewBox="0 0 24 24"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
+                className="text-white"
               >
                 <path
                   d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
-                  fill="#FFC72C"
+                  fill="currentColor"
                 />
                 <path
                   d="M12 17C14.7614 17 17 14.7614 17 12C17 9.23858 14.7614 7 12 7C9.23858 7 7 9.23858 7 12C7 14.7614 9.23858 17 12 17Z"
-                  fill="#007D32"
+                  fill="#FFC72C"
                 />
               </svg>
             </div>
-            <DialogTitle className="text-2xl font-bold text-white">
+          </div>
+          <div className="mt-8 text-center">
+            <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
               M-Pesa Payment
             </DialogTitle>
+            <DialogDescription className="text-gray-500 dark:text-gray-400 mt-1">
+              Enter your Safaricom number to proceed
+            </DialogDescription>
           </div>
-          <DialogDescription className="text-green-100">
-            Enter your Safaricom phone number
-          </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+        <form onSubmit={handleSubmit} className="mt-6 space-y-5">
+          {/* Phone Input */}
           <div className="space-y-2">
-            <Label htmlFor="phone" className="text-green-100">
+            <Label htmlFor="phone" className="text-gray-700 dark:text-gray-300">
               Phone Number
             </Label>
             <div className="relative">
-              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-300">
-                +254
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <span className="text-gray-500">+254</span>
               </div>
               <Input
                 id="phone"
@@ -139,10 +144,90 @@ export function MpesaPaymentDialog({
                 placeholder="712 345 678"
                 value={formatDisplayNumber(inputValue)}
                 onChange={handleInputChange}
-                className="bg-green-700 border-green-600 text-white placeholder-green-300 focus:ring-2 focus:ring-green-400 pl-14 pr-10"
+                className="bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white pl-16 pr-10 h-12 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
                 inputMode="numeric"
               />
-              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-300">
+              <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-gray-400"
+                >
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                </svg>
+              </div>
+            </div>
+            {error && (
+              <p className="text-red-500 text-sm animate-in fade-in">{error}</p>
+            )}
+            <p className="text-gray-500 dark:text-gray-400 text-xs">
+              Your 9-digit Safaricom number
+            </p>
+          </div>
+
+          {/* Payment Summary */}
+          <div className="bg-gray-100 dark:bg-gray-800/50 p-4 rounded-lg border border-gray-200 dark:border-gray-700 transition-all duration-200 hover:shadow-sm">
+            <div className="flex justify-between items-center py-1">
+              <span className="text-gray-600 dark:text-gray-400">Number:</span>
+              <span className="font-medium text-gray-900 dark:text-white">
+                {inputValue ? (
+                  <span className="font-mono">
+                    +254 {formatDisplayNumber(inputValue)}
+                  </span>
+                ) : (
+                  <span className="text-gray-400 dark:text-gray-500">
+                    ______
+                  </span>
+                )}
+              </span>
+            </div>
+            <div className="flex justify-between items-center py-1">
+              <span className="text-gray-600 dark:text-gray-400">Amount:</span>
+              <span className="font-bold text-green-600 dark:text-green-500">
+                {user?.isClient ? "KES 2,000" : "KES 1,500"}
+              </span>
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <Button
+            type="submit"
+            disabled={isProcessing || !isValid}
+            className="w-full h-12 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-70 disabled:transform-none"
+          >
+            {isProcessing ? (
+              <span className="flex items-center justify-center space-x-2">
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                <span>Processing Payment...</span>
+              </span>
+            ) : (
+              <span className="flex items-center justify-center space-x-2">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="20"
@@ -154,76 +239,19 @@ export function MpesaPaymentDialog({
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 >
-                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
                 </svg>
+                <span>Lipa Na M-pesa</span>
               </span>
-            </div>
-            {error && <p className="text-red-300 text-sm">{error}</p>}
-            <p className="text-green-200 text-xs">
-              Enter your 9-digit Safaricom number
-            </p>
-          </div>
-
-          <div className="bg-green-800 p-4 rounded-lg border border-green-700">
-            <div className="flex justify-between text-green-100 text-sm">
-              <span>Full Number:</span>
-              <span className="font-mono font-bold">
-                {inputValue ? (
-                  <span className="text-green-300">
-                    +254 {formatDisplayNumber(inputValue)}
-                  </span>
-                ) : (
-                  "________________"
-                )}
-              </span>
-            </div>
-            <div className="flex justify-between text-green-100 text-sm mt-2">
-              <span>Amount:</span>
-              <span className="font-bold">
-                {user?.isClient ? "KES 2000" : "KES 1500"}
-              </span>
-            </div>
-          </div>
-
-          <div className="pt-2">
-            <Button
-              type="submit"
-              disabled={isProcessing || !isValid}
-              className="w-full bg-yellow-500 hover:bg-yellow-600 text-green-900 font-bold py-3 text-lg disabled:opacity-70 disabled:cursor-not-allowed"
-            >
-              {isProcessing ? (
-                <span className="flex items-center justify-center">
-                  <svg
-                    className="animate-spin -ml-1 mr-2 h-5 w-5 text-green-900"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  Processing...
-                </span>
-              ) : (
-                "Pay with M-Pesa"
-              )}
-            </Button>
-          </div>
+            )}
+          </Button>
         </form>
 
-        <div className="mt-4 text-center text-green-200 text-xs">
-          <p>You will receive an M-Pesa push notification</p>
+        {/* Footer Note */}
+        <div className="mt-4 text-center">
+          <p className="text-xs text-gray-500 dark:text-gray-400 animate-pulse">
+            {`You'll receive an M-Pesa push notification`}
+          </p>
         </div>
       </DialogContent>
     </Dialog>
