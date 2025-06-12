@@ -17,7 +17,7 @@ const Actions = () => {
   console.log("my userdata here", user?.user);
   useEffect(() => {
     // Only proceed when auth and user data are fully loaded
-    if (!isAuthLoaded || loading) return;
+    if (!isAuthLoaded || loading || !user || user?.user === undefined) return;
     if (user?.user?.isAdmin) {
       router.push("/admin/dashboard");
     } else {

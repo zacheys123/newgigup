@@ -214,9 +214,9 @@ const TextRevealLoader = () => (
     <div className="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-500">
       <AnimatedText text="gigUp" />
     </div>
-    <p className="text-gray-400 max-w-md">
+    <div className="text-gray-400 max-w-md">
       <AnimatedText text="Creating connections that matter" delay={0.5} />
-    </p>
+    </div>
   </div>
 );
 
