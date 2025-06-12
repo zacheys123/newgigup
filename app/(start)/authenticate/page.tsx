@@ -8,59 +8,75 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 const Authenticate = () => {
   const [activeLoader, setActiveLoader] = useState<number>(0);
   const [progress, setProgress] = useState<number>(0);
+  const [isFirstVisit, setIsFirstVisit] = useState<boolean>(true);
   const router = useRouter();
   const { user: myuser } = useCurrentUser();
   const { user, isSignedIn } = useUser();
   const { isLoaded } = useAuth();
 
   const timeoutRefs = useRef<NodeJS.Timeout[]>([]);
-  const progressInterval = useRef<number | undefined>(undefined); // Changed to number | undefined
+  const progressInterval = useRef<number | undefined>(undefined);
+
+  // Check if this is the first visit
+  useEffect(() => {
+    const visitedBefore = localStorage.getItem("hasVisitedBefore");
+    if (visitedBefore) {
+      setIsFirstVisit(false);
+    } else {
+      localStorage.setItem("hasVisitedBefore", "true");
+    }
+  }, []);
 
   const loaders = [
     {
       component: <InitialWaveLoader progress={progress} />,
-      duration: 2000,
+      duration: 1000,
     },
     {
       component: <TextRevealLoader />,
-      duration: 5500,
-    },
-    {
-      component: <ParticleLoader />,
-      duration: 3000,
-    },
-    {
-      component: <GeometricLoader />,
       duration: 2500,
     },
     {
+      component: <ParticleLoader />,
+      duration: 2000,
+    },
+    {
+      component: <GeometricLoader />,
+      duration: 1500,
+    },
+    {
       component: <FinalLoader />,
-      duration: 3000,
+      duration: 2000,
     },
   ];
 
-  const startProgress = () => {
-    const totalDuration = loaders.reduce(
-      (sum, loader) => sum + loader.duration,
-      0
-    );
-    const increment = (100 / totalDuration) * 50;
+  const welcomeLoader = {
+    component: <WelcomeBackLoader />,
+    duration: 3000,
+  };
 
-    // Store the numeric interval ID
+  const startProgress = (totalDuration: number) => {
+    const increment = (100 / totalDuration) * 50;
     progressInterval.current = window.setInterval(() => {
       setProgress((prev) => Math.min(prev + increment, 100));
     }, 50);
   };
 
   const LoadingSequence = useCallback(() => {
-    startProgress();
+    const loaderToUse = isFirstVisit ? loaders : [welcomeLoader];
+    const totalDuration = loaderToUse.reduce(
+      (sum, loader) => sum + loader.duration,
+      0
+    );
 
-    loaders.forEach((loader, index) => {
+    startProgress(totalDuration);
+
+    loaderToUse.forEach((loader, index) => {
       const timeout = setTimeout(
         () => {
           setActiveLoader(index + 1);
 
-          if (index === loaders.length - 1) {
+          if (index === loaderToUse.length - 1) {
             if (progressInterval.current !== undefined) {
               clearInterval(progressInterval.current);
               progressInterval.current = undefined;
@@ -79,12 +95,12 @@ const Authenticate = () => {
             }
           }
         },
-        loaders.slice(0, index + 1).reduce((sum, l) => sum + l.duration, 0)
+        loaderToUse.slice(0, index + 1).reduce((sum, l) => sum + l.duration, 0)
       );
 
       timeoutRefs.current.push(timeout);
     });
-  }, [myuser, isLoaded]);
+  }, [myuser, isLoaded, isFirstVisit]);
 
   useEffect(() => {
     return () => {
@@ -159,7 +175,9 @@ const Authenticate = () => {
           transition={{ duration: 0.5 }}
           className="w-full h-full flex items-center justify-center"
         >
-          {loaders[activeLoader]?.component || <FinalLoader />}
+          {isFirstVisit
+            ? loaders[activeLoader]?.component || <FinalLoader />
+            : welcomeLoader.component}
         </motion.div>
       </AnimatePresence>
 
@@ -180,6 +198,76 @@ const Authenticate = () => {
     </div>
   );
 };
+
+// New WelcomeBackLoader component
+const WelcomeBackLoader = () => (
+  <div className="flex flex-col items-center justify-center space-y-8">
+    <motion.div
+      initial={{ scale: 0.8, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="relative"
+    >
+      <motion.div
+        className="w-32 h-32 rounded-full bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center shadow-xl"
+        animate={{
+          rotate: [0, 360],
+        }}
+        transition={{
+          duration: 8,
+          repeat: Infinity,
+          ease: "linear",
+        }}
+      >
+        <motion.div
+          className="absolute inset-0 rounded-full border-4 border-white border-opacity-20"
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.3, 0.8, 0.3],
+          }}
+          transition={{
+            duration: 3,
+            repeat: Infinity,
+          }}
+        />
+        <motion.div
+          className="absolute inset-0 rounded-full border-4 border-white border-opacity-20"
+          animate={{
+            scale: [1, 1.4, 1],
+            opacity: [0.2, 0.6, 0.2],
+          }}
+          transition={{
+            duration: 4,
+            repeat: Infinity,
+            delay: 0.5,
+          }}
+        />
+        <div className="z-10 text-white text-4xl">👋</div>
+      </motion.div>
+    </motion.div>
+
+    <motion.div
+      initial={{ y: 20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ delay: 0.3 }}
+      className="text-center"
+    >
+      <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-500 mb-2">
+        Welcome Back!
+      </h2>
+      <p className="text-gray-300 max-w-md">
+        {`We're preparing your personalized experience...`}
+      </p>
+    </motion.div>
+
+    <motion.div
+      initial={{ width: 0 }}
+      animate={{ width: "100%" }}
+      transition={{ duration: 2, delay: 0.5 }}
+      className="h-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent rounded-full"
+    />
+  </div>
+);
 
 // Loader Components
 const InitialWaveLoader = ({ progress }: { progress: number }) => (

@@ -26,7 +26,6 @@ const Actions = () => {
         router.push("/sign-in");
         return;
       }
-
       // Case 2: We have a userId but no user record in MongoDB
       if (!user?.user?.firstname) {
         setStatus("unregistered");
