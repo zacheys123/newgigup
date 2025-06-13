@@ -56,7 +56,7 @@ const Actions = () => {
           !user?.user?.onboardingComplete &&
           !user?.user?.isAdmin
         ) {
-          router.push("/dashboard");
+          router.push("/about");
         } else {
           router.push("/");
         }
