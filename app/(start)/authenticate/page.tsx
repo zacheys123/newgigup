@@ -13,118 +13,125 @@ const Authenticate = () => {
   const { user: myuser } = useCurrentUser();
   const { user, isSignedIn } = useUser();
   const { isLoaded } = useAuth();
-
+  const initialized = useRef(false);
   const timeoutRefs = useRef<NodeJS.Timeout[]>([]);
   const progressInterval = useRef<number | undefined>(undefined);
 
-  // Check if this is the first visit
+  // Initialize first visit state
   useEffect(() => {
-    const visitedBefore = localStorage.getItem("hasVisitedBefore");
-    if (visitedBefore) {
-      setIsFirstVisit(false);
-    } else {
-      localStorage.setItem("hasVisitedBefore", "true");
+    if (initialized.current) return;
+    initialized.current = true;
+
+    const hasVisited = localStorage.getItem("hasVisited");
+    setIsFirstVisit(!hasVisited);
+    if (!hasVisited) {
+      localStorage.setItem("hasVisited", "true");
     }
   }, []);
 
-  const loaders = [
-    {
-      component: <InitialWaveLoader progress={progress} />,
-      duration: 1000,
-    },
-    {
-      component: <TextRevealLoader />,
-      duration: 2500,
-    },
-    {
-      component: <ParticleLoader />,
-      duration: 2000,
-    },
-    {
-      component: <GeometricLoader />,
-      duration: 1500,
-    },
-    {
-      component: <FinalLoader />,
-      duration: 2000,
-    },
-  ];
+  // Memoized loaders based on isFirstVisit
+  const loaders = React.useMemo(() => {
+    return [
+      {
+        component: <InitialWaveLoader progress={progress} />,
+        duration: 1000,
+      },
+      {
+        component: <TextRevealLoader />,
+        duration: isFirstVisit ? 2500 : 0,
+      },
+      {
+        component: <ParticleLoader />,
+        duration: isFirstVisit ? 2000 : 0,
+      },
+      {
+        component: <GeometricLoader />,
+        duration: isFirstVisit ? 1500 : 0,
+      },
+      {
+        component: <FinalLoader />,
+        duration: isFirstVisit ? 2000 : 2500,
+      },
+    ];
+  }, [isFirstVisit, progress]);
 
-  const welcomeLoader = {
-    component: <WelcomeBackLoader />,
-    duration: 3000,
-  };
-
-  const startProgress = (totalDuration: number) => {
-    const increment = (100 / totalDuration) * 50;
-    progressInterval.current = window.setInterval(() => {
-      setProgress((prev) => Math.min(prev + increment, 100));
-    }, 50);
-  };
-
-  const LoadingSequence = useCallback(() => {
-    const loaderToUse = isFirstVisit ? loaders : [welcomeLoader];
-    const totalDuration = loaderToUse.reduce(
+  const startProgress = useCallback(() => {
+    const totalDuration = loaders.reduce(
       (sum, loader) => sum + loader.duration,
       0
     );
+    const increment = (100 / totalDuration) * 50;
 
-    startProgress(totalDuration);
+    progressInterval.current = window.setInterval(() => {
+      setProgress((prev) => {
+        const newProgress = Math.min(prev + increment, 100);
+        if (newProgress >= 100 && progressInterval.current) {
+          clearInterval(progressInterval.current);
+          progressInterval.current = undefined;
+        }
+        return newProgress;
+      });
+    }, 50);
+  }, [loaders]);
 
-    loaderToUse.forEach((loader, index) => {
-      const timeout = setTimeout(
-        () => {
-          setActiveLoader(index + 1);
+  const redirectUser = useCallback(() => {
+    if (myuser?.user?.isBanned) {
+      router.push("/banned");
+      return;
+    }
 
-          if (index === loaderToUse.length - 1) {
-            if (progressInterval.current !== undefined) {
-              clearInterval(progressInterval.current);
-              progressInterval.current = undefined;
-            }
-            if (myuser?.user?.isAdmin) {
-              router.push(`/admin/dashboard`);
-            } else {
-              if (isLoaded && !myuser?.user?.isAdmin) {
-                if (!myuser?.user?.firstname) {
-                  router.push(`/roles/${user?.id}`);
-                } else {
-                  window.location.reload();
-                  router.push("/");
-                }
-              }
-            }
-          }
-        },
-        loaderToUse.slice(0, index + 1).reduce((sum, l) => sum + l.duration, 0)
-      );
+    if (myuser?.user?.isAdmin) {
+      router.push(`/admin/dashboard`);
+    } else {
+      if (!myuser?.user?.firstname) {
+        router.push(`/roles/${user?.id}`);
+      } else {
+        router.push("/");
+      }
+    }
+  }, [myuser, user?.id, router]);
 
+  const runLoaderSequence = useCallback(() => {
+    startProgress();
+
+    let cumulativeDelay = 0;
+    timeoutRefs.current = [];
+
+    loaders.forEach((loader, index) => {
+      const timeout = setTimeout(() => {
+        setActiveLoader(index + 1);
+
+        if (index === loaders.length - 1) {
+          redirectUser();
+        }
+      }, cumulativeDelay);
+
+      cumulativeDelay += loader.duration;
       timeoutRefs.current.push(timeout);
     });
-  }, [myuser, isLoaded, isFirstVisit]);
+  }, [loaders, startProgress, redirectUser]);
 
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
       timeoutRefs.current.forEach(clearTimeout);
-      timeoutRefs.current = [];
       if (progressInterval.current !== undefined) {
         clearInterval(progressInterval.current);
       }
     };
   }, []);
 
+  // Main effect to trigger the sequence
   useEffect(() => {
+    if (!isLoaded || !myuser) return;
+
     if (myuser?.user?.isBanned) {
-      timeoutRefs.current.forEach(clearTimeout);
-      timeoutRefs.current = [];
-      if (progressInterval.current !== undefined) {
-        clearInterval(progressInterval.current);
-      }
-      router.push("/banned");
+      redirectUser();
       return;
     }
 
-    LoadingSequence();
-  }, [myuser]);
+    runLoaderSequence();
+  }, [isLoaded, myuser, runLoaderSequence, redirectUser]);
 
   if (myuser?.user?.isBanned) {
     return null;
@@ -175,13 +182,10 @@ const Authenticate = () => {
           transition={{ duration: 0.5 }}
           className="w-full h-full flex items-center justify-center"
         >
-          {isFirstVisit
-            ? loaders[activeLoader]?.component || <FinalLoader />
-            : welcomeLoader.component}
+          {loaders[activeLoader]?.component || <FinalLoader />}
         </motion.div>
       </AnimatePresence>
 
-      {/* Global progress bar at bottom */}
       <div className="absolute bottom-10 left-0 right-0 px-10 max-w-3xl mx-auto">
         <div className="h-1.5 w-full bg-gray-800 rounded-full overflow-hidden">
           <motion.div
@@ -199,104 +203,182 @@ const Authenticate = () => {
   );
 };
 
-// New WelcomeBackLoader component
-const WelcomeBackLoader = () => (
-  <div className="flex flex-col items-center justify-center space-y-8">
-    <motion.div
-      initial={{ scale: 0.8, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="relative"
-    >
+// Loader Components
+const InitialWaveLoader = ({ progress }: { progress: number }) => (
+  <div className="relative w-full h-full flex items-center justify-center">
+    {/* Background gradient circles */}
+    {[...Array(8)].map((_, i) => (
       <motion.div
-        className="w-32 h-32 rounded-full bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center shadow-xl"
+        key={`circle-${i}`}
+        className="absolute rounded-full"
+        style={{
+          width: `${60 + i * 40}px`,
+          height: `${60 + i * 40}px`,
+          background: `conic-gradient(from ${
+            i * 45
+          }deg, rgba(139, 92, 246, 0.2), rgba(99, 102, 241, 0.3), transparent 70%)`,
+        }}
+        initial={{ scale: 0.8, opacity: 0 }}
         animate={{
-          rotate: [0, 360],
+          scale: [0.8, 1.1, 0.9],
+          opacity: [0, 0.6, 0.3],
+          rotate: [0, i % 2 ? 180 : -180],
         }}
         transition={{
-          duration: 8,
+          duration: 4 + i * 0.5,
           repeat: Infinity,
-          ease: "linear",
+          repeatType: "reverse",
+          delay: i * 0.2,
+          ease: "anticipate",
+        }}
+      />
+    ))}
+
+    {/* Pulse waves */}
+    {[...Array(5)].map((_, i) => (
+      <motion.div
+        key={`wave-${i}`}
+        className="absolute rounded-full border-2 border-opacity-10"
+        style={{
+          width: `${80 + i * 60}px`,
+          height: `${80 + i * 60}px`,
+          borderColor: i % 2 ? "#8b5cf6" : "#6366f1",
+        }}
+        initial={{ scale: 0.5, opacity: 0 }}
+        animate={{
+          scale: [0.8, 1.5, 0.8],
+          opacity: [0.4, 0.8, 0],
+        }}
+        transition={{
+          duration: 3,
+          repeat: Infinity,
+          delay: i * 0.3,
+          ease: "easeOut",
+        }}
+      />
+    ))}
+
+    {/* Floating particles */}
+    {[...Array(20)].map((_, i) => (
+      <motion.div
+        key={`particle-${i}`}
+        className="absolute rounded-full bg-white"
+        style={{
+          width: `${Math.random() * 4 + 2}px`,
+          height: `${Math.random() * 4 + 2}px`,
+          left: `${Math.random() * 100}%`,
+          top: `${Math.random() * 100}%`,
+          opacity: 0,
+        }}
+        animate={{
+          y: [0, (Math.random() - 0.5) * 100],
+          x: [0, (Math.random() - 0.5) * 50],
+          opacity: [0, 0.8, 0],
+          scale: [0.5, 1.5, 0.5],
+        }}
+        transition={{
+          duration: 3 + Math.random() * 3,
+          repeat: Infinity,
+          delay: Math.random() * 2,
+          ease: "easeInOut",
+        }}
+      />
+    ))}
+
+    {/* Main text container */}
+    <motion.div
+      className="relative z-20 text-center"
+      initial={{ y: 20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.8, ease: "backOut" }}
+    >
+      <motion.div
+        className="text-5xl font-bold mb-4"
+        style={{
+          background:
+            progress > 10
+              ? "linear-gradient(45deg, #8b5cf6, #ec4899, #f59e0b)"
+              : "linear-gradient(45deg, #8b5cf6, #6366f1)",
+          WebkitBackgroundClip: "text",
+          backgroundClip: "text",
+          color: "transparent",
+          textShadow: "0 2px 10px rgba(139, 92, 246, 0.3)",
+        }}
+        animate={{
+          scale: [1, 1.05, 1],
+          letterSpacing: ["0em", "0.02em", "0em"],
+        }}
+        transition={{
+          duration: 3,
+          repeat: Infinity,
+          repeatType: "reverse",
+          ease: "easeInOut",
         }}
       >
+        {progress > 10 ? "Welcome back" : "Welcome"}
+      </motion.div>
+
+      <motion.p
+        className="text-gray-300 text-lg max-w-md mx-auto"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5, duration: 1 }}
+      >
+        {progress > 10
+          ? "We've missed you! Preparing your personalized experience..."
+          : "Let's get started! Initializing your workspace..."}
+      </motion.p>
+
+      {/* Decorative elements */}
+      <motion.div
+        className="absolute -bottom-8 left-0 right-0 flex justify-center"
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ delay: 0.7 }}
+      >
         <motion.div
-          className="absolute inset-0 rounded-full border-4 border-white border-opacity-20"
+          className="h-1 rounded-full bg-gradient-to-r from-transparent via-purple-500 to-transparent"
+          style={{ width: "60%" }}
           animate={{
-            scale: [1, 1.2, 1],
             opacity: [0.3, 0.8, 0.3],
+            width: ["50%", "70%", "50%"],
           }}
           transition={{
             duration: 3,
             repeat: Infinity,
+            ease: "easeInOut",
           }}
         />
-        <motion.div
-          className="absolute inset-0 rounded-full border-4 border-white border-opacity-20"
-          animate={{
-            scale: [1, 1.4, 1],
-            opacity: [0.2, 0.6, 0.2],
-          }}
-          transition={{
-            duration: 4,
-            repeat: Infinity,
-            delay: 0.5,
-          }}
-        />
-        <div className="z-10 text-white text-4xl">👋</div>
       </motion.div>
     </motion.div>
 
+    {/* Floating decorative elements */}
     <motion.div
-      initial={{ y: 20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ delay: 0.3 }}
-      className="text-center"
-    >
-      <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-500 mb-2">
-        Welcome Back!
-      </h2>
-      <p className="text-gray-300 max-w-md">
-        {`We're preparing your personalized experience...`}
-      </p>
-    </motion.div>
-
+      className="absolute top-1/4 left-1/4 w-6 h-6 rounded-full bg-purple-400 blur-sm"
+      animate={{
+        y: [0, -20, 0],
+        opacity: [0.3, 0.7, 0.3],
+      }}
+      transition={{
+        duration: 4,
+        repeat: Infinity,
+        delay: 0.5,
+      }}
+    />
     <motion.div
-      initial={{ width: 0 }}
-      animate={{ width: "100%" }}
-      transition={{ duration: 2, delay: 0.5 }}
-      className="h-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent rounded-full"
+      className="absolute bottom-1/3 right-1/4 w-4 h-4 rounded-full bg-blue-400 blur-sm"
+      animate={{
+        y: [0, 20, 0],
+        opacity: [0.3, 0.7, 0.3],
+      }}
+      transition={{
+        duration: 5,
+        repeat: Infinity,
+        delay: 0.8,
+      }}
     />
   </div>
 );
-
-// Loader Components
-const InitialWaveLoader = ({ progress }: { progress: number }) => (
-  <div className="relative w-64 h-64 flex items-center justify-center">
-    {[...Array(5)].map((_, i) => (
-      <motion.div
-        key={i}
-        className="absolute rounded-full border-2 border-opacity-20 border-white"
-        style={{
-          width: `${40 + i * 30}px`,
-          height: `${40 + i * 30}px`,
-        }}
-        animate={{
-          scale: [1, 1.2, 1],
-          opacity: [0.2, 0.8, 0.2],
-        }}
-        transition={{
-          duration: 2,
-          repeat: Infinity,
-          delay: i * 0.3,
-        }}
-      />
-    ))}
-    <div className="text-white text-xl font-medium z-10">
-      Welcome {progress > 10 ? "back" : ""}
-    </div>
-  </div>
-);
-
 const TextRevealLoader = () => (
   <div className="text-center">
     <div className="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-500">
