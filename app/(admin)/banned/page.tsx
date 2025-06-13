@@ -25,37 +25,13 @@ export default function BannedPage() {
   // Set client flag and check localStorage on mount
 
   useEffect(() => {
-    console.log("User object:", user);
-    console.log("Is banned:", user?.isBanned);
-    console.log("LocalStorage isBanned:", localStorage.getItem("isBanned"));
-  }, [user]);
+    setIsLoadingUser(true);
+    setIsClient(true);
+  }, []);
 
-  useEffect(() => {
-    if (!isUserLoading) {
-      setIsLoadingUser(false);
-    }
-  }, [isUserLoading]);
   useEffect(() => {
     setIsClient(true);
-
-    // Only set banned status if we have user data AND user is banned
-    if (user && user.isBanned) {
-      localStorage.setItem("isBanned", "true");
-      localStorage.setItem(
-        "banData",
-        JSON.stringify({
-          reason: user.banReason,
-          reference: user.banReference,
-          expiresAt: user.banExpiresAt,
-        })
-      );
-    } else if (user && !user.isBanned) {
-      // Clear banned status if user exists but isn't banned
-      localStorage.removeItem("isBanned");
-      localStorage.removeItem("banData");
-      router.push("/");
-    }
-  }, [user]); // Only re-run when user changes
+  }, []);
 
   useEffect(() => {
     if (!isClient || isUserLoading) return;
@@ -64,18 +40,42 @@ export default function BannedPage() {
     const banDataRaw = localStorage.getItem("banData");
     const parsedBanData = banDataRaw ? JSON.parse(banDataRaw) : null;
 
-    const isLocallyNotBanned =
-      localIsBanned === null ||
-      localIsBanned === "false" ||
-      localIsBanned === undefined;
-    const isBanDataEmpty =
-      !parsedBanData || Object.keys(parsedBanData).length === 0;
+    // If we have user data
+    if (user) {
+      if (user.isBanned) {
+        // Update localStorage to match server state
+        localStorage.setItem("isBanned", "true");
+        localStorage.setItem(
+          "banData",
+          JSON.stringify({
+            reason: user.banReason,
+            reference: user.banReference,
+            expiresAt: user.banExpiresAt,
+          })
+        );
+      } else {
+        // User exists and is not banned - clear flags and redirect
+        localStorage.removeItem("isBanned");
+        localStorage.removeItem("banData");
+        router.push("/");
+        return; // Exit early since we're redirecting
+      }
+    } else {
+      // No user data available - check localStorage
+      const shouldRedirect =
+        localIsBanned !== "true" || // Not banned in localStorage
+        !parsedBanData || // No ban data
+        (parsedBanData.expiresAt &&
+          new Date(parsedBanData.expiresAt) < new Date()); // Ban expired
 
-    if (user?.isBanned === false && isLocallyNotBanned && isBanDataEmpty) {
-      router.push("/");
+      if (shouldRedirect) {
+        localStorage.removeItem("isBanned");
+        localStorage.removeItem("banData");
+        router.push("/");
+        return; // Exit early since we're redirecting
+      }
     }
   }, [user, isClient, isUserLoading, router]);
-
   // Prevent going back and force refresh if somehow bypassed
   useEffect(() => {
     if (!isClient) return;

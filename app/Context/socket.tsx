@@ -52,6 +52,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const closeBanNotification = () => {
     setBanNotification((prev) => ({ ...prev, show: false }));
+    router.push("/");
   };
   // Typing status management
   const isTyping = (userId: string) => typingUsers[userId] || false;
@@ -213,7 +214,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
   //         ? `Reason: ${data.reason || "Not specified"}${
   //             data.duration ? ` | Duration: ${data.duration} days` : ""
   //           }`
-  //         : "Your account access has been restored",
+  //         : "ess has been restored",
   //       timestamp: new Date(data.timestamp),
   //       read: false,
   //       chatId: "system-notification", // or some other placeholder
