@@ -3,6 +3,7 @@ import { mpesaService } from "@/services/mpesa.service";
 import connectDb from "@/lib/connectDb";
 
 import { PendingPayment } from "@/models/pendingPayment";
+import User from "@/models/user";
 // import { sendConfirmationEmail } from "@/lib/subscription/sendConfirmationEmail";
 
 // In your verification endpoint
@@ -12,7 +13,7 @@ export async function POST(req: NextRequest) {
 
   try {
     await connectDb();
-
+    console.log("the checkout iD is", checkoutRequestId);
     // Check if payment is already successful
     const pendingPayment = await PendingPayment.findOne({ checkoutRequestId });
     if (pendingPayment?.status === "success") {
@@ -23,14 +24,39 @@ export async function POST(req: NextRequest) {
       checkoutRequestId
     );
 
-    if (verification.success) {
+    if (verification.success && pendingPayment) {
       // Update user and payment status
+      const updatedUser = await User.findOneAndUpdate(
+        { clerkId: pendingPayment.clerkId },
+        {
+          tier: "pro",
+          nextBillingDate: new Date(
+            new Date().setMonth(new Date().getMonth() + 1)
+          ),
+        },
+        { new: true }
+      );
+
+      if (!updatedUser) {
+        throw new Error("User not found");
+      }
 
       await PendingPayment.updateOne(
         { checkoutRequestId },
         { status: "success" }
       );
-      return NextResponse.json({ success: true });
+
+      // Optional: Send confirmation email
+      // await sendConfirmationEmail(updatedUser.email, updatedUser.username);
+
+      return NextResponse.json({
+        success: true,
+        user: {
+          tier: updatedUser.tier,
+          nextBillingDate: updatedUser.nextBillingDate,
+          isPro: true,
+        },
+      });
     }
 
     // Handle timeout specifically

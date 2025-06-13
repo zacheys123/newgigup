@@ -132,7 +132,16 @@ export async function POST(request: NextRequest) {
         phoneNumber,
         username: user.username,
       });
-
+      console.log({
+        clerkId,
+        checkoutRequestId,
+        amount,
+        tier,
+        status: "pending",
+        phoneNumber,
+        username: user.username,
+        message: "Payment initiated - awaiting confirmation",
+      });
       return NextResponse.json({
         checkoutRequestId,
         message: "Payment initiated - awaiting confirmation",

@@ -2,9 +2,13 @@ import { useRef, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useCheckTrial } from "./useCheckTrials";
 import { useCurrentUser } from "./useCurrentUser";
+import { DashboardData } from "@/types/dashboard";
+interface Mydata {
+  data: DashboardData;
+}
 
 interface UsePaymentVerificationOptions {
-  onSuccess?: () => void;
+  onSuccess?: (data?: Mydata) => void;
   onError?: (error: string) => void;
   onCancel?: () => void;
 }
@@ -46,6 +50,11 @@ export function usePaymentVerification(
         setIsMutating(false);
         setisFirstMonthEnd(false);
         options?.onSuccess?.();
+        if (verificationResult.user) {
+          options?.onSuccess?.(verificationResult.user);
+        } else {
+          options?.onSuccess?.();
+        }
       } else if (verificationResult.shouldCancel) {
         // 👈 Handle shouldCancel from backend
         toast.dismiss("payment-verification");
@@ -73,6 +82,7 @@ export function usePaymentVerification(
         toast.dismiss("payment-verification");
         toast.error("Verification cancelled.");
         options?.onCancel?.();
+        console.error("payment Verification,error", err);
       } else {
         toast.dismiss("payment-verification");
         toast.error("Error verifying payment. Please try again.");

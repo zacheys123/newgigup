@@ -43,6 +43,7 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
+  // In your MobileSubscriptionCard component
   const {
     checkPayment,
     cancelVerification,
@@ -50,7 +51,18 @@ export function MobileSubscriptionCard({ plan }: SubscriptionCardProps) {
     paymentSuccess,
     setPaymentSuccess,
   } = usePaymentVerification({
-    onSuccess: () => {
+    onSuccess: (userData) => {
+      if (userData) {
+        // Update the subscription cache if needed
+        mutateSubscription(
+          {
+            tier: userData.data.subscription.tier,
+            isPro: userData.data.subscription.isPro,
+            nextBillingDate: userData.data.subscription.nextBillingDate,
+          },
+          false
+        );
+      }
       setPaymentSuccess(true);
       setShowPaymentDialog(false);
       setIsMutating(false);
