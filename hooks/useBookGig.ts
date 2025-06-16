@@ -172,5 +172,5 @@ export function useBookGig() {
     }
   };
 
-  return { bookGig, bookLoading };
+  return { bookGig, bookLoading, setBookLoading };
 }

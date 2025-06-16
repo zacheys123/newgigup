@@ -25,8 +25,8 @@ import { useSubscription } from "@/hooks/useSubscription";
 import clsx from "clsx";
 import { getGigConditions } from "@/gigHelper";
 import { useMemo } from "react";
+import { ConfettiExplosion } from "./ConfettiExplosion";
 
-//
 // import { useCurrentUser } from "@/hooks/useCurrentUser";
 interface FetchResponse {
   success: boolean;
@@ -161,7 +161,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
       setLoadingPostId("");
     }
   };
-
+  const [showConfetti, setShowConfetti] = useState(false);
   const handleBookGig = async (giginfo: GigProps) => {
     const result = await bookGig(
       giginfo,
@@ -173,15 +173,21 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
       router,
       {
         redirectOnSuccess: false,
-        preventAutoRevalidate: true, // Prevent auto refresh
+        preventAutoRevalidate: true,
       }
     );
 
     if (result.success) {
-      setLastBookedGigId(giginfo?._id as string);
-      setShowConfirmation(true);
+      setLastBookedGigId(giginfo._id ? giginfo?._id : "");
+      setShowConfetti(true);
+
+      setTimeout(() => {
+        setShowConfetti(false);
+        setShowConfirmation(true);
+      }, 3000); // Auto-hide after 3s
     }
   };
+
   // In your parent component
 
   const existingSecret = localStorage.getItem("secret");
@@ -220,6 +226,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
 
   return (
     <>
+      {showConfetti && <ConfettiExplosion />}
       {isDescriptionModal && <GigDescription />}
 
       {isDeleteModal && (

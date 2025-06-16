@@ -13,6 +13,7 @@ import { Toaster } from "sonner";
 import { mutate } from "swr";
 import useStore from "../zustand/useStore";
 import { useCheckTrial } from "@/hooks/useCheckTrials";
+import { BookingSuccessModal } from "@/components/gig/BookingSuccessModal";
 // import { Box } from "@mui/material";
 // import { HiMenuAlt3 } from "react-icons/hi";
 export default function GigLayout({
@@ -108,6 +109,7 @@ export default function GigLayout({
         />{" "}
         <NotificationHandler />
         {children}
+        <BookingSuccessModal gigId={lastBookedGigId} />
         {showConfirmation && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             {/* Backdrop with glass effect - covers entire screen */}
