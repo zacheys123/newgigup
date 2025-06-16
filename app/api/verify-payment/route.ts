@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
       checkoutRequestId
     );
 
-    if (verification.success && pendingPayment) {
+    if (verification.success && pendingPayment && checkoutRequestId) {
       // Update user and payment status
       const updatedUser = await User.findOneAndUpdate(
         { clerkId: pendingPayment.clerkId },

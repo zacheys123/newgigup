@@ -7,6 +7,60 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { ReturningExperience } from "@/components/start/loaders/ReturningLoader";
 import { FirstTimLoader } from "@/components/start/loaders/firstTimeLoader";
 
+// Component for returning users
+const ReturningUserFlow = ({
+  phase,
+  progress,
+}: {
+  phase: number;
+  progress: number;
+}) => {
+  return (
+    <div className="relative h-screen w-full bg-gradient-to-br from-gray-900 to-black overflow-hidden">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={phase}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5 }}
+          className="absolute inset-0 flex items-center justify-center"
+        >
+          <ReturningExperience phase={phase} />
+        </motion.div>
+      </AnimatePresence>
+      <ProgressBar progress={progress} />
+    </div>
+  );
+};
+
+// Component for first-time users
+const FirstTimeUserFlow = ({
+  phase,
+  progress,
+}: {
+  phase: number;
+  progress: number;
+}) => {
+  return (
+    <div className="relative h-screen w-full bg-gradient-to-br from-gray-900 to-black overflow-hidden">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={phase}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5 }}
+          className="absolute inset-0 flex items-center justify-center"
+        >
+          <FirstTimLoader phase={phase} progress={progress} />
+        </motion.div>
+      </AnimatePresence>
+      <ProgressBar progress={progress} />
+    </div>
+  );
+};
+
 export default function Authenticate() {
   const router = useRouter();
   const { user: clerkUser, isSignedIn } = useUser();
@@ -35,7 +89,7 @@ export default function Authenticate() {
   const loaderConfig = React.useMemo(() => {
     const baseConfig = {
       durations: loadingState.isReturning
-        ? [1500, 2000] // Returning user sequence
+        ? [500, 1000] // Returning user sequence
         : [1000, 2500, 2000, 1500, 2000], // First-time sequence
       transitionDuration: 0.5,
     };
@@ -142,30 +196,16 @@ export default function Authenticate() {
     );
   }
 
-  return (
-    <div className="relative h-screen w-full bg-gradient-to-br from-gray-900 to-black overflow-hidden">
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={loadingState.phase}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: loaderConfig.transitionDuration }}
-          className="absolute inset-0 flex items-center justify-center"
-        >
-          {loadingState.isReturning ? (
-            <ReturningExperience phase={loadingState.phase} />
-          ) : (
-            <FirstTimLoader
-              phase={loadingState.phase}
-              progress={loadingState.progress}
-            />
-          )}
-        </motion.div>
-      </AnimatePresence>
-
-      <ProgressBar progress={loadingState.progress} />
-    </div>
+  return loadingState.isReturning ? (
+    <ReturningUserFlow
+      phase={loadingState.phase}
+      progress={loadingState.progress}
+    />
+  ) : (
+    <FirstTimeUserFlow
+      phase={loadingState.phase}
+      progress={loadingState.progress}
+    />
   );
 }
 
