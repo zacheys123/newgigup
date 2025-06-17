@@ -22,7 +22,7 @@ export default function SavedPage() {
           return;
         }
 
-        const response = await fetch(`/api/gigs/dashboard/${userId}/saved`);
+        const response = await fetch(`/api/gigs/dashboard/${userId}/getsaved`);
 
         if (!response.ok) {
           throw new Error("Failed to fetch saved gigs");

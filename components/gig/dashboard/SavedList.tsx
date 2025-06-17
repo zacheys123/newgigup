@@ -4,6 +4,7 @@ import { GigProps } from "@/types/giginterface";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import GigCard from "./GigCard";
+import { useAuth } from "@clerk/nextjs";
 
 interface SavedListProps {
   gigs: GigProps[];
@@ -11,15 +12,18 @@ interface SavedListProps {
 
 export default function SavedList({ gigs }: SavedListProps) {
   const [localGigs, setLocalGigs] = useState(gigs);
-
+  const { userId } = useAuth();
   const handleRemoveSaved = async (gigId: string) => {
     try {
-      const response = await fetch(`/api/gigs/${gigId}/save`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `/api/gigs/dashboard/${userId}/postsaved/${gigId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to remove from saved");
