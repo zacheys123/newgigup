@@ -44,27 +44,3 @@ export const getBookingHistory = async (userId: string) => {
     return [];
   }
 };
-
-export const getSavedGigs = async (userId: string) => {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_URL}/api/gigs/dashboard/${userId}/saved`
-    );
-    return await response.json();
-  } catch (error) {
-    console.error("Error fetching saved gigs:", error);
-    return [];
-  }
-};
-
-export const getFavoriteGigs = async (userId: string) => {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_URL}/api/gigs/dashboard/${userId}/favorites`
-    );
-    return await response.json();
-  } catch (error) {
-    console.error("Error fetching saved gigs:", error);
-    return [];
-  }
-};
