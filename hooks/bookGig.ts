@@ -61,7 +61,7 @@ export const bookGig = async (
       router.replace(`/execute/${gig?._id}`);
     } else {
       toast.error(data.message || "Error occurred");
-      router.replace(`/gigs/${userId}`);
+      router.replace(`/av_gigs/${userId}`);
       router.refresh();
     }
   } catch (error) {

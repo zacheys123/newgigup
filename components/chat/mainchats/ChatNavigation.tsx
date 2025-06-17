@@ -157,13 +157,13 @@ const ChatNavigation = () => {
                 <FaVideo className="h-4 w-4 text-green-2300" />
               </Link>
               <Link
-                href={`/gigs/${userId}`}
+                href={`/settings`}
                 className="flex items-center space-x-2 p-3 rounded-lg hover:bg-gray-700 transition-all duration-200 cursor-pointer bg-gradient-to-br from-[#e9edf0] via-[#154958] to-[#0c6dc9]"
               >
                 <IoSettings className="h-4 w-4 text-fuchsia-400" />
               </Link>
               <Link
-                href={`/gigs/${userId}`}
+                href={user?.user?.isClient ? `/create` : `/av_gigs/${userId}`}
                 className="flex items-center space-x-2 p-3 rounded-lg hover:bg-gray-700 transition-all duration-200 cursor-pointer bg-gradient-to-br from-[#e9edf0] via-[#154958] to-[#0c6dc9]"
               >
                 <FaListAlt className="h-4 w-4 text-fuchsia-300" />

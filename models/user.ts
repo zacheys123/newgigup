@@ -87,6 +87,8 @@ interface IUser extends Document {
   banExpiresAt: Date; // New field for temporary bans
   banReference: string; // New fiel
   theme: "lightMode" | "darkMode" | "system";
+  savedGigs: mongoose.Types.ObjectId[];
+  favoriteGigs: mongoose.Types.ObjectId[];
 }
 
 // Define Mongoose Schema
@@ -203,6 +205,8 @@ const userSchema = new Schema<IUser>(
       default: undefined,
     },
     theme: { type: String, default: "lightMode" },
+    savedGigs: [{ type: Schema.Types.ObjectId, ref: "Gig", default: [] }],
+    favoriteGigs: [{ type: Schema.Types.ObjectId, ref: "Gig", default: [] }],
   },
 
   { timestamps: true }

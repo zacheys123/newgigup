@@ -218,7 +218,13 @@ const FriendsComponent = () => {
                 <Music
                   size={22}
                   className="text-gray-300 hover:text-white cursor-pointer transition-colors"
-                  onClick={() => router.push(`/gigs/${userId}`)}
+                  onClick={() =>
+                    router.push(
+                      user?.user?.isClient
+                        ? `/create/${userId}`
+                        : `/av_gigs/${userId}`
+                    )
+                  }
                 />
                 <Video
                   size={22}

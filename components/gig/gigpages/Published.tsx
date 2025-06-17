@@ -11,6 +11,7 @@ import { GigProps } from "@/types/giginterface";
 import { dataCounties, filterGigs } from "@/utils";
 import { useAuth } from "@clerk/nextjs";
 import { AnimatePresence, motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 import React, { useEffect, useMemo, useState } from "react";
 
@@ -30,14 +31,11 @@ const Published = () => {
   const [location, setLocation] = useState<string>("all");
   const [scheduler, setScheduler] = useState<string>("all");
   const { userId } = useAuth();
-
+  const router = useRouter();
   useEffect(() => {
-    // if (!user) {
-    //   mutateUser().catch((error) => {
-    //     console.error("Failed to mutate user:", error);
-    //     // Consider adding toast notification here
-    //   });
-    // }
+    if (user?.user?.isClient) {
+      router.push(`/create/${userId}`);
+    }
 
     if (normalizeString(user?.user?.city)) {
       setLocation(user.user?.city);

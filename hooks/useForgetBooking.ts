@@ -44,7 +44,7 @@ export function useForgetBookings() {
           bookCount: (myGig?.bookCount?.length || 0) - 1, // Avoid undefined length
         });
       }
-      route.push(`/gigs/${userId}`);
+      route.push(`/av_gigs/${userId}`);
       setLoading(false);
       toast.success(data.message);
     } catch (error: unknown) {
@@ -88,7 +88,7 @@ export function useBookMusician() {
         console.log(data);
         toast.success(data.message);
         console.log(data);
-        router.push(`/gigs/${userId}`);
+        router.push(`/create/${userId}`);
         setLoading(false);
       } else {
         toast.error(data.message);

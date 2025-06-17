@@ -1,3 +1,5 @@
+import { GigProps } from "./giginterface";
+
 export interface handleProfileprops {
   _id: string;
   name: string;
@@ -70,6 +72,8 @@ export interface UserProps {
   banExpiresAt: Date; // New field for temporary ban
   banReference: string; // New fiel
   theme: "lightMode" | "darkMode" | "system" | string;
+  savedGigs: GigProps[];
+  favoriteGigs: GigProps[];
 }
 export interface Users {
   users: UserProps[]; // Optional}

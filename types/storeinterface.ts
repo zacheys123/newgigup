@@ -91,6 +91,8 @@ export const initialState = {
     banExpiresAt: new Date(), // New field for temporary ban
     banReference: "", // New fiel
     theme: "lightMode",
+    savedGigs: [],
+    favoriteGigs: [],
   },
   currentgig: {
     _id: "",
@@ -155,6 +157,7 @@ export const initialState = {
   showTrialModal: false,
   trialRemainingDays: 0,
   showOfflineNotification: false,
+  showConfetti: false,
 };
 interface OnlineUser {
   userId: string;
@@ -199,7 +202,10 @@ export interface StoreState {
   isSchedulerOpen: boolean;
   showTrialModal: boolean;
   trialRemainingDays: number | null;
+
   showOfflineNotification: boolean;
+  showConfetti: boolean;
+  setShowConfetti: (data: boolean) => void;
   setShowOfflineNotification: (data: boolean) => void;
 
   setTrialRemainingDays: (days: number | null) => void;

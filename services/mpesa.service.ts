@@ -30,7 +30,7 @@ interface STKPushQueryResponse {
 function getCallbackUrl(): string {
   return process.env.NODE_ENV === "development"
     ? "https://dadf-105-29-165-231.ngrok-free.app/api/stkcallback"
-    : "https://newgigup.vercel.app/api/stkcallback";
+    : "https://gigup1.vercel.app/api/stkcallback";
 }
 export class MpesaService {
   private consumerKey: string;

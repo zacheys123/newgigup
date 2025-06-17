@@ -33,13 +33,16 @@ const ViewGigDetails = () => {
       </div>
     );
   }
-  if (currentGig?.bookCount == null || currentGig?.postedBy == null) {
+  if (
+    currentGig?.bookCount == null ||
+    (currentGig?.postedBy == null && user?.user?.isMusician)
+  ) {
     return (
       <div className="h-[84%] w-full flex p-2  flex-col justify-center items-center">
         <h4 className="text-gray-400 mb-2">No Gig Info found, try later </h4>
         <div className="flex w-full gap-2 mt-3">
           <Button
-            onClick={() => router.push(`/gigs/${userId}`)}
+            onClick={() => router.push(`/av_gigs/${userId}`)}
             className="!bg-yellow-700 text-gray-200"
           >
             Go to Main Page

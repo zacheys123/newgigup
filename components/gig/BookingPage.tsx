@@ -30,7 +30,7 @@ const BookingPage = ({ currentGig }: BookingProps) => {
 
   useEffect(() => {
     if (currentgig?.isTaken === true) {
-      router.push(`/gigs/${userId}`);
+      router.push(`/av_gigs/${userId}`);
     }
     if (
       currentgig?.bookCount?.some(

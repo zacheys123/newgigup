@@ -58,7 +58,7 @@ const AcceptPage = ({
     if (isTaken) return; // do nothing if gig is taken
 
     if (bookCount?.length > 0) {
-      router.push(`/gigs/${userId}`);
+      router.push(`/av_gigs/${userId}`);
     }
   }, [isTaken, bookCount, userId, router]);
 

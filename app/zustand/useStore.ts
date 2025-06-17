@@ -8,7 +8,7 @@ import { create } from "zustand"; // Import SetState
 
 const useStore = create<StoreState>((set) => ({
   ...initialState,
-
+  setShowConfetti: (data: boolean) => set(() => ({ showConfetti: data })),
   setShowOfflineNotification: (data: boolean) =>
     set(() => ({ showOfflineNotification: data })),
   setTrialRemainingDays: (days: number | null) =>

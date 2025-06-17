@@ -1,13 +1,13 @@
 // components/gig/AllGigsComponent.ts
 import { GigProps } from "@/types/giginterface";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import ButtonComponent from "../ButtonComponent";
 import { PiDotsThreeVerticalBold } from "react-icons/pi";
 import GigDescription from "./GigDescription";
 import useStore from "@/app/zustand/useStore";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useAllGigs } from "@/hooks/useAllGigs";
-import { toast } from "react-toastify";
+
 import { useAuth } from "@clerk/nextjs";
 // import { ArrowRight } from "lucide-react";
 import Image from "next/image";
@@ -25,7 +25,8 @@ import { useSubscription } from "@/hooks/useSubscription";
 import clsx from "clsx";
 import { getGigConditions } from "@/gigHelper";
 import { useMemo } from "react";
-import { ConfettiExplosion } from "./ConfettiExplosion";
+import { FaBookmark, FaHeart, FaRegBookmark, FaRegHeart } from "react-icons/fa";
+import { toast } from "sonner";
 
 // import { useCurrentUser } from "@/hooks/useCurrentUser";
 interface FetchResponse {
@@ -65,6 +66,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
     setLastBookedGigId,
 
     setShowConfirmation,
+    setShowConfetti,
   } = useStore();
 
   const { subscription } = useSubscription(userId as string);
@@ -161,7 +163,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
       setLoadingPostId("");
     }
   };
-  const [showConfetti, setShowConfetti] = useState(false);
+
   const handleBookGig = async (giginfo: GigProps) => {
     const result = await bookGig(
       giginfo,
@@ -223,10 +225,67 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
       ),
     [gig, user, myId, bookCount, subscription]
   );
+  console.log(user);
 
+  const [isFavorite, setIsFavorite] = useState(() =>
+    user?.user?.favoriteGigs?.includes(gig._id)
+  );
+  const [isSaved, setIsSaved] = useState(
+    user?.user?.savedGigs?.includes(gig._id)
+  );
+
+  const handleFavourite = useCallback(async (action: "add" | "remove") => {
+    const previousState = isFavorite;
+    setIsFavorite(action === "add");
+    try {
+      const method = action === "add" ? "POST" : "DELETE";
+      const response = await fetch(
+        `/api/gigs/dashboard/${userId}/favorites/${gig._id}`,
+        {
+          method,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (!response.ok) {
+        setIsFavorite(previousState);
+        throw new Error("Failed to update favorite");
+      }
+      const data = await response.json();
+      setIsFavorite(action === "add");
+      toast.success(data.message);
+    } catch (error) {
+      console.error("Error updating favorite:", error);
+      toast.error("Failed to update favorite");
+    }
+  }, []);
+
+  const handleSave = useCallback(async (action: "add" | "remove") => {
+    try {
+      const method = action === "add" ? "POST" : "DELETE";
+      const response = await fetch(
+        `/api/gigs/dashboard/${userId}/saved/${gig._id}/`,
+        {
+          method,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) throw new Error("Failed to update saved gigs");
+
+      setIsSaved(action === "add");
+      const data = await response.json();
+      toast.success(data.message);
+    } catch (error) {
+      console.error("Error updating saved gig:", error);
+      toast.error("Failed to update saved gig");
+    }
+  }, []);
   return (
     <>
-      {showConfetti && <ConfettiExplosion />}
       {isDescriptionModal && <GigDescription />}
 
       {isDeleteModal && (
@@ -566,6 +625,41 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                 />
               )}
             {/* Context Menu */}
+            {subscription.user?.tier === "free" ||
+              (gig?.isTaken === false && gig?.postedBy?._id !== myId && (
+                <>
+                  <div className="w-full absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+
+                  <div className="absolute top-23 right-1/2 flex gap-2 opacity-40 hover:opacity-80">
+                    <button
+                      onClick={() => {
+                        const action = isFavorite ? "remove" : "add";
+                        handleFavourite(action);
+                      }}
+                      className="p-2 bg-gray-800/80 rounded-full hover:bg-amber-500/80 transition-colors"
+                    >
+                      {isFavorite ? (
+                        <FaHeart className="text-amber-500" />
+                      ) : (
+                        <FaRegHeart className="text-white" />
+                      )}
+                    </button>
+                    <button
+                      onClick={() => {
+                        const action = isSaved ? "remove" : "add";
+                        handleSave(action);
+                      }}
+                      className="p-2 bg-gray-800/80 rounded-full hover:bg-amber-500/80 transition-colors"
+                    >
+                      {isSaved ? (
+                        <FaBookmark className="text-amber-500" />
+                      ) : (
+                        <FaRegBookmark className="text-white" />
+                      )}
+                    </button>
+                  </div>
+                </>
+              ))}
             {!gig?.isTaken && (
               <button
                 onClick={(e) => {

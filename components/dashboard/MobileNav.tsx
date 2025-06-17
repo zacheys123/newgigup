@@ -32,7 +32,7 @@ export function MobileNav() {
     },
     {
       name: "Gigs",
-      href: `/gigs/${userId}`,
+      href: `/av_gigs/${userId}`,
       icon: <MusicIcon className="w-5 h-5" />,
     },
     {
@@ -61,12 +61,12 @@ export function MobileNav() {
     },
     {
       name: "Create ",
-      href: "/gigs/create",
+      href: `/create/${userId}`,
       icon: <PlusIcon className="w-5 h-5" />,
     },
     {
       name: "Gigs",
-      href: "/gigs/" + userId,
+      href: `/create/${userId}`,
       icon: <CalendarIcon className="w-5 h-5" />,
     },
     {

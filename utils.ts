@@ -161,6 +161,8 @@ export const postedBy = {
   banReference: "", // New fiel
   tierStatus: "",
   theme: "",
+  savedGigs: [],
+  favoriteGigs: [],
 };
 
 export const instruments = [
@@ -258,7 +260,7 @@ export const checkEnvironment = () => {
   const base_url =
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000"
-      : "https://newgigup.vercel.app"; // https://v2ds.netlify.app
+      : "https://gigup1.vercel.app"; // https://v2ds.netlify.app
 
   return base_url;
 };

@@ -58,7 +58,7 @@ const navLinks = (userId: string | undefined, user: UserProps) => [
     : []),
   {
     label: "Gigs",
-    href: `/gigs/${userId}`,
+    href: user?.isClient ? `/create/${userId}` : `/av_gigs/${userId}`,
     icon: <Music size={20} />,
   },
   { label: "Settings", href: "/settings", icon: <Settings size={20} /> },

@@ -55,7 +55,7 @@ export default function Home() {
     return user?.user?.isClient
       ? `/create/${userId}`
       : user?.user?.isMusician
-      ? `/gigs/${userId}`
+      ? `/av_gigs/${userId}`
       : `/roles/${userId}`;
   };
 

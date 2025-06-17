@@ -52,3 +52,18 @@ export interface FetchResponse {
   gigstatus: boolean;
   message?: string;
 }
+export type GigFilter = {
+  $or?: Array<{
+    title?: { $regex: string; $options: string };
+    description?: { $regex: string; $options: string };
+
+    // Add any other text-searchable fields
+  }>;
+  price?: string;
+  category?: string;
+  gigTimeline?: string;
+  location?: string;
+  // Add any other fields you might filter on
+  // For array fields:
+  bandCategory?: { $in: string[] };
+};

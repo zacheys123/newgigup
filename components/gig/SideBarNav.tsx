@@ -41,7 +41,7 @@ const SidebarNav = () => {
 
   if (user?.user?.isMusician) {
     links.push({
-      href: `/gigs/${userId}`,
+      href: `/av_gigs/${userId}`,
       Icon: FaHome,
       label: "Home",
     });
@@ -59,7 +59,7 @@ const SidebarNav = () => {
 
   if (user?.user?.isClient) {
     links.push({
-      href: `/gigs/${userId}`,
+      href: `/create/${userId}`,
       Icon: FaHome,
       label: "Home",
     });

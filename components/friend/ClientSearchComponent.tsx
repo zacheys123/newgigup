@@ -98,6 +98,8 @@ const ClientSearchComponent = () => {
               banExpiresAt: new Date(), // New field for temporary ban
               banReference: "", // New fiel
               theme: "lightMode",
+              savedGigs: [],
+              favoriteGigs: [],
             },
           });
         }
@@ -236,7 +238,11 @@ const ClientSearchComponent = () => {
         <Music
           size="19"
           style={{ color: "lightgreen" }}
-          onClick={() => router.push(`/gigs/${userId}`)}
+          onClick={() =>
+            router.push(
+              user?.user?.isClient ? `/create/${userId}` : `/av_gigs/${userId}`
+            )
+          }
         />
         <Video
           size="19"
