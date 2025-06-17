@@ -2,29 +2,27 @@
 import { useEffect, useState } from "react";
 import { GigProps } from "@/types/giginterface";
 import { useAuth } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import SavedList from "@/components/gig/dashboard/SavedList";
 
-export default function SavedPage({ params }: { params: { userId: string } }) {
+export default function SavedPage() {
   const [savedGigs, setSavedGigs] = useState<GigProps[]>([]);
   const [loading, setLoading] = useState(true);
   const { userId: clerkId } = useAuth();
   const router = useRouter();
-
+  const { userId } = useParams();
   useEffect(() => {
     const fetchSavedGigs = async () => {
       try {
         setLoading(true);
         // Verify the user is authorized to view this page
-        if (params.userId !== clerkId) {
+        if (userId !== clerkId) {
           router.push("/unauthorized");
           return;
         }
 
-        const response = await fetch(
-          `/api/gigs/dashboard/${params.userId}/saved`
-        );
+        const response = await fetch(`/api/gigs/dashboard/${userId}/saved`);
 
         if (!response.ok) {
           throw new Error("Failed to fetch saved gigs");
@@ -42,7 +40,7 @@ export default function SavedPage({ params }: { params: { userId: string } }) {
     if (clerkId) {
       fetchSavedGigs();
     }
-  }, [params.userId, clerkId, router]);
+  }, [userId, clerkId, router]);
 
   if (loading) {
     return (
