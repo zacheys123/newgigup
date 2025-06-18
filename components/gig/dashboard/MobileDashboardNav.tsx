@@ -47,7 +47,7 @@ const MobileDashboardNav = ({ userId }: { userId: string }) => {
     <nav className="bg-gray-900 border-t border-gray-700 shadow-lg fixed bottom-0 left-0 right-0 z-50">
       <div className="flex justify-around items-center p-2">
         <Link
-          href="/"
+          href={`av_gigs/${userId}`}
           className={`flex flex-col items-center p-2 rounded-lg transition-colors ${
             pathname === "/"
               ? "text-amber-400" // Home active color
