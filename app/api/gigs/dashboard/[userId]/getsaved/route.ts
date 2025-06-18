@@ -4,15 +4,15 @@ import User from "@/models/user";
 import { getAuth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { userId: string } }
-) {
+export async function GET(request: NextRequest) {
+  const pathParts = request.nextUrl.pathname.split("/");
+  const clerkId = pathParts[pathParts.length - 2]; // This will give you the actual userId
+
   try {
     const { userId } = getAuth(request);
 
     // Verify the requesting user matches the userId in params
-    if (!userId || userId !== params.userId) {
+    if (!userId || userId !== clerkId) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 

@@ -16,8 +16,8 @@ import { colors, fonts } from "@/utils";
 
 import { SaveAll } from "lucide-react";
 
-import FloatingNotesLoader from "@/components/loaders/FloatingNotes";
 import { useCheckTrial } from "@/hooks/useCheckTrials";
+import LoadingSpinner from "./loading";
 
 export default function Home() {
   const { isLoaded, userId } = useAuth();
@@ -63,7 +63,7 @@ export default function Home() {
     return (
       <div className="h-full backdrop-blur-0 bg-black/90 flex justify-center items-center">
         <div className="">
-          <FloatingNotesLoader />
+          <LoadingSpinner />
         </div>
       </div>
     );
