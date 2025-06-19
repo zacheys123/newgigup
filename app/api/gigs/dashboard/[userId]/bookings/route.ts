@@ -21,8 +21,7 @@ export async function GET(request: NextRequest) {
     if (!existingUser) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
-    const mongoUserId = new Types.ObjectId(existingUser._id.toString());
-    //  existingUser._id as Types.ObjectId;
+    const mongoUserId = existingUser._id as Types.ObjectId;
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "6");
