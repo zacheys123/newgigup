@@ -2,7 +2,7 @@
 import DashboardNav from "@/components/gig/dashboard/DashboardNav";
 import MobileDashboardNav from "@/components/gig/dashboard/MobileDashboardNav";
 import { ReactNode } from "react";
-imposrt {useAuth} from "@clerk/nextjs"
+import { useAuth } from "@clerk/nextjs";
 export default function DashboardLayout({
   children,
 
