@@ -93,6 +93,8 @@ export const initialState = {
     theme: "lightMode",
     savedGigs: [],
     favoriteGigs: [],
+    bookingHistory: [],
+    completedGigsCount: 0,
   },
   currentgig: {
     _id: "",
@@ -131,6 +133,9 @@ export const initialState = {
     pricerange: "",
     currency: "",
     scheduleDate: new Date(),
+    bookingHistory: [],
+    paymentStatus: "",
+    completedAt: new Date(),
   },
 
   searchQuery: "",

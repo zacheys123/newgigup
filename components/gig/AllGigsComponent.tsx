@@ -180,13 +180,15 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
     );
 
     if (result.success) {
-      setLastBookedGigId(giginfo._id ? giginfo?._id : "");
+      // Add to local booking history state if using context/state management
+
+      setLastBookedGigId(giginfo._id || "");
       setShowConfetti(true);
 
       setTimeout(() => {
         setShowConfetti(false);
         setShowConfirmation(true);
-      }, 3000); // Auto-hide after 3s
+      }, 3000);
     }
   };
 
@@ -628,7 +630,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
             {subscription.user?.tier === "free" ||
               (gig?.isTaken === false && gig?.postedBy?._id !== myId && (
                 <>
-                  <div className="w-full absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+                  <div className="w-full absolute inset-0 bg-gradient-to-t  to-transparent -z-50" />
 
                   <div className="absolute top-23 right-1/2 flex gap-2 opacity-40 hover:opacity-80">
                     <button

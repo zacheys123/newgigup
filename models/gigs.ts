@@ -87,6 +87,27 @@ const gigSchema = new mongoose.Schema(
     },
     vocalistGenre: { type: [String], default: [] },
     scheduleDate: { type: Date, default: new Date() },
+    bookingHistory: [
+      {
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        status: {
+          type: String,
+          enum: ["pending", "booked", "completed", "cancelled"],
+          default: "pending",
+        }, // 'booked', 'completed', 'cancelled'
+        date: Date,
+        role: String,
+        notes: String,
+      },
+    ],
+
+    paymentStatus: {
+      type: String,
+      enum: ["pending", "paid", "refunded"],
+      default: "pending",
+    },
+    cancellationReason: String,
+    completedAt: Date,
   },
   { timestamps: true }
 );

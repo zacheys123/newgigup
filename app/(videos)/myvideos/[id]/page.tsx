@@ -85,6 +85,8 @@ const VideoProfile = () => {
               theme: "light",
               savedGigs: [],
               favoriteGigs: [],
+              bookingHistory: [],
+              completedGigsCount: 0,
             },
           });
         }

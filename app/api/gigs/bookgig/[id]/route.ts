@@ -37,6 +37,31 @@ export async function PUT(req: NextRequest) {
       );
     }
 
+    // Add to user's booking history immediately (status: pending)
+    const bookingEntry = {
+      gigId: id,
+      status: "pending", // Initial status
+      date: new Date(),
+      role: "musician",
+      notes: "Awaiting selection",
+    };
+
+    await User.findByIdAndUpdate(userid, {
+      $push: {
+        bookingHistory: bookingEntry,
+      },
+    });
+
+    await Gig.findByIdAndUpdate(id, {
+      $push: {
+        bookingHistory: {
+          userId: userid,
+          status: "pending",
+          date: new Date(),
+          role: "musician",
+        },
+      },
+    });
     // Subscription checks
     if (user.tier === "free") {
       const signupDate = user.createdAt;

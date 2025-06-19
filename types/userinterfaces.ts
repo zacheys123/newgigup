@@ -1,5 +1,5 @@
 import { GigProps } from "./giginterface";
-
+import { BookingItem } from "./history";
 export interface handleProfileprops {
   _id: string;
   name: string;
@@ -74,6 +74,8 @@ export interface UserProps {
   theme: "lightMode" | "darkMode" | "system" | string;
   savedGigs: GigProps[];
   favoriteGigs: GigProps[];
+  bookingHistory: BookingItem[];
+  completedGigsCount: number;
 }
 export interface Users {
   users: UserProps[]; // Optional}

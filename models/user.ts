@@ -89,6 +89,17 @@ interface IUser extends Document {
   theme: "lightMode" | "darkMode" | "system";
   savedGigs: mongoose.Types.ObjectId[];
   favoriteGigs: mongoose.Types.ObjectId[];
+
+  bookingHistory: [
+    {
+      gigId: mongoose.Types.ObjectId[];
+      status: string; // 'booked', 'completed', 'cancelled'
+      date: Date;
+      role: string; // 'musician' or 'client'
+      notes: string; // Optional (e.g., cancellation reason)
+    }
+  ];
+  completedGigsCount: number;
 }
 
 // Define Mongoose Schema
@@ -207,6 +218,23 @@ const userSchema = new Schema<IUser>(
     theme: { type: String, default: "lightMode" },
     savedGigs: [{ type: Schema.Types.ObjectId, ref: "Gig", default: [] }],
     favoriteGigs: [{ type: Schema.Types.ObjectId, ref: "Gig", default: [] }],
+    bookingHistory: [
+      {
+        gigId: { type: mongoose.Schema.Types.ObjectId, ref: "Gig" },
+        status: {
+          type: String,
+          enum: ["pending", "booked", "completed", "cancelled"],
+          default: "pending",
+        }, // 'booked', 'completed', 'cancelled'
+        date: Date,
+        role: String, // 'musician' or 'client'
+        notes: String, // Optional (e.g., cancellation reason)
+      },
+    ],
+    completedGigsCount: {
+      type: Number,
+      default: 0,
+    },
   },
 
   { timestamps: true }

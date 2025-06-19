@@ -163,6 +163,16 @@ export const postedBy = {
   theme: "",
   savedGigs: [],
   favoriteGigs: [],
+  bookingHistory: [
+    {
+      gigId: "",
+      status: "", // 'booked', 'completed', 'cancelled'
+      date: new Date(),
+      role: "", // 'musician' or 'client'
+      notes: "", // Optional (e.g., cancellation reason)
+    },
+  ],
+  completedGigsCount: 0,
 };
 
 export const instruments = [

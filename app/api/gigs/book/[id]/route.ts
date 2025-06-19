@@ -2,6 +2,7 @@ import connectDb from "@/lib/connectDb";
 import Gig from "@/models/gigs";
 import User from "@/models/user";
 import { getAuth } from "@clerk/nextjs/server";
+import mongoose from "mongoose";
 
 import { NextRequest, NextResponse } from "next/server";
 
@@ -17,132 +18,158 @@ export async function PUT(req: NextRequest) {
   try {
     await connectDb();
 
-    let gig = await Gig.findById({ _id: id }).populate({
+    const gig = await Gig.findById(id).populate({
       path: "postedBy bookedBy",
       model: User,
     });
-    const bookingUser = await User.findById({ _id: musicianId });
 
     if (!gig) {
       return NextResponse.json({ message: "Gig not found" }, { status: 404 });
     }
 
-    // Get current week start date (Monday)
-    const currentDate = new Date();
-    const currentWeekStart = new Date(currentDate);
-    currentWeekStart.setDate(
-      currentDate.getDate() - ((currentDate.getDay() + 6) % 7)
-    );
-    currentWeekStart.setHours(0, 0, 0, 0);
+    // Verify requestor is gig owner
+    if (gig.postedBy._id.toString() !== userId) {
+      return NextResponse.json({ message: "Not authorized" }, { status: 403 });
+    }
 
-    // Decrement weekly count for users in bookCount who weren't selected
-    // In the part where you decrement counts for unselected musicians:
+    // Update booking history for ALL applicants first
     if (gig.bookCount && gig.bookCount.length > 0) {
-      console.log("Current week start:", currentWeekStart);
-      console.log("Processing bookCount of length:", gig.bookCount.length);
+      // 1. Update status for selected musician
+      await User.updateOne(
+        { _id: musicianId, "bookingHistory.gigId": id },
+        { $set: { "bookingHistory.$.status": "booked" } }
+      );
 
-      for (const userMainID of gig.bookCount) {
-        console.log(`Processing user ID: ${userMainID}`);
-        if (userMainID.toString() !== musicianId.toString()) {
-          console.log(
-            `User ${userMainID} was not selected - decrementing count`
-          );
-          const user = await User.findById(userMainID);
-          console.log(
-            `User ${userMainID} current weekly count:`,
-            user?.gigsBookedThisWeek?.count
-          );
+      await Gig.updateOne(
+        { _id: id, "bookingHistory.userId": musicianId },
+        { $set: { "bookingHistory.$.status": "booked" } }
+      );
 
-          if (user?.gigsBookedThisWeek?.weekStart) {
-            const lastWeekStart = new Date(user.gigsBookedThisWeek.weekStart);
-            console.log(`User's last week start:`, lastWeekStart);
-            console.log(`Is same week?`, lastWeekStart >= currentWeekStart);
-            if (lastWeekStart >= currentWeekStart) {
-              // Only decrement if count is greater than 0
-              await User.findByIdAndUpdate(userMainID, [
-                {
-                  $set: {
-                    "gigsBookedThisWeek.count": {
-                      $cond: [
-                        { $gt: ["$gigsBookedThisWeek.count", 0] }, // Only if count > 0
-                        { $add: ["$gigsBookedThisWeek.count", -1] }, // Then decrement
-                        "$gigsBookedThisWeek.count", // Else keep current value
-                      ],
-                    },
+      // 2. Update status for cancelled musicians
+      const cancelledMusicians = gig.bookCount.filter(
+        (id: string) => id.toString() !== musicianId.toString()
+      );
+
+      await User.updateMany(
+        {
+          _id: { $in: cancelledMusicians },
+          "bookingHistory.gigId": id,
+        },
+        { $set: { "bookingHistory.$.status": "cancelled" } }
+      );
+
+      await Gig.updateMany(
+        {
+          _id: id,
+          "bookingHistory.userId": { $in: cancelledMusicians },
+        },
+        { $set: { "bookingHistory.$.status": "cancelled" } }
+      );
+
+      // 3. Handle weekly count decrement for cancelled musicians
+      const currentWeekStart = new Date();
+      currentWeekStart.setDate(
+        currentWeekStart.getDate() - ((currentWeekStart.getDay() + 6) % 7)
+      );
+      currentWeekStart.setHours(0, 0, 0, 0);
+
+      for (const userMainID of cancelledMusicians) {
+        const user = await User.findById(userMainID);
+        if (user?.gigsBookedThisWeek?.weekStart) {
+          const lastWeekStart = new Date(user.gigsBookedThisWeek.weekStart);
+          if (lastWeekStart >= currentWeekStart) {
+            await User.findByIdAndUpdate(userMainID, [
+              {
+                $set: {
+                  "gigsBookedThisWeek.count": {
+                    $cond: [
+                      { $gt: ["$gigsBookedThisWeek.count", 0] },
+                      { $add: ["$gigsBookedThisWeek.count", -1] },
+                      "$gigsBookedThisWeek.count",
+                    ],
                   },
                 },
-              ]);
-            }
+              },
+            ]);
           }
         }
       }
     }
 
+    // Update gig and selected musician
     const updateGig = {
       isTaken: true,
       bookedBy: musicianId,
       bookCount: [],
       isPending: false,
+      $set: {
+        "bookingHistory.$[elem].status": "booked",
+      },
     };
 
-    if (bookingUser && bookingUser?.refferences.includes(gig.postedBy?._id)) {
-      await gig.updateOne({ $set: updateGig }, { new: true });
-      return NextResponse.json({
-        gigstatus: true,
-        message: "Booked successfully",
-      });
-    } else {
-      await gig.updateOne({ $set: updateGig }, { new: true });
-      gig = await Gig.findById({ _id: id }).populate({
-        path: "postedBy bookedBy",
-        model: User,
-      });
+    const bookingUser = await User.findById(musicianId);
+    const isExistingReference = bookingUser?.refferences.includes(
+      gig.postedBy?._id
+    );
 
-      // Update the selected musician's stats
-      const updatedUser = await User.findByIdAndUpdate(
-        musicianId,
-        {
-          $push: {
-            refferences: gig.postedBy?._id,
-          },
-          $inc: { monthlyGigsBooked: 1 },
+    await Gig.findByIdAndUpdate(id, updateGig, {
+      arrayFilters: [{ "elem.userId": musicianId }],
+      new: true,
+    });
+    // Add this after updating the musician's record
+    await User.findByIdAndUpdate(gig.postedBy._id, {
+      $push: {
+        bookingHistory: {
+          gigId: id,
+          userId: musicianId,
+          status: "booked",
+          date: new Date(),
+          role: "client", // Differentiate client vs musician
         },
-        { new: true }
-      );
+      },
+    });
+    // Define the complete update type
+    const userUpdates: {
+      $inc: {
+        "gigsBookedThisWeek.count": number;
+        monthlyGigsBooked: number;
+      };
+      $set: {
+        lastBookingDate: Date;
+        "bookingHistory.$[elem].status": string;
+      };
+      $push?: {
+        refferences: mongoose.Types.ObjectId;
+      };
+    } = {
+      $inc: {
+        "gigsBookedThisWeek.count": 1,
+        monthlyGigsBooked: 1,
+      },
+      $set: {
+        lastBookingDate: new Date(),
+        "bookingHistory.$[elem].status": "booked",
+      },
+    };
 
-      // Update weekly count for selected musician
-      let updatedCount = 1;
-      if (updatedUser?.gigsBookedThisWeek?.weekStart) {
-        const lastWeekStart = new Date(
-          updatedUser.gigsBookedThisWeek.weekStart
-        );
-        updatedCount =
-          lastWeekStart >= currentWeekStart
-            ? updatedUser.gigsBookedThisWeek.count + 1
-            : 1;
-      }
-
-      await User.findByIdAndUpdate(musicianId, {
-        $inc: {
-          "gigsBookedThisWeek.count": updatedCount,
-          monthlyGigsBooked: 1,
-        },
-        $push: {
-          references: gig.postedBy?._id,
-        },
-        $set: {
-          lastBookingDate: new Date(),
-        },
-      });
-
-      return NextResponse.json({
-        gigstatus: true,
-        message: "Selected the Musician/Band successfully",
-        gig: gig,
-        updatedUser,
-      });
+    // Conditionally add $push
+    if (!isExistingReference) {
+      userUpdates.$push = { refferences: gig.postedBy._id };
     }
+
+    const updatedUser = await User.findByIdAndUpdate(musicianId, userUpdates, {
+      arrayFilters: [{ "elem.gigId": id }],
+      new: true,
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: "Musician selected successfully",
+      gig: await Gig.findById(id).populate("bookedBy"),
+      musician: updatedUser,
+    });
   } catch (error) {
+    console.error("Selection error:", error);
     console.error(error);
     return NextResponse.json({
       gigstatus: false,

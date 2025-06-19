@@ -1,6 +1,7 @@
 import connectDb from "@/lib/connectDb";
 import Gigs from "@/models/gigs";
 import User from "@/models/user";
+import { BookingHistoryItem } from "@/types/giginterface";
 import { getAuth } from "@clerk/nextjs/server";
 
 import { NextRequest, NextResponse } from "next/server";
@@ -35,6 +36,11 @@ type Info = {
   currency: string;
   isPending: boolean;
   scheduleDate: Date;
+  bookingHistory: BookingHistoryItem[];
+  status: string;
+
+  paymentStatus: string;
+  completedAt: Date;
 };
 
 export async function POST(req: NextRequest) {

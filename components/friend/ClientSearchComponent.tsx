@@ -100,6 +100,8 @@ const ClientSearchComponent = () => {
               theme: "lightMode",
               savedGigs: [],
               favoriteGigs: [],
+              bookingHistory: [],
+              completedGigsCount: 0,
             },
           });
         }

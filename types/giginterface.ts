@@ -1,6 +1,6 @@
 import { BusinessCategory } from "@/components/gig/create/types";
 import { UserProps } from "./userinterfaces";
-
+import { BookingItem } from "./history";
 export interface TimeProps {
   from?: string;
   to?: string;
@@ -43,6 +43,9 @@ export interface GigProps {
   pricerange: string;
   currency: string;
   scheduleDate: Date;
+  bookingHistory: BookingItem[];
+  paymentStatus: string;
+  completedAt: Date;
 }
 
 export interface Gigs {
