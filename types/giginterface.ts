@@ -1,6 +1,7 @@
 import { BusinessCategory } from "@/components/gig/create/types";
 import { UserProps } from "./userinterfaces";
 import { BookingItem } from "./history";
+import { Types } from "mongoose";
 export interface TimeProps {
   from?: string;
   to?: string;
@@ -69,4 +70,6 @@ export type GigFilter = {
   // Add any other fields you might filter on
   // For array fields:
   bandCategory?: { $in: string[] };
+  bookedBy: Types.ObjectId;
+  isTaken: boolean;
 };

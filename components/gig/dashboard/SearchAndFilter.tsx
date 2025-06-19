@@ -1,49 +1,55 @@
-// components/dashboard/SearchFilters.tsx
 "use client";
-import { usePathname, useSearchParams, useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
+
+interface SearchFiltersProps {
+  locations: string[];
+  categories: string[];
+  onFilterChange: (filters: {
+    search?: string;
+    location?: string;
+    category?: string;
+  }) => void;
+  initialValues: {
+    search: string;
+    location: string;
+    category: string;
+  };
+}
 
 export default function SearchFilters({
   locations,
   categories,
-}: {
-  locations: string[];
-  categories: string[];
-}) {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  onFilterChange,
+  initialValues,
+}: SearchFiltersProps) {
+  const [searchValue, setSearchValue] = useState(initialValues.search);
   const router = useRouter();
+  const pathname = usePathname();
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget as HTMLFormElement);
-    const params = new URLSearchParams(searchParams);
-
-    params.set("search", formData.get("search") as string);
-    params.set("page", "1");
-    router.replace(`${pathname}?${params.toString()}`);
+    onFilterChange({ search: searchValue });
   };
 
-  const handleFilter = (name: string, value: string) => {
-    const params = new URLSearchParams(searchParams);
+  const handleFilterChange = (name: string, value: string) => {
+    onFilterChange({ [name]: value });
+  };
 
-    if (value) {
-      params.set(name, value);
-    } else {
-      params.delete(name);
-    }
-
-    params.set("page", "1");
-    router.replace(`${pathname}?${params.toString()}`);
+  const handleClearFilters = () => {
+    setSearchValue("");
+    router.replace(pathname);
   };
 
   return (
     <div className="mb-6 space-y-4">
-      <form onSubmit={handleSearch} className="flex gap-2">
+      <form onSubmit={handleSearchSubmit} className="flex gap-2">
         <input
           type="text"
           name="search"
           placeholder="Search gigs..."
-          defaultValue={searchParams.get("search") || ""}
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
           className="flex-1 bg-gray-700 border border-gray-600 rounded-md px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
         />
         <button
@@ -56,8 +62,8 @@ export default function SearchFilters({
 
       <div className="flex flex-wrap gap-4">
         <select
-          onChange={(e) => handleFilter("location", e.target.value)}
-          defaultValue={searchParams.get("location") || ""}
+          onChange={(e) => handleFilterChange("location", e.target.value)}
+          value={initialValues.location}
           className="bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
         >
           <option value="">All Locations</option>
@@ -69,8 +75,8 @@ export default function SearchFilters({
         </select>
 
         <select
-          onChange={(e) => handleFilter("category", e.target.value)}
-          defaultValue={searchParams.get("category") || ""}
+          onChange={(e) => handleFilterChange("category", e.target.value)}
+          value={initialValues.category}
           className="bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
         >
           <option value="">All Categories</option>
@@ -82,7 +88,7 @@ export default function SearchFilters({
         </select>
 
         <button
-          onClick={() => router.replace(pathname)}
+          onClick={handleClearFilters}
           className="text-gray-300 hover:text-white ml-auto"
         >
           Clear Filters
