@@ -1,6 +1,7 @@
 // c/users/admin/appdata/roaming/wondershare/wondersharefilmora/output
 import { BookingEligibility, DashboardData } from "./types/dashboard";
 import { GigProps } from "./types/giginterface";
+import { BookingItem } from "./types/history";
 import { FetchResponse, UserProps } from "./types/userinterfaces";
 
 interface SearchOptions {
@@ -163,15 +164,7 @@ export const postedBy = {
   theme: "",
   savedGigs: [],
   favoriteGigs: [],
-  bookingHistory: [
-    {
-      gigId: "",
-      status: "", // 'booked', 'completed', 'cancelled'
-      date: new Date(),
-      role: "", // 'musician' or 'client'
-      notes: "", // Optional (e.g., cancellation reason)
-    },
-  ],
+  bookingHistory: [] as BookingItem[],
   completedGigsCount: 0,
 };
 

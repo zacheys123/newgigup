@@ -1,8 +1,7 @@
 import { Types } from "mongoose";
-
 export interface BookingItem {
   userId: Types.ObjectId;
-  gigId: Types.ObjectId; // Reference to Gig
+  gigId: Types.ObjectId;
   status: "pending" | "booked" | "completed" | "cancelled";
   date: Date;
   role: "musician" | "client";

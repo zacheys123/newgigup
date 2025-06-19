@@ -4,6 +4,7 @@ import { GigProps } from "./giginterface";
 import { ChatProps, MessageProps } from "./chatinterfaces";
 import { Socket } from "socket.io-client";
 import { DashboardData } from "./dashboard";
+import { BookingItem } from "./history";
 
 export const initialState = {
   gigs: [], // Initialize gigs array
@@ -93,7 +94,7 @@ export const initialState = {
     theme: "lightMode",
     savedGigs: [],
     favoriteGigs: [],
-    bookingHistory: [],
+    bookingHistory: [] as BookingItem[],
     completedGigsCount: 0,
   },
   currentgig: {
@@ -133,7 +134,7 @@ export const initialState = {
     pricerange: "",
     currency: "",
     scheduleDate: new Date(),
-    bookingHistory: [],
+    bookingHistory: [] as BookingItem[],
     paymentStatus: "",
     completedAt: new Date(),
   },

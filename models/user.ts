@@ -92,6 +92,7 @@ interface IUser extends Document {
 
   bookingHistory: [
     {
+      userId: mongoose.Types.ObjectId[];
       gigId: mongoose.Types.ObjectId[];
       status: string; // 'booked', 'completed', 'cancelled'
       date: Date;
