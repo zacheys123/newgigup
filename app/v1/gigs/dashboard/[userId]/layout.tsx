@@ -1,24 +1,26 @@
+"use client"
 import DashboardNav from "@/components/gig/dashboard/DashboardNav";
 import MobileDashboardNav from "@/components/gig/dashboard/MobileDashboardNav";
 import { ReactNode } from "react";
-
+imposrt {useAuth} from "@clerk/nextjs"
 export default function DashboardLayout({
   children,
-  params,
+
 }: {
   children: ReactNode;
-  params: { userId: string };
+
 }) {
+  const {userId} =useAuth()
   return (
     <div className="flex min-h-screen bg-gray-900">
       {/* Desktop Navigation - Hidden on mobile */}
       <div className="hidden md:block">
-        <DashboardNav userId={params.userId} />
+        <DashboardNav userId={userId} />
       </div>
 
       {/* Mobile Navigation - Hidden on desktop */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-50">
-        <MobileDashboardNav userId={params.userId} />
+        <MobileDashboardNav userId={userId} />
       </div>
 
       {/* Main Content */}
