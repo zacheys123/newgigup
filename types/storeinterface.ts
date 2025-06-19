@@ -96,6 +96,7 @@ export const initialState = {
     favoriteGigs: [],
     bookingHistory: [] as BookingItem[],
     completedGigsCount: 0,
+    cancelgigCount: 0,
   },
   currentgig: {
     _id: "",
@@ -164,6 +165,8 @@ export const initialState = {
   trialRemainingDays: 0,
   showOfflineNotification: false,
   showConfetti: false,
+  cancelGig: false,
+  cancelationreason: "",
 };
 interface OnlineUser {
   userId: string;
@@ -211,6 +214,10 @@ export interface StoreState {
 
   showOfflineNotification: boolean;
   showConfetti: boolean;
+  cancelGig: boolean;
+  cancelationreason: string;
+  setcancelationreason: (reason: string) => void;
+  setShowCancelGig: (data: boolean) => void;
   setShowConfetti: (data: boolean) => void;
   setShowOfflineNotification: (data: boolean) => void;
 

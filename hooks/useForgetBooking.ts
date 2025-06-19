@@ -4,9 +4,11 @@ import { useState } from "react";
 import { toast } from "sonner";
 import useSocket from "./useSocket";
 import { usePendingGigs } from "@/app/Context/PendinContext";
+import useStore from "@/app/zustand/useStore";
 
 export function useForgetBookings() {
   const [loading, setLoading] = useState<boolean>(false);
+  const { cancelationreason } = useStore();
   const route = useRouter();
   const { decrementPendingGigs } = usePendingGigs();
   const { socket } = useSocket();
@@ -24,7 +26,11 @@ export function useForgetBookings() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ musicianId: id, dep }),
+        body: JSON.stringify({
+          musicianId: id,
+          dep,
+          reason: cancelationreason,
+        }),
       });
       console.log(response);
       if (!response.ok) {

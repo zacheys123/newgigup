@@ -76,6 +76,7 @@ export interface UserProps {
   favoriteGigs: GigProps[];
   bookingHistory: BookingItem[];
   completedGigsCount: number;
+  cancelgigCount: number;
 }
 export interface Users {
   users: UserProps[]; // Optional}

@@ -89,7 +89,7 @@ interface IUser extends Document {
   theme: "lightMode" | "darkMode" | "system";
   savedGigs: mongoose.Types.ObjectId[];
   favoriteGigs: mongoose.Types.ObjectId[];
-
+  cancelgigCount: number;
   bookingHistory: [
     {
       userId: mongoose.Types.ObjectId[];
@@ -232,6 +232,10 @@ const userSchema = new Schema<IUser>(
         notes: String, // Optional (e.g., cancellation reason)
       },
     ],
+    cancelgigCount: {
+      type: Number,
+      default: 0,
+    },
     completedGigsCount: {
       type: Number,
       default: 0,

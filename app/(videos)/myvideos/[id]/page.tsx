@@ -87,6 +87,7 @@ const VideoProfile = () => {
               favoriteGigs: [],
               bookingHistory: [],
               completedGigsCount: 0,
+              cancelgigCount: 0,
             },
           });
         }

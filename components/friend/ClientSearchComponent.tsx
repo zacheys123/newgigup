@@ -102,6 +102,7 @@ const ClientSearchComponent = () => {
               favoriteGigs: [],
               bookingHistory: [],
               completedGigsCount: 0,
+              cancelgigCount: 0,
             },
           });
         }

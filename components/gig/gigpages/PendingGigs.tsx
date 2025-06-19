@@ -44,7 +44,12 @@ const PendingGigs = () => {
   const [loadingGig, setLoadingGig] = useState<string>("");
   const forget = (curr: GigProps) => {
     setLoadingGig(curr?._id as string);
-    forgetBookings(user?.user?._id as string, curr, userId as string);
+    forgetBookings(
+      user?.user?._id as string,
+      curr,
+      userId as string,
+      "musician"
+    );
   };
   useEffect(() => {
     const savedGigs = localStorage.getItem("pendingGigs");

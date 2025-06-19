@@ -19,6 +19,7 @@ import { CircularProgress } from "@mui/material";
 import { toast } from "sonner";
 import { Drum } from "lucide-react";
 import useSocket from "@/hooks/useSocket";
+import { CancelationModal } from "./gigpages/PendingModal";
 
 const PrePendingComponent = () => {
   const { userId } = useAuth();
@@ -48,11 +49,19 @@ const PrePendingComponent = () => {
     setShowX(false); // Reset the showX state
   };
   console.log(showX);
+  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(
+    null
+  );
+  const {
+    cancelationreason,
+    setcancelationreason,
+    setShowCancelGig,
+    cancelGig,
+  } = useStore(); // Local state for reason
   const [removingId, setRemovingId] = useState<string | null>(null);
   const removeMusicianfrombookCount = async (userid: string) => {
     setRemovingId(userid);
     try {
-      // Optimistically update the UI by removing the musician from local state
       const updatedGig = {
         ...currentgig,
         bookCount:
@@ -61,16 +70,17 @@ const PrePendingComponent = () => {
       };
       useStore.setState({ currentgig: updatedGig });
 
-      // Then make the API call
       const req = await fetch(`/api/gigs/remove-musician/${currentgig?._id}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ musicianId: userid }),
+        body: JSON.stringify({
+          musicianId: userid,
+          reason: cancelationreason, // Include reason
+        }),
       });
 
       const data: { message: string } = await req.json();
 
-      // If there was an error, revert the UI change
       if (!req.ok) {
         useStore.setState({ currentgig });
         toast.error(data.message || "Failed to remove musician");
@@ -80,18 +90,15 @@ const PrePendingComponent = () => {
       setRefetchGig(true);
       toast.success(data.message);
     } catch (error) {
-      // Revert on error
       useStore.setState({ currentgig });
       console.error(error);
       toast.error("Failed to remove musician");
     } finally {
       setRemovingId(null);
+      setShowCancelGig(false); // Close modal
     }
   };
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(
-    null
-  );
 
   const handleBookUser = (bookingId: string) => {
     setSelectedUser(bookingId);
@@ -117,6 +124,14 @@ const PrePendingComponent = () => {
       toast.error("No booking ID selected.");
     }
   };
+  const handleRemoveWithReason = (userid: string) => {
+    setRemovingId(userid);
+    setShowCancelGig(true); // Open cancellation modal
+  };
+  const confirmCancellationWithReason = (reason: string) => {
+    setcancelationreason(reason);
+    removeMusicianfrombookCount(removingId || "");
+  };
 
   if (loading) {
     return (
@@ -131,6 +146,17 @@ const PrePendingComponent = () => {
   }
   return (
     <div className="p-6 pb-[30px] bg-gradient-to-b from-gray-900 to-black text-white min-h-screen">
+      <CancelationModal
+        isOpen={cancelGig}
+        onClose={() => {
+          setShowCancelGig(false);
+          setRemovingId(null);
+        }}
+        onSubmit={confirmCancellationWithReason}
+        isLoading={removingId !== null}
+        userType="client"
+      />
+
       {showConfirmation && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm z-50">
           <div className="bg-gray-700 p-6 rounded-lg shadow-lg ">
@@ -216,9 +242,10 @@ const PrePendingComponent = () => {
                           ? "opacity-50 cursor-not-allowed"
                           : "cursor-pointer"
                       }`}
-                      onClick={() =>
-                        removingId !== myuser?._id &&
-                        removeMusicianfrombookCount(myuser?._id || "")
+                      onClick={
+                        () =>
+                          removingId !== myuser?._id &&
+                          handleRemoveWithReason(myuser?._id || "") // Updated to use new handler
                       }
                     >
                       x

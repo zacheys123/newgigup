@@ -166,6 +166,7 @@ export const postedBy = {
   favoriteGigs: [],
   bookingHistory: [] as BookingItem[],
   completedGigsCount: 0,
+  cancelgigCount: 0,
 };
 
 export const instruments = [
