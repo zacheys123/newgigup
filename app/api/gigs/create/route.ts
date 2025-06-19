@@ -1,7 +1,7 @@
 import connectDb from "@/lib/connectDb";
 import Gigs from "@/models/gigs";
 import User from "@/models/user";
-import { BookingHistoryItem } from "@/types/giginterface";
+import { BookingItem } from "@/types/history";
 import { getAuth } from "@clerk/nextjs/server";
 
 import { NextRequest, NextResponse } from "next/server";
@@ -36,7 +36,7 @@ type Info = {
   currency: string;
   isPending: boolean;
   scheduleDate: Date;
-  bookingHistory: BookingHistoryItem[];
+  bookingHistory: BookingItem[];
   status: string;
 
   paymentStatus: string;
