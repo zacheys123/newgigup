@@ -11,6 +11,7 @@ import {
 } from "next/navigation";
 import { useEffect, useState } from "react";
 import { GigProps } from "@/types/giginterface";
+import { Review, UserProps } from "@/types/userinterfaces";
 
 interface Filters {
   locations: string[];
@@ -23,6 +24,12 @@ interface GetGigsOptions {
   search?: string;
   location?: string;
   category?: string;
+}
+interface ApiResponse {
+  data: GigProps[];
+
+  total: number;
+  filters: Filters;
 }
 
 export default function BookingsPage() {
@@ -63,8 +70,7 @@ export default function BookingsPage() {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
-      return await response.json();
+      return (await response.json()) as ApiResponse;
     } catch (error) {
       console.error("Error fetching booked gigs:", error);
       return {
@@ -105,6 +111,25 @@ export default function BookingsPage() {
     fetchBookedGigs();
   }, [params.userId, page, search, location, category]);
 
+  const getGigRatings = (gigId: string, postedBy: UserProps) => {
+    if (!postedBy?.myreviews) return null;
+
+    // Filter reviews for this specific gig
+    const gigReviews = postedBy.myreviews.filter(
+      (review: Review) =>
+        review.gigId &&
+        review.gigId.toString() === gigId &&
+        typeof review.rating === "number"
+    );
+
+    if (gigReviews.length === 0) return null;
+    const average =
+      gigReviews.reduce((sum, r) => sum + r.rating, 0) / gigReviews.length;
+    return {
+      average: Number(average.toFixed(1)),
+      count: gigReviews.length,
+    };
+  };
   const handlePageChange = (newPage: number) => {
     const newSearchParams = new URLSearchParams(searchParams.toString());
     newSearchParams.set("page", newPage.toString());
@@ -147,7 +172,7 @@ export default function BookingsPage() {
         </div>
       ) : (
         <>
-          <BookingsList gigs={bookedGigs} />
+          <BookingsList gigs={bookedGigs} getRatings={getGigRatings} />
           <Pagination
             totalPages={Math.ceil(total / limit)}
             currentPage={page}

@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
     // Get booked gigs with pagination
     const [bookedGigs, total] = await Promise.all([
       Gigs.find(query)
-        .populate("postedBy", "firstname lastname email picture")
+        .populate("postedBy", "firstname lastname email picture myreviews")
         .skip((page - 1) * limit)
         .limit(limit)
         .lean(),
