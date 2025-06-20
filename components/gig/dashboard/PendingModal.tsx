@@ -21,7 +21,7 @@ export const CancelationModal = ({
   isOpen,
   onClose,
   onSubmit,
-  isLoading = false,
+  isLoading,
   userType,
 }: CancelationModalProps) => {
   const { cancelationreason, setcancelationreason } = useStore();
@@ -48,13 +48,13 @@ export const CancelationModal = ({
             value={cancelationreason}
             onChange={(e) => setcancelationreason(e.target.value)}
             placeholder="Reason for cancellation..."
-            className="bg-gray-800 text-white border-gray-700"
+            className="bg-gray-800 text-neutral-400 title border-gray-700"
           />
           <div className="flex justify-end space-x-2">
             <Button
-              variant="outline"
+              variant="secondary"
               onClick={onClose}
-              className="text-white border-gray-700 hover:bg-gray-700"
+              className="text-gray border-gray-700 hover:bg-gray-700"
             >
               Cancel
             </Button>

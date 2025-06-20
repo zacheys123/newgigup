@@ -1,29 +1,72 @@
+// app/api/gigs/remove-musician/[gigId]/route.ts
+import { NextRequest, NextResponse } from "next/server";
 import connectDb from "@/lib/connectDb";
 import Gigs from "@/models/gigs";
+import { Types } from "mongoose";
 import { getAuth } from "@clerk/nextjs/server";
-import { NextRequest, NextResponse } from "next/server";
 
-export async function DELETE(req: NextRequest) {
-  const id = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
-  const { userId } = getAuth(req);
-  const { musicianId } = await req.json();
-
+export async function DELETE(request: NextRequest) {
+  const gigId = request.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
+  const { userId } = getAuth(request);
+  const { musicianId, reason } = await request.json();
   console.log(musicianId);
   if (!userId) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  try {
-    await connectDb();
-    const gig = await Gigs.findOne({ _id: id });
+  if (
+    !Types.ObjectId.isValid(gigId || "") ||
+    !Types.ObjectId.isValid(musicianId)
+  ) {
+    return NextResponse.json({ message: "Invalid ID format" }, { status: 400 });
+  }
+  if (!reason) {
+    return NextResponse.json(
+      { message: "A reason is Required" },
+      { status: 400 }
+    );
+  } else {
+    const cancellationDate = new Date();
+    try {
+      await connectDb();
+      // Update the gig - remove musician and add cancellation reason
+      const updatedGig = await Gigs.findByIdAndUpdate(
+        gigId,
+        {
+          $pull: { bookCount: musicianId },
+          $set: {
+            cancellationReason: reason,
+          },
+          $push: {
+            bookingHistory: {
+              userId: musicianId,
+              status: "cancelled",
+              date: cancellationDate,
+              role: "musician",
+              cancellationReason: reason,
+            },
+          },
+        },
+        { new: true }
+      );
 
-    await gig.updateOne({
-      $pull: { bookCount: musicianId },
-    });
+      if (!updatedGig) {
+        return NextResponse.json({ message: "Gig not found" }, { status: 404 });
+      }
 
-    return NextResponse.json({ message: "User removed successfully" });
-  } catch (error) {
-    console.error("Error deleting gig:", error);
-    return NextResponse.json({ message: "Error deleting gig", status: 500 });
+      return NextResponse.json({
+        message: "Musician removed successfully",
+        gig: updatedGig,
+      });
+    } catch (error) {
+      console.error("Error removing musician:", error);
+      return NextResponse.json(
+        {
+          message: "Error removing musician",
+          error: error instanceof Error ? error.message : "Unknown error",
+        },
+        { status: 500 }
+      );
+    }
   }
 }

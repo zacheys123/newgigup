@@ -19,7 +19,7 @@ import { CircularProgress } from "@mui/material";
 import { toast } from "sonner";
 import { Drum } from "lucide-react";
 import useSocket from "@/hooks/useSocket";
-import { CancelationModal } from "./gigpages/PendingModal";
+import { CancelationModal } from "./dashboard/PendingModal";
 
 const PrePendingComponent = () => {
   const { userId } = useAuth();
@@ -58,10 +58,11 @@ const PrePendingComponent = () => {
     setShowCancelGig,
     cancelGig,
   } = useStore(); // Local state for reason
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
   const removeMusicianfrombookCount = async (userid: string) => {
-    setRemovingId(userid);
     try {
+      setIsSubmitting(true); // Start submission
       const updatedGig = {
         ...currentgig,
         bookCount:
@@ -75,27 +76,25 @@ const PrePendingComponent = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           musicianId: userid,
-          reason: cancelationreason, // Include reason
+          reason: cancelationreason,
+          dep: "client",
         }),
       });
 
       const data: { message: string } = await req.json();
-
-      if (!req.ok) {
-        useStore.setState({ currentgig });
-        toast.error(data.message || "Failed to remove musician");
-        return;
-      }
+      if (!req.ok) throw new Error(data.message);
 
       setRefetchGig(true);
       toast.success(data.message);
     } catch (error) {
       useStore.setState({ currentgig });
-      console.error(error);
-      toast.error("Failed to remove musician");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to remove musician"
+      );
     } finally {
+      setIsSubmitting(false);
       setRemovingId(null);
-      setShowCancelGig(false); // Close modal
+      setShowCancelGig(false);
     }
   };
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -153,7 +152,7 @@ const PrePendingComponent = () => {
           setRemovingId(null);
         }}
         onSubmit={confirmCancellationWithReason}
-        isLoading={removingId !== null}
+        isLoading={isSubmitting}
         userType="client"
       />
 

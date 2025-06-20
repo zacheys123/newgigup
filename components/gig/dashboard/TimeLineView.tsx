@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FiCalendar,
@@ -13,20 +13,95 @@ import {
   FiXCircle,
   FiChevronRight,
   FiChevronDown,
+  FiTrash2,
+  FiX,
 } from "react-icons/fi";
 import Image from "next/image";
 import type { BookingHistoryItem } from "@/types/history";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 interface TimelineViewProps {
   gigs: BookingHistoryItem[];
+  onDelete: (ids: string[]) => Promise<void>;
 }
 
-export default function TimelineView({ gigs }: TimelineViewProps) {
+export default function TimelineView({ gigs, onDelete }: TimelineViewProps) {
   const [expandedGig, setExpandedGig] = useState<string | null>(null);
   const gigRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+  const [selectedGigs, setSelectedGigs] = useState<string[]>([]);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [selectAll, setSelectAll] = useState(false);
   const setGigRef = (id: string) => (el: HTMLDivElement | null) => {
     gigRefs.current[id] = el;
   };
+  const toggleSelectGig = (gigId: string) => {
+    setSelectedGigs((prev) =>
+      prev.includes(gigId)
+        ? prev.filter((id) => id !== gigId)
+        : [...prev, gigId]
+    );
+  };
+  const handleSelectAll = () => {
+    if (selectAll) {
+      setSelectedGigs([]);
+    } else {
+      setSelectedGigs(gigs.map((gig) => gig._id));
+    }
+    setSelectAll(!selectAll);
+  };
+
+  useEffect(() => {
+    if (selectedGigs.length === gigs.length && gigs.length > 0) {
+      setSelectAll(true);
+    } else {
+      setSelectAll(false);
+    }
+  }, [selectedGigs, gigs]);
+  const handleDelete = async (gigId: string) => {
+    setIsDeleting(true);
+    try {
+      await onDelete([gigId]);
+      setSelectedGigs((prev) => prev.filter((id) => id !== gigId));
+      // Close the expanded view if the deleted gig is currently expanded
+      if (expandedGig === gigId) {
+        setExpandedGig(null);
+      }
+    } catch (error) {
+      console.error("Failed to delete gig:", error);
+      // You might want to add error handling UI here
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleMultiDelete = async () => {
+    if (selectedGigs.length === 0) return;
+
+    // Add confirmation dialog
+    const confirmed = window.confirm(
+      `Are you sure you want to delete ${selectedGigs.length} selected gig(s)? This action cannot be undone.`
+    );
+
+    if (!confirmed) return;
+
+    setIsDeleting(true);
+    try {
+      await onDelete(selectedGigs);
+      setSelectedGigs([]);
+      setSelectAll(false);
+      if (expandedGig && selectedGigs.includes(expandedGig)) {
+        setExpandedGig(null);
+      }
+    } catch (error) {
+      console.error("Failed to delete gigs:", error);
+      // Consider adding a toast notification here
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  // Handle multi-delete
+
   const handleToggle = (gigId: string) => {
     const isExpanding = expandedGig !== gigId;
     setExpandedGig(isExpanding ? gigId : null);
@@ -40,6 +115,40 @@ export default function TimelineView({ gigs }: TimelineViewProps) {
       }, 100); // Small delay to allow animation to start
     }
   };
+
+  const renderDeleteButton = (gigId: string) => (
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        handleDelete(gigId);
+      }}
+      className={`text-red-400 hover:text-red-500 transition-colors p-1 ${
+        isDeleting ? "opacity-50 cursor-not-allowed" : ""
+      }`}
+      disabled={isDeleting}
+      aria-label="Delete gig"
+    >
+      {isDeleting && selectedGigs.includes(gigId) ? (
+        <LoadingSpinner />
+      ) : (
+        <FiTrash2 size={18} />
+      )}
+    </button>
+  );
+
+  const renderCheckbox = (gigId: string) => (
+    <div
+      onClick={(e) => e.stopPropagation()}
+      className="flex items-center mr-2"
+    >
+      <input
+        type="checkbox"
+        checked={selectedGigs.includes(gigId)}
+        onChange={() => toggleSelectGig(gigId)}
+        className="h-4 w-4 rounded border-gray-300 text-amber-500 focus:ring-amber-500"
+      />
+    </div>
+  );
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -114,6 +223,70 @@ export default function TimelineView({ gigs }: TimelineViewProps) {
   return (
     <div className="relative">
       {/* Timeline line */}
+      {selectedGigs.length > 0 ? (
+        <div className="sticky top-0 z-20 bg-gray-800 p-3 mb-4 rounded-lg shadow-lg flex justify-between items-center">
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                checked={selectAll}
+                onChange={handleSelectAll}
+                className="h-4 w-4 rounded border-gray-300 text-amber-500 focus:ring-amber-500 mr-2"
+              />
+              <span className="text-gray-300">
+                {selectedGigs.length} selected
+              </span>
+            </div>
+            <button
+              onClick={handleMultiDelete}
+              disabled={isDeleting || selectedGigs.length === 0}
+              className={`flex items-center ${
+                selectedGigs.length === 0
+                  ? "bg-gray-600/30 text-gray-500 cursor-not-allowed"
+                  : "bg-red-500/20 text-red-400 hover:bg-red-500/30"
+              } px-3 py-1 rounded-md transition-colors`}
+            >
+              {isDeleting ? (
+                <>
+                  <LoadingSpinner />
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  Delete Selected ({selectedGigs.length})
+                  <FiTrash2 className="ml-2" />
+                </>
+              )}
+            </button>
+          </div>
+          <button
+            onClick={() => {
+              setSelectedGigs([]);
+              setSelectAll(false);
+            }}
+            className="text-gray-400 hover:text-gray-200"
+          >
+            <FiX size={20} />
+          </button>
+        </div>
+      ) : (
+        <div className="sticky top-0 z-10 bg-gray-900/80 backdrop-blur-sm p-3 mb-4 rounded-lg flex justify-between items-center">
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              checked={selectAll}
+              onChange={handleSelectAll}
+              className="h-4 w-4 rounded border-gray-300 text-amber-500 focus:ring-amber-500 mr-2"
+            />
+            <span className="text-gray-400 text-sm">
+              {selectAll ? "All selected" : "Select all"}
+            </span>
+          </div>
+          <span className="text-gray-400 text-sm">
+            {gigs.length} gigs total
+          </span>
+        </div>
+      )}
       <div className="absolute left-8 top-0 h-full w-0.5 bg-gradient-to-b from-gray-700 via-gray-600 to-gray-700" />
 
       <div className="space-y-8">
@@ -142,7 +315,9 @@ export default function TimelineView({ gigs }: TimelineViewProps) {
             <motion.div
               layout
               className={`bg-gray-800/70 backdrop-blur-sm rounded-xl border ${
-                gig.status === "completed"
+                selectedGigs.includes(gig._id)
+                  ? "border-amber-400/40 ring-2 ring-amber-400/20"
+                  : gig.status === "completed"
                   ? "border-emerald-400/20"
                   : gig.status === "booked"
                   ? "border-blue-400/20"
@@ -151,10 +326,11 @@ export default function TimelineView({ gigs }: TimelineViewProps) {
                   : "border-red-400/20"
               } overflow-hidden transition-all duration-200 shadow-lg`}
             >
-              <button
+              <div
                 onClick={() => handleToggle(gig._id)}
-                className="w-full flex items-start justify-between p-6 hover:bg-gray-700/30 transition-colors text-left"
+                className="w-full flex items-start justify-between p-6 hover:bg-gray-700/30 transition-colors text-left cursor-pointer"
               >
+                {renderCheckbox(gig._id)}
                 <div className="flex-1">
                   <div className="flex items-start justify-between">
                     <h3 className="text-xl font-semibold text-white">
@@ -163,6 +339,7 @@ export default function TimelineView({ gigs }: TimelineViewProps) {
                     <div className="flex space-x-2">
                       {getStatusBadge(gig.status)}
                       {getPaymentBadge(gig.gigId.paymentStatus)}
+                      {renderDeleteButton(gig._id)}
                     </div>
                   </div>
 
@@ -194,7 +371,7 @@ export default function TimelineView({ gigs }: TimelineViewProps) {
                     <FiChevronRight className="text-gray-400" />
                   )}
                 </div>
-              </button>
+              </div>
               <AnimatePresence>
                 {expandedGig === gig._id && (
                   <motion.div

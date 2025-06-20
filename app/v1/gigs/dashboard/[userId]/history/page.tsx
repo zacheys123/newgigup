@@ -50,6 +50,29 @@ export default function HistoryPage() {
     );
   }
 
+  const handleDelete = async (ids: string[]) => {
+    try {
+      const response = await fetch("/api/gigs/deletebookingHistory", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ids }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete bookings");
+      }
+
+      // Refresh the history after successful deletion
+      const updatedGigs = historyGigs.filter((gig) => !ids.includes(gig._id));
+      setHistoryGigs(updatedGigs);
+    } catch (error) {
+      console.error("Delete error:", error);
+      // You might want to add a toast notification here
+      throw error; // Re-throw to let the TimelineView handle the loading state
+    }
+  };
   return (
     <div className="space-y-8">
       <motion.h1
@@ -75,7 +98,7 @@ export default function HistoryPage() {
           </button>
         </motion.div>
       ) : (
-        <TimelineView gigs={historyGigs} />
+        <TimelineView gigs={historyGigs} onDelete={handleDelete} />
       )}
     </div>
   );
