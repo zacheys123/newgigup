@@ -1,4 +1,5 @@
 "use client";
+
 import { UserButton, useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 import Logo from "./Logo";
@@ -16,76 +17,79 @@ const Nav = () => {
   const router = useRouter();
   const { user } = useCurrentUser();
   const { isFirstMonthEnd } = useCheckTrial(user?.user);
-
   const isAdmin = user?.user?.isAdmin;
 
   return (
-    <nav className="sticky top-0 w-full bg-neutral-900 text-white shadow-md py-4 px-6 flex items-center justify-between  shadow-slate-700 ">
-      {/* Logo on the left side */}
-      <div className="flex items-center justify-between flex-1">
-        {isFirstMonthEnd ? <MobileSheet /> : <Logo />}
-      </div>
-      {/* Navigation items aligned to the right */}
-      <div className="flex items-center gap-3 ml-auto">
-        {userId ? (
-          <div className="flex items-center gap-6">
-            <Link
-              href={`/contact`}
-              className="flex items-center gap-2 p-3 rounded-full transition-all hover:bg-neutral-700 hover:scale-105"
-            >
-              <MdEmail size="21" />
-              <span className="hidden md:inline">Gigs</span>
-            </Link>
+    <nav className="sticky top-0 z-50 w-full bg-gradient-to-r from-[#0f0f0f]/80 to-[#1a1a1a]/80 backdrop-blur-md border-b border-white/10 shadow-md">
+      <div className="flex flex-wrap items-center justify-between gap-4 px-4 sm:px-8 py-3 max-w-screen-2xl mx-auto overflow-x-auto">
+        {/* Logo or MobileSheet */}
+        <div className="flex items-center min-w-[100px] max-w-[150px] overflow-hidden">
+          {isFirstMonthEnd ? <MobileSheet /> : <Logo />}
+        </div>
 
-            {user?.user?.firstname && (
-              <>
-                {!isFirstMonthEnd && (
-                  <Link
-                    href={"/profile"}
-                    className="flex items-center gap-2 p-3 rounded-full transition-all hover:bg-neutral-700 hover:scale-105"
-                  >
-                    <User size="21" />
-                    <span className="hidden md:inline">Profile</span>
-                  </Link>
-                )}
+        {/* Action Links */}
+        <div className="flex items-center gap-3 flex-wrap justify-end overflow-x-auto text-sm font-medium tracking-wide">
+          {userId ? (
+            <>
+              <Link
+                href="/contact"
+                className="flex items-center gap-2 px-3 py-1.5 text-white hover:text-teal-300 transition hover:scale-105"
+              >
+                <MdEmail size={18} />
+                <span className="hidden sm:inline">Gigs</span>
+              </Link>
+
+              {!isFirstMonthEnd && !isAdmin && (
                 <Link
-                  href="/settings"
-                  className="flex items-center gap-2 p-3 rounded-full transition-all hover:bg-neutral-700 hover:scale-105"
+                  href="/profile"
+                  className="flex items-center gap-2 px-3 py-1.5 text-white hover:text-purple-300 transition hover:scale-105"
                 >
-                  <Settings size="21" />
-                  <span className="hidden md:inline">FAQ</span>
+                  <User size={18} />
+                  <span className="hidden sm:inline">Profile</span>
                 </Link>
-                {isAdmin && (
-                  <Link
-                    href="/admin/dashboard"
-                    className="text-sm font-medium flex items-center  bg-rose-300 bg-opacity-50 rounded-xl p-2"
-                  >
-                    <User2Icon size={15} />
-                    <span className="title">Admin</span>
-                  </Link>
-                )}
-              </>
-            )}
-            <UserButton afterSignOutUrl="/" />
-          </div>
-        ) : (
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              className="px-4 py-2 rounded-full text-white border border-yellow-500 hover:bg-slate-700"
-              onClick={() => router.push("/sign-up")}
-            >
-              SignUp
-            </Button>
-            <Button
-              variant="ghost"
-              className="px-4 py-2 rounded-full text-white border border-yellow-500 hover:bg-slate-700"
-              onClick={() => router.push("/sign-in")}
-            >
-              SignIn
-            </Button>
-          </div>
-        )}
+              )}
+
+              <Link
+                href="/settings"
+                className="flex items-center gap-2 px-3 py-1.5 text-white hover:text-blue-300 transition hover:scale-105"
+              >
+                <Settings size={18} />
+                <span className="hidden sm:inline">FAQ</span>
+              </Link>
+
+              {isAdmin && (
+                <Link
+                  href="/admin/dashboard"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-600/20 text-rose-100 hover:bg-rose-600/30 transition"
+                >
+                  <User2Icon size={16} />
+                  <span className="hidden sm:inline">Admin</span>
+                </Link>
+              )}
+
+              <div className="min-w-[36px]">
+                <UserButton afterSignOutUrl="/" />
+              </div>
+            </>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                className="rounded-full px-4 py-1.5 border border-yellow-400 text-yellow-400 hover:bg-yellow-400/10 hover:text-white transition-all duration-150"
+                onClick={() => router.push("/sign-up")}
+              >
+                Sign Up
+              </Button>
+              <Button
+                variant="ghost"
+                className="rounded-full px-4 py-1.5 border border-yellow-400 text-yellow-400 hover:bg-yellow-400/10 hover:text-white transition-all duration-150"
+                onClick={() => router.push("/sign-in")}
+              >
+                Sign In
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
     </nav>
   );

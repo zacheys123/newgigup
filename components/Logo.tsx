@@ -5,7 +5,6 @@ import Link from "next/link";
 const Logo = () => {
   const waveRef = useRef<HTMLDivElement>(null);
 
-  // Hover animation
   useEffect(() => {
     if (!waveRef.current) return;
 
@@ -18,31 +17,30 @@ const Logo = () => {
       paused: true,
     });
 
-    waveRef.current.addEventListener("mouseenter", () => hoverAnim.play());
-    waveRef.current.addEventListener("mouseleave", () => hoverAnim.reverse());
+    const handleEnter = () => hoverAnim.play();
+    const handleLeave = () => hoverAnim.reverse();
+
+    waveRef.current.addEventListener("mouseenter", handleEnter);
+    waveRef.current.addEventListener("mouseleave", handleLeave);
 
     return () => {
-      waveRef.current?.removeEventListener("mouseenter", () =>
-        hoverAnim.play()
-      );
-      waveRef.current?.removeEventListener("mouseleave", () =>
-        hoverAnim.reverse()
-      );
+      waveRef.current?.removeEventListener("mouseenter", handleEnter);
+      waveRef.current?.removeEventListener("mouseleave", handleLeave);
     };
   }, []);
 
   return (
-    <Link href="/" className="group" aria-label="GigUp Home">
+    <Link href="/" className="group block max-w-[130px] md:max-w-[180px]">
       <div
         ref={waveRef}
-        className="relative w-32 h-16 flex items-center justify-center"
+        className="relative w-full h-16 flex items-center justify-center overflow-hidden"
       >
         {/* Gradient Wave Shape (Hidden on small screens) */}
         <svg
           width="100%"
           height="100%"
           viewBox="0 0 200 80"
-          className="hidden md:block absolute"
+          className="hidden md:block absolute top-0 left-0 w-full h-full"
           preserveAspectRatio="xMidYMid meet"
         >
           <path
@@ -61,12 +59,12 @@ const Logo = () => {
           </defs>
         </svg>
 
-        {/* Text Logo (Responsive) */}
-        <div className="relative z-10 text-center">
-          <span className="text-2xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-teal-400">
+        {/* Text Logo */}
+        <div className="relative z-10 text-center w-full">
+          <span className="block text-lg md:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-teal-400 leading-tight truncate">
             GigUp
           </span>
-          <p className="text-xs md:text-sm font-light text-gray-500 mt-1">
+          <p className="text-[10px] md:text-xs font-light text-gray-500 mt-0.5 truncate">
             Elevate Your Gig
           </p>
         </div>

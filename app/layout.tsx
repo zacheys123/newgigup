@@ -9,6 +9,7 @@ import { NotificationProvider } from "./Context/NotificationContext";
 import ToastWrapper from "@/components/ToastWrapper";
 import { PendingGigsProvider } from "./Context/PendinContext";
 import NetworkWrapper from "@/components/NetworkWrapper";
+import ToasterShad from "@/components/ToasterShad";
 
 export const metadata: Metadata = {
   title: "Gigup",
@@ -32,6 +33,7 @@ export default function RootLayout({
                     <NetworkWrapper>
                       {children}
                       <ToastWrapper />
+                      <ToasterShad />
                     </NetworkWrapper>
                   </ClerkLoaded>
                 </PendingGigsProvider>

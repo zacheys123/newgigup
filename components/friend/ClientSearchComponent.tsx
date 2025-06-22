@@ -7,9 +7,7 @@ import { IoCheckmarkDone } from "react-icons/io5";
 import { Button } from "../ui/button";
 import { MdAdd } from "react-icons/md";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { Box } from "@mui/material";
 import { BsFacebook, BsInstagram, BsTwitter } from "react-icons/bs";
-
 import { ArrowLeftIcon, Music, Video } from "lucide-react";
 import useStore from "@/app/zustand/useStore";
 import {
@@ -19,9 +17,13 @@ import {
   handleUnFollowingCurrent,
 } from "@/utils";
 import { FaTiktok, FaYoutube } from "react-icons/fa";
+import ReportButton from "../report/ReportButton";
+import Image from "next/image";
+
 type FriendProps = {
   user: UserProps;
 };
+
 const ClientSearchComponent = () => {
   const { userId } = useAuth();
   const { username } = useParams();
@@ -102,6 +104,12 @@ const ClientSearchComponent = () => {
               favoriteGigs: [],
               bookingHistory: [],
               completedGigsCount: 0,
+              musicianConfirmPayment: {
+                gigId: "",
+                confirmPayment: false,
+              },
+              clientConfirmPayment: { gigId: "", confirmPayment: false },
+              reportsCount: 0,
               cancelgigCount: 0,
             },
           });
@@ -142,273 +150,357 @@ const ClientSearchComponent = () => {
         : follower?._id === userId
     );
   })();
+
+  // import { useEffect, useState } from "react";
+
+  // export function useSimpleToast() {
+  //   const [toast, setToast] = useState<{
+  //     message: string;
+  //     type: "success" | "error";
+  //     show: boolean;
+  //   }>({ message: "", type: "success", show: false });
+
+  //   const showToast = (
+  //     message: string,
+  //     type: "success" | "error" = "success"
+  //   ) => {
+  //     setToast({ message, type, show: true });
+  //     setTimeout(() => setToast((prev) => ({ ...prev, show: false })), 3000);
+  //   };
+
+  //   return { toast, showToast };
+  // }
+
+  // Usage:
+  // const { showToast } = useSimpleToast()
+  // showToast('Report submitted!', 'success')
   if (loading) return <div>loading....</div>;
   return (
-    <div className="overflow-y-auto h-[95%] w-[90%] mx-auto  shadow-md shadow-orange-300 flex flex-col gap-2">
-      {/* Fixed Gigheader */}
-
-      <div className="h-[180px] bg-neutral-800 flex items-center px-2 justify-around  rounded-bl-3xl rounded-br-3xl">
-        {/* {friend?.user?.picture && friend?.user?.picture !== null ? (
-          <Image
-            className="w-[100px] h-[100px] rounded-full object-cover bg-slate-400"
-            src={friend.picture}
-            alt="Profile Pic"
-            width={100}
-            height={100}
-          />
-        ) : ( */}
-        <div className="w-[100px] h-[100px] rounded-full  bg-neutral-300 flex justify-center items-center">
-          <span className="text-5xl">
-            {friend?.user?.firstname?.split("")[0]}
-          </span>
-          <span className="text-3xl">
-            {friend?.user?.lastname?.split("")[0]}
-          </span>
-        </div>
-        <div className="w-[60px] h-[60px] flex flex-col flex-1 mx-2 mt-[100px]">
-          <span className="flex gap-1">
-            <span className=" text-sm text-gray-400">
-              {friend?.user?.firstname}
-            </span>
-            <span className=" text-sm text-gray-400">
-              {friend?.user?.lastname}
-            </span>
-          </span>
-          <span className="text-[11px] text-gray-400">
-            {/* {friend?.user?.experience} years of experience in {friend?.user?.instrument}
-             */}
-            {friend?.user?.email}
-          </span>
-        </div>
-
-        <div className=" flex justify-center items-center">
-          {(friend && !follow && isFollowing) || optimisticFollow ? (
-            <Button
-              className="min-w-[50px] h-[30px] text-white  text-[11px] bg-transparent border-2 border-gray-300 "
-              onClick={() => {
-                if (friend && friend?.user?._id) {
-                  // Ensure _id is defined
-                  try {
-                    handleUnfollow(friend?.user?._id, user?.user);
-                    handleUnFollowingCurrent(friend?.user?._id, user?.user);
-                    setRefetch((prev) => !prev);
-                    setOptimisticFollow(false);
-                    setFollow(false); // Update global state as well
-                  } catch (error) {
-                    setOptimisticFollow(true);
-                    setFollow(true); // Update global state as well
-                    console.error("Error following:", error);
-                  }
-                } else {
-                  console.log("No friend Id");
-                }
-              }}
-            >
-              following <IoCheckmarkDone />
-            </Button>
-          ) : (
-            <Button
-              className="min-w-[50px] h-[30px] text-white  text-[11px] bg-blue-600 hover:bg-blue-700"
-              onClick={() => {
-                if (friend && friend?.user?._id) {
-                  // Ensure _id is defined
-                  try {
-                    handleFollow(friend?.user?._id, user?.user);
-                    handleFollowing(friend?.user?._id, user?.user);
-                    setRefetch((prev) => !prev);
-                    setOptimisticFollow(true);
-                    setFollow(true); // Update global state as well
-                  } catch (error) {
-                    setOptimisticFollow(false);
-                    setFollow(!follow); // Update global state as well
-                    console.error("Error following:", error);
-                  }
-                }
-              }}
-            >
-              Follow <MdAdd />
-            </Button>
-          )}
-        </div>
-      </div>
-      <div className="h-[70px] flex gap-2 justify-around items-center">
-        <ArrowLeftIcon
-          size="19"
-          style={{ color: "lightgrey" }}
-          onClick={() => router.back()}
-        />
-
-        <Music
-          size="19"
-          style={{ color: "lightgreen" }}
-          onClick={() =>
-            router.push(
-              user?.user?.isClient ? `/create/${userId}` : `/av_gigs/${userId}`
-            )
-          }
-        />
-        <Video
-          size="19"
-          style={{ color: "pink" }}
-          onClick={() =>
-            router.push(
-              `/search/allvideos/${friend?.user?._id}/*${user?.user?.firstname}${user?.user?.lastname}`
-            )
-          }
-        />
-      </div>
-      <Box className="h-fit bg-neutral-800 w-[100%] px-2 py-3">
-        <h4 className="text-[16px] font-bold text-gray-400 mt-3 mb-1 ">
-          Fullname
-        </h4>
-        <div className="flex gap-2">
-          <span className="text-[12px] font-bold text-gray-500">
-            {friend?.user?.firstname}
-          </span>
-          <span className="text-[12px] font-bold text-gray-500 ">
-            {friend?.user?.lastname}
-          </span>
-        </div>
-      </Box>
-      <Box className="h-fit bg-neutral-800 w-[100%] px-2 py-3">
-        <h4 className="text-[16px] font-bold text-gray-400 mt-3 mb-1 ">
-          Contact Info
-        </h4>
-        <div className="flex flex-col">
-          <span className="text-[12px] font-bold text-gray-500">
-            {friend?.user?.email}
-          </span>
-        </div>
-      </Box>
-      <Box className="h-fit bg-neutral-800 w-[100%] px-2 py-5">
-        <h4 className="text-[16px] font-bold text-gray-400 mt-3 mb-1 ">
-          General Info
-        </h4>
-        <div className="flex flex-col h-fit py-2">
-          <span className="text-[12px] font-bold text-gray-500 flex flex-col">
-            <span className="text-[15px] font-bold text-neutral-400 font-mono">
-              City:{" "}
-            </span>
-            {friend?.user?.city ? friend?.user?.city : "-null"}
-          </span>
-
-          <div className="flex justify-around my-3 gap-2">
-            <span className="text-[12px] font-bold text-red-500 bg-gray-200 opacity-80 rounded-md py-1 px-2">
-              {friend?.user?.followers && friend?.user?.followers?.length === 1
-                ? `${friend?.user?.followers?.length} follower`
-                : `${friend?.user?.followers?.length} followers`}
-            </span>
-            <span className="text-gray-400">|</span>
-            <span className="text-[12px] font-bold text-red-500 bg-gray-200 opacity-80 rounded-md py-1 px-2">
-              {friend?.user?.followings?.length === 1 ||
-              friend?.user?.followings?.length === 0
-                ? `${friend?.user?.followings?.length} following`
-                : `${friend?.user?.followings?.length} followings`}
-            </span>
+    <div className="overflow-y-auto h-screen w-full bg-gradient-to-b from-gray-50 to-gray-100">
+      {/* Header Section */}
+      <div className="relative h-64 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-b-3xl shadow-lg">
+        <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2">
+          <div className="w-32 h-32 rounded-full border-4 border-white bg-white shadow-xl flex items-center justify-center">
+            {friend?.user?.picture ? (
+              <Image
+                src={friend.user.picture}
+                alt="Profile"
+                className="w-full h-full rounded-full object-cover"
+                width={100}
+                height={100}
+              />
+            ) : (
+              <div className="w-full h-full rounded-full bg-gradient-to-br from-indigo-400 to-purple-400 flex items-center justify-center text-white text-5xl font-bold">
+                {friend?.user?.firstname?.charAt(0)}
+                {friend?.user?.lastname?.charAt(0)}
+              </div>
+            )}
           </div>
-          <div className="flex flex-col gap-2">
-            <span className="text-[12px] font-bold text-gray-500 flex flex-col">
-              <span className="text-[15px] font-bold text-neutral-400 font-mono">
-                Organization/Company/Hotel:
-              </span>
-              {friend?.user?.organization
-                ? friend?.user?.organization
-                : "-null"}
-            </span>
-            <div className="text-[12px] font-bold text-gray-500 flex gap-5 mt-3 justify-center">
-              {friend?.user?.handles &&
-                friend?.user?.handles.split(",").map((handle, i) => (
-                  <div key={i} className="mx-4">
-                    <span className="text-[12px]  font-bold text-gray-500 flex items-center ">
-                      {handle.includes("instagram") && (
-                        <BsInstagram
-                          onClick={() =>
-                            window.open(
-                              handle.startsWith("http")
-                                ? handle
-                                : `https://${handle}`,
-                              "_blank"
-                            )
-                          }
-                          size="19"
-                          style={{ color: "yellow" }}
-                        />
-                      )}
-                      {handle.includes("tiktok") && (
-                        <FaTiktok
-                          onClick={() =>
-                            window.open(
-                              handle.startsWith("http")
-                                ? handle
-                                : `https://${handle}`,
-                              "_blank"
-                            )
-                          }
-                          size="19"
-                          style={{ color: "purple" }}
-                        />
-                      )}
-                      {handle.includes("youtube") && (
-                        <FaYoutube
-                          onClick={() =>
-                            window.open(
-                              handle.startsWith("http")
-                                ? handle
-                                : `https://${handle}`,
-                              "_blank"
-                            )
-                          }
-                          size="19"
-                          style={{ color: "red" }}
-                        />
-                      )}
-                      {handle.includes("x") && (
-                        <BsTwitter
-                          onClick={() =>
-                            window.open(
-                              handle.startsWith("http")
-                                ? handle
-                                : `https://${handle}`,
-                              "_blank"
-                            )
-                          }
-                          size="19"
-                          style={{ color: "blue" }}
-                        />
-                      )}
-                      {handle.includes("facebook") && (
-                        <BsFacebook
-                          onClick={() =>
-                            window.open(
-                              handle.startsWith("http")
-                                ? handle
-                                : `https://${handle}`,
-                              "_blank"
-                            )
-                          }
-                          size="19"
-                          style={{ color: "lightblue" }}
-                        />
-                      )}
-                    </span>
-                  </div>
-                ))}
+        </div>
+      </div>
+
+      {/* Profile Content */}
+      <div className="mt-20 px-6 pb-10">
+        {/* Name and Follow Button */}
+        <div className="flex flex-col items-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-800">
+            {friend?.user?.firstname} {friend?.user?.lastname}
+          </h1>
+          <p className="text-gray-500 text-sm mb-4">
+            {friend?.user?.experience} years of experience in{" "}
+            {friend?.user?.instrument}
+          </p>
+
+          <div className="flex gap-4">
+            {(friend && !follow && isFollowing) || optimisticFollow ? (
+              <Button
+                variant="outline"
+                className="px-6 py-2 text-indigo-600 border-indigo-600 hover:bg-indigo-50"
+                onClick={() => {
+                  if (friend && friend?.user?._id) {
+                    try {
+                      handleUnfollow(friend?.user?._id, user?.user);
+                      handleUnFollowingCurrent(friend?.user?._id, user?.user);
+                      setRefetch((prev) => !prev);
+                      setOptimisticFollow(false);
+                      setFollow(false);
+                    } catch (error) {
+                      setOptimisticFollow(true);
+                      setFollow(true);
+                      console.error("Error following:", error);
+                    }
+                  }
+                }}
+              >
+                <IoCheckmarkDone className="mr-2" />
+                Following
+              </Button>
+            ) : (
+              <Button
+                className="px-6 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white shadow-md"
+                onClick={() => {
+                  if (friend && friend?.user?._id) {
+                    try {
+                      handleFollow(friend?.user?._id, user?.user);
+                      handleFollowing(friend?.user?._id, user?.user);
+                      setRefetch((prev) => !prev);
+                      setOptimisticFollow(true);
+                      setFollow(true);
+                    } catch (error) {
+                      setOptimisticFollow(false);
+                      setFollow(!follow);
+                      console.error("Error following:", error);
+                    }
+                  }
+                }}
+              >
+                <MdAdd className="mr-2" />
+                Follow
+              </Button>
+            )}
+            <ReportButton userId={friend?.user?._id ? friend?.user?._id : ""} />
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="flex justify-center gap-6 mb-8">
+          <button
+            onClick={() => router.back()}
+            className="flex flex-col items-center text-gray-600 hover:text-indigo-600 transition-colors"
+          >
+            <div className="w-10 h-10 rounded-full bg-white shadow-sm border border-gray-200 flex items-center justify-center">
+              <ArrowLeftIcon className="text-gray-500" size={18} />
+            </div>
+            <span className="text-xs mt-1">Back</span>
+          </button>
+
+          <button
+            onClick={() =>
+              router.push(
+                user?.user?.isClient
+                  ? `/create/${userId}`
+                  : `/av_gigs/${userId}`
+              )
+            }
+            className="flex flex-col items-center text-gray-600 hover:text-indigo-600 transition-colors"
+          >
+            <div className="w-10 h-10 rounded-full bg-white shadow-sm border border-gray-200 flex items-center justify-center">
+              <Music className="text-green-500" size={18} />
+            </div>
+            <span className="text-xs mt-1">Music</span>
+          </button>
+
+          <button
+            onClick={() =>
+              router.push(
+                `/search/allvideos/${friend?.user?._id}/*${user?.user?.firstname}${user?.user?.lastname}`
+              )
+            }
+            className="flex flex-col items-center text-gray-600 hover:text-indigo-600 transition-colors"
+          >
+            <div className="w-10 h-10 rounded-full bg-white shadow-sm border border-gray-200 flex items-center justify-center">
+              <Video className="text-pink-500" size={18} />
+            </div>
+            <span className="text-xs mt-1">Videos</span>
+          </button>
+        </div>
+
+        {/* Profile Sections */}
+        <div className="space-y-6">
+          {/* Contact Info */}
+          <div className="bg-white rounded-xl shadow-sm p-6">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
+              Contact Information
+            </h2>
+            <div className="space-y-3">
+              <div>
+                <p className="text-sm text-gray-500">Email</p>
+                <p className="text-gray-800 font-medium">
+                  {friend?.user?.email || "Not provided"}
+                </p>
+              </div>
+              {friend?.user?.city && (
+                <div>
+                  <p className="text-sm text-gray-500">Location</p>
+                  <p className="text-gray-800 font-medium">
+                    {friend?.user?.city}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
+          {friend?.user?.bio && (
+            <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+              <div className="bg-gradient-to-r from-indigo-50 to-purple-50 px-6 py-4">
+                <h2 className="text-lg font-semibold text-indigo-800 flex items-center gap-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  Professional Bio
+                </h2>
+              </div>
+              <div className="p-6">
+                <div className="prose prose-indigo max-w-none">
+                  <p className="text-gray-700 whitespace-pre-line">
+                    {friend?.user?.bio}
+                  </p>
+                </div>
+                {friend?.user?.talentbio && (
+                  <div className="mt-4 pt-4 border-t border-gray-100">
+                    <h3 className="text-sm font-medium text-gray-500 mb-2">
+                      Specialties
+                    </h3>
+                    <p className="text-gray-600">{friend?.user?.talentbio}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Social Media */}
+          {friend?.user?.handles && (
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h2 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
+                Social Media
+              </h2>
+              <div className="flex justify-center gap-6">
+                {friend?.user?.handles.split(",").map((handle, i) => (
+                  <div key={i}>
+                    {handle.includes("instagram") && (
+                      <button
+                        onClick={() =>
+                          window.open(
+                            handle.startsWith("http")
+                              ? handle
+                              : `https://${handle}`,
+                            "_blank"
+                          )
+                        }
+                        className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-yellow-500 text-white flex items-center justify-center shadow-md hover:shadow-lg transition-shadow"
+                      >
+                        <BsInstagram size={18} />
+                      </button>
+                    )}
+                    {handle.includes("tiktok") && (
+                      <button
+                        onClick={() =>
+                          window.open(
+                            handle.startsWith("http")
+                              ? handle
+                              : `https://${handle}`,
+                            "_blank"
+                          )
+                        }
+                        className="w-10 h-10 rounded-full bg-gray-900 text-white flex items-center justify-center shadow-md hover:shadow-lg transition-shadow"
+                      >
+                        <FaTiktok size={18} />
+                      </button>
+                    )}
+                    {handle.includes("youtube") && (
+                      <button
+                        onClick={() =>
+                          window.open(
+                            handle.startsWith("http")
+                              ? handle
+                              : `https://${handle}`,
+                            "_blank"
+                          )
+                        }
+                        className="w-10 h-10 rounded-full bg-red-600 text-white flex items-center justify-center shadow-md hover:shadow-lg transition-shadow"
+                      >
+                        <FaYoutube size={18} />
+                      </button>
+                    )}
+                    {handle.includes("x") && (
+                      <button
+                        onClick={() =>
+                          window.open(
+                            handle.startsWith("http")
+                              ? handle
+                              : `https://${handle}`,
+                            "_blank"
+                          )
+                        }
+                        className="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center shadow-md hover:shadow-lg transition-shadow"
+                      >
+                        <BsTwitter size={18} />
+                      </button>
+                    )}
+                    {handle.includes("facebook") && (
+                      <button
+                        onClick={() =>
+                          window.open(
+                            handle.startsWith("http")
+                              ? handle
+                              : `https://${handle}`,
+                            "_blank"
+                          )
+                        }
+                        className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-md hover:shadow-lg transition-shadow"
+                      >
+                        <BsFacebook size={18} />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {/* Stats */}
+          <div className="bg-white rounded-xl shadow-sm p-6">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
+              Statistics
+            </h2>
+            <div className="flex justify-around">
+              <div className="text-center">
+                <p className="text-2xl font-bold text-indigo-600">
+                  {friend?.user?.followers?.length || 0}
+                </p>
+                <p className="text-sm text-gray-500">Followers</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-purple-600">
+                  {friend?.user?.followings?.length || 0}
+                </p>
+                <p className="text-sm text-gray-500">Following</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Bio */}
+          {friend?.user?.bio && (
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h2 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
+                About
+              </h2>
+              <p className="text-gray-700">{friend?.user?.bio}</p>
+            </div>
+          )}
+
+          {/* Organization */}
+          {friend?.user?.organization && (
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h2 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
+                Organization
+              </h2>
+              <p className="text-gray-700">{friend?.user?.organization}</p>
+            </div>
+          )}
         </div>
-      </Box>
-      <Box className="h-fit bg-neutral-800 w-[100%] px-2 py-3">
-        <h4 className="text-[16px] font-bold text-gray-400 mt-3 mb-1 ">
-          Bio Info
-        </h4>
-        <div className="flex flex-col">
-          <span className="text-[12px] font-bold text-gray-500">
-            {friend?.user?.bio ? friend?.user?.bio : "-null"}
-          </span>
+
+        {/* Footer */}
+        <div className="mt-10 text-center text-gray-400 text-sm">
+          <p>&copy; {new Date().getFullYear()} Gigup. All rights reserved.</p>
         </div>
-      </Box>
-      <div className="flex justify-center p-2">
-        <span className="text-neutral-500 link"> &copy;Gigup 2025 </span>
       </div>
     </div>
   );

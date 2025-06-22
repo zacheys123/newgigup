@@ -29,6 +29,7 @@ import Link from "next/link";
 import { Button } from "../ui/button";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeToggle } from "./theme/ThemeToggler";
+import { MdDangerous } from "react-icons/md";
 
 interface NavbarProps {
   user: AdminNavbarProps;
@@ -109,6 +110,12 @@ const AdminNavbar = ({ user }: NavbarProps) => {
       icon: Ban,
       label: "Banned Users",
       allowedRoles: ["super"],
+    },
+    {
+      href: "/admin/reports",
+      icon: MdDangerous,
+      label: "Reported Users",
+      allowedRoles: ["super", "support"],
     },
   ];
 
