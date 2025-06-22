@@ -18,13 +18,18 @@ export interface CreateReportRequest {
   additionalInfo?: string;
   userid: string;
 }
-
+// types/report.ts
 export interface PopulatedReport
   extends Omit<IReport, "reportedUser" | "reportedBy" | "resolvedBy"> {
   _id: string;
   reportedUser: IUser;
   reportedBy: IUser;
-  resolvedBy?: IUser;
+  // resolvedBy?: {
+  //   _id: string;
+  //   firstname: string;
+  //   lastname: string;
+  //   email: string;
+  // };
 }
 
 export interface ReportsTableProps {

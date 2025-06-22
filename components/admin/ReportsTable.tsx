@@ -35,10 +35,11 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { UserReportsBadge } from "./UserReportsBadge";
+// import { UserReportsBadge } from "./UserReportsBadge";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
@@ -51,6 +52,11 @@ export default function ReportsTable({
   const [reports, setReports] = useState(initialReports);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [userReportsModal, setUserReportsModal] = useState({
+    open: false,
+    userId: "",
+    reports: [] as typeof initialReports,
+  });
 
   // Track mounted state to avoid hydration issues
   useEffect(() => {
@@ -64,35 +70,62 @@ export default function ReportsTable({
   const handleRefresh = async () => {
     setIsRefreshing(true);
     try {
-      const response = await fetch("/api/admin/reports/getReports", {
+      const response = await fetch("/api/admin/reports/latest", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
-        next: { revalidate: 0 }, // Bypass cache
       });
 
-      if (!response.ok) throw new Error("Failed to refresh reports");
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.message || "Failed to refresh reports");
+      }
 
       const data = await response.json();
-      setReports(data.reports);
+      setReports(data);
       toast.success("Reports refreshed successfully");
     } catch (error) {
       console.error("Error refreshing reports:", error);
-      toast.error("Failed to refresh reports. Please try again.");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to refresh reports"
+      );
     } finally {
       setIsRefreshing(false);
     }
   };
-
+  useEffect(() => {
+    console.log(
+      "Reports data:",
+      reports.map((report) => report)
+    );
+  }, [reports]);
   // Auto-refresh every 5 minutes (optional)
   useEffect(() => {
     const interval = setInterval(() => {
       handleRefresh();
-    }, 5 * 60 * 1000); // 5 minutes
+    }, 5 * 60 * 1000);
 
     return () => clearInterval(interval);
   }, []);
+
+  const viewAllReports = async (userId: string) => {
+    try {
+      const response = await fetch(`/api/admin/reports/${userId}`);
+      if (!response.ok) throw new Error("Failed to fetch user reports");
+
+      const userReports = await response.json();
+      setUserReportsModal({
+        open: true,
+        userId,
+        reports: userReports,
+      });
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to load user reports"
+      );
+    }
+  };
 
   if (!isMounted) {
     return (
@@ -267,9 +300,16 @@ export default function ReportsTable({
                 </div>
 
                 <div className="pt-2">
-                  <UserReportsBadge
-                    userId={report.reportedUser._id as string}
-                  />
+                  <Button
+                    variant="link"
+                    size="sm"
+                    className="text-primary h-auto p-0"
+                    onClick={() =>
+                      viewAllReports(report.reportedUser._id as string)
+                    }
+                  >
+                    View all reports for this user
+                  </Button>
                 </div>
               </CardContent>
 
@@ -289,8 +329,12 @@ export default function ReportsTable({
                       isBanned: report.reportedUser.isBanned || false,
                       banReason: report.reportedUser.banReason || "",
                       banReference: report.reportedUser.banReference || "",
-                      bannedAt: report.reportedUser.bannedAt || null,
-                      banExpiresAt: report.reportedUser.banExpiresAt || null,
+                      bannedAt: report.reportedUser.bannedAt
+                        ? new Date(report.reportedUser.bannedAt)
+                        : undefined,
+                      banExpiresAt: report.reportedUser.banExpiresAt
+                        ? new Date(report.reportedUser.banExpiresAt)
+                        : undefined,
                     })
                   }
                 >
@@ -315,10 +359,7 @@ export default function ReportsTable({
                   <TableHead>Additional Info</TableHead>
                   <TableHead className="w-[120px]">Status</TableHead>
                   <TableHead className="w-[150px]">Date</TableHead>
-                  <TableHead className="w-[120px]">Reports</TableHead>
-                  <TableHead className="w-[100px] text-right">
-                    Actions
-                  </TableHead>
+                  <TableHead className="w-[120px]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -385,38 +426,44 @@ export default function ReportsTable({
                         {formatDate(report.createdAt)}
                       </time>
                     </TableCell>
-                    <TableCell>
-                      <UserReportsBadge
-                        userId={report.reportedUser._id as string}
-                      />
-                    </TableCell>
                     <TableCell className="text-right">
-                      <Button
-                        variant={
-                          report.reportedUser.isBanned
-                            ? "outline"
-                            : "destructive"
-                        }
-                        size="sm"
-                        onClick={() =>
-                          setSelectedUser({
-                            ...report.reportedUser,
-                            _id: report.reportedUser._id as string,
-                            firstname: report.reportedUser.firstname,
-                            lastname: report.reportedUser.lastname || "",
-                            email: report.reportedUser.email,
-                            isBanned: report.reportedUser.isBanned || false,
-                            banReason: report.reportedUser.banReason || "",
-                            banReference:
-                              report.reportedUser.banReference || "",
-                            bannedAt: report.reportedUser.bannedAt || null,
-                            banExpiresAt:
-                              report.reportedUser.banExpiresAt || null,
-                          })
-                        }
-                      >
-                        {report.reportedUser.isBanned ? "Banned" : "Ban"}
-                      </Button>
+                      <div className="flex gap-2 justify-end">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() =>
+                            viewAllReports(report.reportedUser._id as string)
+                          }
+                        >
+                          View All
+                        </Button>
+                        <Button
+                          variant={
+                            report.reportedUser.isBanned
+                              ? "outline"
+                              : "destructive"
+                          }
+                          size="sm"
+                          onClick={() =>
+                            setSelectedUser({
+                              ...report.reportedUser,
+                              _id: report.reportedUser._id as string,
+                              firstname: report.reportedUser.firstname,
+                              lastname: report.reportedUser.lastname || "",
+                              email: report.reportedUser.email,
+                              isBanned: report.reportedUser.isBanned || false,
+                              banReason: report.reportedUser.banReason || "",
+                              banReference:
+                                report.reportedUser.banReference || "",
+                              bannedAt: report.reportedUser.bannedAt || null,
+                              banExpiresAt:
+                                report.reportedUser.banExpiresAt || null,
+                            })
+                          }
+                        >
+                          {report.reportedUser.isBanned ? "Banned" : "Ban"}
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -450,6 +497,73 @@ export default function ReportsTable({
               <BanUserButton user={selectedUser} />
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* All Reports Dialog */}
+      <Dialog
+        open={userReportsModal.open}
+        onOpenChange={(open) =>
+          setUserReportsModal((prev) => ({ ...prev, open }))
+        }
+      >
+        <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl">
+              All Reports for{" "}
+              {userReportsModal.reports[0]?.reportedUser.firstname}
+            </DialogTitle>
+            <DialogDescription>
+              Total reports: {userReportsModal.reports.length}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            {userReportsModal.reports.map((report) => (
+              <Card key={report._id}>
+                <CardHeader className="p-4">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <CardTitle className="text-sm font-medium">
+                        {formatDate(report.createdAt)}
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        Status:{" "}
+                        <Badge
+                          variant={
+                            report.status === "resolved"
+                              ? "success"
+                              : report.status === "pending"
+                              ? "warning"
+                              : "secondary"
+                          }
+                          className="capitalize"
+                        >
+                          {report.status}
+                        </Badge>
+                      </CardDescription>
+                    </div>
+                    <Badge variant="outline">
+                      Reported by: {report.reportedBy.firstname}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-4 pt-0 space-y-2">
+                  <div>
+                    <p className="font-medium text-sm">Reason:</p>
+                    <p className="text-sm">{report.reason}</p>
+                  </div>
+                  {report.additionalInfo && (
+                    <div>
+                      <p className="font-medium text-sm">Details:</p>
+                      <p className="text-sm text-muted-foreground">
+                        {report.additionalInfo}
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </DialogContent>
       </Dialog>
     </div>

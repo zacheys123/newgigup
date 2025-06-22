@@ -19,7 +19,7 @@ export default function ReportsPage() {
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        const res = await fetch("/api/admin/reports/getReports"); // Adjust if your API path is different
+        const res = await fetch("/api/admin/reports/latest"); // Adjust if your API path is different
         if (res.status === 401) {
           router.push("/");
           return;
