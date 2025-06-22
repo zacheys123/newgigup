@@ -86,7 +86,7 @@ export interface UserProps {
     gigId: Types.ObjectId | string;
     confirmPayment: boolean;
   };
-  reportsCount: 0;
+  reportsCount: number;
 }
 export interface Users {
   users: UserProps[]; // Optional}

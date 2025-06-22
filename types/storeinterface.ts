@@ -97,8 +97,11 @@ export const initialState = {
     bookingHistory: [] as BookingItem[],
     completedGigsCount: 0,
     cancelgigCount: 0,
-    musicianConfirmPayment: {},
-    clientConfirmPayment: {},
+    musicianConfirmPayment: {
+      gigId: "",
+      confirmPayment: false,
+    },
+    clientConfirmPayment: { gigId: "", confirmPayment: false },
     reportsCount: 0,
   },
   currentgig: {
