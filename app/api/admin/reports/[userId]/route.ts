@@ -5,10 +5,10 @@ import Report from "@/models/reports";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
-  const userId = request.nextUrl.pathname.split("/");
+  const userId = request.nextUrl.pathname.split("/").pop();
   try {
     await connectDb();
-
+    console.log(userId);
     const reports = await Report.find({ reportedUser: userId })
       .populate("reportedUser", "firstname lastname email")
       .populate("reportedBy", "firstname lastname email")

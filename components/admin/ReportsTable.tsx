@@ -39,7 +39,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-// import { UserReportsBadge } from "./UserReportsBadge";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
@@ -51,16 +50,20 @@ export default function ReportsTable({
   const [expandedReport, setExpandedReport] = useState<string | null>(null);
   const [reports, setReports] = useState(initialReports);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Add loading state
   const [userReportsModal, setUserReportsModal] = useState({
     open: false,
     userId: "",
     reports: [] as typeof initialReports,
   });
 
-  // Track mounted state to avoid hydration issues
   useEffect(() => {
-    setIsMounted(true);
+    // Simulate loading initial data
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 500);
+
+    return () => clearTimeout(timer);
   }, []);
 
   const toggleExpand = (reportId: string) => {
@@ -83,7 +86,7 @@ export default function ReportsTable({
       }
 
       const data = await response.json();
-      setReports(data);
+      setReports(data.reports);
       toast.success("Reports refreshed successfully");
     } catch (error) {
       console.error("Error refreshing reports:", error);
@@ -94,12 +97,11 @@ export default function ReportsTable({
       setIsRefreshing(false);
     }
   };
+
   useEffect(() => {
-    console.log(
-      "Reports data:",
-      reports.map((report) => report)
-    );
+    console.log("Reports data:", reports);
   }, [reports]);
+
   // Auto-refresh every 5 minutes (optional)
   useEffect(() => {
     const interval = setInterval(() => {
@@ -127,10 +129,11 @@ export default function ReportsTable({
     }
   };
 
-  if (!isMounted) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary" />
+        <span className="ml-4">Loading reports...</span>
       </div>
     );
   }
@@ -166,8 +169,16 @@ export default function ReportsTable({
         </div>
       </div>
 
+      {/* Loading state during refresh */}
+      {isRefreshing && (
+        <div className="flex items-center justify-center p-8">
+          <RefreshCw className="h-6 w-6 animate-spin mr-2" />
+          <span className="title">Loading new reports...</span>
+        </div>
+      )}
+
       {/* Empty State */}
-      {reports.length === 0 && (
+      {!isRefreshing && reports.length === 0 && (
         <div className="flex flex-col items-center justify-center p-12 text-center border-2 border-dashed rounded-lg">
           <Flag className="h-12 w-12 text-muted-foreground mb-4" />
           <h3 className="text-xl font-semibold tracking-tight">
@@ -191,7 +202,7 @@ export default function ReportsTable({
       )}
 
       {/* Mobile/Tablet View - Card Layout */}
-      {reports.length > 0 && (
+      {!isRefreshing && reports.length > 0 && (
         <div className="lg:hidden space-y-4">
           {reports.map((report) => (
             <Card
@@ -347,7 +358,7 @@ export default function ReportsTable({
       )}
 
       {/* Desktop View - Table Layout */}
-      {reports.length > 0 && (
+      {!isRefreshing && reports.length > 0 && (
         <div className="hidden lg:block">
           <div className="rounded-lg border overflow-hidden">
             <Table>
