@@ -18,7 +18,7 @@ import { toast } from "sonner";
 import CountUp from "react-countup";
 
 import { ChatBubbleLeftIcon } from "@heroicons/react/24/solid";
-import { useConfirmPayment } from "@/hooks/useConfirmPayment";
+import { getConfirmState, useConfirmPayment } from "@/hooks/useConfirmPayment";
 import ButtonComponent from "@/components/ButtonComponent";
 import { useCancelGig } from "@/hooks/useCancelGig";
 import {
@@ -86,13 +86,38 @@ const GigCard = ({ gig, onOpenChat }: AllGigsComponentProps) => {
     onOpenChat("chat", postedByUser);
   };
 
-  const { isConfirming } = useConfirmPayment();
+  const { isConfirming, isFinalizing, finalizePayment } = useConfirmPayment();
+  const { paymentConfirmations, setConfirmedParty, setCanFinalize } =
+    useStore();
+
+  const gigId = gig?._id;
+  const confirmation = gigId ? paymentConfirmations[gigId] : undefined;
+  const confirmedParty = confirmation?.confirmedParty ?? "none";
+  const canFinalize = confirmation?.canFinalize ?? false;
+
+  console.log(confirmation, confirmedParty, canFinalize);
+  useEffect(() => {
+    const storedState = getConfirmState(gig._id ? gig?._id : "");
+
+    setConfirmedParty(gig._id ? gig?._id : "", storedState.confirmedParty);
+    setCanFinalize(gig._id ? gig?._id : "", storedState.canFinalize);
+  }, []);
 
   // Add these utility functions
   const isMusician = gig?.bookedBy?._id === user?.user?._id;
 
   const needsMusicianConfirmation =
     gig?.isTaken && isMusician && !gig?.musicianConfirmPayment?.confirmPayment;
+
+  const handleFinalizePayment = async () => {
+    if (!gig) return;
+
+    await finalizePayment(
+      gig._id ? gig?._id : "",
+      !isMusician ? "client" : "musician",
+      "Finalized via app"
+    );
+  };
   return (
     <motion.div
       key={gig?._id}
@@ -199,15 +224,60 @@ const GigCard = ({ gig, onOpenChat }: AllGigsComponentProps) => {
         {!loading ? (
           <div className="flex space-x-3">
             {needsMusicianConfirmation ? (
-              <ButtonComponent
-                classname="flex-1 flex items-center justify-center gap-2 bg-emerald-600 hover:bg-gray-600/80 text-gray-300 hover:text-white py-2.5 px-4 rounded-lg transition-all duration-200 border border-gray-600/50"
-                onclick={() => {
-                  setShowPaymentConfirmation(true);
-                  setCurrentGig(gig);
-                }}
-                disabled={isConfirming}
-                title={isConfirming ? "Confirming..." : "Confirm Payment"}
-              />
+              <div className="w-full flex flex-col gap-2">
+                {confirmedParty === "none" && (
+                  <div className="flex justify-center gap-4 my-3">
+                    <ButtonComponent
+                      variant="secondary"
+                      classname="!bg-green-600 hover:!bg-green-700 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
+                      onclick={() => {
+                        setShowPaymentConfirmation(true);
+                        setCurrentGig(gig);
+                      }}
+                      disabled={isConfirming || isFinalizing}
+                      title={
+                        isConfirming
+                          ? "Confirming..."
+                          : isFinalizing
+                          ? "Finalizing..."
+                          : "Confirm Payment"
+                      }
+                    />
+                    {!gig?.musicianConfirmPayment?.temporaryConfirm && (
+                      <ButtonComponent
+                        variant="secondary"
+                        classname="!bg-red-600 hover:!bg-red-700 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
+                        onclick={() => handleCancelClick()}
+                        disabled={isCanceling}
+                        title={isCanceling ? "Canceling..." : "Cancel Gig"}
+                      />
+                    )}
+                  </div>
+                )}
+
+                {/* Waiting for other party */}
+                {confirmedParty === "partial" && (
+                  <div className="text-center">
+                    <p className="text-xs text-yellow-400 font-medium animate-pulse">
+                      Waiting for the other party to confirm...
+                    </p>
+                    <div className="flex justify-center mt-1">
+                      <div className="h-1 w-1/2 bg-yellow-400 rounded-full animate-pulse"></div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Finalize button */}
+                {canFinalize && (
+                  <ButtonComponent
+                    variant="secondary"
+                    classname="!bg-emerald-600 hover:!bg-emerald-700 w-full h-7 text-[11px] font-semibold text-white px-3 rounded transition-all"
+                    onclick={() => handleFinalizePayment()}
+                    disabled={isFinalizing}
+                    title={isFinalizing ? "Finalizing..." : "Finalize Payment"}
+                  />
+                )}
+              </div>
             ) : (
               <>
                 {videoLimitReached && testfilteredvids ? (
@@ -234,21 +304,6 @@ const GigCard = ({ gig, onOpenChat }: AllGigsComponentProps) => {
             )}
 
             {/* Only show cancel button if no videos have been added */}
-            {!gig?.musicianConfirmPayment?.confirmPayment && (
-              <button
-                onClick={handleCancelClick}
-                className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-rose-600/90 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white py-2.5 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-rose-500/20"
-              >
-                {isCanceling ? (
-                  <CircularProgress size={16} className="text-white" />
-                ) : (
-                  <>
-                    <Trash2 className="w-4 h-4" />
-                    <span className="text-sm">Cancel</span>
-                  </>
-                )}
-              </button>
-            )}
           </div>
         ) : (
           <div className="animate-pulse flex space-x-4">

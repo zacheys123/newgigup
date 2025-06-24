@@ -17,7 +17,7 @@ import { CheckCircle2, LockKeyhole, RotateCw } from "lucide-react";
 interface CodeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (code: string) => Promise<{ readyToFinalize?: boolean }>;
+  onConfirm: (code: string) => void;
 }
 
 export const CodeModal = ({ isOpen, onClose, onConfirm }: CodeModalProps) => {
@@ -29,10 +29,7 @@ export const CodeModal = ({ isOpen, onClose, onConfirm }: CodeModalProps) => {
     if (!code.trim()) return;
     setIsSubmitting(true);
     try {
-      const result = await onConfirm(code);
-      if (result?.readyToFinalize) {
-        setReadyToFinalize(true);
-      }
+      await onConfirm(code);
     } finally {
       setIsSubmitting(false);
     }
@@ -73,7 +70,7 @@ export const CodeModal = ({ isOpen, onClose, onConfirm }: CodeModalProps) => {
             <DialogDescription className="text-gray-600 dark:text-gray-300 mt-1">
               {readyToFinalize
                 ? "Ready to complete the payment process?"
-                : "Enter the last 3-digit payment message:And wait for the confirmation from the musician "}
+                : "Please enter the last 3 letters/digits of the payment confirmation meessage. Payment will be marked complete only if both codes match."}
             </DialogDescription>
           </motion.div>
         </DialogHeader>

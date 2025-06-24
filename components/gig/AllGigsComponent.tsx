@@ -76,7 +76,6 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
     setLoadingPostId,
 
     setLastBookedGigId,
-
     setShowConfirmation,
     setShowConfetti,
     setShowPaymentConfirmation,
@@ -85,18 +84,19 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
   const { isConfirming, isFinalizing, finalizePayment } = useConfirmPayment();
   const { paymentConfirmations, setConfirmedParty, setCanFinalize } =
     useStore();
-  const confirmationState = paymentConfirmations[gig._id ? gig?._id : ""] || {
-    confirmedParty: "none",
-    canFinalize: false,
-  };
 
+  const gigId = gig?._id;
+  const confirmation = gigId ? paymentConfirmations[gigId] : undefined;
+  const confirmedParty = confirmation?.confirmedParty ?? "none";
+  const canFinalize = confirmation?.canFinalize ?? false;
+
+  console.log(confirmation, confirmedParty, canFinalize);
   useEffect(() => {
     const storedState = getConfirmState(gig._id ? gig?._id : "");
-    if (storedState.confirmedParty !== "none") {
-      setConfirmedParty(gig._id ? gig?._id : "", storedState.confirmedParty);
-      setCanFinalize(gig._id ? gig?._id : "", storedState.canFinalize);
-    }
-  }, [gig._id]);
+
+    setConfirmedParty(gig._id ? gig?._id : "", storedState.confirmedParty);
+    setCanFinalize(gig._id ? gig?._id : "", storedState.canFinalize);
+  }, []);
   const { subscription } = useSubscription(userId as string);
   const [bookCount, setBookCount] = useState(gig.bookCount.length || 0);
   const [currviewCount, setCurrviewCount] = useState(0);
@@ -511,7 +511,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
             {needsClientConfirmation && (
               <div className="w-full flex flex-col gap-2">
                 {/* Initial state */}
-                {confirmationState.confirmedParty === "none" && (
+                {confirmedParty === "none" && (
                   <div className="flex justify-evenly gap-4">
                     <ButtonComponent
                       variant="secondary"
@@ -532,7 +532,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                     <ButtonComponent
                       variant="secondary"
                       classname="!bg-red-600 hover:!bg-red-700 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
-                      onclick={() => handleCancelClick(gig._id ? gig?._id : "")}
+                      onclick={() => handleCancelClick(gig._id ?? "")}
                       disabled={isCanceling}
                       title={isCanceling ? "Canceling..." : "Cancel Musician"}
                     />
@@ -540,7 +540,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                 )}
 
                 {/* Waiting for other party */}
-                {confirmationState.confirmedParty === "partial" && (
+                {confirmedParty === "partial" && (
                   <div className="text-center">
                     <p className="text-xs text-yellow-400 font-medium animate-pulse">
                       Waiting for the other party to confirm...
@@ -551,8 +551,8 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                   </div>
                 )}
 
-                {/* Ready to finalize */}
-                {confirmationState.canFinalize && (
+                {/* Finalize button */}
+                {canFinalize && (
                   <ButtonComponent
                     variant="secondary"
                     classname="!bg-emerald-600 hover:!bg-emerald-700 w-full h-7 text-[11px] font-semibold text-white px-3 rounded transition-all"

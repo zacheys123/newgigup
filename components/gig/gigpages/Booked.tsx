@@ -73,7 +73,7 @@ const Booked = () => {
     setShowX(false);
   };
 
-  const [clientCode, setClientCode] = useState("");
+  const [musicianCode, setMusicianCode] = useState("");
   const { confirmPayment } = useConfirmPayment();
 
   return (
@@ -94,8 +94,8 @@ const Booked = () => {
               type="text"
               placeholder="Enter code"
               className="w-full border px-3 py-2 rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={clientCode}
-              onChange={(e) => setClientCode(e.target.value)}
+              value={musicianCode}
+              onChange={(e) => setMusicianCode(e.target.value)}
             />
 
             <div className="flex justify-end space-x-3">
@@ -111,7 +111,7 @@ const Booked = () => {
                     currentgig?._id || "",
                     "musician",
                     "Client confirmed via app",
-                    clientCode
+                    musicianCode
                   );
                   setShowPaymentConfirmation(false);
                 }}

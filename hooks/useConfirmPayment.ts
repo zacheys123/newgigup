@@ -43,8 +43,12 @@ const clearConfirmState = (gigId: string) => {
 export const useConfirmPayment = () => {
   const [isConfirming, setIsConfirming] = useState(false);
   const [isFinalizing, setIsFinalizing] = useState(false);
-  const { setConfirmedParty, setCanFinalize, resetConfirmationState } =
-    useStore();
+  const {
+    setConfirmedParty,
+    setCanFinalize,
+    resetConfirmationState,
+    setShowPaymentConfirmation,
+  } = useStore();
 
   const confirmPayment = async (
     gigId: string,
@@ -70,8 +74,11 @@ export const useConfirmPayment = () => {
       if (!res.ok) throw new Error(data.error || "Failed to confirm payment");
 
       const newStatus = data.readyToFinalize ? "both" : "partial";
-
+      setShowPaymentConfirmation(false);
       // Update both store and localStorage
+      const { paymentConfirmations } = useStore.getState();
+      console.log("After confirm:", paymentConfirmations);
+
       setConfirmedParty(gigId, newStatus);
       setCanFinalize(gigId, data.readyToFinalize);
       setConfirmState(gigId, newStatus, data.readyToFinalize);

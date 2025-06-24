@@ -35,8 +35,6 @@ const MyGigs = () => {
     setLoadingPostId,
     showPaymentConfirmation: isOpen,
     setShowPaymentConfirmation,
-    setConfirmedParty,
-    setCanFinalize,
   } = useStore();
   const [loadingSecret, setLoadingSecret] = useState<boolean>(false);
   const [forgotsecret, setForgotSecret] = useState<boolean>(false);
@@ -171,25 +169,12 @@ const MyGigs = () => {
   const handlePaymentConfirm = async (code: string) => {
     if (!currentgig) return;
 
-    try {
-      const result = await confirmPayment(
-        currentgig._id ? currentgig._id : "",
-        isClient ? "client" : "musician",
-        "Confirmed via app",
-        code
-      );
-
-      if (result?.readyToFinalize) {
-        setConfirmedParty("both");
-        setCanFinalize(true);
-      } else {
-        setConfirmedParty("partial");
-      }
-
-      return result;
-    } catch (error) {
-      throw error;
-    }
+    await confirmPayment(
+      currentgig._id ? currentgig._id : "",
+      isClient ? "client" : "musician",
+      "Confirmed via app",
+      code
+    );
   };
   // const handleFinalizePayment = async () => {
   //   if (!currentgig) return;
@@ -216,14 +201,9 @@ const MyGigs = () => {
         isOpen={isOpen}
         onClose={() => {
           setShowPaymentConfirmation(false);
-          setConfirmedParty("none");
-          setCanFinalize(false);
         }}
         onConfirm={async (code: string) => {
-          const result = await handlePaymentConfirm(code);
-          return {
-            readyToFinalize: result?.readyToFinalize || false,
-          };
+          await handlePaymentConfirm(code);
         }}
       />
 
