@@ -104,11 +104,6 @@ const ClientSearchComponent = () => {
               favoriteGigs: [],
               bookingHistory: [],
               completedGigsCount: 0,
-              musicianConfirmPayment: {
-                gigId: "",
-                confirmPayment: false,
-              },
-              clientConfirmPayment: { gigId: "", confirmPayment: false },
               reportsCount: 0,
               cancelgigCount: 0,
             },

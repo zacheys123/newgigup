@@ -4,19 +4,17 @@ import { useState } from "react";
 import { toast } from "sonner";
 import useSocket from "./useSocket";
 import { usePendingGigs } from "@/app/Context/PendinContext";
-import useStore from "@/app/zustand/useStore";
 
 export function useForgetBookings() {
   const [loading, setLoading] = useState<boolean>(false);
-  const { cancelationreason } = useStore();
+
   const route = useRouter();
   const { decrementPendingGigs } = usePendingGigs();
   const { socket } = useSocket();
   const forgetBookings = async (
     id: string,
     myGig: GigProps,
-    userId: string,
-    dep?: string
+    userId: string
   ) => {
     console.log(myGig);
     try {
@@ -28,8 +26,6 @@ export function useForgetBookings() {
         },
         body: JSON.stringify({
           musicianId: id,
-          dep,
-          reason: cancelationreason,
         }),
       });
       console.log(response);

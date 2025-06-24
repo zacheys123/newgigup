@@ -167,11 +167,6 @@ export const postedBy = {
   bookingHistory: [] as BookingItem[],
   completedGigsCount: 0,
   cancelgigCount: 0,
-  musicianConfirmPayment: {
-    gigId: "",
-    confirmPayment: false,
-  },
-  clientConfirmPayment: { gigId: "", confirmPayment: false },
   reportsCount: 0,
 };
 

@@ -17,7 +17,7 @@ import { isCreatorIsCurrentUserAndTaken } from "@/constants";
 import { Ban, EyeIcon, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import { Trash2, X } from "lucide-react";
-import { Input } from "../ui/input";
+
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useScheduleGig } from "@/hooks/useScheduleGig";
 import { canStillBookThisWeekDetailed, formatViewCount } from "@/utils";
@@ -27,8 +27,20 @@ import { getGigConditions } from "@/gigHelper";
 import { useMemo } from "react";
 import { FaBookmark, FaHeart, FaRegBookmark, FaRegHeart } from "react-icons/fa";
 import { toast } from "sonner";
+import { useConfirmPayment } from "@/hooks/useConfirmPayment";
 
-// import { useCurrentUser } from "@/hooks/useCurrentUser";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "../ui/input";
+import { useCancelGig } from "@/hooks/useCancelGig";
+import { Button } from "../ui/button";
+
 interface FetchResponse {
   success: boolean;
   message?: string;
@@ -67,6 +79,8 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
 
     setShowConfirmation,
     setShowConfetti,
+    showPaymentConfirmation,
+    setShowPaymentConfirmation,
   } = useStore();
 
   const { subscription } = useSubscription(userId as string);
@@ -77,7 +91,17 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
   const { bookGig, bookLoading } = useBookGig();
   const myId = user?.user?._id;
   const router = useRouter();
+
+  const isClient = gig?.postedBy?._id === myId;
   // conditionsl styling
+
+  const needsClientConfirmation =
+    gig?.isTaken && isClient && !gig?.clientConfirmPayment?.confirmPayment;
+
+  const paymentConfirmed = gig?.paymentStatus === "paid";
+
+  const { confirmPayment, isConfirming } = useConfirmPayment();
+
   const handleModal = async (gig: GigProps) => {
     try {
       if (gig?.postedBy?._id === myId) {
@@ -286,17 +310,89 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
       toast.error("Failed to update saved gig");
     }
   }, []);
+
+  const [confirmingRole, setConfirmingRole] = useState<"client" | "musician">(
+    "client"
+  );
+  const [clientCode, setClientCode] = useState("");
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
+  const [cancelingGigId, setCancelingGigId] = useState<string | null>(null);
+  const { cancelGig, isCanceling } = useCancelGig();
+  const handleCancelClick = (gigId: string) => {
+    setCancelingGigId(gigId);
+    setShowCancelDialog(true);
+    setCurrentGig(gig); // Assuming you want to track the current gig
+  };
+
+  const handleConfirmCancel = async () => {
+    if (!cancelingGigId || !cancelReason) return;
+
+    try {
+      await cancelGig(
+        cancelingGigId,
+        gig.bookedBy?._id ? gig.bookedBy?._id : "", // musicianId
+        cancelReason,
+        isClient ? "client" : "musician" // Determine role based on who is canceling
+      );
+      setShowCancelDialog(false);
+      setCancelReason("");
+      setCancelingGigId(null);
+    } catch (error) {
+      console.error("Cancellation failed:", error);
+    }
+  };
   return (
     <>
-      {isDescriptionModal && <GigDescription />}
+      {showPaymentConfirmation && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg sm:max-w-[400px] max-w-[370px] w-full">
+            <h3 className="text-lg font-medium mb-4">Confirm Payment</h3>
+            <p className="mb-2 text-sm text-gray-700">
+              Please enter the last 3 letters/digits of the payment confirmation
+              message. Payment will be marked complete only if both codes match.
+            </p>
 
+            <Input
+              type="text"
+              placeholder="Enter code"
+              className="w-full border px-3 py-2 rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={clientCode}
+              onChange={(e) => setClientCode(e.target.value)}
+            />
+
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => setShowPaymentConfirmation(false)}
+                className="px-4 py-2 border rounded-md"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  await confirmPayment(
+                    currentgig?._id || "",
+                    confirmingRole,
+                    "Client confirmed via app",
+                    clientCode
+                  );
+                  setShowPaymentConfirmation(false);
+                }}
+                className="px-4 py-2 bg-green-600 text-white rounded-md"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {isDescriptionModal && <GigDescription />}
       {isDeleteModal && (
         <DeleteModal
           setIsDeleteModal={setIsDeleteModal}
           currentGig={currentgig}
         />
       )}
-
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -433,25 +529,44 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
           </div>
 
           <div className="flex space-x-2">
+            {needsClientConfirmation && (
+              <div className="w-full flex justify-evenly gap-4">
+                <ButtonComponent
+                  variant="secondary"
+                  classname="!bg-green-600 hover:!bg-green-700 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
+                  onclick={() => {
+                    setConfirmingRole("client");
+                    setShowPaymentConfirmation(true);
+                    setCurrentGig(gig);
+                  }}
+                  disabled={isConfirming}
+                  title={isConfirming ? "Confirming..." : "Confirm Payment"}
+                />
+                <ButtonComponent
+                  variant="secondary"
+                  classname="!bg-red-600 hover:!bg-red-700 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
+                  onclick={() => handleCancelClick(gig._id ? gig?._id : "")}
+                  disabled={isCanceling}
+                  title={isCanceling ? "Canceling..." : "Cancel Musician"}
+                />
+              </div>
+            )}
             {/* Review Button (Restored) */}
-            {isCreatorIsCurrentUserAndTaken(gig, myId as string) && (
+            {gig.postedBy?.myreviews?.some(
+              (review) => review.gigId === gig._id
+            ) ? (
+              <button className="text-xs px-3 py-1.5 rounded-md bg-gray-300 text-gray-600 cursor-default">
+                Reviewed
+              </button>
+            ) : paymentConfirmed &&
+              isCreatorIsCurrentUserAndTaken(gig, myId as string) ? (
               <button
                 onClick={() => handleReviewModal(gig)}
-                className={`text-xs px-3 py-1.5 rounded-md transition-colors  ${
-                  gig.postedBy?.myreviews?.some(
-                    (review) => review.gigId === gig._id
-                  )
-                    ? "bg-gray-300 text-gray-600 cursor-default" // Reviewed state
-                    : "bg-amber-700 hover:bg-amber-600 text-white" // Review state
-                }`}
+                className="text-xs px-3 py-1.5 rounded-md bg-amber-700 hover:bg-amber-600 text-white"
               >
-                {gig.postedBy?.myreviews?.some(
-                  (review) => review.gigId === gig._id
-                )
-                  ? "Reviewed"
-                  : "Leave Review"}
+                Leave Review
               </button>
-            )}
+            ) : null}
             {isCurrentWhoCreatedGig && (
               <div className="w-full h-full relative">
                 <span className="w6 h-6">
@@ -678,6 +793,46 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
         </div>
         {/* Modals */}
       </motion.div>
+      {/* Cancellation Dialog */}
+      <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Cancel Booking</DialogTitle>
+            <DialogDescription>
+              Please provide a reason for cancelling this booking.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="reason" className="text-right">
+                Reason
+              </label>
+              <Input
+                id="reason"
+                value={cancelReason}
+                onChange={(e) => setCancelReason(e.target.value)}
+                placeholder="E.g. scheduling conflict, etc."
+                className="col-span-3"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowCancelDialog(false)}
+            >
+              Back
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirmCancel}
+              disabled={!cancelReason || isCanceling}
+            >
+              {isCanceling ? "Cancelling..." : "Confirm Cancellation"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   ); // Example: Displaying the title
 };

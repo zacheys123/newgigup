@@ -97,11 +97,7 @@ export const initialState = {
     bookingHistory: [] as BookingItem[],
     completedGigsCount: 0,
     cancelgigCount: 0,
-    musicianConfirmPayment: {
-      gigId: "",
-      confirmPayment: false,
-    },
-    clientConfirmPayment: { gigId: "", confirmPayment: false },
+
     reportsCount: 0,
   },
   currentgig: {
@@ -144,6 +140,11 @@ export const initialState = {
     bookingHistory: [] as BookingItem[],
     paymentStatus: "",
     completedAt: new Date(),
+    musicianConfirmPayment: {
+      gigId: "",
+      confirmPayment: false,
+    },
+    clientConfirmPayment: { gigId: "", confirmPayment: false },
   },
 
   searchQuery: "",
@@ -222,6 +223,8 @@ export interface StoreState {
   showConfetti: boolean;
   cancelGig: boolean;
   cancelationreason: string;
+  showPaymentConfirmation: boolean;
+  setShowPaymentConfirmation: (data: boolean) => void;
   setcancelationreason: (reason: string) => void;
   setShowCancelGig: (data: boolean) => void;
   setShowConfetti: (data: boolean) => void;

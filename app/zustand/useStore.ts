@@ -9,6 +9,9 @@ import { create } from "zustand"; // Import SetState
 const useStore = create<StoreState>((set) => ({
   ...initialState,
 
+  showPaymentConfirmation: false,
+  setShowPaymentConfirmation: (data: boolean) =>
+    set(() => ({ showPaymentConfirmation: data })),
   setcancelationreason: (reason) => set({ cancelationreason: reason }),
   setShowCancelGig: (data: boolean) => set(() => ({ cancelGig: data })),
   setShowConfetti: (data: boolean) => set(() => ({ showConfetti: data })),

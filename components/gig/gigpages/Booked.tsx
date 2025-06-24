@@ -13,6 +13,7 @@ import GigCard from "./GigCard";
 import { Search } from "react-feather";
 import { UserProps } from "@/types/userinterfaces";
 import ChatModal from "./ChatModal";
+import { useConfirmPayment } from "@/hooks/useConfirmPayment";
 
 const Booked = () => {
   const { loading: gigsLoading, gigs } = useAllGigs();
@@ -24,7 +25,14 @@ const Booked = () => {
   const [typeOfGig, setTypeOfGig] = useState<string>("");
   const debouncedSearch = useDebounce(typeOfGig, 300);
 
-  const { showVideo, setShowVideo, currentgig, currentUser: user } = useStore();
+  const {
+    showVideo,
+    setShowVideo,
+    currentgig,
+    currentUser: user,
+    showPaymentConfirmation,
+    setShowPaymentConfirmation,
+  } = useStore();
 
   const filterGigs = (gigs: GigProps[], searchquery?: string) => {
     let sortedData = gigs;
@@ -64,9 +72,58 @@ const Booked = () => {
   const handleOpenX = () => {
     setShowX(false);
   };
+
+  const [clientCode, setClientCode] = useState("");
+  const { confirmPayment } = useConfirmPayment();
+
   return (
     <div className="flex flex-col h-[calc(100vh-100px)] w-full bg-gradient-to-br from-gray-900 to-gray-800">
       {/* Main Content Area */}
+
+      {showPaymentConfirmation && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg sm:max-w-[400px] max-w-[350px] w-full">
+            <h3 className="text-lg font-medium mb-4">Confirm Payment</h3>
+            <p className="mb-2 text-sm text-gray-700">
+              Please enter the last 3 letters/digits of the payment confirmation
+              meessage. Payment will be marked complete only if both codes
+              match.{" "}
+            </p>
+
+            <input
+              type="text"
+              placeholder="Enter code"
+              className="w-full border px-3 py-2 rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={clientCode}
+              onChange={(e) => setClientCode(e.target.value)}
+            />
+
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => setShowPaymentConfirmation(false)}
+                className="px-4 py-2 border rounded-md"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  await confirmPayment(
+                    currentgig?._id || "",
+                    "musician",
+                    "Client confirmed via app",
+                    clientCode
+                  );
+                  setShowPaymentConfirmation(false);
+                }}
+                className="px-4 py-2 bg-green-600 text-white rounded-md"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex-1 flex flex-col min-h-0">
         <motion.div
           className="relative group mb-8"

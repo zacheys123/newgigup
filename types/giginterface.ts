@@ -47,6 +47,14 @@ export interface GigProps {
   bookingHistory: BookingItem[];
   paymentStatus: string;
   completedAt: Date;
+  musicianConfirmPayment: {
+    gigId: Types.ObjectId | string;
+    confirmPayment: boolean;
+  };
+  clientConfirmPayment: {
+    gigId: Types.ObjectId | string;
+    confirmPayment: boolean;
+  };
 }
 
 export interface Gigs {

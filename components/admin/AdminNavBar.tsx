@@ -292,7 +292,7 @@ const AdminNavbar = ({ user }: NavbarProps) => {
                     Settings
                   </span>
                 </Link>
-              </DropdownMenuItem>
+              </DropdownMenuItem>{" "}
               <DropdownMenuSeparator
                 className={
                   resolvedTheme === "dark" ? "bg-gray-700" : "bg-gray-200"

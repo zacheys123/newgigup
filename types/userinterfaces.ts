@@ -1,4 +1,3 @@
-import { Types } from "mongoose";
 import { GigProps } from "./giginterface";
 import { BookingItem } from "./history";
 export interface handleProfileprops {
@@ -78,14 +77,7 @@ export interface UserProps {
   bookingHistory: BookingItem[];
   completedGigsCount: number;
   cancelgigCount: number;
-  musicianConfirmPayment: {
-    gigId: Types.ObjectId | string;
-    confirmPayment: boolean;
-  };
-  clientConfirmPayment: {
-    gigId: Types.ObjectId | string;
-    confirmPayment: boolean;
-  };
+
   reportsCount: number;
 }
 export interface Users {

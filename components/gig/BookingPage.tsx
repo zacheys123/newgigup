@@ -26,12 +26,7 @@ const BookingPage = ({ currentGig }: BookingProps) => {
   const { user } = useCurrentUser();
   const router = useRouter();
   const forget = () =>
-    forgetBookings(
-      user?.user?._id as string,
-      currentgig,
-      userId as string,
-      "musician"
-    );
+    forgetBookings(user?.user?._id as string, currentgig, userId as string);
 
   useEffect(() => {
     if (currentgig?.isTaken === true) {

@@ -1,10 +1,8 @@
 import useStore from "@/app/zustand/useStore";
 import { getFormattedPrice } from "@/gigHelper";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { useForgetBookings } from "@/hooks/useForgetBooking";
 import { useVideos } from "@/hooks/useVideos";
 import { GigProps } from "@/types/giginterface";
-import { useAuth } from "@clerk/nextjs";
 import { CircularProgress } from "@mui/material";
 import { motion } from "framer-motion";
 import { Lock, Trash2, Video, X } from "lucide-react";
@@ -20,15 +18,28 @@ import { toast } from "sonner";
 import CountUp from "react-countup";
 
 import { ChatBubbleLeftIcon } from "@heroicons/react/24/solid";
+import { useConfirmPayment } from "@/hooks/useConfirmPayment";
+import ButtonComponent from "@/components/ButtonComponent";
+import { useCancelGig } from "@/hooks/useCancelGig";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 interface AllGigsComponentProps {
   gig: GigProps;
   onOpenChat: (type: "chat", user: UserProps) => void;
 }
 const GigCard = ({ gig, onOpenChat }: AllGigsComponentProps) => {
-  const { userId } = useAuth();
-  const { setShowVideo, setCurrentGig } = useStore();
-  const [loadingGig, setLoadingGig] = useState<string>("");
+  const { setShowVideo, setCurrentGig, setShowPaymentConfirmation } =
+    useStore();
+
   const { user } = useCurrentUser();
   const validGigid = typeof gig?._id === "string" ? gig?._id : ""; // Default to empty string if undefined
   const validUserId =
@@ -38,14 +49,33 @@ const GigCard = ({ gig, onOpenChat }: AllGigsComponentProps) => {
     validGigid,
     validUserId
   );
-
   const testfilteredvids =
     friendvideos?.videos?.filter((video) => video.gigId === gig._id) || [];
-  const { forgetBookings } = useForgetBookings();
-  const forget = (curr: GigProps) => {
-    setLoadingGig(curr?._id as string);
-    forgetBookings(user?.user?._id as string, curr, userId as string, "taken");
+
+  // cancel gig
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
+  const { cancelGig, isCanceling } = useCancelGig();
+
+  const handleCancelClick = () => {
+    setShowCancelDialog(true);
   };
+
+  const handleConfirmCancel = async () => {
+    try {
+      await cancelGig(
+        gig._id ? gig?._id : "",
+        gig.bookedBy?._id ? gig.bookedBy?._id : "",
+        cancelReason,
+        "musician" // Since this is the musician's action
+      );
+      setShowCancelDialog(false);
+      setCancelReason("");
+    } catch (error) {
+      console.error("Cancellation failed:", error);
+    }
+  };
+  //
   const videoLimitReached =
     testfilteredvids?.length && testfilteredvids?.length >= 4;
   const [showVideoModal, setShowVideoModal] = useState(false);
@@ -55,6 +85,14 @@ const GigCard = ({ gig, onOpenChat }: AllGigsComponentProps) => {
   const handleOpenChat = () => {
     onOpenChat("chat", postedByUser);
   };
+
+  const { isConfirming } = useConfirmPayment();
+
+  // Add these utility functions
+  const isMusician = gig?.bookedBy?._id === user?.user?._id;
+
+  const needsMusicianConfirmation =
+    gig?.isTaken && isMusician && !gig?.musicianConfirmPayment?.confirmPayment;
   return (
     <motion.div
       key={gig?._id}
@@ -74,6 +112,21 @@ const GigCard = ({ gig, onOpenChat }: AllGigsComponentProps) => {
               <MapPin className="w-3.5 h-3.5 text-indigo-300 mr-1" />
               <p className="text-sm text-gray-300">{gig.location}</p>
             </div>
+          </div>
+
+          <div className="flex items-center text-xs mt-1">
+            <span className="mr-2">Payment Status:</span>
+            <span
+              className={`px-2 py-0.5 rounded-full text-xs ${
+                gig.paymentStatus === "paid"
+                  ? "bg-green-100 text-green-800"
+                  : gig.paymentStatus === "refunded"
+                  ? "bg-red-100 text-red-800"
+                  : "bg-yellow-100 text-yellow-800"
+              }`}
+            >
+              {gig.paymentStatus?.toUpperCase()}
+            </span>
           </div>
           <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-200 border border-indigo-400/30">
             Active Booking
@@ -145,34 +198,48 @@ const GigCard = ({ gig, onOpenChat }: AllGigsComponentProps) => {
         {/* Action Buttons */}
         {!loading ? (
           <div className="flex space-x-3">
-            {videoLimitReached && testfilteredvids ? (
-              <button
-                className="flex-1 flex items-center justify-center gap-2 bg-gray-700/70 hover:bg-gray-600/80 text-gray-300 hover:text-white py-2.5 px-4 rounded-lg transition-all duration-200 border border-gray-600/50"
-                onClick={() => setShowVideoModal(true)}
-              >
-                <Lock className="w-4 h-4" />
-                <span className="text-sm">Manage Videos</span>
-              </button>
-            ) : (
-              <button
-                onClick={() => {
+            {needsMusicianConfirmation ? (
+              <ButtonComponent
+                classname="flex-1 flex items-center justify-center gap-2 bg-emerald-600 hover:bg-gray-600/80 text-gray-300 hover:text-white py-2.5 px-4 rounded-lg transition-all duration-200 border border-gray-600/50"
+                onclick={() => {
+                  setShowPaymentConfirmation(true);
                   setCurrentGig(gig);
-                  setShowVideo(true);
                 }}
-                className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-400 hover:to-indigo-500 text-white py-2.5 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-indigo-500/30"
-              >
-                <Video className="w-4 h-4" />
-                <span className="text-sm">Add Content</span>
-              </button>
+                disabled={isConfirming}
+                title={isConfirming ? "Confirming..." : "Confirm Payment"}
+              />
+            ) : (
+              <>
+                {videoLimitReached && testfilteredvids ? (
+                  <button
+                    className="flex-1 flex items-center justify-center gap-2 bg-gray-700/70 hover:bg-gray-600/80 text-gray-300 hover:text-white py-2.5 px-4 rounded-lg transition-all duration-200 border border-gray-600/50"
+                    onClick={() => setShowVideoModal(true)}
+                  >
+                    <Lock className="w-4 h-4" />
+                    <span className="text-sm">Manage Videos</span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setCurrentGig(gig);
+                      setShowVideo(true);
+                    }}
+                    className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-400 hover:to-indigo-500 text-white py-2.5 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-indigo-500/30"
+                  >
+                    <Video className="w-4 h-4" />
+                    <span className="text-sm">Add Content</span>
+                  </button>
+                )}
+              </>
             )}
 
             {/* Only show cancel button if no videos have been added */}
-            {testfilteredvids.length === 0 && (
+            {!gig?.musicianConfirmPayment?.confirmPayment && (
               <button
-                onClick={() => forget(gig)}
+                onClick={handleCancelClick}
                 className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-rose-600/90 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white py-2.5 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-rose-500/20"
               >
-                {loadingGig === gig._id ? (
+                {isCanceling ? (
                   <CircularProgress size={16} className="text-white" />
                 ) : (
                   <>
@@ -230,6 +297,55 @@ const GigCard = ({ gig, onOpenChat }: AllGigsComponentProps) => {
         validUserId={validUserId}
         setRefetch={setRefetch}
       />
+      <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+        <DialogContent className="sm:max-w-[500px] max-w-[360px]  bg-white dark:bg-gray-900 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 transition-all duration-300">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-semibold text-gray-800 dark:text-white">
+              ❌ Cancel Booking
+            </DialogTitle>
+            <DialogDescription className="text-sm text-gray-500 dark:text-gray-300">
+              Please provide a reason for cancelling this booking. This helps us
+              improve future experiences.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid gap-6 py-4">
+            <div className="flex flex-col gap-2">
+              <label
+                htmlFor="reason"
+                className="text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Reason for cancellation
+              </label>
+              <Input
+                id="reason"
+                value={cancelReason}
+                onChange={(e) => setCancelReason(e.target.value)}
+                placeholder="E.g. scheduling conflict, artist unavailable..."
+                className="w-full px-4 py-2 border rounded-md bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-cyan-500 focus:outline-none transition"
+              />
+            </div>
+          </div>
+
+          <DialogFooter className="flex justify-end space-x-4 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setShowCancelDialog(false)}
+              className="border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 transition"
+            >
+              Back
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirmCancel}
+              disabled={!cancelReason || isCanceling}
+              className="bg-red-600 hover:bg-red-700 text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isCanceling ? "Cancelling..." : "Confirm Cancellation"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 };

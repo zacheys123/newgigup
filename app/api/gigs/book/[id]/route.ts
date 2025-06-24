@@ -28,7 +28,7 @@ export async function PUT(req: NextRequest) {
     }
 
     // Verify requestor is gig owner
-    if (gig.postedBy._id.toString() !== userId) {
+    if (gig.postedBy.clerkId.toString() !== userId) {
       return NextResponse.json({ message: "Not authorized" }, { status: 403 });
     }
 

@@ -102,14 +102,6 @@ interface IUser extends Document {
   ];
   completedGigsCount: number;
   reportsCount: number;
-  clientConfirmPayment: {
-    gigId: mongoose.Types.ObjectId[] | string;
-    confirmPayment: boolean;
-  };
-  musicianConfirmPayment: {
-    gigId: mongoose.Types.ObjectId[] | string;
-    confirmPayment: boolean;
-  };
 }
 
 // Define Mongoose Schema
@@ -249,14 +241,7 @@ const userSchema = new Schema<IUser>(
       type: Number,
       default: 0,
     },
-    musicianConfirmPayment: {
-      gigId: { type: Schema.Types.ObjectId, ref: "Gig", default: [] },
-      confirmPayment: { type: Boolean },
-    },
-    clientConfirmPayment: {
-      gigId: { type: Schema.Types.ObjectId, ref: "Gig", default: [] },
-      confirmPayment: { type: Boolean },
-    },
+
     reportsCount: {
       type: Number,
       default: 0,
