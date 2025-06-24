@@ -327,7 +327,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
   const [cancelReason, setCancelReason] = useState("");
   const [cancelingGigId, setCancelingGigId] = useState<string | null>(null);
   const { cancelGig, isCanceling } = useCancelGig();
-
+  console.log(gig);
   const handleCancelClick = (gigId: string) => {
     setCancelingGigId(gigId);
     setShowCancelDialog(true);
@@ -540,27 +540,32 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                 )}
 
                 {/* Waiting for other party */}
-                {confirmedParty === "partial" && (
-                  <div className="text-center">
-                    <p className="text-xs text-yellow-400 font-medium animate-pulse">
-                      Waiting for the other party to confirm...
-                    </p>
-                    <div className="flex justify-center mt-1">
-                      <div className="h-1 w-1/2 bg-yellow-400 rounded-full animate-pulse"></div>
+                {confirmedParty === "partial" &&
+                  !gig?.musicianConfirmPayment?.temporaryConfirm &&
+                  !gig?.clientConfirmPayment?.temporaryConfirm && (
+                    <div className="text-center">
+                      <p className="text-xs text-yellow-400 font-medium animate-pulse">
+                        Waiting for the other party to confirm...
+                      </p>
+                      <div className="flex justify-center mt-1">
+                        <div className="h-1 w-1/2 bg-yellow-400 rounded-full animate-pulse"></div>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
                 {/* Finalize button */}
-                {canFinalize && (
-                  <ButtonComponent
-                    variant="secondary"
-                    classname="!bg-emerald-600 hover:!bg-emerald-700 w-full h-7 text-[11px] font-semibold text-white px-3 rounded transition-all"
-                    onclick={() => handleFinalizePayment()}
-                    disabled={isFinalizing}
-                    title={isFinalizing ? "Finalizing..." : "Finalize Payment"}
-                  />
-                )}
+                {gig?.musicianConfirmPayment?.temporaryConfirm &&
+                  gig?.clientConfirmPayment?.temporaryConfirm && (
+                    <ButtonComponent
+                      variant="secondary"
+                      classname="!bg-emerald-600 hover:!bg-emerald-700 w-full h-7 text-[11px] font-semibold text-white px-3 rounded transition-all"
+                      onclick={() => handleFinalizePayment()}
+                      disabled={isFinalizing}
+                      title={
+                        isFinalizing ? "Finalizing..." : "Finalize Payment"
+                      }
+                    />
+                  )}
               </div>
             )}
             {/* Review Button (Restored) */}
