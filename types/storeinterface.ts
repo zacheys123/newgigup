@@ -143,8 +143,15 @@ export const initialState = {
     musicianConfirmPayment: {
       gigId: "",
       confirmPayment: false,
+      confirmedAt: new Date(),
+      code: "",
     },
-    clientConfirmPayment: { gigId: "", confirmPayment: false },
+    clientConfirmPayment: {
+      gigId: "",
+      confirmPayment: false,
+      confirmedAt: new Date(),
+      code: "",
+    },
   },
 
   searchQuery: "",

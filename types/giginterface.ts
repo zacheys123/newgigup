@@ -50,10 +50,14 @@ export interface GigProps {
   musicianConfirmPayment: {
     gigId: Types.ObjectId | string;
     confirmPayment: boolean;
+    confirmedAt: Date;
+    code: string;
   };
   clientConfirmPayment: {
     gigId: Types.ObjectId | string;
     confirmPayment: boolean;
+    confirmedAt: Date;
+    code: string;
   };
 }
 

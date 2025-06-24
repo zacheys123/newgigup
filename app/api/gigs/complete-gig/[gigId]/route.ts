@@ -24,12 +24,22 @@ export async function POST(req: NextRequest) {
   const { userId } = getAuth(req);
   const { role, notes, code } = await req.json();
 
+  console.log("role", role);
+  console.log("code", code);
+  console.log("Gigid", gigId);
+  console.log("notes", notes);
+
   if (!userId) {
     return NextResponse.json(
       { error: "UserId required data" },
       { status: 400 }
     );
   }
+
+  if (!gigId || Array.isArray(gigId)) {
+    return NextResponse.json({ error: "Invalid gig ID." }, { status: 400 });
+  }
+
   if (!gigId) {
     return NextResponse.json(
       { error: "GigId is  required data" },
@@ -42,7 +52,7 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   }
-  if (!code) {
+  if (!code && gigId && role) {
     return NextResponse.json(
       { error: "CPayment Code is required data" },
       { status: 400 }
@@ -74,36 +84,37 @@ export async function POST(req: NextRequest) {
     }
 
     // Capture code from the caller (musician or client) but do not write to DB yet
-    let musicianCode = gig.musicianConfirmPayment?.code;
-    let clientCode = gig.clientConfirmPayment?.code;
+    // Capture incoming code from the current caller
+    const incomingCode = code;
 
+    // Determine if this is musician or client and update the relevant field
     if (role === "musician") {
-      musicianCode = code;
+      gig.musicianConfirmPayment = {
+        gigId: gig._id,
+        confirmPayment: true,
+        confirmedAt: new Date(),
+        code: incomingCode,
+      };
     } else {
-      clientCode = code;
+      gig.clientConfirmPayment = {
+        gigId: gig._id,
+        confirmPayment: true,
+        confirmedAt: new Date(),
+        code: incomingCode,
+      };
     }
 
+    // Check if BOTH have confirmed AND codes match
+    const bothConfirmed =
+      gig.musicianConfirmPayment?.confirmPayment &&
+      gig.clientConfirmPayment?.confirmPayment;
+
     const codesMatch =
-      musicianCode && clientCode && musicianCode === clientCode;
+      gig.musicianConfirmPayment?.code &&
+      gig.clientConfirmPayment?.code &&
+      gig.musicianConfirmPayment.code === gig.clientConfirmPayment.code;
 
-    if (!codesMatch) {
-      // Save only the *calling* user's intent to confirm with code — no status update yet
-      if (role === "musician") {
-        gig.musicianConfirmPayment = {
-          gigId: gig._id,
-          confirmPayment: true,
-          confirmedAt: new Date(),
-          code,
-        };
-      } else {
-        gig.clientConfirmPayment = {
-          gigId: gig._id,
-          confirmPayment: true,
-          confirmedAt: new Date(),
-          code,
-        };
-      }
-
+    if (!bothConfirmed || !codesMatch) {
       await gig.save();
 
       return NextResponse.json({
@@ -111,10 +122,21 @@ export async function POST(req: NextRequest) {
         paymentStatus: "pending",
         message:
           role === "musician"
-            ? "Code received. Awaiting client to confirm with same code."
-            : "Code received. Awaiting musician to confirm with same code.",
+            ? "Code received. Awaiting client to confirm with the same code."
+            : "Code received. Awaiting musician to confirm with the same code.",
       });
     }
+
+    await gig.save();
+
+    return NextResponse.json({
+      success: true,
+      paymentStatus: "pending",
+      message:
+        role === "musician"
+          ? "Code received. Awaiting client to confirm with same code."
+          : "Code received. Awaiting musician to confirm with same code.",
+    });
 
     // If codes match, proceed to finalize everything
     const session = await Gig.startSession();

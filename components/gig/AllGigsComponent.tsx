@@ -40,6 +40,7 @@ import {
 import { Input } from "../ui/input";
 import { useCancelGig } from "@/hooks/useCancelGig";
 import { Button } from "../ui/button";
+import CodeModal from "./gigpages/CodeModal";
 
 interface FetchResponse {
   success: boolean;
@@ -79,8 +80,6 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
 
     setShowConfirmation,
     setShowConfetti,
-    showPaymentConfirmation,
-    setShowPaymentConfirmation,
   } = useStore();
 
   const { subscription } = useSubscription(userId as string);
@@ -311,14 +310,12 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
     }
   }, []);
 
-  const [confirmingRole, setConfirmingRole] = useState<"client" | "musician">(
-    "client"
-  );
-  const [clientCode, setClientCode] = useState("");
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
   const [cancelingGigId, setCancelingGigId] = useState<string | null>(null);
   const { cancelGig, isCanceling } = useCancelGig();
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [theGig, setTheGig] = useState<GigProps>();
   const handleCancelClick = (gigId: string) => {
     setCancelingGigId(gigId);
     setShowCancelDialog(true);
@@ -342,50 +339,25 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
       console.error("Cancellation failed:", error);
     }
   };
+
+  const handlePaymentConfirm = async (code: string) => {
+    if (!theGig) return;
+    await confirmPayment(
+      theGig._id ? theGig?._id : "",
+      isClient ? "client" : "musician",
+      "Confirmed via app",
+      code
+    );
+  };
+
   return (
     <>
-      {showPaymentConfirmation && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg sm:max-w-[400px] max-w-[370px] w-full">
-            <h3 className="text-lg font-medium mb-4">Confirm Payment</h3>
-            <p className="mb-2 text-sm text-gray-700">
-              Please enter the last 3 letters/digits of the payment confirmation
-              message. Payment will be marked complete only if both codes match.
-            </p>
+      <CodeModal
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}
+        onConfirm={handlePaymentConfirm}
+      />
 
-            <Input
-              type="text"
-              placeholder="Enter code"
-              className="w-full border px-3 py-2 rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={clientCode}
-              onChange={(e) => setClientCode(e.target.value)}
-            />
-
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={() => setShowPaymentConfirmation(false)}
-                className="px-4 py-2 border rounded-md"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={async () => {
-                  await confirmPayment(
-                    currentgig?._id || "",
-                    confirmingRole,
-                    "Client confirmed via app",
-                    clientCode
-                  );
-                  setShowPaymentConfirmation(false);
-                }}
-                className="px-4 py-2 bg-green-600 text-white rounded-md"
-              >
-                Confirm
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
       {isDescriptionModal && <GigDescription />}
       {isDeleteModal && (
         <DeleteModal
@@ -535,9 +507,8 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                   variant="secondary"
                   classname="!bg-green-600 hover:!bg-green-700 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
                   onclick={() => {
-                    setConfirmingRole("client");
-                    setShowPaymentConfirmation(true);
-                    setCurrentGig(gig);
+                    setShowPaymentModal(true);
+                    setTheGig(gig);
                   }}
                   disabled={isConfirming}
                   title={isConfirming ? "Confirming..." : "Confirm Payment"}
@@ -742,7 +713,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                 />
               )}
             {/* Context Menu */}
-            {subscription.user?.tier === "free" ||
+            {subscription?.user?.tier === "free" ||
               (gig?.isTaken === false && gig?.postedBy?._id !== myId && (
                 <>
                   <div className="w-full absolute inset-0 bg-gradient-to-t  to-transparent -z-50" />
@@ -795,31 +766,40 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
       </motion.div>
       {/* Cancellation Dialog */}
       <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[500px] max-w-[360px]  bg-white dark:bg-gray-900 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 transition-all duration-300">
           <DialogHeader>
-            <DialogTitle>Cancel Booking</DialogTitle>
-            <DialogDescription>
-              Please provide a reason for cancelling this booking.
+            <DialogTitle className="text-2xl font-semibold text-gray-800 dark:text-white">
+              ❌ Cancel Booking
+            </DialogTitle>
+            <DialogDescription className="text-sm text-gray-500 dark:text-gray-300">
+              Please provide a reason for cancelling this booking. This helps us
+              improve future experiences.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <label htmlFor="reason" className="text-right">
-                Reason
+
+          <div className="grid gap-6 py-4">
+            <div className="flex flex-col gap-2">
+              <label
+                htmlFor="reason"
+                className="text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Reason for cancellation
               </label>
               <Input
                 id="reason"
                 value={cancelReason}
                 onChange={(e) => setCancelReason(e.target.value)}
-                placeholder="E.g. scheduling conflict, etc."
-                className="col-span-3"
+                placeholder="E.g. scheduling conflict, artist unavailable..."
+                className="w-full px-4 py-2 border rounded-md bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-cyan-500 focus:outline-none transition"
               />
             </div>
           </div>
-          <DialogFooter>
+
+          <DialogFooter className="flex justify-end space-x-4 mt-4">
             <Button
               variant="outline"
               onClick={() => setShowCancelDialog(false)}
+              className="border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 transition"
             >
               Back
             </Button>
@@ -827,6 +807,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
               variant="destructive"
               onClick={handleConfirmCancel}
               disabled={!cancelReason || isCanceling}
+              className="bg-red-600 hover:bg-red-700 text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isCanceling ? "Cancelling..." : "Confirm Cancellation"}
             </Button>

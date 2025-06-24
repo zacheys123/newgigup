@@ -12,6 +12,10 @@ export const useConfirmPayment = () => {
     notes?: string,
     code?: string
   ) => {
+    console.log(code);
+    if (!code) {
+      alert("no Code");
+    }
     try {
       const response = await fetch(`/api/gigs/complete-gig/${gigId}`, {
         method: "POST",

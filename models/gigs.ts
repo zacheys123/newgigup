@@ -107,14 +107,18 @@ const gigSchema = new mongoose.Schema(
       default: "pending",
     },
     cancellationReason: String,
-    completedAt: Date,
+
     musicianConfirmPayment: {
-      gigId: { type: Schema.Types.ObjectId, ref: "Gig", default: [] },
+      gigId: { type: Schema.Types.ObjectId, ref: "Gig" },
       confirmPayment: { type: Boolean },
+      confirmedAt: { type: Date },
+      code: { type: String },
     },
     clientConfirmPayment: {
-      gigId: { type: Schema.Types.ObjectId, ref: "Gig", default: [] },
+      gigId: { type: Schema.Types.ObjectId, ref: "Gig" },
       confirmPayment: { type: Boolean },
+      confirmedAt: { type: Date },
+      code: { type: String },
     },
   },
   { timestamps: true }

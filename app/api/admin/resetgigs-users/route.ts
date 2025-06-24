@@ -8,15 +8,16 @@ import User from "@/models/user";
 export async function POST(req: NextRequest) {
   const { userId: clerkId } = getAuth(req);
 
-  // Optional: restrict to admin Clerk ID
   try {
     await connectDb();
 
+    // Optional: restrict to admin Clerk ID
     const currentuser = await User.findOne({ clerkId });
     if (!currentuser?.isAdmin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    // Reset gigs
+
+    // Reset gigs - including proper reset of payment confirmations
     await Gig.updateMany(
       {},
       {
@@ -25,21 +26,45 @@ export async function POST(req: NextRequest) {
           bookedBy: null,
           bookingHistory: [],
           bookCount: [],
+          musicianConfirmPayment: {
+            gigId: null,
+            confirmPayment: false,
+            confirmedAt: null,
+            code: null,
+          },
+          clientConfirmPayment: {
+            gigId: null,
+            confirmPayment: false,
+            confirmedAt: null,
+            code: null,
+          },
+          paymentStatus: "pending",
+          cancellationReason: null,
+          completedAt: null,
         },
       }
     );
-    // Reset user refferences
+
+    // Reset user references
     await User.updateMany(
       {},
       {
         $set: {
           bookingHistory: [],
-          refference: [],
+          refference: [], // Note: Typo here - should be "reference" if that's your actual field name
           allreviews: [],
           myreviews: [],
+          cancelgigCount: 0,
+          completedGigsCount: 0,
+          // Reset weekly booking counts if needed
+          gigsBookedThisWeek: {
+            count: 0,
+            weekStart: null,
+          },
         },
       }
     );
+
     return NextResponse.json({
       success: true,
       message: "All gigs and users reset successfully.",
