@@ -27,7 +27,7 @@ import { getGigConditions } from "@/gigHelper";
 import { useMemo } from "react";
 import { FaBookmark, FaHeart, FaRegBookmark, FaRegHeart } from "react-icons/fa";
 import { toast } from "sonner";
-import { useConfirmPayment } from "@/hooks/useConfirmPayment";
+import { getConfirmState, useConfirmPayment } from "@/hooks/useConfirmPayment";
 
 import {
   Dialog,
@@ -40,7 +40,6 @@ import {
 import { Input } from "../ui/input";
 import { useCancelGig } from "@/hooks/useCancelGig";
 import { Button } from "../ui/button";
-import CodeModal from "./gigpages/CodeModal";
 
 interface FetchResponse {
   success: boolean;
@@ -80,8 +79,24 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
 
     setShowConfirmation,
     setShowConfetti,
+    setShowPaymentConfirmation,
   } = useStore();
 
+  const { isConfirming, isFinalizing, finalizePayment } = useConfirmPayment();
+  const { paymentConfirmations, setConfirmedParty, setCanFinalize } =
+    useStore();
+  const confirmationState = paymentConfirmations[gig._id ? gig?._id : ""] || {
+    confirmedParty: "none",
+    canFinalize: false,
+  };
+
+  useEffect(() => {
+    const storedState = getConfirmState(gig._id ? gig?._id : "");
+    if (storedState.confirmedParty !== "none") {
+      setConfirmedParty(gig._id ? gig?._id : "", storedState.confirmedParty);
+      setCanFinalize(gig._id ? gig?._id : "", storedState.canFinalize);
+    }
+  }, [gig._id]);
   const { subscription } = useSubscription(userId as string);
   const [bookCount, setBookCount] = useState(gig.bookCount.length || 0);
   const [currviewCount, setCurrviewCount] = useState(0);
@@ -95,11 +110,9 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
   // conditionsl styling
 
   const needsClientConfirmation =
-    gig?.isTaken && isClient && !gig?.clientConfirmPayment?.confirmPayment;
+    gig?.isTaken && isClient && !gig?.clientConfirmPayment?.temporaryConfirm;
 
   const paymentConfirmed = gig?.paymentStatus === "paid";
-
-  const { confirmPayment, isConfirming } = useConfirmPayment();
 
   const handleModal = async (gig: GigProps) => {
     try {
@@ -314,8 +327,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
   const [cancelReason, setCancelReason] = useState("");
   const [cancelingGigId, setCancelingGigId] = useState<string | null>(null);
   const { cancelGig, isCanceling } = useCancelGig();
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [theGig, setTheGig] = useState<GigProps>();
+
   const handleCancelClick = (gigId: string) => {
     setCancelingGigId(gigId);
     setShowCancelDialog(true);
@@ -340,24 +352,18 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
     }
   };
 
-  const handlePaymentConfirm = async (code: string) => {
-    if (!theGig) return;
-    await confirmPayment(
-      theGig._id ? theGig?._id : "",
+  const handleFinalizePayment = async () => {
+    if (!currentgig) return;
+
+    await finalizePayment(
+      gig._id ? gig?._id : "",
       isClient ? "client" : "musician",
-      "Confirmed via app",
-      code
+      "Finalized via app"
     );
   };
 
   return (
     <>
-      <CodeModal
-        isOpen={showPaymentModal}
-        onClose={() => setShowPaymentModal(false)}
-        onConfirm={handlePaymentConfirm}
-      />
-
       {isDescriptionModal && <GigDescription />}
       {isDeleteModal && (
         <DeleteModal
@@ -501,25 +507,60 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
           </div>
 
           <div className="flex space-x-2">
+            {/* Payment Confirmation Flow */}
             {needsClientConfirmation && (
-              <div className="w-full flex justify-evenly gap-4">
-                <ButtonComponent
-                  variant="secondary"
-                  classname="!bg-green-600 hover:!bg-green-700 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
-                  onclick={() => {
-                    setShowPaymentModal(true);
-                    setTheGig(gig);
-                  }}
-                  disabled={isConfirming}
-                  title={isConfirming ? "Confirming..." : "Confirm Payment"}
-                />
-                <ButtonComponent
-                  variant="secondary"
-                  classname="!bg-red-600 hover:!bg-red-700 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
-                  onclick={() => handleCancelClick(gig._id ? gig?._id : "")}
-                  disabled={isCanceling}
-                  title={isCanceling ? "Canceling..." : "Cancel Musician"}
-                />
+              <div className="w-full flex flex-col gap-2">
+                {/* Initial state */}
+                {confirmationState.confirmedParty === "none" && (
+                  <div className="flex justify-evenly gap-4">
+                    <ButtonComponent
+                      variant="secondary"
+                      classname="!bg-green-600 hover:!bg-green-700 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
+                      onclick={() => {
+                        setShowPaymentConfirmation(true);
+                        setCurrentGig(gig);
+                      }}
+                      disabled={isConfirming || isFinalizing}
+                      title={
+                        isConfirming
+                          ? "Confirming..."
+                          : isFinalizing
+                          ? "Finalizing..."
+                          : "Confirm Payment"
+                      }
+                    />
+                    <ButtonComponent
+                      variant="secondary"
+                      classname="!bg-red-600 hover:!bg-red-700 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
+                      onclick={() => handleCancelClick(gig._id ? gig?._id : "")}
+                      disabled={isCanceling}
+                      title={isCanceling ? "Canceling..." : "Cancel Musician"}
+                    />
+                  </div>
+                )}
+
+                {/* Waiting for other party */}
+                {confirmationState.confirmedParty === "partial" && (
+                  <div className="text-center">
+                    <p className="text-xs text-yellow-400 font-medium animate-pulse">
+                      Waiting for the other party to confirm...
+                    </p>
+                    <div className="flex justify-center mt-1">
+                      <div className="h-1 w-1/2 bg-yellow-400 rounded-full animate-pulse"></div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Ready to finalize */}
+                {confirmationState.canFinalize && (
+                  <ButtonComponent
+                    variant="secondary"
+                    classname="!bg-emerald-600 hover:!bg-emerald-700 w-full h-7 text-[11px] font-semibold text-white px-3 rounded transition-all"
+                    onclick={() => handleFinalizePayment()}
+                    disabled={isFinalizing}
+                    title={isFinalizing ? "Finalizing..." : "Finalize Payment"}
+                  />
+                )}
               </div>
             )}
             {/* Review Button (Restored) */}

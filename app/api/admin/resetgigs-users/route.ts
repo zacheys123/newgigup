@@ -31,16 +31,19 @@ export async function POST(req: NextRequest) {
             confirmPayment: false,
             confirmedAt: null,
             code: null,
+            temporaryConfirm: false,
           },
           clientConfirmPayment: {
             gigId: null,
             confirmPayment: false,
             confirmedAt: null,
             code: null,
+            temporaryConfirm: false,
           },
           paymentStatus: "pending",
           cancellationReason: null,
           completedAt: null,
+          viewCount: [],
         },
       }
     );

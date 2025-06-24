@@ -5,6 +5,11 @@ import { ChatProps, MessageProps } from "./chatinterfaces";
 import { Socket } from "socket.io-client";
 import { DashboardData } from "./dashboard";
 import { BookingItem } from "./history";
+// In your types/storeinterface.ts
+interface PaymentConfirmationState {
+  confirmedParty: "none" | "partial" | "both";
+  canFinalize: boolean;
+}
 
 export const initialState = {
   gigs: [], // Initialize gigs array
@@ -145,12 +150,14 @@ export const initialState = {
       confirmPayment: false,
       confirmedAt: new Date(),
       code: "",
+      temporaryConfirm: false,
     },
     clientConfirmPayment: {
       gigId: "",
       confirmPayment: false,
       confirmedAt: new Date(),
       code: "",
+      temporaryConfirm: false,
     },
   },
 
@@ -181,6 +188,8 @@ export const initialState = {
   showConfetti: false,
   cancelGig: false,
   cancelationreason: "",
+  confirmedParty: "none" as "" | "none" | "partial" | "both",
+  canFinalize: false,
 };
 interface OnlineUser {
   userId: string;
@@ -231,6 +240,18 @@ export interface StoreState {
   cancelGig: boolean;
   cancelationreason: string;
   showPaymentConfirmation: boolean;
+  confirmedParty: "none" | "partial" | "both" | "";
+  canFinalize: boolean;
+  paymentConfirmations: Record<string, PaymentConfirmationState>;
+
+  // Actions
+  setConfirmedParty: (
+    gigId: string,
+    status: "none" | "partial" | "both"
+  ) => void;
+  setCanFinalize: (gigId: string, canFinalize: boolean) => void;
+  resetConfirmationState: (gigId: string) => void;
+
   setShowPaymentConfirmation: (data: boolean) => void;
   setcancelationreason: (reason: string) => void;
   setShowCancelGig: (data: boolean) => void;

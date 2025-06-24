@@ -6,6 +6,7 @@ import Gigheader from "@/components/gig/Gigheader";
 import ColorLoading from "@/components/loaders/ColorLoading";
 import AlreadyReviewModal from "@/components/modals/AlreadyReviewModall";
 import { useAllGigs } from "@/hooks/useAllGigs";
+import { useConfirmPayment } from "@/hooks/useConfirmPayment";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useDebounce } from "@/hooks/useDebounce";
 import { GigProps } from "@/types/giginterface";
@@ -15,6 +16,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import { CodeModal } from "./CodeModal";
 
 const MyGigs = () => {
   const { loading: gigsLoading, gigs, mutateGigs } = useAllGigs();
@@ -31,6 +33,10 @@ const MyGigs = () => {
     setConfirmEdit,
     currentgig,
     setLoadingPostId,
+    showPaymentConfirmation: isOpen,
+    setShowPaymentConfirmation,
+    setConfirmedParty,
+    setCanFinalize,
   } = useStore();
   const [loadingSecret, setLoadingSecret] = useState<boolean>(false);
   const [forgotsecret, setForgotSecret] = useState<boolean>(false);
@@ -157,8 +163,70 @@ const MyGigs = () => {
   const existingSecret = localStorage.getItem("secret");
   const isLoading = gigsLoading;
   const [showFilters, setShowFilters] = useState(false);
+
+  const isClient = currentgig?.postedBy?._id === user?.user?._id;
+  // In MyGigs.tsx
+  const { confirmPayment } = useConfirmPayment();
+
+  const handlePaymentConfirm = async (code: string) => {
+    if (!currentgig) return;
+
+    try {
+      const result = await confirmPayment(
+        currentgig._id ? currentgig._id : "",
+        isClient ? "client" : "musician",
+        "Confirmed via app",
+        code
+      );
+
+      if (result?.readyToFinalize) {
+        setConfirmedParty("both");
+        setCanFinalize(true);
+      } else {
+        setConfirmedParty("partial");
+      }
+
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  };
+  // const handleFinalizePayment = async () => {
+  //   if (!currentgig) return;
+
+  //   try {
+  //     await finalizePayment(
+  //       currentgig._id,
+  //       isClient ? "client" : "musician",
+  //       "Finalized via app"
+  //     );
+  //     toast.success("Payment finalized successfully.");
+  //     setCanFinalize(false);
+  //     setConfirmedParty("none");
+  //     setShowPaymentConfirmation(false);
+  //     mutateGigs(); // Refresh gig state
+  //   } catch (error) {
+  //     console.error("Finalize failed", error);
+  //   }
+  // };
+
   return (
     <>
+      <CodeModal
+        isOpen={isOpen}
+        onClose={() => {
+          setShowPaymentConfirmation(false);
+          setConfirmedParty("none");
+          setCanFinalize(false);
+        }}
+        onConfirm={async (code: string) => {
+          const result = await handlePaymentConfirm(code);
+          return {
+            readyToFinalize: result?.readyToFinalize || false,
+          };
+        }}
+      />
+
       {confirmEdit && !existingSecret && (
         <div className="fixed z-50 inset-0 flex items-center justify-center bg-opacity-80 backdrop-blur-[13px] w-[100%] mx-auto h-full -py-6">
           {!forgotsecret ? (
@@ -404,6 +472,7 @@ const MyGigs = () => {
                         className=" overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-amber-500/30 hover:-translate-y-1"
                       >
                         <AllGigsComponent gig={gig} />
+
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                       </div>
                     ))}

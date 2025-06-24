@@ -8,7 +8,37 @@ import { create } from "zustand"; // Import SetState
 
 const useStore = create<StoreState>((set) => ({
   ...initialState,
+  // ... other state ...
+  paymentConfirmations: {},
 
+  setConfirmedParty: (gigId, status) =>
+    set((state) => ({
+      paymentConfirmations: {
+        ...state.paymentConfirmations,
+        [gigId]: {
+          ...(state.paymentConfirmations[gigId] || { canFinalize: false }),
+          confirmedParty: status,
+        },
+      },
+    })),
+
+  setCanFinalize: (gigId, canFinalize) =>
+    set((state) => ({
+      paymentConfirmations: {
+        ...state.paymentConfirmations,
+        [gigId]: {
+          ...(state.paymentConfirmations[gigId] || { confirmedParty: "none" }),
+          canFinalize,
+        },
+      },
+    })),
+
+  resetConfirmationState: (gigId) =>
+    set((state) => {
+      const newConfirmations = { ...state.paymentConfirmations };
+      delete newConfirmations[gigId];
+      return { paymentConfirmations: newConfirmations };
+    }),
   showPaymentConfirmation: false,
   setShowPaymentConfirmation: (data: boolean) =>
     set(() => ({ showPaymentConfirmation: data })),

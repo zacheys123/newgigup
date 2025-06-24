@@ -52,12 +52,14 @@ export interface GigProps {
     confirmPayment: boolean;
     confirmedAt: Date;
     code: string;
+    temporaryConfirm: boolean;
   };
   clientConfirmPayment: {
     gigId: Types.ObjectId | string;
     confirmPayment: boolean;
     confirmedAt: Date;
     code: string;
+    temporaryConfirm: boolean;
   };
 }
 

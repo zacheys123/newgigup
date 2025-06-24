@@ -113,12 +113,14 @@ const gigSchema = new mongoose.Schema(
       confirmPayment: { type: Boolean },
       confirmedAt: { type: Date },
       code: { type: String },
+      temporaryConfirm: Boolean,
     },
     clientConfirmPayment: {
       gigId: { type: Schema.Types.ObjectId, ref: "Gig" },
       confirmPayment: { type: Boolean },
       confirmedAt: { type: Date },
       code: { type: String },
+      temporaryConfirm: Boolean,
     },
   },
   { timestamps: true }

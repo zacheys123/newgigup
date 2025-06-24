@@ -1,52 +1,141 @@
 // hooks/useConfirmPayment.ts
+import useStore from "@/app/zustand/useStore";
+import { useState } from "react";
 import { toast } from "sonner";
-import { mutate } from "swr";
-import { useRouter } from "next/navigation";
+
+// Storage utilities
+export const getConfirmState = (gigId: string) => {
+  try {
+    const raw = localStorage.getItem("confirmState");
+    const parsed = raw ? JSON.parse(raw) : {};
+    return parsed[gigId] || { confirmedParty: "none", canFinalize: false };
+  } catch {
+    return { confirmedParty: "none", canFinalize: false };
+  }
+};
+
+const setConfirmState = (
+  gigId: string,
+  status: "none" | "partial" | "both",
+  canFinalize: boolean
+) => {
+  try {
+    const raw = localStorage.getItem("confirmState");
+    const parsed = raw ? JSON.parse(raw) : {};
+    parsed[gigId] = { confirmedParty: status, canFinalize };
+    localStorage.setItem("confirmState", JSON.stringify(parsed));
+  } catch (err) {
+    console.error("Failed to store confirmation state:", err);
+  }
+};
+
+const clearConfirmState = (gigId: string) => {
+  try {
+    const raw = localStorage.getItem("confirmState");
+    const parsed = raw ? JSON.parse(raw) : {};
+    delete parsed[gigId];
+    localStorage.setItem("confirmState", JSON.stringify(parsed));
+  } catch (err) {
+    console.error("Failed to clear confirmation state:", err);
+  }
+};
 
 export const useConfirmPayment = () => {
-  const router = useRouter();
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [isFinalizing, setIsFinalizing] = useState(false);
+  const { setConfirmedParty, setCanFinalize, resetConfirmationState } =
+    useStore();
 
   const confirmPayment = async (
     gigId: string,
-    role: "client" | "musician",
-    notes?: string,
-    code?: string
+    role: string,
+    notes: string,
+    code: string
   ) => {
-    console.log(code);
-    if (!code) {
-      alert("no Code");
-    }
+    setIsConfirming(true);
+
+    // Optimistic update
+    const optimisticStatus = "partial"; // Assume partial confirmation first
+    setConfirmedParty(gigId, optimisticStatus);
+    setConfirmState(gigId, optimisticStatus, false);
+
     try {
-      const response = await fetch(`/api/gigs/complete-gig/${gigId}`, {
+      const res = await fetch(`/api/gigs/confirm-payment/${gigId}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ role, notes, code }),
       });
 
-      const data = await response.json();
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to confirm payment");
 
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to confirm payment");
-      }
+      const newStatus = data.readyToFinalize ? "both" : "partial";
 
-      await Promise.all([mutate("/api/gigs/getgigs"), mutate("/api/users/me")]);
+      // Update both store and localStorage
+      setConfirmedParty(gigId, newStatus);
+      setCanFinalize(gigId, data.readyToFinalize);
+      setConfirmState(gigId, newStatus, data.readyToFinalize);
 
-      toast.success(data.message || "Confirmation submitted");
-      if (data.paymentStatus === "paid") {
-        router.refresh();
-      }
-
+      toast.success(data.message);
       return data;
     } catch (error) {
-      console.error("Error confirming payment:", error);
+      // Rollback on error
+      setConfirmedParty(gigId, "none");
+      setCanFinalize(gigId, false);
+      clearConfirmState(gigId);
+
       toast.error(
         error instanceof Error ? error.message : "Failed to confirm payment"
       );
       throw error;
+    } finally {
+      setIsConfirming(false);
     }
   };
 
-  return { confirmPayment, isConfirming: false };
+  const finalizePayment = async (
+    gigId: string,
+    role: string,
+    notes: string
+  ) => {
+    setIsFinalizing(true);
+
+    // Optimistic update
+    setCanFinalize(gigId, false);
+
+    try {
+      const res = await fetch(`/api/gigs/confirm-payment/${gigId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role, notes }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to finalize payment");
+
+      // Clear state on success
+      resetConfirmationState(gigId);
+      clearConfirmState(gigId);
+
+      toast.success(data.message);
+      return data;
+    } catch (error) {
+      // Rollback on error
+      setCanFinalize(gigId, true);
+
+      toast.error(
+        error instanceof Error ? error.message : "Failed to finalize payment"
+      );
+      throw error;
+    } finally {
+      setIsFinalizing(false);
+    }
+  };
+
+  return {
+    confirmPayment,
+    finalizePayment,
+    isConfirming,
+    isFinalizing,
+  };
 };

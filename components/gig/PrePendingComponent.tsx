@@ -4,11 +4,12 @@ import { useParams, useRouter } from "next/navigation";
 import { useGetGigs } from "@/hooks/useGetGig";
 import useStore from "@/app/zustand/useStore";
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ChatBubbleOvalLeftIcon,
   UserIcon,
   VideoCameraIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/solid";
 import { UserProps } from "@/types/userinterfaces";
 import Modal from "../Modal";
@@ -35,34 +36,24 @@ const PrePendingComponent = () => {
     type: "chat" | "video";
     user: UserProps;
   } | null>(null);
-  console.log(modal);
   const [showX, setShowX] = useState(false);
-  // //   const forget = () => forgetBookings(userId || "", currentgig);
-  // const handleBookUser = (bookingId: string) => {
-  //   setSelectedUser(bookingId);
-  //   console.log(`User ${userId} booked. Others disqualified.`);
-  //   bookgig(router, currentgig, userId || "", bookingId as string);
-  // };
-
-  // Define the onOpenX function
-  const handleOpenX = () => {
-    setShowX(false); // Reset the showX state
-  };
-  console.log(showX);
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(
     null
   );
+  console.log(showX);
   const {
     cancelationreason,
     setcancelationreason,
     setShowCancelGig,
     cancelGig,
-  } = useStore(); // Local state for reason
+  } = useStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+
   const removeMusicianfrombookCount = async (userid: string) => {
     try {
-      setIsSubmitting(true); // Start submission
+      setIsSubmitting(true);
       const updatedGig = {
         ...currentgig,
         bookCount:
@@ -97,7 +88,6 @@ const PrePendingComponent = () => {
       setShowCancelGig(false);
     }
   };
-  const [showConfirmation, setShowConfirmation] = useState(false);
 
   const handleBookUser = (bookingId: string) => {
     setSelectedUser(bookingId);
@@ -107,7 +97,6 @@ const PrePendingComponent = () => {
 
   const confirmCancel = () => {
     if (selectedBookingId) {
-      // playSound();
       bookgig(router, currentgig, userId || "", selectedBookingId);
       if (socket) {
         socket.emit("gigBookinMusician", {
@@ -115,7 +104,6 @@ const PrePendingComponent = () => {
           musicianId: selectedBookingId,
           isTaken: true,
           title: currentgig?.title,
-          // bookCount: currentgig?.bookCount,
         });
       }
       setShowConfirmation(false);
@@ -123,28 +111,35 @@ const PrePendingComponent = () => {
       toast.error("No booking ID selected.");
     }
   };
+
   const handleRemoveWithReason = (userid: string) => {
     setRemovingId(userid);
-    setShowCancelGig(true); // Open cancellation modal
+    setShowCancelGig(true);
   };
+
   const confirmCancellationWithReason = (reason: string) => {
     setcancelationreason(reason);
     removeMusicianfrombookCount(removingId || "");
   };
 
+  const handleOpenX = () => {
+    setShowX(false);
+  };
+
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen text-gray-300 backdrop-blur-xl bg-black bg-opacity-50 ">
+      <div className="flex justify-center items-center min-h-screen bg-gray-900">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full"
+          className="w-10 h-10 border-4 border-amber-500 border-t-transparent rounded-full"
         />
       </div>
     );
   }
+
   return (
-    <div className="p-6 pb-[30px] bg-gradient-to-b from-gray-900 to-black text-white min-h-screen">
+    <div className="p-6 pb-8 bg-gray-900 text-gray-100 min-h-screen">
       <CancelationModal
         isOpen={cancelGig}
         onClose={() => {
@@ -156,187 +151,223 @@ const PrePendingComponent = () => {
         userType="client"
       />
 
-      {showConfirmation && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm z-50">
-          <div className="bg-gray-700 p-6 rounded-lg shadow-lg ">
-            <h4 className="text-gray-200 text-lg font-bold mb-4">
-              Are you sure?
-            </h4>
-            <p className="text-gray-400 text-sm mb-4">
-              This action cannot be undone.
-            </p>
-            <div className="flex gap-4">
-              <button
-                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition-colors"
-                onClick={confirmCancel}
-              >
-                Confirm
-              </button>
-              <button
-                className="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-md transition-colors"
-                onClick={() => {
-                  setSelectedUser(null);
-                  setShowConfirmation(false);
-                }}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {showConfirmation && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 backdrop-blur-sm z-50"
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              className="bg-gray-800 p-8 rounded-xl shadow-2xl border border-gray-700 sm:max-w-md max-w-sm w-full"
+            >
+              <div className="flex justify-between items-start mb-4">
+                <h4 className="text-xl font-bold text-gray-100">
+                  Confirm Booking
+                </h4>
+                <button
+                  onClick={() => setShowConfirmation(false)}
+                  className="text-gray-400 hover:text-gray-200 transition-colors"
+                >
+                  <XMarkIcon className="h-6 w-6" />
+                </button>
+              </div>
+              <p className="text-gray-300 mb-6">
+                Are you sure you want to book this musician? This action cannot
+                be undone.
+              </p>
+              <div className="flex gap-4 justify-end">
+                <button
+                  className="px-6 py-2 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg transition-all duration-200"
+                  onClick={() => {
+                    setSelectedUser(null);
+                    setShowConfirmation(false);
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="px-6 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-lg transition-all duration-200 shadow-lg shadow-amber-500/10"
+                  onClick={confirmCancel}
+                >
+                  Confirm
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {bookloading && (
-        <div className="h-[800px] absolute w-[90%] mx-auto  z-50 backdrop-blur-xl bg-black bg-opacity-50 flex justify-center items-center">
+        <div className="fixed inset-0 z-50 backdrop-blur-md bg-black bg-opacity-70 flex justify-center items-center">
           <CircularProgress
-            className="mx-auto mb-6"
-            size={30}
-            thickness={5}
-            style={{ color: "yellow" }}
+            size={40}
+            thickness={4}
+            className="text-amber-500"
           />
         </div>
       )}
+
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         exit={{ opacity: 0, height: 0 }}
-        className="max-w-3xl mx-auto p-6 bg-gray-800 rounded-xl shadow-xl pb-[50px]"
+        className="max-w-4xl mx-auto p-8 bg-gray-800 rounded-xl shadow-2xl border border-gray-700"
       >
-        <h1 className="text-3xl font-extrabold text-gray-100">
-          {currentgig?.title}
-        </h1>
-        <p className="text-gray-400 text-md mt-2 capitalize">
-          {currentgig?.description}
-        </p>
-        <p
-          className={`mt-3 text-sm font-semibold tracking-wide uppercase ${
-            currentgig?.isTaken ? "text-red-400" : "text-green-400"
-          }`}
-        >
-          {currentgig?.isTaken ? "This gig is taken" : "Available"}
-        </p>
-
-        <h2 className="text-2xl font-semibold mt-6 text-gray-200">
-          {currentgig && currentgig?.bookCount?.length > 0
-            ? "Interested Musicians"
-            : "No Musicians"}
-        </h2>
-        <div className="mt-1 max-h-[370px]  sm:max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800 space-y-4">
-          {currentgig?.bookCount?.map((myuser: UserProps) => {
-            return (
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-100 mb-2">
+            {currentgig?.title}
+          </h1>
+          <p className="text-gray-400 text-lg mb-4 capitalize">
+            {currentgig?.description}
+          </p>
+          <div className="flex items-center gap-2">
+            <span
+              className={`inline-block w-3 h-3 rounded-full ${
+                currentgig?.isTaken ? "bg-red-500" : "bg-green-500"
+              }`}
+            ></span>
+            <p className="text-sm font-medium tracking-wide uppercase">
+              {currentgig?.isTaken
+                ? "Position Filled"
+                : "Accepting Applications"}
+            </p>
+          </div>
+        </div>
+        <div className="mb-6">
+          <h2 className="text-2xl font-semibold text-gray-200 mb-4">
+            {currentgig && currentgig?.bookCount?.length > 0
+              ? "Interested Musicians"
+              : "No Applicants Yet"}
+          </h2>
+          <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
+            {currentgig?.bookCount?.map((myuser: UserProps) => (
               <motion.div
                 key={myuser?._id}
-                className="flex last:mb-30 flex-col sm:flex-row justify-between items-start sm:items-center p-4 bg-gray-700 rounded-lg transition-all shadow-md relative"
-                whileHover={{
-                  scale: 1.02,
-                  boxShadow: "0px 5px 15px rgba(255, 255, 255, 0.1)",
-                }}
+                className="group relative p-5 bg-gray-750 rounded-lg border border-gray-700 hover:border-amber-500/30 transition-all duration-200"
+                whileHover={{ y: -2 }}
+                layout
               >
-                <div className="min-w-0 flex-1">
-                  <p className="text-lg font-semibold text-gray-100">
-                    {myuser.firstname} {myuser.lastname}
-                    <span
-                      className={`absolute right-4 top-1 font-bold ${
-                        removingId === myuser?._id
-                          ? "opacity-50 cursor-not-allowed"
-                          : "cursor-pointer"
-                      }`}
-                      onClick={
-                        () =>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="text-lg font-semibold text-gray-100 truncate">
+                        {myuser.firstname} {myuser.lastname}
+                      </h3>
+                      <button
+                        className={`opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-400 transition-all ${
+                          removingId === myuser?._id ? "cursor-not-allowed" : ""
+                        }`}
+                        onClick={() =>
                           removingId !== myuser?._id &&
-                          handleRemoveWithReason(myuser?._id || "") // Updated to use new handler
-                      }
+                          handleRemoveWithReason(myuser?._id || "")
+                        }
+                        disabled={removingId === myuser?._id}
+                      >
+                        <XMarkIcon className="h-5 w-5 text-white" />
+                      </button>
+                    </div>
+
+                    <p className="text-sm text-gray-400 mb-3">{myuser.email}</p>
+
+                    <div className="flex flex-wrap gap-2">
+                      {myuser.instrument && (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-700 text-amber-300">
+                          {myuser.instrument === "drums" ? (
+                            <>
+                              <Drum className="h-3 w-3 mr-1" />{" "}
+                              {myuser.instrument}
+                            </>
+                          ) : (
+                            <>
+                              {myuser.instrument === "piano" && "🎹"}
+                              {myuser.instrument === "guitar" && "🎸"}
+                              {myuser.instrument === "bass" && "🎸"}
+                              {myuser.instrument === "saxophone" && "🎷"}
+                              {myuser.instrument === "trumpet" && "🎺"}
+                              {myuser.instrument === "violin" && "🎻"}
+                              {myuser.instrument}
+                            </>
+                          )}
+                        </span>
+                      )}
+
+                      {myuser.roleType && (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-700 text-blue-300">
+                          {myuser.roleType === "dj" && "🎛 DJ"}
+                          {myuser.roleType === "mc" && "🪕 MC"}
+                          {myuser.roleType === "voaclist" && "🎙 Vocalist"}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <button
+                      onClick={() => handleBookUser(myuser?._id || "")}
+                      className={`px-4 py-2 text-sm rounded-lg font-medium transition-all ${
+                        selectedUser === user?.user?._id
+                          ? "bg-gray-600 text-gray-400 cursor-not-allowed"
+                          : "bg-amber-600 hover:bg-amber-500 text-white shadow-md"
+                      }`}
+                      disabled={selectedUser !== null}
                     >
-                      x
-                    </span>
-                  </p>
-                  <p className="text-sm text-gray-400">{myuser.email}</p>
-                  {myuser.instrument === "piano" && (
-                    <p className="text-sm text-gray-300 italic">
-                      🎹 {myuser.instrument}
-                    </p>
-                  )}
-                  {myuser.instrument === "guitar" && (
-                    <p className="text-sm text-gray-300 italic">
-                      🎸 {myuser.instrument}
-                    </p>
-                  )}
-                  {myuser.instrument === "bass" && (
-                    <p className="text-sm text-gray-300 italic">
-                      🎸 {myuser.instrument}
-                    </p>
-                  )}{" "}
-                  {myuser.instrument === "drums" && (
-                    <p className="text-sm text-gray-300 italic flex gap-1 my-1">
-                      <Drum /> {myuser.instrument}
-                    </p>
-                  )}{" "}
-                  {myuser.instrument === "saxophone" && (
-                    <p className="text-sm text-gray-300 italic">
-                      🎷 {myuser.instrument}
-                    </p>
-                  )}{" "}
-                  {myuser.instrument === "trumpet" && (
-                    <p className="text-sm text-gray-300 italic">
-                      🎺 {myuser.instrument}
-                    </p>
-                  )}
-                  {myuser.instrument === "violin" && (
-                    <p className="text-sm text-gray-300 italic">
-                      🎻 {myuser.instrument}
-                    </p>
-                  )}
-                  {myuser.roleType === "dj" && (
-                    <p className="text-sm text-gray-300 italic">🎛 Deejay</p>
-                  )}
-                  {myuser.roleType === "mc" && (
-                    <p className="text-sm text-gray-300 italic">🪕 EMcee</p>
-                  )}{" "}
-                  {myuser.roleType === "voaclist" && (
-                    <p className="text-sm text-gray-300 italic">🎙 Vocalist</p>
-                  )}
-                </div>
-                <div className="flex items-center space-x-3 sm:space-x-4 mt-3 sm:mt-0">
-                  <button
-                    onClick={() => handleBookUser(myuser?._id || "")}
-                    className={`px-4 py-2 text-xs sm:text-sm rounded-lg font-semibold transition-all ${
-                      selectedUser === user?.user?._id
-                        ? "bg-orange-300 text-gray-300 cursor-not-allowed"
-                        : "bg-amber-600 hover:bg-blue-500 text-white"
-                    }`}
-                    disabled={selectedUser !== null}
-                  >
-                    Book
-                  </button>
-                  <ChatBubbleOvalLeftIcon
-                    className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-300 cursor-pointer hover:text-yellow-400 transition-transform transform hover:scale-110"
-                    onClick={() => setModal({ type: "chat", user: myuser })}
-                  />
-                  <UserIcon
-                    className="w-5 h-5 sm:w-6 sm:h-6 text-green-300 cursor-pointer hover:text-green-400 transition-transform transform hover:scale-110"
-                    onClick={() => router.push(`/search/${myuser?.username}`)}
-                  />
-                  <VideoCameraIcon
-                    className="w-5 h-5 sm:w-6 sm:h-6 text-red-400 cursor-pointer hover:text-red-500 transition-transform transform hover:scale-110"
-                    onClick={() => setModal({ type: "video", user: myuser })}
-                  />
+                      Book
+                    </button>
+
+                    <div className="flex gap-2">
+                      <button
+                        className="p-2 text-amber-400 hover:text-amber-300 bg-gray-700 hover:bg-gray-650 rounded-full transition-all"
+                        onClick={() => setModal({ type: "chat", user: myuser })}
+                      >
+                        <ChatBubbleOvalLeftIcon className="h-5 w-5" />
+                      </button>
+                      <button
+                        className="p-2 text-blue-400 hover:text-blue-300 bg-gray-700 hover:bg-gray-650 rounded-full transition-all"
+                        onClick={() =>
+                          router.push(`/search/${myuser?.username}`)
+                        }
+                      >
+                        <UserIcon className="h-5 w-5" />
+                      </button>
+                      <button
+                        className="p-2 text-red-400 hover:text-red-300 bg-gray-700 hover:bg-gray-650 rounded-full transition-all"
+                        onClick={() =>
+                          setModal({ type: "video", user: myuser })
+                        }
+                      >
+                        <VideoCameraIcon className="h-5 w-5" />
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </motion.div>
-            );
-          })}
+            ))}
+          </div>
         </div>
       </motion.div>
-      {/* Modal */}
-      {modal && (
-        <div className="fixed inset-0 flex items-center justify-center  bg-opacity-70 backdrop-blur-[12px] w-[100%] mx-auto h-full -py-6">
-          <Modal
-            onClose={() => setModal(null)}
-            modal={modal}
-            user={user?.user}
-            onOpenX={handleOpenX}
-          />
-        </div>
-      )}
+
+      <AnimatePresence>
+        {modal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 backdrop-blur-md z-50"
+          >
+            <Modal
+              onClose={() => setModal(null)}
+              modal={modal}
+              user={user?.user}
+              onOpenX={handleOpenX}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
