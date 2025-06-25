@@ -100,9 +100,9 @@ const AcceptPage = ({
         toast.success(data?.message || "Review submitted successfully");
         setRating(0);
         setComment("");
-        // setTimeout(() => {
-        //   router.push(`/gigs/${userId}`);
-        // }, 2000);
+        setTimeout(() => {
+          router.push(`/mygigs/${userId}`);
+        }, 2000);
       } else {
         toast.error(
           data?.message || "There was an issue submitting the review"

@@ -124,7 +124,7 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   const gigId = req.nextUrl.pathname.split("/").pop();
   const { userId } = getAuth(req);
-  const { notes } = await req.json();
+  const { role, notes } = await req.json();
 
   if (!userId) {
     return NextResponse.json(
@@ -173,33 +173,25 @@ export async function PUT(req: NextRequest) {
         ...gig.musicianConfirmPayment,
         confirmPayment: true,
         confirmedAt: new Date(),
-        temporaryConfirm: undefined,
+        temporaryConfirm: false,
       };
 
       gig.clientConfirmPayment = {
         ...gig.clientConfirmPayment,
         confirmPayment: true,
         confirmedAt: new Date(),
-        temporaryConfirm: undefined,
+        temporaryConfirm: false,
       };
 
       gig.paymentStatus = "paid";
       gig.completedAt = new Date();
 
       gig.bookingHistory.push({
-        userId: gig.bookedBy._id,
+        userId: role === "client" ? gig.postedBy._id : gig.bookedBy._id,
         status: "completed",
         date: new Date(),
-        role: "musician",
-        notes: notes || "Musician confirmed payment",
-      });
-
-      gig.bookingHistory.push({
-        userId: gig.postedBy._id,
-        status: "completed",
-        date: new Date(),
-        role: "client",
-        notes: notes || "Client confirmed payment",
+        role,
+        notes: notes ? role + notes : role + "Confirmed payment",
       });
 
       await gig.save({ session });

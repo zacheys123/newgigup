@@ -109,8 +109,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
   const isClient = gig?.postedBy?._id === myId;
   // conditionsl styling
 
-  const needsClientConfirmation =
-    gig?.isTaken && isClient && !gig?.clientConfirmPayment?.temporaryConfirm;
+  const needsClientConfirmation = gig?.isTaken && isClient;
 
   const paymentConfirmed = gig?.paymentStatus === "paid";
 
@@ -358,7 +357,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
     await finalizePayment(
       gig._id ? gig?._id : "",
       isClient ? "client" : "musician",
-      "Finalized via app"
+      "Confirmed payment ,Finalized via app"
     );
   };
 
@@ -511,41 +510,43 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
             {needsClientConfirmation && (
               <div className="w-full flex flex-col gap-2">
                 {/* Initial state */}
-                {confirmedParty === "none" && (
-                  <div className="flex justify-evenly gap-4">
-                    <ButtonComponent
-                      variant="secondary"
-                      classname="!bg-green-600 hover:!bg-green-700 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
-                      onclick={() => {
-                        setShowPaymentConfirmation(true);
-                        setCurrentGig(gig);
-                      }}
-                      disabled={isConfirming || isFinalizing}
-                      title={
-                        isConfirming
-                          ? "Confirming..."
-                          : isFinalizing
-                          ? "Finalizing..."
-                          : "Confirm Payment"
-                      }
-                    />
-                    <ButtonComponent
-                      variant="secondary"
-                      classname="!bg-red-600 hover:!bg-red-700 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
-                      onclick={() => handleCancelClick(gig._id ?? "")}
-                      disabled={isCanceling}
-                      title={isCanceling ? "Canceling..." : "Cancel Musician"}
-                    />
-                  </div>
-                )}
+                {confirmedParty === "none" &&
+                  !gig?.clientConfirmPayment?.code && (
+                    <div className="flex justify-evenly gap-4">
+                      <ButtonComponent
+                        variant="secondary"
+                        classname="!bg-green-600 hover:!bg-green-700 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
+                        onclick={() => {
+                          setShowPaymentConfirmation(true);
+                          setCurrentGig(gig);
+                        }}
+                        disabled={isConfirming || isFinalizing}
+                        title={
+                          isConfirming
+                            ? "Confirming..."
+                            : isFinalizing
+                            ? "Finalizing..."
+                            : "Confirm Payment"
+                        }
+                      />
+                      <ButtonComponent
+                        variant="secondary"
+                        classname="!bg-red-600 hover:!bg-red-700 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
+                        onclick={() => handleCancelClick(gig._id ?? "")}
+                        disabled={isCanceling}
+                        title={isCanceling ? "Canceling..." : "Cancel Musician"}
+                      />
+                    </div>
+                  )}
 
                 {/* Waiting for other party */}
-                {confirmedParty === "partial" &&
-                  !gig?.musicianConfirmPayment?.temporaryConfirm &&
-                  !gig?.clientConfirmPayment?.temporaryConfirm && (
+                {gig?.clientConfirmPayment?.code &&
+                  gig?.clientConfirmPayment?.temporaryConfirm &&
+                  !gig?.musicianConfirmPayment?.code &&
+                  !gig?.musicianConfirmPayment?.temporaryConfirm && (
                     <div className="text-center">
                       <p className="text-xs text-yellow-400 font-medium animate-pulse">
-                        Waiting for the other party to confirm...
+                        Payment Status Pending:Wating for musician confirmation
                       </p>
                       <div className="flex justify-center mt-1">
                         <div className="h-1 w-1/2 bg-yellow-400 rounded-full animate-pulse"></div>
@@ -555,7 +556,9 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
 
                 {/* Finalize button */}
                 {gig?.musicianConfirmPayment?.temporaryConfirm &&
-                  gig?.clientConfirmPayment?.temporaryConfirm && (
+                  gig?.clientConfirmPayment?.temporaryConfirm &&
+                  !gig?.musicianConfirmPayment?.confirmPayment &&
+                  !gig?.clientConfirmPayment?.confirmPayment && (
                     <ButtonComponent
                       variant="secondary"
                       classname="!bg-emerald-600 hover:!bg-emerald-700 w-full h-7 text-[11px] font-semibold text-white px-3 rounded transition-all"
@@ -579,7 +582,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
               isCreatorIsCurrentUserAndTaken(gig, myId as string) ? (
               <button
                 onClick={() => handleReviewModal(gig)}
-                className="text-xs px-3 py-1.5 rounded-md bg-amber-700 hover:bg-amber-600 text-white"
+                className="text-xs px-3 py-1.5 rounded-md bg-amber-700 hover:bg-amber-600 text-white whitespace-nowrap"
               >
                 Leave Review
               </button>

@@ -106,18 +106,18 @@ const GigCard = ({ gig, onOpenChat }: AllGigsComponentProps) => {
   // Add these utility functions
   const isMusician = gig?.bookedBy?._id === user?.user?._id;
 
-  const needsMusicianConfirmation =
-    gig?.isTaken && isMusician && !gig?.musicianConfirmPayment?.confirmPayment;
+  const needsMusicianConfirmation = gig?.isTaken && isMusician;
 
   const handleFinalizePayment = async () => {
     if (!gig) return;
 
     await finalizePayment(
       gig._id ? gig?._id : "",
-      !isMusician ? "client" : "musician",
-      "Finalized via app"
+      isMusician ? "musician" : "client",
+      "Confirmed payment ,Finalized via app"
     );
   };
+  console.log(gig);
   return (
     <motion.div
       key={gig?._id}
@@ -223,41 +223,43 @@ const GigCard = ({ gig, onOpenChat }: AllGigsComponentProps) => {
         {/* Action Buttons */}
         {!loading ? (
           <div className="flex space-x-3">
-            {needsMusicianConfirmation ? (
+            {needsMusicianConfirmation && (
               <div className="w-full flex flex-col gap-2">
-                {confirmedParty === "none" && (
-                  <div className="flex justify-center gap-4 my-3">
-                    <ButtonComponent
-                      variant="secondary"
-                      classname="!bg-green-600 hover:!bg-green-700 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
-                      onclick={() => {
-                        setShowPaymentConfirmation(true);
-                        setCurrentGig(gig);
-                      }}
-                      disabled={isConfirming || isFinalizing}
-                      title={
-                        isConfirming
-                          ? "Confirming..."
-                          : isFinalizing
-                          ? "Finalizing..."
-                          : "Confirm Payment"
-                      }
-                    />
-                    {!gig?.musicianConfirmPayment?.temporaryConfirm && (
+                {confirmedParty === "none" &&
+                  !gig?.clientConfirmPayment?.code && (
+                    <div className="flex justify-center gap-4 my-3">
                       <ButtonComponent
                         variant="secondary"
-                        classname="!bg-red-600 hover:!bg-red-700 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
-                        onclick={() => handleCancelClick()}
-                        disabled={isCanceling}
-                        title={isCanceling ? "Canceling..." : "Cancel Gig"}
+                        classname="!bg-green-600 hover:!bg-green-700 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
+                        onclick={() => {
+                          setShowPaymentConfirmation(true);
+                          setCurrentGig(gig);
+                        }}
+                        disabled={isConfirming || isFinalizing}
+                        title={
+                          isConfirming
+                            ? "Confirming..."
+                            : isFinalizing
+                            ? "Finalizing..."
+                            : "Confirm Payment"
+                        }
                       />
-                    )}
-                  </div>
-                )}
+                      {!gig?.musicianConfirmPayment?.temporaryConfirm && (
+                        <ButtonComponent
+                          variant="secondary"
+                          classname="!bg-red-600 hover:!bg-red-700 h-7 text-[11px] font-normal text-white px-3 rounded transition-all"
+                          onclick={() => handleCancelClick()}
+                          disabled={isCanceling}
+                          title={isCanceling ? "Canceling..." : "Cancel Gig"}
+                        />
+                      )}
+                    </div>
+                  )}
 
                 {/* Waiting for other party */}
-                {confirmedParty === "partial" &&
-                  !gig?.musicianConfirmPayment?.temporaryConfirm &&
+                {gig?.musicianConfirmPayment?.code &&
+                  gig?.musicianConfirmPayment?.temporaryConfirm &&
+                  !gig?.clientConfirmPayment?.code &&
                   !gig?.clientConfirmPayment?.temporaryConfirm && (
                     <div className="text-center">
                       <p className="text-xs text-yellow-400 font-medium animate-pulse">
@@ -271,7 +273,9 @@ const GigCard = ({ gig, onOpenChat }: AllGigsComponentProps) => {
 
                 {/* Finalize button */}
                 {gig?.musicianConfirmPayment?.temporaryConfirm &&
-                  gig?.clientConfirmPayment?.temporaryConfirm && (
+                  gig?.clientConfirmPayment?.temporaryConfirm &&
+                  !gig?.musicianConfirmPayment?.confirmPayment &&
+                  !gig?.clientConfirmPayment?.confirmPayment && (
                     <ButtonComponent
                       variant="secondary"
                       classname="!bg-emerald-600 hover:!bg-emerald-700 w-full h-7 text-[11px] font-semibold text-white px-3 rounded transition-all"
@@ -283,8 +287,10 @@ const GigCard = ({ gig, onOpenChat }: AllGigsComponentProps) => {
                     />
                   )}
               </div>
-            ) : (
-              <>
+            )}
+
+            {gig.paymentStatus === "paid" && (
+              <div className="w-full">
                 {videoLimitReached && testfilteredvids ? (
                   <button
                     className="flex-1 flex items-center justify-center gap-2 bg-gray-700/70 hover:bg-gray-600/80 text-gray-300 hover:text-white py-2.5 px-4 rounded-lg transition-all duration-200 border border-gray-600/50"
@@ -299,13 +305,13 @@ const GigCard = ({ gig, onOpenChat }: AllGigsComponentProps) => {
                       setCurrentGig(gig);
                       setShowVideo(true);
                     }}
-                    className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-400 hover:to-indigo-500 text-white py-2.5 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-indigo-500/30"
+                    className="whitespace-nowrap flex  p-3 items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-400 hover:to-indigo-500 text-white py-2.5 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-indigo-500/30"
                   >
                     <Video className="w-4 h-4" />
-                    <span className="text-sm">Add Content</span>
+                    <span className="text-sm">Add Video Content</span>
                   </button>
                 )}
-              </>
+              </div>
             )}
 
             {/* Only show cancel button if no videos have been added */}

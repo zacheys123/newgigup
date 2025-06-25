@@ -195,6 +195,8 @@ const MyGigs = () => {
   //   }
   // };
 
+  const bgigs = filteredGigs.filter((gig) => gig?.isTaken);
+
   return (
     <>
       <CodeModal
@@ -415,7 +417,7 @@ const MyGigs = () => {
                         {filteredGigs.length}
                       </span>
                       <span className="text-2xl text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-purple-400 to-orange-300 font-semibold">
-                        {"Gigs Pending and Booked"}
+                        Gigs Pending and {bgigs.length} Booked
                       </span>
                     </h2>
                   </div>
