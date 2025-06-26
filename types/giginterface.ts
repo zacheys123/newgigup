@@ -61,6 +61,7 @@ export interface GigProps {
     code: string;
     temporaryConfirm: boolean;
   };
+  gigRating: number;
 }
 
 export interface Gigs {

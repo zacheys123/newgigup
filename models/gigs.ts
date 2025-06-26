@@ -122,6 +122,7 @@ const gigSchema = new mongoose.Schema(
       code: { type: String },
       temporaryConfirm: Boolean,
     },
+    gigRating: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

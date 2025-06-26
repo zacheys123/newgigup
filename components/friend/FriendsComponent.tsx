@@ -633,6 +633,7 @@ const FriendsComponent = () => {
             friend={friend}
             error={error}
             isLoading={isLoading}
+            setShow={setShowMore}
           />
         </motion.div>
       )}

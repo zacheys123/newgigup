@@ -159,6 +159,7 @@ export const initialState = {
       code: "",
       temporaryConfirm: false,
     },
+    gigRating: 0,
   },
 
   searchQuery: "",

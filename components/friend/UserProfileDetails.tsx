@@ -1,31 +1,32 @@
-// components/UserProfileDetails.tsx
 "use client";
 
-import { UserProps } from "@/types/userinterfaces";
-import { useRouter } from "next/navigation";
+import { Review, UserProps } from "@/types/userinterfaces";
 import React, { useEffect, useState } from "react";
-
 import { motion } from "framer-motion";
-
-import {
-  FaAward,
-  FaThumbsUp,
-  FaThumbsDown,
-  FaFrownOpen,
-  FaStar,
-  FaCrown,
-  FaFire,
-  FaHeart,
-  FaRegClock,
-  FaExclamationTriangle,
-  FaTimes,
-  FaCheck,
-} from "react-icons/fa";
-import { IoShieldCheckmark, IoRibbon, IoSparkles } from "react-icons/io5";
-import { GiAchievement } from "react-icons/gi";
 import { Button } from "../ui/button";
 import useSocket from "@/hooks/useSocket";
 import { mutate } from "swr";
+import { useAllGigs } from "@/hooks/useAllGigs";
+import { GigProps } from "@/types/giginterface";
+import { NotificationToast } from "./user-reliability/Notification";
+import { UserProfileHeader } from "./user-reliability/UserProfileHeader";
+import { RatingOverview } from "./user-reliability/RatingOverview";
+import { PerformanceMetrics } from "./user-reliability/PerformanceMetrics";
+import { BadgesSection } from "./user-reliability/BadgesSection";
+import { PerformanceImpact } from "./user-reliability/PerformanceImapact";
+import { useRouter } from "next/navigation";
+import { IoRibbon, IoShieldCheckmark, IoSparkles } from "react-icons/io5";
+import {
+  FaAward,
+  FaCrown,
+  FaFire,
+  FaFrownOpen,
+  FaHeart,
+  FaRegClock,
+  FaStar,
+  FaThumbsDown,
+} from "react-icons/fa";
+import { GiAchievement } from "react-icons/gi";
 
 interface Badge {
   name: string;
@@ -36,24 +37,137 @@ interface Badge {
   tier?: "bronze" | "silver" | "gold" | "platinum";
 }
 
+// Utility functions
+// --- Helper Functions (keep these defined as in the previous response) ---
+interface CombinedRatingOptions {
+  directReviewsWeight: number;
+  gigBasedWeight: number;
+}
+
+const combineRatings = (
+  directRating: number,
+  gigBasedRating: number,
+  options: CombinedRatingOptions
+): number => {
+  const { directReviewsWeight, gigBasedWeight } = options;
+  if (directRating === 0 && gigBasedRating === 0) return 0;
+  if (gigBasedRating === 0) return directRating;
+  if (directRating === 0) return gigBasedRating;
+  const totalWeight = directReviewsWeight + gigBasedWeight;
+  return (
+    (directRating * directReviewsWeight + gigBasedRating * gigBasedWeight) /
+    totalWeight
+  );
+};
+
+type RatingSource = Review | number;
+
+interface RatingBreakdown {
+  "5": number;
+  "4": number;
+  "3": number;
+  "2": number;
+  "1": number;
+  [key: string]: number;
+}
+
+const getRatingBreakdown = (ratings: RatingSource[]): RatingBreakdown => {
+  const breakdown: RatingBreakdown = { "5": 0, "4": 0, "3": 0, "2": 0, "1": 0 };
+  ratings.forEach((item) => {
+    let ratingValue: number;
+    if (typeof item === "number") {
+      ratingValue = item;
+    } else {
+      ratingValue = item.rating;
+    }
+    const roundedRating = Math.round(ratingValue);
+    if (roundedRating >= 1 && roundedRating <= 5) {
+      breakdown[roundedRating.toString()]++;
+    }
+  });
+  return breakdown;
+};
+
+// --- Main calculateAverageRating Function ---
+
+interface CalculateRatingResult {
+  directRating: number;
+  gigBasedRating: number;
+  combinedRating: number;
+  totalReviews: number;
+  ratingBreakdown: RatingBreakdown;
+}
+
+const calculateAverageRating = (
+  user: UserProps,
+  allGigs: GigProps[] = []
+): CalculateRatingResult => {
+  const directReviews = user.allreviews ? user?.allreviews : [];
+  const directRating =
+    directReviews.length > 0
+      ? directReviews.reduce((sum, review) => sum + review.rating, 0) /
+        directReviews.length
+      : 0;
+
+  const userGigs = allGigs.filter(
+    (gig) =>
+      gig.bookedBy === user._id &&
+      gig.musicianConfirmPayment?.confirmPayment && // Use optional chaining
+      gig.clientConfirmPayment?.confirmPayment // Use optional chaining
+  );
+
+  // --- KEY CHANGE HERE ---
+  // Only include gigRating if it's a valid number.
+  const gigRatings = userGigs.flatMap((gig) =>
+    typeof gig.gigRating === "number" ? [gig.gigRating] : []
+  );
+  // -----------------------
+
+  const gigBasedRating =
+    gigRatings.length > 0
+      ? gigRatings.reduce((sum, rating) => sum + rating, 0) / gigRatings.length
+      : 0;
+
+  const combinedRating = combineRatings(directRating, gigBasedRating, {
+    directReviewsWeight: 0.7,
+    gigBasedWeight: 0.3,
+  });
+
+  // Prepare all individual ratings for the breakdown calculation
+  const allIndividualRatings: RatingSource[] = [
+    ...directReviews, // Review objects from direct reviews
+    ...gigRatings, // Numbers from gig.gigRating
+  ];
+
+  return {
+    directRating,
+    gigBasedRating,
+    combinedRating,
+    totalReviews: directReviews.length + gigRatings.length,
+    ratingBreakdown: getRatingBreakdown(allIndividualRatings),
+  };
+};
+
 const UserProfileDetails = ({
   friend,
   error,
   isLoading,
+  setShow,
 }: {
   friend: UserProps;
   error: string;
   isLoading: boolean;
+  setShow: (show: boolean) => void;
 }) => {
   const router = useRouter();
   const { socket } = useSocket();
   const [showNotification, setShowNotification] = useState(false);
   const [notification, setNotification] = useState({ title: "", message: "" });
+  const { gigs: allGigs } = useAllGigs();
 
   useEffect(() => {
-    // Initialize Socket.IO connection
     if (!socket) return;
-    // Listen for badge achievement notifications
+
     socket.on("badgeAchieved", (data) => {
       if (data.userId === friend?._id) {
         setNotification({
@@ -61,9 +175,8 @@ const UserProfileDetails = ({
           message: `You've earned the ${data.badgeName} badge!`,
         });
         setShowNotification(true);
-        mutate(`/api/user/getuser/${friend.username}`); // Revalidate the user data
+        mutate(`/api/user/getuser/${friend.username}`);
 
-        // Hide notification after 5 seconds
         setTimeout(() => setShowNotification(false), 5000);
       }
     });
@@ -71,54 +184,24 @@ const UserProfileDetails = ({
     return () => {
       socket.disconnect();
     };
-  }, [friend?._id, mutate]);
+  }, [friend?._id, friend?.username, socket]);
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full shadow-lg"
-        />
-        <h6 className="ml-4 text-xl font-semibold text-gray-700 animate-pulse">
-          Loading user details...
-        </h6>
-      </div>
-    );
-  }
+  const {
+    directRating,
+    gigBasedRating,
+    combinedRating,
+    totalReviews,
+    ratingBreakdown,
+  } = calculateAverageRating(friend || {}, allGigs || []);
 
-  if (error || !friend) {
-    return (
-      <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-        <div className="bg-white p-10 rounded-2xl shadow-xl border border-gray-100 text-center">
-          <p className="text-gray-700 text-xl font-medium mb-4">
-            {`Oops! Couldn't load user details.`}
-          </p>
-          <Button
-            onClick={() => router.back()}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors duration-300"
-          >
-            Go Back
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  // Calculate reliability score
   const totalGigs =
     (friend.completedGigsCount || 0) + (friend.cancelgigCount || 0);
   const reliabilityScore =
     totalGigs > 0 ? ((friend.completedGigsCount || 0) / totalGigs) * 100 : 100;
 
-  // Calculate average rating
-  const averageRating = friend.allreviews?.length
-    ? friend.allreviews.reduce((sum, review) => sum + review.rating, 0) /
-      friend.allreviews.length
-    : 0;
+  // Calculate average rating for badge conditions
+  const averageRating = combinedRating;
 
-  // Define all possible badges with conditions
   const ALL_BADGES: Badge[] = [
     {
       name: "Newcomer",
@@ -150,7 +233,7 @@ const UserProfileDetails = ({
     },
     {
       name: "Gig Champion",
-      icon: <FaCrown className="text-purple-500" />,
+      icon: <FaCrown className="text-purple-500" />, // Fixed typo here
       description: "Completed 25+ gigs with 98%+ reliability",
       condition: (user) =>
         (user.completedGigsCount || 0) >= 25 && reliabilityScore >= 98,
@@ -182,8 +265,8 @@ const UserProfileDetails = ({
       name: "Early Bird",
       icon: <FaRegClock className="text-green-500" />,
       description: "Consistently arrives early to gigs (tracked via check-ins)",
-      condition: (user) => user.completedGigsCount >= 90,
-      upcomingCondition: (user) => user.completedGigsCount >= 80,
+      condition: (user) => (user.completedGigsCount || 0) >= 90,
+      upcomingCondition: (user) => (user.completedGigsCount || 0) >= 80,
       tier: "silver",
     },
     {
@@ -206,8 +289,8 @@ const UserProfileDetails = ({
       name: "Gig Streak",
       icon: <FaFire className="text-orange-500" />,
       description: "Completed 5 gigs in a row without cancellations",
-      condition: (user) => user.completedGigsCount >= 5,
-      upcomingCondition: (user) => user.completedGigsCount >= 3,
+      condition: (user) => (user.completedGigsCount || 0) >= 5,
+      upcomingCondition: (user) => (user.completedGigsCount || 0) >= 3,
       tier: "silver",
     },
     {
@@ -232,418 +315,79 @@ const UserProfileDetails = ({
     },
   ];
 
-  // Get earned badges
-  const getEarnedBadges = () => {
-    return ALL_BADGES.filter((badge) => badge.condition(friend));
-  };
+  const earnedBadges = ALL_BADGES.filter((badge) => badge.condition(friend));
+  const upcomingBadges = ALL_BADGES.filter(
+    (badge) => !badge.condition(friend) && badge.upcomingCondition?.(friend)
+  );
 
-  // Get upcoming badges (ones the user is close to earning)
-  const getUpcomingBadges = () => {
-    return ALL_BADGES.filter(
-      (badge) => !badge.condition(friend) && badge.upcomingCondition?.(friend)
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+          className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full shadow-lg"
+        />
+        <h6 className="ml-4 text-xl font-semibold text-gray-700 animate-pulse">
+          Loading user details...
+        </h6>
+      </div>
     );
-  };
+  }
 
-  const earnedBadges = getEarnedBadges();
-  const upcomingBadges = getUpcomingBadges();
-
-  // Determine progress toward next badge (example for Top Performer)
-  const progressToNextBadge = () => {
-    if (earnedBadges.some((b) => b.name === "Top Performer")) return null;
-
-    const completed = friend.completedGigsCount || 0;
-    if (completed < 7) return null;
-
-    const progress = Math.min(100, ((completed - 7) / (10 - 7)) * 100);
-    return {
-      badgeName: "Top Performer",
-      progress,
-      remaining: 10 - completed,
-      description: "Complete 10 gigs with 95%+ reliability",
-    };
-  };
-
-  const nextBadgeProgress = progressToNextBadge();
+  if (error || !friend) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="bg-white p-10 rounded-2xl shadow-xl border border-gray-100 text-center">
+          <p className="text-gray-700 text-xl font-medium mb-4">
+            {error || "Couldn't load user details"}
+          </p>
+          <Button
+            onClick={() => router.back()}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors duration-300"
+          >
+            Go Back
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="overflow-y-auto h-screen w-full bg-gradient-to-b from-gray-50 to-gray-100 p-6">
-      {/* Notification Toast */}
       {showNotification && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 20 }}
-          className="fixed top-4 right-4 bg-white p-4 rounded-lg shadow-xl border-l-4 border-green-500 z-50 max-w-sm"
-        >
-          <div className="flex items-start">
-            <div className="flex-shrink-0 text-green-500 text-xl">
-              <FaAward />
-            </div>
-            <div className="ml-3">
-              <h3 className="font-bold text-gray-900">{notification.title}</h3>
-              <p className="text-gray-700">{notification.message}</p>
-            </div>
-            <button
-              onClick={() => setShowNotification(false)}
-              className="ml-auto text-gray-400 hover:text-gray-500"
-            >
-              ✕
-            </button>
-          </div>
-        </motion.div>
+        <NotificationToast
+          title={notification.title}
+          message={notification.message}
+          onClose={() => setShowNotification(false)}
+        />
       )}
 
       <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-lg p-8 mt-10 border border-gray-100">
-        {/* ... (previous header code remains the same) ... */}
+        <UserProfileHeader username={friend.username} setShow={setShow} />
 
-        {/* Progress to Next Badge */}
-        {nextBadgeProgress && (
-          <div className="bg-indigo-50 p-6 rounded-lg shadow-sm mb-8">
-            <h3 className="text-lg font-semibold text-indigo-800 mb-3">
-              {`         On Your Way to "${nextBadgeProgress.badgeName}" Badge!
-            `}
-            </h3>
-            <div className="w-full bg-gray-200 rounded-full h-4 mb-2">
-              <div
-                className="bg-gradient-to-r from-indigo-400 to-purple-500 h-4 rounded-full"
-                style={{ width: `${nextBadgeProgress.progress}%` }}
-              ></div>
-            </div>
-            <p className="text-sm text-gray-700">
-              {nextBadgeProgress.remaining} more gigs needed (
-              {nextBadgeProgress.description})
-            </p>
-          </div>
-        )}
+        <RatingOverview
+          directRating={directRating}
+          gigBasedRating={gigBasedRating}
+          combinedRating={combinedRating}
+          totalReviews={totalReviews}
+          ratingBreakdown={ratingBreakdown}
+          completedGigsCount={friend.completedGigsCount || 0}
+        />
 
-        {/* Badges Section */}
-        <div className="bg-gray-50 p-6 rounded-lg shadow-sm mb-8">
-          <h2 className="text-xl font-bold text-gray-800 mb-4 border-b border-gray-200 pb-3">
-            Achievements & Status Badges
-          </h2>
+        <PerformanceMetrics
+          completedGigsCount={friend.completedGigsCount || 0}
+          cancelgigCount={friend.cancelgigCount || 0}
+          reliabilityScore={reliabilityScore}
+        />
 
-          {earnedBadges.length > 0 ? (
-            <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-                {earnedBadges.map((badge, index) => (
-                  <motion.div
-                    key={index}
-                    whileHover={{ scale: 1.03 }}
-                    className={`relative bg-white p-4 rounded-xl shadow-sm border-l-4 ${
-                      badge.tier === "bronze"
-                        ? "border-amber-700"
-                        : badge.tier === "silver"
-                        ? "border-gray-400"
-                        : badge.tier === "gold"
-                        ? "border-yellow-500"
-                        : "border-purple-600"
-                    }`}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div
-                        className={`text-2xl ${
-                          badge.tier === "bronze"
-                            ? "text-amber-700"
-                            : badge.tier === "silver"
-                            ? "text-gray-500"
-                            : badge.tier === "gold"
-                            ? "text-yellow-500"
-                            : "text-purple-600"
-                        }`}
-                      >
-                        {badge.icon}
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-gray-800 flex items-center gap-2">
-                          {badge.name}
-                          {badge.tier === "platinum" && (
-                            <span className="text-xs bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full">
-                              PLATINUM
-                            </span>
-                          )}
-                        </h3>
-                        <p className="text-sm text-gray-600 mt-1">
-                          {badge.description}
-                        </p>
-                      </div>
-                    </div>
-                    {badge.tier && (
-                      <div
-                        className="absolute top-2 right-2 text-xs font-medium ${
-                        badge.tier === 'bronze' ? 'text-amber-700' :
-                        badge.tier === 'silver' ? 'text-gray-500' :
-                        badge.tier === 'gold' ? 'text-yellow-500' :
-                        'text-purple-600'
-                      }"
-                      >
-                        {badge.tier.toUpperCase()}
-                      </div>
-                    )}
-                  </motion.div>
-                ))}
-              </div>
+        <BadgesSection
+          earnedBadges={earnedBadges}
+          upcomingBadges={upcomingBadges}
+        />
 
-              {/* Upcoming Badges */}
-              {upcomingBadges.length > 0 && (
-                <div className="mt-10">
-                  <h3 className="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
-                    <FaRegClock className="text-blue-500" />
-                    {`Upcoming Badges You're Close To Earning`}
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {upcomingBadges.map((badge, index) => {
-                      // Calculate progress for each upcoming badge
-                      let progress = 0;
-                      let remaining = "";
+        <PerformanceImpact />
 
-                      if (badge.name === "Top Performer") {
-                        const completed = friend.completedGigsCount || 0;
-                        progress = Math.min(
-                          100,
-                          ((completed - 7) / (10 - 7)) * 100
-                        );
-                        remaining = `${10 - completed} more gigs`;
-                      } else if (badge.name === "Highly Rated") {
-                        const neededReviews =
-                          5 - (friend.completedGigsCount || 0);
-                        progress = Math.min(
-                          100,
-                          ((friend.completedGigsCount || 0) / 5) * 100
-                        );
-                        remaining =
-                          neededReviews > 0
-                            ? `${neededReviews} more gigs`
-                            : "Need higher rating";
-                      }
-                      // Add similar conditions for other badges
-
-                      return (
-                        <div
-                          key={index}
-                          className="bg-white p-4 rounded-lg border-2 border-dashed border-gray-300 hover:border-blue-300 transition-colors"
-                        >
-                          <div className="flex items-start gap-3">
-                            <div className="text-gray-400 text-2xl">
-                              {badge.icon}
-                            </div>
-                            <div className="flex-1">
-                              <h4 className="font-medium text-gray-700">
-                                {badge.name}
-                              </h4>
-                              <p className="text-xs text-gray-500 mt-1">
-                                {badge.description}
-                              </p>
-                              {progress > 0 && (
-                                <div className="mt-2">
-                                  <div className="w-full bg-gray-100 rounded-full h-2">
-                                    <div
-                                      className="bg-blue-400 h-2 rounded-full"
-                                      style={{ width: `${progress}%` }}
-                                    ></div>
-                                  </div>
-                                  <p className="text-xs text-gray-600 mt-1">
-                                    {remaining} to unlock
-                                  </p>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="text-center py-8">
-              <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                <FaAward className="text-gray-400 text-2xl" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-700 mb-2">
-                No badges earned yet
-              </h3>
-              <p className="text-gray-500 max-w-md mx-auto">
-                Complete gigs, maintain good ratings, and build your reliability
-                to start earning badges.
-              </p>
-              <Button
-                variant="outline"
-                className="mt-4 border-blue-500 text-blue-600 hover:bg-blue-50"
-                onClick={() => router.push("/how-it-works#badges")}
-              >
-                Learn how to earn badges
-              </Button>
-            </div>
-          )}
-        </div>
-
-        {/* Performance Statistics */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div className="bg-blue-50 p-5 rounded-lg border border-blue-100">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-blue-600 font-medium">Completed</p>
-                <p className="text-3xl font-bold text-blue-800 mt-1">
-                  {friend.completedGigsCount || 0}
-                </p>
-              </div>
-              <div className="bg-blue-100 p-2 rounded-full">
-                <FaCheck className="text-blue-600" />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-red-50 p-5 rounded-lg border border-red-100">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-red-600 font-medium">Canceled</p>
-                <p className="text-3xl font-bold text-red-800 mt-1">
-                  {friend.cancelgigCount || 0}
-                </p>
-              </div>
-              <div className="bg-red-100 p-2 rounded-full">
-                <FaTimes className="text-red-600" />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-green-50 p-5 rounded-lg border border-green-100">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-green-600 font-medium">
-                  Reliability
-                </p>
-                <p className="text-3xl font-bold text-green-800 mt-1">
-                  {reliabilityScore.toFixed(0)}%
-                </p>
-              </div>
-              <div className="bg-green-100 p-2 rounded-full">
-                <IoShieldCheckmark className="text-green-600" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Rating Breakdown */}
-        {friend.allreviews && friend.allreviews?.length > 0 && (
-          <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8">
-            <h3 className="text-lg font-bold text-gray-800 mb-4">
-              Rating Breakdown
-            </h3>
-            <div className="space-y-4">
-              <div className="flex items-center">
-                <span className="w-24 text-gray-600">Overall</span>
-                <div className="flex-1 flex items-center">
-                  <div className="flex mr-2">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <FaStar
-                        key={star}
-                        className={`${
-                          star <= Math.round(averageRating)
-                            ? "text-yellow-400"
-                            : "text-gray-300"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-gray-700 font-medium">
-                    {averageRating.toFixed(1)} ({friend.allreviews.length}{" "}
-                    reviews)
-                  </span>
-                </div>
-              </div>
-
-              {[5, 4, 3, 2, 1].map((rating) => {
-                const count =
-                  friend?.allreviews &&
-                  friend?.allreviews.filter((r) => r.rating === rating).length;
-                const percentage =
-                  count &&
-                  friend.allreviews &&
-                  (count / friend.allreviews.length) * 100;
-
-                return (
-                  <div key={rating} className="flex items-center">
-                    <span className="w-24 text-gray-600">
-                      {rating} star{rating !== 1 ? "s" : ""}
-                    </span>
-                    <div className="flex-1 flex items-center">
-                      <div className="w-full bg-gray-100 rounded-full h-2.5 mr-3">
-                        <div
-                          className="bg-yellow-400 h-2.5 rounded-full"
-                          style={{ width: `${percentage}%` }}
-                        ></div>
-                      </div>
-                      <span className="text-sm text-gray-600 w-10">
-                        {count}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* Incentives & Consequences */}
-        <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-6 rounded-xl border border-indigo-100 mb-8">
-          <h3 className="text-xl font-bold text-indigo-800 mb-4">
-            Performance Impact
-          </h3>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <h4 className="font-semibold text-green-600 mb-3 flex items-center gap-2">
-                <FaThumbsUp /> Benefits for Good Performance
-              </h4>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-2">
-                  <FaCheck className="text-green-500 mt-1 flex-shrink-0" />
-                  <span>Higher search ranking</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <FaCheck className="text-green-500 mt-1 flex-shrink-0" />
-                  <span>Access to premium gigs</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <FaCheck className="text-green-500 mt-1 flex-shrink-0" />
-                  <span>Verified badge on profile</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <FaCheck className="text-green-500 mt-1 flex-shrink-0" />
-                  <span>Reduced platform fees</span>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold text-red-600 mb-3 flex items-center gap-2">
-                <FaExclamationTriangle /> Consequences for Poor Performance
-              </h4>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-2">
-                  <FaTimes className="text-red-500 mt-1 flex-shrink-0" />
-                  <span>Lower search visibility</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <FaTimes className="text-red-500 mt-1 flex-shrink-0" />
-                  <span>Temporary gig restrictions</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <FaTimes className="text-red-500 mt-1 flex-shrink-0" />
-                  <span>Warning labels on profile</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <FaTimes className="text-red-500 mt-1 flex-shrink-0" />
-                  <span>Increased platform fees</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
         <div className="mt-8 pt-6 border-t border-gray-200 text-center text-sm text-gray-500">
           {friend.createdAt && friend.updatedAt && (
             <p>

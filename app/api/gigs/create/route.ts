@@ -38,7 +38,7 @@ type Info = {
   scheduleDate: Date;
   bookingHistory: BookingItem[];
   status: string;
-
+  gigRating: number;
   paymentStatus: string;
   completedAt: Date;
 };
@@ -74,6 +74,7 @@ export async function POST(req: NextRequest) {
     currency,
     isPending,
     scheduleDate,
+    gigRating,
   }: Info = await req.json();
 
   console.log(isPending);
@@ -252,6 +253,7 @@ export async function POST(req: NextRequest) {
       currency,
       isPending,
       scheduleDate,
+      gigRating,
     });
 
     await User.findByIdAndUpdate(postedBy, {

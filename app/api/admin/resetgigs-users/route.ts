@@ -44,6 +44,7 @@ export async function POST(req: NextRequest) {
           cancellationReason: null,
           completedAt: null,
           viewCount: [],
+          gigRating: 0,
         },
       }
     );
