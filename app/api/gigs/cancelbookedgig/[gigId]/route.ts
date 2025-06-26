@@ -6,7 +6,7 @@ import User from "@/models/user";
 import { Types } from "mongoose";
 import { getAuth } from "@clerk/nextjs/server";
 
-export async function DELETE(request: NextRequest) {
+export async function PUT(request: NextRequest) {
   const gigId = request.nextUrl.pathname.split("/").pop();
   const { userId } = getAuth(request);
   const { musicianId, reason, cancelerRole } = await request.json();
@@ -45,6 +45,20 @@ export async function DELETE(request: NextRequest) {
             isTaken: false,
             bookedBy: null,
             cancellationReason: reason,
+            musicianConfirmPayment: {
+              gigId: null,
+              confirmPayment: false,
+              confirmedAt: null,
+              code: null,
+              temporaryConfirm: false,
+            },
+            clientConfirmPayment: {
+              gigId: null,
+              confirmPayment: false,
+              confirmedAt: null,
+              code: null,
+              temporaryConfirm: false,
+            },
           },
           $push: {
             bookingHistory: {

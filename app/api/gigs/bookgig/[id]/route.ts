@@ -125,7 +125,7 @@ export async function PUT(req: NextRequest) {
     });
 
     await gig.updateOne({
-      $push: { bookCount: userid },
+      $push: { bookCount: userid, viewCount: userid },
     });
 
     const updatedGig = await Gig.findById(id).populate("bookCount");

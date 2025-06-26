@@ -139,12 +139,19 @@ const GigCard = ({ gig, onOpenChat }: AllGigsComponentProps) => {
             </div>
           </div>
 
-          <div className="flex items-center text-xs mt-1">
-            <span className="mr-2">Payment Status:</span>
+          <div
+            className={`flex items-center text-xs mt-1      ${
+              gig.paymentStatus === "paid" &&
+              "bg-emerald-500 rounded-full  p-2 whitespace-nowrap"
+            }`}
+          >
+            <span className="mr-2 text-[9px] text-amber-100 ">
+              Payment Status:
+            </span>
             <span
               className={`px-2 py-0.5 rounded-full text-xs ${
                 gig.paymentStatus === "paid"
-                  ? "bg-green-100 text-green-800"
+                  ? " text-amber-300 title"
                   : gig.paymentStatus === "refunded"
                   ? "bg-red-100 text-red-800"
                   : "bg-yellow-100 text-yellow-800"
@@ -153,9 +160,11 @@ const GigCard = ({ gig, onOpenChat }: AllGigsComponentProps) => {
               {gig.paymentStatus?.toUpperCase()}
             </span>
           </div>
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-200 border border-indigo-400/30">
-            Active Booking
-          </span>
+          {gig.paymentStatus === "pending" && (
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-200 border border-indigo-400/30">
+              Active Booking
+            </span>
+          )}
         </div>
       </div>
 
@@ -225,8 +234,8 @@ const GigCard = ({ gig, onOpenChat }: AllGigsComponentProps) => {
           <div className="flex space-x-3">
             {needsMusicianConfirmation && (
               <div className="w-full flex flex-col gap-2">
-                {confirmedParty === "none" &&
-                  !gig?.clientConfirmPayment?.code && (
+                {!gig?.clientConfirmPayment?.code &&
+                  !gig?.musicianConfirmPayment?.code && (
                     <div className="flex justify-center gap-4 my-3">
                       <ButtonComponent
                         variant="secondary"
@@ -293,7 +302,7 @@ const GigCard = ({ gig, onOpenChat }: AllGigsComponentProps) => {
               <div className="w-full">
                 {videoLimitReached && testfilteredvids ? (
                   <button
-                    className="flex-1 flex items-center justify-center gap-2 bg-gray-700/70 hover:bg-gray-600/80 text-gray-300 hover:text-white py-2.5 px-4 rounded-lg transition-all duration-200 border border-gray-600/50"
+                    className="w-[200px] mx-auto flex items-center justify-center gap-2 bg-violet-600 hover:bg-gray-600/80 text-gray-200 hover:text-white py-2.5 px-4 rounded-lg transition-all duration-200 border border-gray-600/50"
                     onClick={() => setShowVideoModal(true)}
                   >
                     <Lock className="w-4 h-4" />

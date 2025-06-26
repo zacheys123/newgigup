@@ -77,7 +77,7 @@ export interface UserProps {
   bookingHistory: BookingItem[];
   completedGigsCount: number;
   cancelgigCount: number;
-
+  reliabilityScore?: number;
   reportsCount: number;
 }
 export interface Users {

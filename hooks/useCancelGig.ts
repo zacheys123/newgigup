@@ -13,16 +13,13 @@ export const useCancelGig = () => {
   ) => {
     try {
       setIsCanceling(true);
-      const response = await fetch(
-        `/api/gigs/clientmusician-cancelgig/${gigId}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ musicianId, reason, cancelerRole }),
-        }
-      );
+      const response = await fetch(`/api/gigs/cancelbookedgig/${gigId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ musicianId, reason, cancelerRole }),
+      });
 
       if (!response.ok) {
         throw new Error("Failed to cancel gig");

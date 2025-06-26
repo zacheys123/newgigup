@@ -100,6 +100,7 @@ interface IUser extends Document {
       notes: string; // Optional (e.g., cancellation reason)
     }
   ];
+  reliabilityScore: number;
   completedGigsCount: number;
   reportsCount: number;
 }
@@ -246,6 +247,7 @@ const userSchema = new Schema<IUser>(
       type: Number,
       default: 0,
     },
+    reliabilityScore: Number,
   },
 
   { timestamps: true }

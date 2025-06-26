@@ -1,13 +1,38 @@
 "use client";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
+import {
+  FiUser,
+  FiMail,
+  FiAtSign,
+  FiStar,
+  FiCalendar,
+  FiXCircle,
+  FiDollarSign,
+  FiClock,
+} from "react-icons/fi";
+import { useAllGigs } from "@/hooks/useAllGigs";
 import FollowButton from "./FollowButton";
 import { UserProps } from "@/types/userinterfaces";
-import { FiUser, FiMail, FiAtSign } from "react-icons/fi";
-import { useAllGigs } from "@/hooks/useAllGigs";
-import { useEffect, useState } from "react";
-import { GigProps } from "@/types/giginterface";
-import Image from "next/image";
+import { ArrowRight } from "lucide-react";
+
+interface PaymentConfirmation {
+  gigId: string;
+  confirmPayment: boolean;
+  confirmedAt?: Date | string;
+  temporaryConfirm?: boolean;
+  code?: string;
+}
+
+interface MyGigProps {
+  _id: string;
+  postedBy: UserProps;
+  bookedBy?: UserProps;
+  musicianConfirmPayment?: PaymentConfirmation;
+  clientConfirmPayment?: PaymentConfirmation;
+}
 
 const MainUser = ({
   _id,
@@ -22,63 +47,181 @@ const MainUser = ({
   organization,
   roleType,
   instrument,
+  completedGigsCount,
+  cancelgigCount,
 }: UserProps) => {
   const router = useRouter();
   const { loading: gigsLoading, gigs } = useAllGigs();
-
-  const handleClick = () => {
-    if (isMusician) {
-      router.push(`/search/${username}`);
-    } else if (isClient) {
-      router.push(`/client/search/${username}`);
-    }
-  };
-
-  const [musicianGigCount, setMusicianGigCount] = useState<number>(0);
   const [rating, setRating] = useState<number>(0);
 
-  const calculateRating = (
-    reviews: { rating: number }[],
-    gigCount: number
-  ): number => {
-    if (!reviews || reviews.length === 0) return 0;
+  // Memoize calculations to prevent unnecessary recomputations
+  // const { confirmedPayments } = useMemo(() => {
+  //   if (gigsLoading || !gigs)
+  //     return { confirmedPayments: 0, clientPaymentHistory: [] };
 
-    const avgReviewRating =
-      reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
-    const experienceFactor = Math.log10(gigCount + 0.5) * 1.0;
-    const finalRating = Math.min(
-      5,
-      avgReviewRating * 0.7 + experienceFactor * 0.3
-    );
+  //   return {
+  //     confirmedPayments: calculateConfirmedPayments(gigs, _id || ""),
+  //   };
+  // }, [gigs, gigsLoading, _id]);
 
-    return Math.round(finalRating * 10) / 10;
-  };
+  // Inside your MainUser component
+  const postedGigs = useMemo(() => {
+    if (!_id || !gigs) return [];
+    return calculateConfirmedPayments(gigs, _id);
+  }, [gigs, _id]);
 
-  useEffect(() => {
-    if (gigsLoading || !gigs) return;
-    // Filter gigs where bookedBy._id matches the current user's _id
-    const bookedGigs = gigs.filter((gig: GigProps) => {
-      return gig?.bookedBy?._id === _id;
+  // For debugging - log the results
+  const postedGigsPaymentStats = useMemo(() => {
+    const now = Date.now();
+    const fiveDaysInMs = 5 * 24 * 60 * 60 * 1000; // 5 days in milliseconds
+
+    const musicianConfirmedOnly = postedGigs.filter((gig) => {
+      const musicianConfirmed = gig.musicianConfirmPayment?.confirmPayment;
+      const clientConfirmed = gig.clientConfirmPayment?.confirmPayment;
+      const musicianConfirmDate = gig.musicianConfirmPayment?.confirmedAt
+        ? new Date(gig.musicianConfirmPayment.confirmedAt).getTime()
+        : null;
+      const clientConfirmDate = gig.clientConfirmPayment?.confirmedAt
+        ? new Date(gig.clientConfirmPayment.confirmedAt).getTime()
+        : null;
+
+      return (
+        musicianConfirmed &&
+        !clientConfirmed &&
+        musicianConfirmDate &&
+        now - musicianConfirmDate > fiveDaysInMs &&
+        (!clientConfirmDate || clientConfirmDate < musicianConfirmDate)
+      );
     });
 
-    setMusicianGigCount(bookedGigs.length);
+    return {
+      totalPosted: postedGigs.length,
+      bothConfirmed: postedGigs.filter(
+        (gig) =>
+          gig.musicianConfirmPayment?.confirmPayment &&
+          gig.clientConfirmPayment?.confirmPayment
+      ).length,
+      onlyMusicianConfirmed: postedGigs.filter(
+        (gig) =>
+          gig.musicianConfirmPayment?.temporaryConfirm &&
+          !gig.clientConfirmPayment?.temporaryConfirm
+      ).length,
+      onlyClientConfirmed: postedGigs.filter(
+        (gig) =>
+          !gig.musicianConfirmPayment?.temporaryConfirm &&
+          gig.clientConfirmPayment?.temporaryConfirm
+      ).length,
 
-    if (isMusician) {
-      // Only calculate rating for musicians
-setRating(
-  calculateRating(
-    bookedGigs.flatMap((gig: GigProps) => {
-      // Explicitly check if allreviews exists and is the correct type
-      if (gig.bookedBy?.allreviews && Array.isArray(gig.bookedBy.allreviews)) {
-        return gig.bookedBy.allreviews;
-      }
-      return [];
-    }),
-    bookedGigs.length
-  )
-);
-    }
+      noneConfirmed: postedGigs.filter(
+        (gig) =>
+          !gig.musicianConfirmPayment?.confirmPayment &&
+          !gig.clientConfirmPayment?.confirmPayment
+      ).length,
+      // New fields for date-based analysis
+      musicianConfirmedOver5DaysAgo: musicianConfirmedOnly.length,
+      musicianConfirmedOver5DaysAgoDetails: musicianConfirmedOnly.map(
+        (gig) => ({
+          gigId: gig._id,
+          musicianConfirmedAt: gig.musicianConfirmPayment?.confirmedAt,
+          daysSinceMusicianConfirmation: gig.musicianConfirmPayment?.confirmedAt
+            ? Math.floor(
+                (now -
+                  new Date(gig.musicianConfirmPayment.confirmedAt).getTime()) /
+                  (1000 * 60 * 60 * 24)
+              )
+            : null,
+          clientLastUpdated: gig.clientConfirmPayment?.confirmedAt,
+        })
+      ),
+    };
+  }, [postedGigs]);
+
+  // Log these stats
+  useEffect(() => {
+    console.log("Posted Gigs Payment Stats:", postedGigsPaymentStats);
+  }, [postedGigsPaymentStats]);
+
+  // Log these stats
+
+  // Combined effect for all gig-related calculations
+  useEffect(() => {
+    if (gigsLoading || !gigs || !isMusician) return;
+
+    const bookedGigs =
+      gigs.gigs?.filter((gig: MyGigProps) => gig?.bookedBy?._id === _id) || [];
+    setRating(
+      calculateRating(
+        bookedGigs.flatMap((gig: MyGigProps) =>
+          gig?.bookedBy?.allreviews && Array.isArray(gig?.bookedBy?.allreviews)
+            ? gig?.bookedBy?.allreviews
+            : []
+        ),
+        bookedGigs.length
+      )
+    );
   }, [_id, isMusician, gigs, gigsLoading]);
+
+  const handleClick = () => {
+    const path = isMusician
+      ? `/search/${username}`
+      : `/client/search/${username}`;
+    router.push(path);
+  };
+
+  // Stats configuration for dynamic rendering
+  // Update your stats configuration to include the new metrics
+  const stats = [
+    ...(isClient
+      ? [
+          {
+            icon: <FiDollarSign className="text-green-400 mb-1" />,
+            value: postedGigsPaymentStats.bothConfirmed,
+            label: "Gigs Paid",
+            color: "text-green-400",
+            tooltip: "Gigs with both confirmations",
+          },
+          {
+            icon: <FiClock className="text-amber-400 mb-1" />,
+            value:
+              postedGigsPaymentStats.musicianConfirmedOver5DaysAgo +
+              postedGigsPaymentStats.onlyMusicianConfirmed,
+            label: "Pending Payment",
+            color: "text-amber-400",
+            tooltip: "Musician confirmed but awaiting client (5+ days)",
+          },
+        ]
+      : [
+          {
+            icon: <FiCalendar className="text-green-400 mb-1" />,
+            value: completedGigsCount || 0,
+            label: "Completed Gigs",
+            color: "text-green-400",
+            tooltip: "Successfully completed gigs",
+          },
+        ]),
+    {
+      icon: <FiXCircle className="text-red-400 mb-1" />,
+      value: cancelgigCount || 0,
+      label: "Canceled Gigs",
+      color: "text-red-400",
+      tooltip: "Canceled gigs",
+    },
+    {
+      icon: (
+        <FiStar
+          className={isMusician ? "text-amber-400 mb-1" : "text-blue-400 mb-1"}
+        />
+      ),
+      value: isMusician
+        ? rating.toFixed(1)
+        : `${postedGigsPaymentStats.bothConfirmed}/${postedGigs.length}`,
+      label: isMusician ? "Rating" : "Paid/Total",
+      color: isMusician ? "text-amber-400" : "text-blue-400",
+      tooltip: isMusician
+        ? "Performance rating"
+        : `Paid: ${postedGigsPaymentStats.bothConfirmed} of ${postedGigs.length}`,
+    },
+  ];
 
   return (
     <motion.div
@@ -87,130 +230,252 @@ setRating(
       whileTap={{ scale: 0.97 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
       className={`
-        relative overflow-hidden rounded-2xl p-5 cursor-pointer backdrop-blur-md border border-white/10 transition-all duration-300
+        relative overflow-hidden rounded-xl p-6 cursor-pointer backdrop-blur-md border transition-all duration-300
         ${
           isMusician
-            ? "bg-gradient-to-br from-amber-900/20 to-yellow-700/10 hover:shadow-amber-500/20"
-            : "bg-gradient-to-br from-slate-800/20 to-slate-700/10 hover:shadow-slate-500/10"
+            ? "bg-gradient-to-br from-amber-900/20 to-yellow-700/10 hover:shadow-amber-500/20 border-amber-900/30"
+            : "bg-gradient-to-br from-slate-800/20 to-slate-700/10 hover:shadow-slate-500/10 border-slate-700/30"
         }
       `}
+      aria-label={`View profile of ${firstname} ${lastname}`}
     >
-      {/* Avatar + Basic Info */}
-      <div className="flex items-center gap-4">
-        {picture ? (
-          <Image
-            src={picture || ""}
-            alt="pic"
-            width={30}
-            height={30}
-            className="object-cover rounded-full"
+      <div className="flex flex-col gap-4">
+        {/* Header Section */}
+        <div className="flex items-start gap-4">
+          <Avatar
+            picture={picture ? picture : ""}
+            firstname={firstname}
+            lastname={lastname}
           />
-        ) : (
-          <div className="w-[30px] h-[30px] rounded-full flex justify-center items-center">
-            {firstname ? firstname[0] : ""}
+
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-white truncate">
+                {firstname} {lastname}
+              </h3>
+              <h5
+                className="font-mono text-[12px] items-center whitespace-nowrap text-neutral-400 flex  gap-2"
+                onClick={handleClick}
+              >
+                View more <ArrowRight size={13} />
+              </h5>
+            </div>
+
+            <UserInfo
+              isClient={isClient}
+              email={email}
+              organization={organization}
+              firstname={firstname}
+              roleType={roleType}
+              instrument={instrument}
+            />
           </div>
-        )}
-        <div className="flex-1 min-w-0">
-          <h3 className="text-base font-medium text-white truncate">
-            {firstname} {lastname}
-          </h3>
-          <div className="flex items-center gap-2 text-xs text-gray-400 mt-0.5 truncate">
-            {isClient ? (
-              <>
-                <FiUser className="text-xs" />
-                <span>{organization || `${firstname}'s Org`}</span>
-                <span>{organization ? `${organization}` : ""}</span>
-                <span className="text-emerald-300 font-bold">
-                  {isClient && "client"}
-                </span>
-              </>
-            ) : (
-              <>
-                <FiMail className="text-xs" />
-                <span>{email}</span>{" "}
-                <span className="text-emerald-300 font-bold">
-                  {isMusician && roleType === "instrumentalist"
-                    ? `I play ${instrument}`
-                    : roleType === "dj"
-                    ? "Deejay"
-                    : roleType === "mc"
-                    ? "EMcee"
-                    : roleType === "vocalist"
-                    ? "i'm a Vocalist"
-                    : "musician"}
-                </span>
-              </>
-            )}
+        </div>
+
+        {/* Stats Section */}
+        <div className="grid grid-cols-3 gap-3 mt-2">
+          {stats.map((stat, index) => (
+            <Tooltip key={index} content={stat.tooltip}>
+              <StatBox
+                icon={stat.icon}
+                value={stat.value}
+                label={stat.label}
+                color={stat.color}
+              />
+            </Tooltip>
+          ))}
+        </div>
+
+        {/* Footer Section */}
+        <div className="flex items-center justify-between mt-2 px-2 py-2 rounded-lg bg-white/5 border border-white/10">
+          <div className="flex items-center gap-2 text-sm text-gray-300">
+            <FiAtSign className="opacity-70" />
+            <span className="font-mono">@{username}</span>
           </div>
+
+          {_id && (
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <FollowButton _id={_id} followers={followers} />
+            </motion.div>
+          )}
         </div>
       </div>
-
-      {/* Username & Follow */}
-      <div className="flex items-center justify-between text-xs text-gray-400 mt-4 px-3 py-1.5 rounded-lg border border-white/5 bg-white/5">
-        <div className="flex items-center gap-1.5">
-          <FiAtSign className="text-xs" />
-          <span className="font-mono">@{username}</span>
-        </div>
-        {_id && (
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <FollowButton _id={_id} followers={followers} />
-          </motion.div>
-        )}
-      </div>
-
-      {/* Stats for Musicians */}
-      {isMusician && (
-        <div className="grid grid-cols-2 gap-2.5 mt-3">
-          {/* Gigs */}
-          <div className="bg-white/5 border border-white/10 rounded-lg p-2 backdrop-blur-sm group hover:bg-amber-900/20 transition-all duration-200">
-            <div className="flex flex-col items-center justify-center">
-              <span className="text-amber-300 font-semibold text-base group-hover:text-amber-200 transition-colors">
-                {gigsLoading ? (
-                  <span className="text-amber-300 text-[10px]">
-                    Processing...
-                  </span>
-                ) : (
-                  musicianGigCount
-                )}
-              </span>
-              <span className="text-[11px] text-gray-400 group-hover:text-amber-100/80 mt-0.5 transition-colors">
-                Gigs Booked
-              </span>
-            </div>
-          </div>
-
-          {/* Rating */}
-          <div className="bg-white/5 border border-white/10 rounded-lg p-2 backdrop-blur-sm group hover:bg-amber-900/20 transition-all duration-200">
-            <div className="flex flex-col items-center justify-center">
-              <div className="flex items-baseline gap-1">
-                <span className="text-amber-300 font-semibold text-base group-hover:text-amber-200 transition-colors">
-                  {rating.toFixed(1)}
-                </span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-3 w-3 text-amber-400 -mb-0.5"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-              </div>
-              <span className="text-[11px] text-gray-400 group-hover:text-amber-100/80 mt-0.5 transition-colors">
-                Rating
-              </span>
-            </div>
-          </div>
-        </div>
-      )}
-      {isClient && (
-        <div className="flex h-[19px] my-6">
-          <div className="h-full">
-            <h1 className="text-[12px] text-gray-200">{organization}</h1>
-          </div>
-        </div>
-      )}
     </motion.div>
   );
+};
+
+// Sub-components for better readability
+const Avatar = ({
+  picture,
+  firstname,
+  lastname,
+}: {
+  picture?: string;
+  firstname?: string;
+  lastname?: string;
+}) => (
+  <div className="relative">
+    {picture ? (
+      <Image
+        src={picture}
+        alt={`${firstname} ${lastname}`}
+        width={48}
+        height={48}
+        className="rounded-full border-2 border-white/20 object-cover"
+      />
+    ) : (
+      <div className="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white font-medium">
+        {firstname?.[0]}
+        {lastname?.[0]}
+      </div>
+    )}
+  </div>
+);
+
+const UserInfo = ({
+  isClient,
+  email,
+  organization,
+  firstname,
+  roleType,
+  instrument,
+}: {
+  isClient?: boolean;
+  email?: string;
+  organization?: string;
+  firstname?: string;
+  roleType?: string;
+  instrument?: string;
+}) => (
+  <>
+    <div className="flex items-center gap-2 text-sm text-gray-300 mt-1 truncate">
+      {isClient ? (
+        <>
+          <FiUser className="text-xs opacity-70" />
+          <span>{organization || `${firstname}'s Organization`}</span>
+        </>
+      ) : (
+        <>
+          <FiMail className="text-xs opacity-70" />
+          <span className="truncate">{email}</span>
+        </>
+      )}
+    </div>
+
+    <div className="mt-2">
+      <span
+        className={`text-xs font-medium ${
+          isClient ? "text-blue-400" : "text-amber-400"
+        }`}
+      >
+        {isClient
+          ? "Client"
+          : roleType === "instrumentalist"
+          ? `${instrument} Player`
+          : roleType === "dj"
+          ? "DJ"
+          : roleType === "mc"
+          ? "MC"
+          : roleType === "vocalist"
+          ? "Vocalist"
+          : "Musician"}
+      </span>
+    </div>
+  </>
+);
+
+const StatBox = ({
+  icon,
+  value,
+  label,
+  color,
+}: {
+  icon: React.ReactNode;
+  value: string | number;
+  label: string;
+  color: string;
+}) => (
+  <div className="bg-white/5 p-3 rounded-lg border border-white/10 hover:bg-white/10 transition-colors">
+    <div className="flex flex-col items-center">
+      {icon}
+      <span className={`${color} font-bold`}>{value}</span>
+      <span className="text-xs text-gray-400 mt-0.5 whitespace-nowrap">
+        {label}
+      </span>
+    </div>
+  </div>
+);
+
+// Tooltip component remains the same as in your original code
+const Tooltip = ({
+  content,
+  children,
+  position = "top",
+}: {
+  content: string;
+  children: React.ReactNode;
+  position?: "top" | "bottom" | "left" | "right";
+}) => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  const positionClasses = {
+    top: "bottom-full mb-2",
+    bottom: "top-full mt-2",
+    left: "right-full mr-2",
+    right: "left-full ml-2",
+  };
+
+  return (
+    <div className="relative inline-block">
+      <div
+        onMouseEnter={() => setIsVisible(true)}
+        onMouseLeave={() => setIsVisible(false)}
+        className="inline-block"
+      >
+        {children}
+      </div>
+      {isVisible && (
+        <div
+          className={`absolute ${positionClasses[position]} z-50 px-3 py-2 text-sm text-white bg-gray-800 rounded-md shadow-lg whitespace-nowrap`}
+        >
+          {content}
+          <div
+            className={`absolute w-2 h-2 bg-gray-800 rotate-45 ${
+              position === "top"
+                ? "-bottom-1 left-1/2 -translate-x-1/2"
+                : position === "bottom"
+                ? "-top-1 left-1/2 -translate-x-1/2"
+                : position === "left"
+                ? "-right-1 top-1/2 -translate-y-1/2"
+                : "-left-1 top-1/2 -translate-y-1/2"
+            }`}
+          />
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Utility functions
+const calculateRating = (
+  reviews: { rating: number }[],
+  gigCount: number
+): number => {
+  if (!reviews || reviews.length === 0) return 0;
+
+  const avgReviewRating =
+    reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+  const experienceFactor = Math.log10(gigCount + 0.5) * 1.0;
+  return (
+    Math.round(
+      Math.min(5, avgReviewRating * 0.7 + experienceFactor * 0.3) * 10
+    ) / 10
+  );
+};
+
+const calculateConfirmedPayments = (gigs: MyGigProps[], userId: string) => {
+  if (!gigs || !Array.isArray(gigs)) return [];
+  return gigs.filter((gig) => gig.postedBy._id === userId);
 };
 
 export default MainUser;

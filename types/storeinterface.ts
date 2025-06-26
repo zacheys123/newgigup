@@ -102,7 +102,7 @@ export const initialState = {
     bookingHistory: [] as BookingItem[],
     completedGigsCount: 0,
     cancelgigCount: 0,
-
+    reliabilityScore: 0,
     reportsCount: 0,
   },
   currentgig: {
