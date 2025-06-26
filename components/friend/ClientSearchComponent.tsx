@@ -106,6 +106,12 @@ const ClientSearchComponent = () => {
               completedGigsCount: 0,
               reportsCount: 0,
               cancelgigCount: 0,
+              rate: {
+                regular: "",
+                function: "",
+                concert: "",
+                corporate: "",
+              },
             },
           });
         }

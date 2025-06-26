@@ -19,6 +19,11 @@ import {
   Briefcase,
   Mail,
   X,
+  Piano,
+  DollarSign,
+  Calendar,
+  ChevronUp,
+  ChevronDown,
 } from "lucide-react";
 import { UserProps, VideoProfileProps } from "@/types/userinterfaces";
 
@@ -47,7 +52,12 @@ interface UpdateResponse {
   updateStatus: boolean;
   message?: string;
 }
-
+interface RateProps {
+  regular: string;
+  function: string;
+  concert: string;
+  corporate: string;
+}
 const CurrentUserProfile = () => {
   // Authentication and user data
 
@@ -70,6 +80,12 @@ const CurrentUserProfile = () => {
   const [email, setEmail] = useState<string | null>("");
   const [username, setUsername] = useState<string | null>("");
   const [phone, setPhone] = useState<string>("");
+  const [rate, setRate] = useState<RateProps>({
+    regular: "",
+    function: "",
+    concert: "",
+    corporate: "",
+  });
 
   // Location Information
   const [address, setAddress] = useState<string | null>("");
@@ -163,6 +179,12 @@ const CurrentUserProfile = () => {
       setIsMusician(user?.user?.isMusician || false);
       setIsClient(user?.user?.isClient || false);
       setClientHandles(user?.user?.handles);
+      setRate({
+        regular: user?.user?.rate?.regular || "",
+        function: user?.user?.rate?.function || "",
+        concert: user?.user?.rate?.concert || "",
+        corporate: user?.user?.rate?.corporate || "",
+      });
     }
   }, [
     user,
@@ -214,6 +236,7 @@ const CurrentUserProfile = () => {
       clienthandles,
       isMusician,
       isClient,
+      rate,
     };
 
     if (user) {
@@ -302,7 +325,7 @@ const CurrentUserProfile = () => {
   //     user.email.toLowerCase().includes(searchTerm.toLowerCase())
   // );
   console.log(modalData);
-
+  const [showRates, setShowRates] = useState(false);
   if (!user) {
     return (
       <div className="h-screen w-screen flex justify-center items-center animate-pulse">
@@ -684,12 +707,69 @@ const CurrentUserProfile = () => {
               />
               <TextInput
                 label="Phone"
-                value={phone}
+                value={rate.regular ? rate.regular : ""}
                 onChange={setPhone}
                 placeholder="+1 (123) 456-7890"
               />
             </SectionContainer>
+            {isMusician && (
+              <SectionContainer
+                icon={<Piano size={18} />}
+                title="Job Rates"
+                onClickHeader={() => setShowRates(!showRates)}
+                action={
+                  showRates ? (
+                    <ChevronUp size={18} className="text-gray-500" />
+                  ) : (
+                    <ChevronDown size={18} className="text-gray-500" />
+                  )
+                }
+              >
+                {showRates && rate && (
+                  <div className="space-y-4">
+                    <TextInput
+                      label="Regular gigs"
+                      value={rate.regular}
+                      onChange={(value: string) =>
+                        setRate((prev) => ({ ...prev, regular: value }))
+                      }
+                      placeholder="Enter rate for Regular Gigs"
+                      Icon={<DollarSign size={16} className="text-gray-200" />}
+                    />
 
+                    <TextInput
+                      label="Functions"
+                      value={rate.function}
+                      onChange={(value: string) =>
+                        setRate((prev) => ({ ...prev, function: value }))
+                      }
+                      placeholder="Enter rate for functions"
+                      Icon={<Calendar size={16} className="text-gray-200" />}
+                    />
+
+                    <TextInput
+                      label="Corporate gigs"
+                      value={rate.corporate}
+                      onChange={(value: string) =>
+                        setRate((prev) => ({ ...prev, corporate: value }))
+                      }
+                      placeholder="Enter rate for Corporate Gigs"
+                      Icon={<Briefcase size={16} className="text-gray-200" />}
+                    />
+
+                    <TextInput
+                      label="Concerts"
+                      value={rate.concert}
+                      onChange={(value: string) =>
+                        setRate((prev) => ({ ...prev, concert: value }))
+                      }
+                      placeholder="Enter rate for Concerts"
+                      Icon={<Music size={16} className="text-gray-200" />}
+                    />
+                  </div>
+                )}
+              </SectionContainer>
+            )}
             {/* Location Information */}
             <SectionContainer icon={<Globe size={18} />} title="Location">
               <TextInput label="City" value={city || ""} onChange={setCity} />

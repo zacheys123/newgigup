@@ -86,6 +86,8 @@ export default function Dashboard() {
         <MusicianDashboard
           gigsBooked={data?.user?.gigsBooked ?? 0}
           earnings={data?.user?.userearnings ?? 0}
+          firstLogin={data?.user?.firstLogin}
+          onboarding={data?.user?.onboardingComplete}
         />
       ) : data?.user?.isClient === true ? (
         <ClientDashboard

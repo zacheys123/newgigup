@@ -10,7 +10,15 @@ import { MdAdd } from "react-icons/md";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { BsInstagram, BsTwitter, BsFacebook } from "react-icons/bs"; // Added BsFacebook and BsTwitter
 import { MdRateReview } from "react-icons/md";
-import { ArrowLeftIcon, MenuIcon, Music, Video } from "lucide-react";
+import {
+  ArrowLeftIcon,
+  Briefcase,
+  Calendar,
+  DollarSign,
+  MenuIcon,
+  Music,
+  Video,
+} from "lucide-react";
 import useSWR, { mutate } from "swr";
 import {
   handleFollow,
@@ -473,6 +481,93 @@ const FriendsComponent = () => {
                       <p className="text-gray-800 font-medium text-base">
                         {friend?.experience || "N/A"}
                       </p>
+                    </div>
+                  )}
+                  {friend?.rate && (
+                    <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                      <h2 className="text-xl font-bold text-gray-800 mb-4 border-b border-gray-200 pb-3">
+                        Job Rates
+                      </h2>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {friend.rate.regular && (
+                          <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border border-blue-100">
+                            <div className="flex items-center justify-between">
+                              <p className="text-sm text-blue-600 font-medium">
+                                Regular Gigs
+                              </p>
+                              <DollarSign className="h-4 w-4 text-blue-400" />
+                            </div>
+                            <p className="text-gray-800 font-semibold text-lg mt-2">
+                              {friend.rate.regular}
+                            </p>
+                            <p className="text-xs text-blue-500 mt-1">
+                              Standard performances
+                            </p>
+                          </div>
+                        )}
+
+                        {friend.rate.function && (
+                          <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border border-purple-100">
+                            <div className="flex items-center justify-between">
+                              <p className="text-sm text-purple-600 font-medium">
+                                Functions
+                              </p>
+                              <Calendar className="h-4 w-4 text-purple-400" />
+                            </div>
+                            <p className="text-gray-800 font-semibold text-lg mt-2">
+                              {friend.rate.function}
+                            </p>
+                            <p className="text-xs text-purple-500 mt-1">
+                              Private events
+                            </p>
+                          </div>
+                        )}
+
+                        {friend.rate.concert && (
+                          <div className="bg-gradient-to-br from-amber-50 to-amber-100 p-4 rounded-lg border border-amber-100">
+                            <div className="flex items-center justify-between">
+                              <p className="text-sm text-amber-600 font-medium">
+                                Concerts
+                              </p>
+                              <Music className="h-4 w-4 text-amber-400" />
+                            </div>
+                            <p className="text-gray-800 font-semibold text-lg mt-2">
+                              {friend.rate.concert}
+                            </p>
+                            <p className="text-xs text-amber-500 mt-1">
+                              Stage performances
+                            </p>
+                          </div>
+                        )}
+
+                        {friend.rate.corporate && (
+                          <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 p-4 rounded-lg border border-emerald-100">
+                            <div className="flex items-center justify-between">
+                              <p className="text-sm text-emerald-600 font-medium">
+                                Corporate
+                              </p>
+                              <Briefcase className="h-4 w-4 text-emerald-400" />
+                            </div>
+                            <p className="text-gray-800 font-semibold text-lg mt-2">
+                              {friend.rate.corporate}
+                            </p>
+                            <p className="text-xs text-emerald-500 mt-1">
+                              Business events
+                            </p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* {friend.rate.notes && (
+                      <div className="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <p className="text-xs text-gray-500 font-medium">
+                          Notes
+                        </p>
+                        <p className="text-sm text-gray-700 mt-1">
+                          {friend.rate.notes}
+                        </p>
+                      </div>
+                    )} */}
                     </div>
                   )}
                 </div>

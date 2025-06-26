@@ -111,7 +111,8 @@ const Booked = () => {
                     currentgig?._id || "",
                     "musician",
                     "Client confirmed via app",
-                    musicianCode
+                    musicianCode,
+                    0
                   );
                   setShowPaymentConfirmation(false);
                 }}

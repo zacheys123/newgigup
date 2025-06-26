@@ -8,6 +8,7 @@ import {
   FiMusic,
 } from "react-icons/fi";
 import { experiences } from "@/data";
+import { motion } from "framer-motion";
 
 interface FilterState {
   roleType: string[];
@@ -94,7 +95,7 @@ const SearchFilters = ({ onFilterChange }: SearchFiltersProps) => {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors shadow-sm text-gray-700 hover:text-gray-900"
+        className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors shadow-sm text-gray-700 hover:text-gray-900 ml-[100px] whitespace-nowrap"
       >
         <FiFilter className="text-gray-600" />
         <span className="font-medium">Filter Users</span>
@@ -117,7 +118,17 @@ const SearchFilters = ({ onFilterChange }: SearchFiltersProps) => {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-lg border border-gray-200 z-50 overflow-hidden">
+        <motion.div
+          initial={{ y: "-500px", opacity: 0 }}
+          animate={{ y: ["70px", "50px", "30px", "50px", 0], opacity: 1 }}
+          transition={{ duration: 0.7, delay: 0.2 }}
+          exit={{
+            y: [0, "30px", "50px", "-200px"],
+            opacity: 1,
+            transition: { duration: 1, delay: 0.78 },
+          }}
+          className="absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-lg border border-gray-200 z-50 overflow-hidden"
+        >
           <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
             <h3 className="font-medium text-gray-800">Filter Options</h3>
             <button
@@ -270,7 +281,7 @@ const SearchFilters = ({ onFilterChange }: SearchFiltersProps) => {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
     </div>
   );

@@ -54,7 +54,8 @@ export const useConfirmPayment = () => {
     gigId: string,
     role: string,
     notes: string,
-    code: string
+    code: string,
+    rating: number
   ) => {
     setIsConfirming(true);
 
@@ -67,7 +68,7 @@ export const useConfirmPayment = () => {
       const res = await fetch(`/api/gigs/confirm-payment/${gigId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role, notes, code }),
+        body: JSON.stringify({ role, notes, code, rating }),
       });
 
       const data = await res.json();

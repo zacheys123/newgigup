@@ -77,7 +77,13 @@ export interface UserProps {
   bookingHistory: BookingItem[];
   completedGigsCount: number;
   cancelgigCount: number;
-  reliabilityScore?: number;
+  rate: {
+    regular: string;
+    function: string;
+    concert: string;
+    corporate: string;
+  };
+  firstTimeInProfile?: boolean;
   reportsCount: number;
 }
 export interface Users {

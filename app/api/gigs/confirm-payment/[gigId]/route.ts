@@ -9,7 +9,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
   const gigId = req.nextUrl.pathname.split("/").pop();
   const { userId } = getAuth(req);
-  const { role, notes, code, gigRating } = await req.json();
+  const { role, notes, code, rating } = await req.json();
 
   if (!userId) {
     return NextResponse.json(
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
         notes,
         updatedAt: new Date(),
       };
-      gig.gigRating = gigRating;
+      gig.gigRating = rating;
     }
 
     await gig.save();

@@ -168,7 +168,13 @@ export const postedBy = {
   completedGigsCount: 0,
   cancelgigCount: 0,
   reportsCount: 0,
-  reliabilityScore: 0,
+  rate: {
+    regular: "",
+    function: "",
+    concert: "",
+    corporate: "",
+  },
+  firstTimeInProfile: false,
 };
 
 export const instruments = [

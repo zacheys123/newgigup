@@ -62,20 +62,17 @@ const SearchComponent = () => {
     : processedUsers;
 
   // Apply additional filters
+  // Apply additional filters
   const applyAdditionalFilters = (users: UserProps[]) => {
     return users.filter((user) => {
-      // Client/Musician filter
-      if (activeFilters.clientOnly && !user.isClient) {
-        return false;
-      }
-      if (activeFilters.musicianOnly && !user.isMusician) {
-        return false;
-      }
+      // Client/Musician filter - this is the crucial fix
+      if (activeFilters.clientOnly && !user.isClient) return false;
+      if (activeFilters.musicianOnly && !user.isMusician) return false;
 
       // Role type filter
       if (
         activeFilters.roleType.length > 0 &&
-        !activeFilters.roleType.includes(user.roleType ? user.roleType : "")
+        (!user.roleType || !activeFilters.roleType.includes(user.roleType))
       ) {
         return false;
       }
@@ -159,19 +156,25 @@ const SearchComponent = () => {
               </div>
             )}
 
-            <div className="flex gap-2 ml-auto">
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.2 }}
+              className="fixed top-[115px] right-3 z-50 w-72"
+            >
               <SearchFilters
                 isMusician={isMusician}
                 onFilterChange={handleFilterChange}
               />
-            </div>
+            </motion.div>
           </div>
         </motion.div>
 
         {/* User Grid */}
         <AnimatePresence>
           {finalFilteredUsers.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 pt-[50px]">
               {finalFilteredUsers.map((user: UserProps, index: number) => (
                 <motion.div
                   key={user._id}

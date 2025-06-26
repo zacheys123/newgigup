@@ -166,14 +166,15 @@ const MyGigs = () => {
   // In MyGigs.tsx
   const { confirmPayment } = useConfirmPayment();
 
-  const handlePaymentConfirm = async (code: string) => {
+  const handlePaymentConfirm = async (code: string, rating: number) => {
     if (!currentgig) return;
 
     await confirmPayment(
       currentgig._id ? currentgig._id : "",
       isClient ? "client" : "musician",
       "Confirmed via app",
-      code
+      code,
+      rating
     );
   };
   // const handleFinalizePayment = async () => {
@@ -204,8 +205,8 @@ const MyGigs = () => {
         onClose={() => {
           setShowPaymentConfirmation(false);
         }}
-        onConfirm={async (code: string) => {
-          await handlePaymentConfirm(code);
+        onConfirm={async (code: string, rating: number) => {
+          await handlePaymentConfirm(code, rating);
         }}
       />
 

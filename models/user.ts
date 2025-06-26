@@ -100,9 +100,15 @@ interface IUser extends Document {
       notes: string; // Optional (e.g., cancellation reason)
     }
   ];
-  reliabilityScore: number;
+  rate: {
+    regular: string;
+    function: string;
+    concert: string;
+    corporate: string;
+  };
   completedGigsCount: number;
   reportsCount: number;
+  firstTimeInProfile: boolean;
 }
 
 // Define Mongoose Schema
@@ -247,7 +253,14 @@ const userSchema = new Schema<IUser>(
       type: Number,
       default: 0,
     },
-    reliabilityScore: Number,
+
+    rate: {
+      regular: String,
+      function: String,
+      concert: String,
+      corporate: String,
+    },
+    firstTimeInProfile: Boolean,
   },
 
   { timestamps: true }
@@ -302,6 +315,8 @@ userSchema.index({ reportsCount: 1 });
 // 📌 Reviews & Relations
 userSchema.index({ "allreviews.postedBy": 1 });
 userSchema.index({ "allreviews.postedTo": 1 });
+userSchema.index({ rate: 1 });
+
 userSchema.index({ followers: 1 });
 userSchema.index({ followings: 1 });
 

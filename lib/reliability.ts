@@ -16,15 +16,6 @@ export const getReliabilityBadge = (score: number) => {
   return { text: "New", color: "bg-gray-600" };
 };
 
-export const filterByReliability = (users: UserProps[], minScore: number) => {
-  return users.filter((user) => {
-    const score =
-      user.reliabilityScore ||
-      calculateReliability(user.completedGigsCount, user.cancelgigCount);
-    return score >= minScore;
-  });
-};
-
 // utils/reliability.ts
 export const getUserTier = (user: UserProps) => {
   const completed = user.completedGigsCount || 0;

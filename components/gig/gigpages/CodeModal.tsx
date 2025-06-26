@@ -12,16 +12,18 @@ import {
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle2, LockKeyhole, RotateCw } from "lucide-react";
+import { CheckCircle2, LockKeyhole, RotateCw, Star } from "lucide-react";
 
 interface CodeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (code: string) => void;
+  onConfirm: (code: string, rating: number) => void;
 }
 
 export const CodeModal = ({ isOpen, onClose, onConfirm }: CodeModalProps) => {
   const [code, setCode] = useState("");
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [readyToFinalize, setReadyToFinalize] = useState(false);
 
@@ -29,7 +31,7 @@ export const CodeModal = ({ isOpen, onClose, onConfirm }: CodeModalProps) => {
     if (!code.trim()) return;
     setIsSubmitting(true);
     try {
-      await onConfirm(code);
+      await onConfirm(code, rating);
     } finally {
       setIsSubmitting(false);
     }
@@ -38,8 +40,13 @@ export const CodeModal = ({ isOpen, onClose, onConfirm }: CodeModalProps) => {
   const handleFinalize = async () => {
     setIsSubmitting(true);
     try {
-      await onConfirm(code);
+      await onConfirm(code, rating);
       onClose();
+      // Reset state after closing
+      setCode("");
+      setRating(0);
+      setHoverRating(0);
+      setReadyToFinalize(false);
     } finally {
       setIsSubmitting(false);
     }
@@ -63,14 +70,14 @@ export const CodeModal = ({ isOpen, onClose, onConfirm }: CodeModalProps) => {
               ) : (
                 <>
                   <LockKeyhole className="h-5 w-5 text-blue-500" />
-                  Confirm Payment
+                  {"Confirm Payment"}
                 </>
               )}
             </DialogTitle>
             <DialogDescription className="text-gray-600 dark:text-gray-300 mt-1">
               {readyToFinalize
                 ? "Ready to complete the payment process?"
-                : "Please enter the last 3 letters/digits of the payment confirmation meessage. Payment will be marked complete only if both codes match."}
+                : "Please  rate your experience and  enter the last 3 letters/digits of the payment confirmation message."}
             </DialogDescription>
           </motion.div>
         </DialogHeader>
@@ -95,6 +102,37 @@ export const CodeModal = ({ isOpen, onClose, onConfirm }: CodeModalProps) => {
                     maxLength={6}
                   />
                 </div>
+
+                <div className="flex flex-col items-center space-y-2">
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    How would you rate this experience?
+                  </p>
+                  <div className="flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        className="focus:outline-none"
+                        onClick={() => setRating(star)}
+                        onMouseEnter={() => setHoverRating(star)}
+                        onMouseLeave={() => setHoverRating(0)}
+                      >
+                        <Star
+                          className={`h-6 w-6 ${
+                            (hoverRating || rating) >= star
+                              ? "fill-yellow-400 text-yellow-400"
+                              : "text-gray-300 dark:text-gray-500"
+                          }`}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {rating > 0
+                      ? `You rated ${rating} star${rating > 1 ? "s" : ""}`
+                      : "Click to rate"}
+                  </p>
+                </div>
               </div>
             ) : (
               <div className="py-6 text-center">
@@ -104,9 +142,22 @@ export const CodeModal = ({ isOpen, onClose, onConfirm }: CodeModalProps) => {
                 <p className="text-sm text-green-700 dark:text-green-300 font-medium">
                   Both parties have confirmed with matching codes
                 </p>
+                {rating > 0 && (
+                  <div className="flex items-center justify-center gap-1 mt-2">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        className={`h-4 w-4 ${
+                          rating >= star
+                            ? "fill-yellow-400 text-yellow-400"
+                            : "text-gray-300 dark:text-gray-500"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                )}
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                  {`Click "Finalize" to complete the transaction
-               `}{" "}
+                  {`Click "Finalize" to complete the transaction`}
                 </p>
               </div>
             )}
@@ -125,7 +176,7 @@ export const CodeModal = ({ isOpen, onClose, onConfirm }: CodeModalProps) => {
               </Button>
               <Button
                 onClick={handleSubmit}
-                disabled={!code || isSubmitting}
+                disabled={!code || rating === 0 || isSubmitting}
                 className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800"
               >
                 {isSubmitting ? (
