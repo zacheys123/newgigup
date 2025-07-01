@@ -180,7 +180,7 @@ import { SVGProps } from "react";
 import { useAllGigs } from "@/hooks/useAllGigs";
 import { GigProps } from "@/types/giginterface";
 
-export const Icons = {
+ const Icons = {
   // User profile icon
   user: (props: SVGProps<SVGSVGElement>) => (
     <svg
