@@ -197,7 +197,7 @@ const MyGigs = () => {
   // };
 
   const bgigs = filteredGigs.filter((gig) => gig?.isTaken);
-
+  console.log(filteredGigs);
   return (
     <>
       <CodeModal

@@ -388,7 +388,7 @@ const CreateGig = () => {
     }));
     setShowTalentModal(false);
   };
-  console.log("mydata", gigInputs);
+  console.log("mydata schedulingProcedure.type", schedulingProcedure.type);
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

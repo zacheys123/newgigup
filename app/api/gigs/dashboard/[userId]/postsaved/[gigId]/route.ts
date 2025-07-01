@@ -58,7 +58,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: "Removed from saved gigs",
+      message: "Removed from Drafts",
     });
   } catch (error) {
     console.error(error);

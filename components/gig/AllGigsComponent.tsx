@@ -277,7 +277,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
     try {
       const method = action === "add" ? "POST" : "DELETE";
       const response = await fetch(
-        `/api/gigs/dashboard/${userId}/favorites/${gig._id}`,
+        `/api/gigs/dashboard/${userId}/postfavorites/${gig?._id}`,
         {
           method,
           headers: {
@@ -302,7 +302,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
     try {
       const method = action === "add" ? "POST" : "DELETE";
       const response = await fetch(
-        `/api/gigs/dashboard/${userId}/saved/${gig._id}/`,
+        `/api/gigs/dashboard/${userId}/postsaved/${gig._id}/`,
         {
           method,
           headers: {
