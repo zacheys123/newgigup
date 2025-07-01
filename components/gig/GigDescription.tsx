@@ -245,7 +245,7 @@ const GigDescription = ({}) => {
                   className="
               "
                 >
-                  {currentgig?.postedBy?.email}
+                  {currentgig?.postedBy?.organization}
                 </DetailValue>
               </DetailItem>
 

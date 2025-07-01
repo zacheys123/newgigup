@@ -440,14 +440,8 @@ const CreateGig = () => {
           vocalistGenre: gigInputs.vocalistGenre,
           pricerange: gigInputs.pricerange,
           currency: gigInputs.currency,
-          isPending:
-            schedulingProcedure.type === "automatic"
-              ? true
-              : schedulingProcedure.type === "regular"
-              ? true
-              : schedulingProcedure.type === "create"
-              ? false
-              : false,
+
+          schedulingProcedure: schedulingProcedure,
           scheduleDate: schedulingProcedure.date,
         }),
       });

@@ -41,6 +41,7 @@ type Info = {
   gigRating: number;
   paymentStatus: string;
   completedAt: Date;
+  schedulingProcedure?: { type: string };
 };
 
 export async function POST(req: NextRequest) {
@@ -75,12 +76,13 @@ export async function POST(req: NextRequest) {
     isPending,
     scheduleDate,
     gigRating,
+    schedulingProcedure,
   }: Info = await req.json();
 
   console.log(isPending);
   console.log(day);
   console.log(currency);
-
+  console.log("schedulingProcedure", schedulingProcedure);
   if (!title) {
     return NextResponse.json({
       gigstatus: "false",
@@ -188,6 +190,12 @@ export async function POST(req: NextRequest) {
       });
     }
   }
+  if (!schedulingProcedure) {
+    return NextResponse.json({
+      gigstatus: "false",
+      message: "Invalid schedulingData",
+    });
+  }
 
   const { userId } = getAuth(req);
   if (!userId) {
@@ -251,7 +259,14 @@ export async function POST(req: NextRequest) {
       vocalistGenre,
       pricerange,
       currency,
-      isPending,
+      isPending:
+        schedulingProcedure.type === "automatic"
+          ? true
+          : schedulingProcedure.type === "regular"
+          ? true
+          : schedulingProcedure.type === "create"
+          ? false
+          : false,
       scheduleDate,
       gigRating,
     });
