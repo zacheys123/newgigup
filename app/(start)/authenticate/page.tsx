@@ -84,7 +84,6 @@ export default function Authenticate() {
       isReturning: !!hasSession,
     }));
   }, []);
-
   // Loader sequence configuration
   const loaderConfig = React.useMemo(() => {
     const baseConfig = {

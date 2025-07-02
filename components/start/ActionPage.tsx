@@ -718,29 +718,30 @@ const ActionPage = () => {
               buttonText: "Coming Soon",
               disabled: true,
             },
-            {
-              role: "admin",
-              title: "Admin Role",
-              accent: "emerald",
-              description: "Register as Admin",
-              buttonText: "Admin Initiallization",
-              onClick: () => handleModal(),
-              disabled: false,
-            },
+            ...(isAdminEmail(user?.emailAddresses[0]?.emailAddress)
+              ? [
+                  {
+                    role: "admin",
+                    title: "Admin Role",
+                    accent: "emerald",
+                    description: "Register as Admin",
+                    buttonText: "Admin Initialization",
+                    onClick: () => handleModal(),
+                    disabled: false,
+                  },
+                ]
+              : []),
           ].map((card) => (
             <div
               key={card.role}
-              className={
-                card.role === "admin"
-                  ? `${baseStyles} 
-                      ${card.disabled ? "opacity-80" : "hover:-translate-y-1"} 
-                      ${
-                        accentStyles[
-                          card.accent as keyof typeof accentStyles
-                        ] || accentStyles.default
-                      }`
-                  : "hidden"
+              className={`
+              ${baseStyles} 
+              ${card.disabled ? "opacity-80" : "hover:-translate-y-1"} 
+              ${
+                accentStyles[card.accent as keyof typeof accentStyles] ||
+                accentStyles.default
               }
+            `}
               onClick={!card.disabled ? card.onClick : undefined}
             >
               {/* Gradient border effect */}
@@ -854,3 +855,9 @@ const ActionPage = () => {
 };
 
 export default ActionPage;
+
+function isAdminEmail(email?: string | null): boolean {
+  if (!email) return false;
+  const whitelist = process.env.ADMIN_WHITELIST?.split(",") || [];
+  return whitelist.includes(email.trim().toLowerCase());
+}
