@@ -17,6 +17,10 @@ export function useAllVideos(userid: string) {
         description: "",
         source: "",
         gigId: "",
+        likes: [],
+        isPublic: false,
+        isPrivate: false,
+        thumbnail: "",
       },
     ],
   });
@@ -54,6 +58,10 @@ export function useAllVideos(userid: string) {
                 description: "",
                 source: "",
                 gigId: "",
+                likes: [],
+                isPublic: false,
+                isPrivate: false,
+                thumbnail: "",
               },
             ],
           });
