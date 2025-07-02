@@ -6,7 +6,6 @@ import { getAuth } from "@clerk/nextjs/server";
 import User from "@/models/user";
 
 export async function GET(req: NextRequest) {
-  const id = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
   const { userId } = getAuth(req);
 
   if (!userId) {
