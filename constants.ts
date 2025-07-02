@@ -29,3 +29,10 @@ export const isBookerIsCurrentUserAndPendingIsTrueTakenFalse = (
 // ) => {
 //   return friendvideos?.filter((video: VideoProps) => video.gigId === gig._id);
 // };
+
+// constants/breakpoints.ts
+export const BREAKPOINTS = {
+  MOBILE: "(max-width: 768px)",
+  TABLET: "(min-width: 769px) and (max-width: 1024px)",
+  DESKTOP: "(min-width: 1025px)",
+};

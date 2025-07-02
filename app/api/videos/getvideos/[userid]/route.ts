@@ -15,12 +15,13 @@ export async function GET(req: NextRequest) {
 
   try {
     await connectDb();
-    console.log("My Id", id);
-    const vids = await Video.find().populate({ path: "postedBy", model: User });
-    console.log("all my gigs", vids);
+
+    const vids = await Video.find({ isPublic: true }).populate({
+      path: "postedBy",
+      model: User,
+    });
 
     const videos = vids?.filter((video) => {
-      console.log("video objects", video);
       return video?.postedBy?._id.toString() === id;
     });
     return NextResponse.json({

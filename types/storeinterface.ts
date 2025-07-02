@@ -111,6 +111,7 @@ export const initialState = {
       corporate: "",
     },
     firstTimeInProfile: false,
+    likedVideos: [],
   },
   currentgig: {
     _id: "",

@@ -175,6 +175,7 @@ export const postedBy = {
     corporate: "",
   },
   firstTimeInProfile: false,
+  likedVideos: [],
 };
 
 export const instruments = [

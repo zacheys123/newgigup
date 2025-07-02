@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { Schema } from "mongoose";
 import { models } from "mongoose";
 
 const VideoSchema = new mongoose.Schema(
@@ -21,7 +22,6 @@ const VideoSchema = new mongoose.Schema(
     },
     gigId: {
       type: String,
-      required: true,
     },
     isPublic: {
       type: Boolean,
@@ -31,8 +31,13 @@ const VideoSchema = new mongoose.Schema(
     isPrivate: {
       type: Boolean,
       default: false,
-      required: true,
+      required: false,
     },
+    thumbnail: {
+      type: String,
+      lowercase: true,
+    },
+    likes: [{ type: Schema.Types.ObjectId, ref: "User" }],
   },
   { timestamps: true }
 );

@@ -85,6 +85,7 @@ export interface UserProps {
   };
   firstTimeInProfile?: boolean;
   reportsCount: number;
+  likedVideos: VideoProps[];
 }
 export interface Users {
   users: UserProps[]; // Optional}
@@ -96,8 +97,19 @@ export interface VideoProps {
   source: string;
   description?: string;
   gigId: string;
-  postedBy?: string | { _id: string; firstname: string; [key: string]: string };
+  postedBy?:
+    | string
+    | {
+        _id: string;
+        firstname: string;
+        username: string;
+        [key: string]: string;
+      };
   createdAt?: Date;
+  thumbnail: string;
+  isPublic: boolean;
+  isPrivate: boolean;
+  likes?: string[] | UserProps[];
 }
 export interface VideoProfileProps {
   _id: string;

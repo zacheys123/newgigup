@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import UserListModal from "../gig/create/UserList";
 
-const Musicians = ({ _id }: UserProps) => {
+const Musicians = ({ _id }: UserProps & { isMobile: boolean }) => {
   const { users: allusers, loading } = useAllUsers();
   const { user } = useCurrentUser();
   const router = useRouter();
@@ -100,40 +100,19 @@ const Musicians = ({ _id }: UserProps) => {
     title: string;
     users: UserProps[];
   }>({ title: "", users: [] });
+
   if (loading) {
     return (
-      <div className="mt-21 w-full max-w-6xl mx-auto px-4">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <div className="h-7 w-48 bg-neutral-800 rounded-md mb-2"></div>
-            <div className="h-4 w-64 bg-neutral-800 rounded-md"></div>
-          </div>
-          <div className="h-6 w-16 bg-neutral-800 rounded-full"></div>
-        </div>
-
-        <div className="relative">
-          <div className="flex gap-5 pb-6 overflow-x-auto scrollbar-hide">
-            {[...Array(6)].map((_, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="flex flex-col items-center flex-shrink-0 w-28 mx-5 animate-pulse"
-              >
-                <div className="relative mb-3">
-                  <div className="absolute inset-0 bg-neutral-800 rounded-full blur-md -z-10 w-20"></div>
-                  <div className="relative flex items-center justify-center w-24 h-24 rounded-full bg-neutral-800 border-2 border-neutral-700 overflow-hidden">
-                    <div className="w-full h-full bg-neutral-800 animate-pulse"></div>
-                  </div>
-                </div>
-
-                <div className="text-center w-full">
-                  <div className="h-4 w-20 bg-neutral-800 rounded-md mx-auto mb-2 animate-pulse"></div>
-                  <div className="h-3 w-16 bg-neutral-800 rounded-full mx-auto mt-1 animate-pulse"></div>
-                  <div className="h-3 w-12 bg-neutral-800 rounded-md mx-auto mt-2 animate-pulse"></div>
-                </div>
-              </motion.div>
+      <div className="w-full max-w-6xl mx-auto px-4 py-8">
+        <div className="flex flex-col gap-6">
+          <div className="h-8 w-64 bg-gradient-to-r from-gray-800 to-gray-700 rounded-lg animate-pulse" />
+          <div className="flex gap-4 overflow-x-auto pb-4">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="flex flex-col items-center min-w-[120px]">
+                <div className="h-20 w-20 rounded-full bg-gradient-to-br from-gray-800 to-gray-700 animate-pulse" />
+                <div className="h-4 w-16 mt-3 bg-gray-800 rounded animate-pulse" />
+                <div className="h-3 w-12 mt-2 bg-gray-800 rounded animate-pulse" />
+              </div>
             ))}
           </div>
         </div>
@@ -142,92 +121,88 @@ const Musicians = ({ _id }: UserProps) => {
   }
 
   return (
-    <div className="mt-11 w-full max-w-6xl mx-auto px-4">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-neutral-100 text-xl font-bold">
-          Musicians Near You
-          <span className="block text-sm font-normal text-neutral-400 mt-1">
-            Connect with local talent
-          </span>
-        </h2>
-        {[
-          {
-            label: "nearby",
-            value: CurrentMusicianAroundWhereIam?.length || 0,
-            onClick: () => {
+    <div className="w-full max-w-6xl mx-auto px-4 py-8">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="bg-gradient-to-br from-gray-900/50 to-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50"
+      >
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+          <div>
+            <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-purple-400">
+              Musicians Near You
+            </h2>
+            <p className="text-gray-400 mt-1">
+              Connect with talented artists in your area
+            </p>
+          </div>
+
+          <button
+            onClick={() => {
               setModalData({
                 title: "Nearby Musicians",
                 users: CurrentMusicianAroundWhereIam || [],
               });
               setShowNearByModal(true);
-            },
-          },
-        ].map((stat) => (
-          <span
-            key={stat?.label}
-            onClick={stat.onClick}
-            className="text-xs bg-orange-500/30 text-orange-300 px-3 py-1.5 rounded-full font-medium"
+            }}
+            className="px-4 py-2 text-xs font-medium bg-gradient-to-br from-amber-500/20 to-purple-500/20 hover:from-amber-500/30 hover:to-purple-500/30 border border-amber-400/30 rounded-full text-amber-300 transition-all"
           >
-            {stat?.value} {stat?.label}
-          </span>
-        ))}
-      </div>
-
-      <div className="relative">
-        <div className="flex gap-5 pb-6 overflow-x-auto scrollbar-hide">
-          {NotCurrentUserAndNotClientIsMusician?.map((myuser: UserProps) => (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              whileHover={{ y: -5 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-              key={myuser?._id}
-              className="flex flex-col items-center flex-shrink-0 w-28 cursor-pointer group"
-              onClick={() => router.push(`/search/${myuser?.username}`)}
-            >
-              <div className="relative mb-3">
-                <div className="absolute inset-0 bg-gradient-to-br from-orange-500/40 to-purple-500/30 rounded-full blur-md group-hover:blur-lg transition-all duration-300 -z-10" />
-                <div className="relative flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-neutral-800 to-neutral-900 border-2 border-neutral-700 group-hover:border-orange-400 transition-all duration-300 overflow-hidden">
-                  {myuser?.picture ? (
-                    <Image
-                      src={myuser.picture}
-                      alt={`${myuser.firstname}'s profile`}
-                      className="w-full h-full object-cover"
-                      width={14}
-                      height={14}
-                    />
-                  ) : (
-                    <>
-                      <span className="text-orange-300 text-3xl font-bold">
-                        {myuser?.firstname?.split("")[0]?.toUpperCase()}
-                      </span>
-                      <span className="text-neutral-100 text-2xl">
-                        {myuser?.lastname?.split("")[0]}
-                      </span>
-                    </>
-                  )}
-                </div>
-              </div>
-
-              <div className="text-center w-full">
-                <h3 className="text-neutral-100 text-sm font-semibold truncate">
-                  {myuser?.firstname} {myuser?.lastname?.split("")[0]}.
-                </h3>
-                {myuser?.instrument && (
-                  <p className="text-xs text-orange-400 mt-1 font-medium bg-orange-500/10 px-2 py-0.5 rounded-full inline-block">
-                    {myuser.instrument}
-                  </p>
-                )}
-                {myuser?.genre && (
-                  <p className="text-[11px] text-neutral-400 mt-1.5">
-                    {myuser.genre}
-                  </p>
-                )}
-              </div>
-            </motion.div>
-          ))}
+            {CurrentMusicianAroundWhereIam?.length || 0} nearby
+          </button>
         </div>
-      </div>
+
+        <div className="relative">
+          <div className="flex gap-4 pb-2 overflow-x-auto scrollbar-hide">
+            {NotCurrentUserAndNotClientIsMusician?.map(
+              (musician: UserProps) => (
+                <motion.div
+                  key={musician._id}
+                  initial={{ opacity: 0, x: 20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  whileHover={{ y: -5 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  className="flex flex-col items-center flex-shrink-0 w-24 cursor-pointer group"
+                  onClick={() => router.push(`/search/${musician.username}`)}
+                >
+                  <div className="relative mb-3">
+                    <div className="absolute inset-0 bg-gradient-to-br from-amber-500/30 to-purple-500/20 rounded-full blur-md group-hover:blur-lg transition-all duration-300 -z-10" />
+                    <div className="relative flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 group-hover:border-amber-400 transition-all duration-300 overflow-hidden">
+                      {musician.picture ? (
+                        <Image
+                          src={musician.picture}
+                          alt={`${musician.firstname}'s profile`}
+                          className="w-full h-full object-cover"
+                          width={64}
+                          height={64}
+                        />
+                      ) : (
+                        <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-purple-400">
+                          {musician.firstname?.[0]}
+                          {musician.lastname?.[0]}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="text-center w-full">
+                    <h3 className="text-sm font-medium text-gray-200 truncate">
+                      {musician.firstname}
+                    </h3>
+                    {musician.instrument && (
+                      <p className="text-xs text-amber-400 mt-1 font-medium">
+                        {musician.instrument}
+                      </p>
+                    )}
+                  </div>
+                </motion.div>
+              )
+            )}
+          </div>
+        </div>
+      </motion.div>
+
       <UserListModal
         isOpen={showNearby}
         onClose={() => setShowNearByModal(false)}

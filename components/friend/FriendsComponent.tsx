@@ -162,13 +162,13 @@ const FriendsComponent = () => {
   return (
     <div className="overflow-y-auto h-screen w-full bg-gradient-to-b from-gray-50 to-gray-100">
       {/* Header Section */}
-      <div className="relative h-64 bg-gradient-to-br  via-blue-600 to-emerald-300 rounded-b-3xl shadow-lg">
+      <div className="relative h-[210px] bg-gradient-to-br from-blue-600 to-emerald-300 rounded-b-3xl shadow-lg">
+        {" "}
         {/* Logo and UserButton in top right */}
         <div className="w-[90%] absolute top-4 right-6 flex items-center gap-4 z-10 justify-between ">
           <Logo /> {/* Assuming Logo component can take color prop */}
           <UserButton afterSignOutUrl="/" />
         </div>
-
         <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2">
           <div className="w-32 h-32 rounded-full border-4 border-white bg-white shadow-xl flex items-center justify-center overflow-hidden">
             {friend?.picture ? ( // Assuming `friend.picture` exists
@@ -181,7 +181,7 @@ const FriendsComponent = () => {
                 quality={80}
               />
             ) : (
-              <div className="w-full h-full rounded-full bg-gradient-to-br from-indigo-400 to-purple-400 flex items-center justify-center text-white text-5xl font-bold">
+              <div className="w-full h-full rounded-full bg-gradient-to-br from-indigo-400 to-purple-400 flex items-center justify-center text-white text-3xl capitalize font-bold">
                 {friend?.firstname?.charAt(0)}
                 {friend?.lastname?.charAt(0)}
               </div>
@@ -195,7 +195,7 @@ const FriendsComponent = () => {
         <div className="mt-20 px-6 pb-10 max-w-3xl mx-auto">
           {/* Name and Follow Button */}
           <div className="flex flex-col items-center mb-6">
-            <h1 className="text-3xl font-extrabold text-gray-800 tracking-tight">
+            <h1 className="text-2xl capitalize font-extrabold text-gray-800 tracking-tight">
               {friend?.firstname} {friend?.lastname}
             </h1>
             {friend?.experience && friend?.instrument && (
@@ -203,9 +203,9 @@ const FriendsComponent = () => {
                 <span className="font-semibold text-gray-600">
                   {friend.experience}
                 </span>{" "}
-                years of experience as an{" "}
+                years of experience as a{" "}
                 <span className="font-semibold text-indigo-600">
-                  {friend.instrument}
+                  {friend.instrument && `${friend.instrument}  player`}
                 </span>
               </p>
             )}
@@ -260,7 +260,9 @@ const FriendsComponent = () => {
                 onClick={() => setShowMore(true)}
               >
                 <span className="flex items-center">
-                  <MenuIcon />
+                  <MenuIcon
+                    style={{ backgroundColor: "white", color: "black" }}
+                  />
                 </span>
               </Button>
             </div>

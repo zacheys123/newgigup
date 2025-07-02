@@ -1,3 +1,4 @@
+import { VideoProps } from "@/types/userinterfaces";
 import mongoose, { Schema, models, Document, Model } from "mongoose";
 
 // Define TypeScript Interface
@@ -109,6 +110,7 @@ interface IUser extends Document {
   completedGigsCount: number;
   reportsCount: number;
   firstTimeInProfile: boolean;
+  likedVideos: VideoProps[];
 }
 
 // Define Mongoose Schema
@@ -261,6 +263,7 @@ const userSchema = new Schema<IUser>(
       corporate: String,
     },
     firstTimeInProfile: Boolean,
+    likedVideos: [{ type: Schema.Types.ObjectId, ref: "Video" }],
   },
 
   { timestamps: true }
