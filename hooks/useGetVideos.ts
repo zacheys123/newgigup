@@ -15,6 +15,10 @@ export const useGetVideos = () => {
         description: "",
         source: "",
         gigId: "",
+        likes: [],
+        isPublic: false,
+        isPrivate: false,
+        thumbnail: "",
       },
     ],
   });
@@ -54,6 +58,10 @@ export const useGetVideos = () => {
                 description: "",
                 source: "",
                 gigId: "",
+                likes: [],
+                isPublic: false,
+                isPrivate: false,
+                thumbnail: "",
               },
             ],
           });
