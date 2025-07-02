@@ -17,6 +17,10 @@ export function useVideos(gigid: string, userid: string) {
         description: "",
         source: "",
         gigId: "",
+        likes: [],
+        isPublic: false,
+        isPrivate: false,
+        thumbnail: "",
       },
     ],
   });
@@ -59,6 +63,10 @@ export function useVideos(gigid: string, userid: string) {
                 description: "",
                 source: "",
                 gigId: "",
+                likes: [],
+                isPublic: false,
+                isPrivate: false,
+                thumbnail: "",
               },
             ],
           });
