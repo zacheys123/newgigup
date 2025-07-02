@@ -4,7 +4,7 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { VideoProps } from "@/types/userinterfaces";
 import { CircularProgress } from "@mui/material";
 import { motion } from "framer-motion";
-import { ArrowBigLeftIcon, Upload } from "lucide-react";
+import { ArrowBigLeftIcon, RefreshCw, Upload } from "lucide-react";
 import moment from "moment";
 import { useParams, useRouter } from "next/navigation";
 import React, { FormEvent, useEffect, useState } from "react";
@@ -32,9 +32,13 @@ const AllVideosPage = () => {
   const [description, setDescription] = useState<string>("");
   const router = useRouter();
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const [likedVideos, setLikedVideos] = useState<Set<string>>(new Set());
+
   const [shareUrl, setShareUrl] = useState<string>("");
   console.log(shareUrl);
+  // In your useState initialization:
+  const [likedVideos, setLikedVideos] = useState<Set<string>>(new Set());
+
+  // In your useEffect where you initialize from localStorage:
   useEffect(() => {
     if (!userid) return;
 
@@ -44,14 +48,27 @@ const AllVideosPage = () => {
       .then((data) => {
         setFriendVideos(data.videos || []);
         setLoading(false);
-        // Initialize liked videos from localStorage
 
+        // Initialize liked videos from localStorage
         const storedLikes = localStorage.getItem("likedVideos");
         if (storedLikes) {
-          setLikedVideos(new Set(JSON.parse(storedLikes)));
-        } else {
-          setLikedVideos(user?.user?.likedVideos);
-          localStorage.setItem("likedVideos", user?.user?.likedVideos);
+          try {
+            const parsedLikes = JSON.parse(storedLikes);
+            // Ensure it's an array before converting to Set
+            setLikedVideos(
+              new Set(Array.isArray(parsedLikes) ? parsedLikes : [])
+            );
+          } catch (e) {
+            console.log(e);
+            setLikedVideos(new Set());
+          }
+        } else if (user?.user?.likedVideos) {
+          // Ensure user.likedVideos is an array before converting to Set
+          const userLikes = Array.isArray(user.user.likedVideos)
+            ? user.user.likedVideos
+            : [];
+          setLikedVideos(new Set(userLikes));
+          localStorage.setItem("likedVideos", JSON.stringify(userLikes));
         }
       })
       .catch((error) => {
@@ -106,34 +123,85 @@ const AllVideosPage = () => {
     }
   };
 
+  const [isLikeLoading, setIsLikeLoading] = useState<string | null>(null);
   const toggleLike = async (videoId: string) => {
+    setIsLikeLoading(videoId);
+    const newLikedVideos = new Set(likedVideos);
+    const wasLiked = newLikedVideos.has(videoId);
+
     try {
-      const newLikedVideos = new Set(likedVideos);
-      if (newLikedVideos.has(videoId)) {
+      // 1. Optimistically update the UI
+
+      // Toggle like status optimistically
+      if (wasLiked) {
         newLikedVideos.delete(videoId);
-        // Call API to remove like
-        await fetch(`/api/videos/unlike/${videoId}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId: user?.user?._id }),
-        });
       } else {
         newLikedVideos.add(videoId);
-        // Call API to add like
-        await fetch(`/api/videos/like/${videoId}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId: user?.user?._id }),
-        });
       }
       setLikedVideos(newLikedVideos);
+
+      // 2. Update the local storage optimistically
       localStorage.setItem(
         "likedVideos",
         JSON.stringify(Array.from(newLikedVideos))
       );
+
+      // 3. Update the video's like count optimistically (if needed)
+      setFriendVideos((prevVideos) =>
+        prevVideos.map((video) =>
+          video._id === videoId
+            ? {
+                ...video,
+                likes: wasLiked
+                  ? video.likes?.filter((id) => id !== user?.user?._id) // Decrement like
+                  : [...(video.likes || []), user?.user?._id], // Increment like
+              }
+            : video
+        )
+      );
+
+      // 4. Make the API call
+      const endpoint = wasLiked
+        ? `/api/videos/unlike/${videoId}`
+        : `/api/videos/like/${videoId}`;
+
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user?.user?._id }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update like");
+      }
     } catch (error) {
       console.error("Error toggling like:", error);
-      toast.error("Failed to update like");
+
+      // 5. Revert optimistic update on error
+      const originalLikedVideos = new Set(likedVideos);
+      setLikedVideos(originalLikedVideos);
+
+      localStorage.setItem(
+        "likedVideos",
+        JSON.stringify(Array.from(originalLikedVideos))
+      );
+
+      setFriendVideos((prevVideos) =>
+        prevVideos.map((video) =>
+          video._id === videoId
+            ? {
+                ...video,
+                likes: wasLiked
+                  ? [...(video.likes || []), user?.user?._id] // Revert unlike
+                  : video.likes?.filter((id) => id !== user?.user?._id), // Revert like
+              }
+            : video
+        )
+      );
+
+      toast.error("Failed to update like. Please try again.");
+    } finally {
+      setIsLikeLoading(null);
     }
   };
 
@@ -206,6 +274,7 @@ const AllVideosPage = () => {
       <header className="sticky top-0 z-10 bg-gradient-to-r from-gray-900/95 to-black/95 backdrop-blur-md border-b border-gray-800/50 shadow-lg">
         <div className="px-6 py-4 max-w-7xl mx-auto">
           <div className="flex items-center justify-between gap-4">
+            {/* Back Button */}
             <button
               onClick={() => router.back()}
               className="flex items-center gap-2 group transition-all"
@@ -221,6 +290,7 @@ const AllVideosPage = () => {
               </span>
             </button>
 
+            {/* Main Title with User Info */}
             <div className="flex flex-col items-center">
               <h1 className="text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-400 via-purple-400 to-pink-500 animate-gradient">
                 {user?.user?._id === userid
@@ -240,17 +310,38 @@ const AllVideosPage = () => {
               </div>
             </div>
 
-            {user?.user?._id === userid && (
+            {/* Right Side Buttons */}
+            <div className="flex items-center gap-3">
+              {/* Refresh Button */}
               <button
-                onClick={() => setIsUploadModalOpen(true)}
-                className="hidden sm:flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500/90 to-amber-600/90 hover:from-amber-500 hover:to-amber-600 rounded-full shadow-lg hover:shadow-amber-500/30 transition-all group"
+                onClick={() => setRefetch((prev) => !prev)}
+                className="p-2 rounded-full bg-gray-800/70 hover:bg-amber-500/20 text-gray-400 hover:text-amber-400 transition-all group"
+                title="Refresh videos"
               >
-                <Upload size={18} className="text-white" />
-                <span className="text-sm font-medium text-white">
-                  Upload New
-                </span>
+                <motion.div
+                  animate={{ rotate: refetch ? 360 : 0 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <RefreshCw
+                    size={18}
+                    className={loading ? "animate-spin" : ""}
+                  />
+                </motion.div>
               </button>
-            )}
+
+              {/* Upload Button (only shows for current user) */}
+              {user?.user?._id === userid && (
+                <button
+                  onClick={() => setIsUploadModalOpen(true)}
+                  className="hidden sm:flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500/90 to-amber-600/90 hover:from-amber-500 hover:to-amber-600 rounded-full shadow-lg hover:shadow-amber-500/30 transition-all group"
+                >
+                  <Upload size={18} className="text-white" />
+                  <span className="text-sm font-medium text-white">
+                    Upload New
+                  </span>
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </header>
@@ -328,6 +419,10 @@ const AllVideosPage = () => {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-6"
+              style={{
+                maxHeight: "calc(100vh - 150px)", // Adjust based on your header height
+                overflowY: "auto",
+              }}
             >
               {friendvideos.map((video) => (
                 <motion.div
@@ -394,16 +489,21 @@ const AllVideosPage = () => {
                       <div className="flex items-center gap-3">
                         <button
                           onClick={() => toggleLike(video._id)}
+                          disabled={isLikeLoading === video._id}
                           className="flex items-center gap-1 text-xs"
                         >
-                          <Heart
-                            size={16}
-                            className={
-                              likedVideos.has(video._id)
-                                ? "text-red-500 fill-red-500"
-                                : "text-gray-400"
-                            }
-                          />
+                          {isLikeLoading === video._id ? (
+                            <CircularProgress size={16} />
+                          ) : (
+                            <Heart
+                              size={16}
+                              className={
+                                likedVideos.has(video._id)
+                                  ? "text-red-500 fill-red-500"
+                                  : "text-gray-400"
+                              }
+                            />
+                          )}
                           <span className="text-gray-400">
                             {video.likes?.length || 0}
                           </span>

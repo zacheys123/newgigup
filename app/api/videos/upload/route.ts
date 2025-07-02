@@ -14,8 +14,8 @@ export async function POST(req: NextRequest) {
       source,
       description,
       gigId,
-      isPublic = true,
-      isPrivate = false,
+      isPublic,
+
       thumbnail,
     } = body;
 
@@ -35,8 +35,8 @@ export async function POST(req: NextRequest) {
       source,
       description,
       gigId,
-      isPublic,
-      isPrivate,
+      isPublic: isPublic !== false,
+
       thumbnail: thumbnail ? thumbnail.toLowerCase() : "",
     });
 

@@ -34,6 +34,7 @@ const VideoUploadModal = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  const [privacy, setPrivacy] = useState<"public" | "private">("public"); // New state for privacy
   const handleFileChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const dep = "video";
@@ -162,6 +163,7 @@ const VideoUploadModal = ({
           source: videoUrl,
           thumbnail: thumbnailUrl,
           postedBy: user?.user?._id,
+          isPublic: privacy === "public",
         }),
       });
 
@@ -433,7 +435,45 @@ const VideoUploadModal = ({
                 </div>
               </div>
 
-              {/* Submit Button */}
+              <div className="space-y-3">
+                <label className="block text-sm font-medium text-gray-300">
+                  Privacy Settings
+                </label>
+                <div className="flex items-center gap-4">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="privacy"
+                      value="public"
+                      checked={privacy === "public"}
+                      onChange={() => setPrivacy("public")}
+                      className="h-4 w-4 text-amber-500 focus:ring-amber-500 border-gray-600"
+                    />
+                    <span className="text-sm text-gray-300">
+                      Public (Visible to everyone)
+                    </span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="privacy"
+                      value="private"
+                      checked={privacy === "private"}
+                      onChange={() => setPrivacy("private")}
+                      className="h-4 w-4 text-amber-500 focus:ring-amber-500 border-gray-600"
+                    />
+                    <span className="text-sm text-gray-300">
+                      Private (Only visible to you)
+                    </span>
+                  </label>
+                </div>
+                <p className="text-xs text-gray-500">
+                  {privacy === "public"
+                    ? "This video will be visible on your profile and in search results."
+                    : "Only you will be able to view this video."}
+                </p>
+              </div>
+
               <div className="pt-2">
                 <button
                   type="submit"

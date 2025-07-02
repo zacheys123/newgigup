@@ -8,29 +8,42 @@ import User from "@/models/user";
 export async function GET(req: NextRequest) {
   const id = req.nextUrl.pathname.split("/").pop(); // Extract the `id` from the URL path
   const { userId } = getAuth(req);
+
   if (!userId) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
-  // Check if a string is a valid ObjectId
 
   try {
     await connectDb();
 
-    const vids = await Video.find({ isPublic: true }).populate({
+    // Find the current user first
+    const currentUser = await User.findOne({ clerkId: userId });
+    if (!currentUser) {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
+
+    // Get all videos with populated postedBy
+    const allVideos = await Video.find().sort({ createdAt: -1 }).populate({
       path: "postedBy",
       model: User,
     });
 
-    const videos = vids?.filter((video) => {
-      return video?.postedBy?._id.toString() === id;
+    // Filter videos based on privacy and ownership
+    const filteredVideos = allVideos.filter((video) => {
+      // If video is public, include it
+      if (video.isPublic) return true;
+
+      // If video is private, only include if current user is the owner
+      return video.postedBy?.clerkId === userId;
     });
+
     return NextResponse.json({
-      videos,
+      videos: filteredVideos,
     });
   } catch (error) {
-    console.error("Error fetching user:", error);
+    console.error("Error fetching videos:", error);
     return NextResponse.json({
-      message: "An error occurred while fetching the user.",
+      message: "An error occurred while fetching videos.",
       error: (error as Error).message,
       status: 500,
     });
