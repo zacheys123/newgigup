@@ -195,8 +195,16 @@ const ProfilePage = () => {
 
 export default ProfilePage;
 
+<<<<<<< HEAD
 // Icons component remains the same
 const Icons = {
+=======
+import { SVGProps } from "react";
+import { useAllGigs } from "@/hooks/useAllGigs";
+import { GigProps } from "@/types/giginterface";
+
+ const Icons = {
+>>>>>>> c5e11c3f86ab6aaa1cf9b5f01fa8bb5a54cd98cf
   // User profile icon
   user: (props: SVGProps<SVGSVGElement>) => (
     <svg
