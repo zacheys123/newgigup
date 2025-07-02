@@ -725,7 +725,7 @@ const ActionPage = () => {
                     title: "Admin Role",
                     accent: "emerald",
                     description: "Register as Admin",
-                    buttonText: "Admin Initialization",
+                    buttonText: "Admin Registration",
                     onClick: () => handleModal(),
                     disabled: false,
                   },
