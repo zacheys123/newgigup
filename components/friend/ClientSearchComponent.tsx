@@ -106,6 +106,7 @@ const ClientSearchComponent = () => {
               completedGigsCount: 0,
               reportsCount: 0,
               cancelgigCount: 0,
+              likedVideos: [],
               rate: {
                 regular: "",
                 function: "",

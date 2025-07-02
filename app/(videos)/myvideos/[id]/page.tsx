@@ -88,7 +88,7 @@ const VideoProfile = () => {
               bookingHistory: [],
               completedGigsCount: 0,
               cancelgigCount: 0,
-
+              likedVideos: [],
               reportsCount: 0,
               rate: {
                 regular: "",
