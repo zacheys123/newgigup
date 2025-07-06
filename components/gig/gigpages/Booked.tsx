@@ -7,13 +7,14 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { GigProps } from "@/types/giginterface";
 import { motion } from "framer-motion";
 import React, { useMemo, useState } from "react";
-import { BanIcon, Video } from "lucide-react";
+import { BanIcon, RotateCw, Video } from "lucide-react";
 
 import GigCard from "./GigCard";
 import { Search } from "react-feather";
 import { UserProps } from "@/types/userinterfaces";
 import ChatModal from "./ChatModal";
 import { useConfirmPayment } from "@/hooks/useConfirmPayment";
+import { Button } from "@/components/ui/button";
 
 const Booked = () => {
   const { loading: gigsLoading, gigs } = useAllGigs();
@@ -23,6 +24,7 @@ const Booked = () => {
     user: UserProps;
   } | null>(null);
   const [typeOfGig, setTypeOfGig] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const debouncedSearch = useDebounce(typeOfGig, 300);
 
   const {
@@ -76,15 +78,33 @@ const Booked = () => {
   const [musicianCode, setMusicianCode] = useState("");
   const { confirmPayment } = useConfirmPayment();
 
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    try {
+      await confirmPayment(
+        currentgig?._id || "",
+        "musician",
+        "Musician confirmed via app",
+        musicianCode,
+        0
+      );
+      setShowPaymentConfirmation(false);
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setIsSubmitting(false);
+      setShowPaymentConfirmation(false);
+    }
+  };
   return (
     <div className="flex flex-col h-[calc(100vh-100px)] w-full bg-gradient-to-br from-gray-900 to-gray-800">
       {/* Main Content Area */}
 
       {showPaymentConfirmation && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg sm:max-w-[400px] max-w-[350px] w-full">
+          <div className="bg-white p-6 rounded-lg sm:max-w-[400px] max-w-[300px] w-full">
             <h3 className="text-lg font-medium mb-4">Confirm Payment</h3>
-            <p className="mb-2 text-sm text-gray-700">
+            <p className="mb-2 text-[10px] text-gray-700">
               Please enter the last 3 letters/digits of the payment confirmation
               meessage. Payment will be marked complete only if both codes
               match.{" "}
@@ -93,7 +113,7 @@ const Booked = () => {
             <input
               type="text"
               placeholder="Enter code"
-              className="w-full border px-3 py-2 rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border px-3 py-2 text-xs rounded-md text-neutral-500 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={musicianCode}
               onChange={(e) => setMusicianCode(e.target.value)}
             />
@@ -101,25 +121,25 @@ const Booked = () => {
             <div className="flex justify-end space-x-3">
               <button
                 onClick={() => setShowPaymentConfirmation(false)}
-                className="px-4 py-2 border rounded-md"
+                className="px-4 py-2 border rounded-md text-neutral-500 text-xs"
               >
                 Cancel
               </button>
-              <button
-                onClick={async () => {
-                  await confirmPayment(
-                    currentgig?._id || "",
-                    "musician",
-                    "Client confirmed via app",
-                    musicianCode,
-                    0
-                  );
-                  setShowPaymentConfirmation(false);
-                }}
-                className="px-4 py-2 bg-green-600 text-white rounded-md"
+
+              <Button
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800"
               >
-                Confirm
-              </button>
+                {isSubmitting ? (
+                  <span className="flex items-center gap-2">
+                    <RotateCw className="h-4 w-4 animate-spin" />
+                    Confirming...
+                  </span>
+                ) : (
+                  "Confirm"
+                )}
+              </Button>
             </div>
           </div>
         </div>

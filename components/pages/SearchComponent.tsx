@@ -175,25 +175,23 @@ const SearchComponent = () => {
         <AnimatePresence>
           {finalFilteredUsers.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 pt-[50px]">
-              {finalFilteredUsers
-                .filter((u) => myuser?.user?.isMusician && u?.isMusician)
-                ?.map((user: UserProps, index: number) => (
-                  <motion.div
-                    key={user._id}
-                    layout
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{
-                      type: "spring",
-                      stiffness: 300,
-                      damping: 25,
-                      delay: index * 0.03,
-                    }}
-                  >
-                    <MainUser {...user} />
-                  </motion.div>
-                ))}
+              {finalFilteredUsers?.map((user: UserProps, index: number) => (
+                <motion.div
+                  key={user._id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 300,
+                    damping: 25,
+                    delay: index * 0.03,
+                  }}
+                >
+                  <MainUser {...user} />
+                </motion.div>
+              ))}
             </div>
           ) : (
             <motion.div
