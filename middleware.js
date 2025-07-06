@@ -1,45 +1,52 @@
 // middleware.ts
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { clerkMiddleware } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
 
-const isPublicRoute = createRouteMatcher([
+// 1. Define EXCEPTIONS first (public routes)
+const publicRoutes = [
   "/",
   "/sign-in(.*)",
   "/sign-up(.*)",
   "/banned",
   "/unauthorized",
-  "/api/stkcallback",
-]);
+  "/api/stkcallback", // MPesa callback
+  "/api/cron(.*)", // All cron jobs
+  "/api/public(.*)", // Any other public APIs
+];
 
-const isAdminRoute = createRouteMatcher(["/admin(.*)", "/api/admin(.*)"]);
+// 2. Define ADMIN routes
+const adminRoutes = ["/admin(.*)", "/api/admin(.*)"];
 
 export default clerkMiddleware(async (auth, request) => {
-  // Public routes
-  if (isPublicRoute(request)) {
-    // Redirect authenticated users away from auth pages
-    if (auth.userId && request.nextUrl.pathname.startsWith("/sign-")) {
+  const path = request.nextUrl.pathname;
+
+  // 3. Skip middleware for public routes
+  if (publicRoutes.some((route) => new RegExp(route).test(path))) {
+    // Special handling for auth pages
+    if (auth.userId && path.startsWith("/sign-")) {
       return Response.redirect(new URL("/", request.url));
     }
-    return;
+    return NextResponse.next();
   }
 
-  // Protect all non-public routes
+  // 4. PROTECT ALL OTHER ROUTES (including all other APIs)
   await auth.protect();
 
-  // Check banned status from Clerk metadata (no DB required)
+  // 5. Additional checks
   const { isBanned } = auth().sessionClaims?.metadata || {};
-  if (isBanned && request.nextUrl.pathname !== "/banned") {
+  if (isBanned && path !== "/banned") {
     return Response.redirect(new URL("/banned", request.url));
   }
 
-  // Admin route checks
-  if (isAdminRoute(request)) {
-    const sessionClaims = auth().sessionClaims;
-    if (sessionClaims?.metadata?.role === "admin") {
-      return Response.redirect(new URL("/admin/dashboard", request.url));
+  // 6. Admin route checks
+  if (adminRoutes.some((route) => new RegExp(route).test(path))) {
+    if (auth().sessionClaims?.metadata?.role !== "admin") {
+      return new NextResponse("Unauthorized", { status: 401 });
     }
   }
 });
 
+// 7. Matcher config (simplified)
 export const config = {
-  matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
+  matcher: ["/((?!_next|static|favicon.ico).*)"], // Catch ALL routes except Next.js internals
 };

@@ -11,6 +11,7 @@ export interface IPendingPayment extends Document {
   createdAt?: Date;
   updatedAt?: Date;
   username: string;
+  isRenewal: boolean;
 }
 
 // 2. Define the Mongoose Schema
@@ -23,6 +24,7 @@ const pendingPaymentSchema = new Schema<IPendingPayment>(
     tier: { type: String, required: true },
     phoneNumber: { type: String }, // correct default type to String
     username: { type: String, required: true }, // pending, success, failed
+    isRenewal: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

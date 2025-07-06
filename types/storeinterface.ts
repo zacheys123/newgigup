@@ -102,7 +102,7 @@ export const initialState = {
     bookingHistory: [] as BookingItem[],
     completedGigsCount: 0,
     cancelgigCount: 0,
-
+    mpesaPhoneNumber: "",
     reportsCount: 0,
     rate: {
       regular: "",

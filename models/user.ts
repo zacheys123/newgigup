@@ -1,8 +1,10 @@
 import { VideoProps } from "@/types/userinterfaces";
 import mongoose, { Schema, models, Document, Model } from "mongoose";
+import { Types } from "mongoose";
 
 // Define TypeScript Interface
 interface IUser extends Document {
+  _id: Types.ObjectId;
   clerkId: string;
   picture?: string;
   firstname?: string;
@@ -111,6 +113,9 @@ interface IUser extends Document {
   reportsCount: number;
   firstTimeInProfile: boolean;
   likedVideos: VideoProps[];
+  mpesaPhoneNumber?: string;
+  renewalAttempts: number;
+  lastRenewalAttempt: Date;
 }
 
 // Define Mongoose Schema
@@ -264,6 +269,16 @@ const userSchema = new Schema<IUser>(
     },
     firstTimeInProfile: Boolean,
     likedVideos: [{ type: Schema.Types.ObjectId, ref: "Video" }],
+
+    mpesaPhoneNumber: {
+      type: String,
+      lowerCase: true,
+    },
+    renewalAttempts: {
+      type: Number,
+      default: 0,
+    },
+    lastRenewalAttempt: Date,
   },
 
   { timestamps: true }

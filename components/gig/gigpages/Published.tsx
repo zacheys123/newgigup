@@ -205,21 +205,34 @@ const PublishedContent = () => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.5 }}
-                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4  "
+                  className="relative" // Added relative positioning
                 >
-                  {filteredGigs.map((gig: GigProps) => (
+                  {/* Scrollable container */}
+                  <div className="overflow-y-auto h-[calc(100vh-200px)]">
+                    {" "}
+                    {/* Adjust height as needed */}
                     <motion.div
-                      key={gig?._id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3 }}
-                      whileHover={{ y: -5 }}
-                      className="relative group overflow-hidden rounded-xl hover:border-amber-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/10 "
+                      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4   pt-[14px] pb-[200px]" // Added padding
                     >
-                      <AllGigsComponent gig={gig} />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                      {filteredGigs.map((gig: GigProps) => (
+                        <motion.div
+                          key={gig?._id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3 }}
+                          whileHover={{ y: -5 }}
+                          className="relative group overflow-hidden rounded-xl hover:border-amber-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/10"
+                        >
+                          <AllGigsComponent gig={gig} />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                        </motion.div>
+                      ))}
                     </motion.div>
-                  ))}
+                  </div>
+
+                  {/* Optional scroll gradient indicators */}
+                  <div className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-gray-900 to-transparent pointer-events-none" />
+                  <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-gray-900 to-transparent pointer-events-none" />
                 </motion.div>
               ) : (
                 <motion.div

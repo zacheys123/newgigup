@@ -92,7 +92,7 @@ const MobileSheet = () => {
         <Menu
           className={cn(
             "text-3xl transition-colors duration-200 hover:text-teal-300",
-            "text-gray-900 dark:text-white"
+            "text-gray-300 dark:text-white "
           )}
         />
       </SheetTrigger>
@@ -135,13 +135,6 @@ const MobileSheet = () => {
             <div className="mt-6 p-2 w-fit text-sm rounded-md font-semibold shadow-md text-white bg-gradient-to-br from-purple-600 via-emerald-600 to-orange-600 dark:from-purple-400 dark:via-emerald-400 dark:to-orange-500">
               {tier} Version
             </div>
-
-            <ThemeToggle
-              theme={theme}
-              resolvedTheme={resolvedTheme}
-              toggleTheme={toggleTheme}
-              useSystemTheme={useSystemTheme}
-            />
           </>
         ) : (
           <>
@@ -209,6 +202,12 @@ const MobileSheet = () => {
             </div>
           </>
         )}
+        <ThemeToggle
+          theme={theme}
+          resolvedTheme={resolvedTheme}
+          toggleTheme={toggleTheme}
+          useSystemTheme={useSystemTheme}
+        />
       </SheetContent>
     </Sheet>
   );

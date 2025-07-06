@@ -21,6 +21,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  if (process.env.NODE_ENV === "production") {
+    fetch("/api/cron/init", { cache: "no-store" });
+  }
+
   return (
     <html lang="en">
       <body className="min-h-screen bg-gray-200 w-screen overflow-x-hidden">

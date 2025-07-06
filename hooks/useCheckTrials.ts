@@ -43,7 +43,7 @@ export const useCheckTrial = (user: UserProps | null) => {
       setTrialRemainingDays(daysLeft);
       const timeout = setTimeout(() => {
         setTrialRemainingDays(null);
-      }, 4000);
+      }, 6000);
       return () => clearTimeout(timeout);
     }
   }, [user, isPro]);

@@ -374,7 +374,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="w-[90%] mx-auto bg-white/5 backdrop-blur-sm rounded-xl p-3 mb-3 border border-white/10 hover:border-white/20 transition-all"
+        className="w-[90%] mx-auto bg-white/5 backdrop-blur-sm rounded-xl py-4 px-2 mb-3 border border-white/10 hover:border-white/20 transition-all"
         style={{
           background:
             gig?.isPending === false
@@ -724,7 +724,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                 <>
                   {isProOnlyForFreeUser ? (
                     <div className="text-center">
-                      <p className="text-xs text-amber-300 mb-1 bg-gray-500 p-2">
+                      <p className="text-xs text-amber-300 mb-1 bg-gray-500/40 p-2 rounded-xl">
                         Pro members only for gigs over 10k KES
                       </p>
                       <ButtonComponent
@@ -763,40 +763,42 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
               )}
             {/* Context Menu */}
             {subscription?.user?.tier === "free" ||
-              (gig?.isTaken === false && gig?.postedBy?._id !== myId && (
-                <>
-                  <div className="w-full absolute inset-0 bg-gradient-to-t  to-transparent -z-50" />
+              (gig?.isTaken === false &&
+                gig?.postedBy?._id !== myId &&
+                !isProOnlyForFreeUser && (
+                  <>
+                    <div className="w-full absolute inset-0 bg-gradient-to-t  to-transparent -z-50" />
 
-                  <div className="absolute top-23 right-1/2 flex gap-2 opacity-40 hover:opacity-80">
-                    <button
-                      onClick={() => {
-                        const action = isFavorite ? "remove" : "add";
-                        handleFavourite(action);
-                      }}
-                      className="p-2 bg-gray-800/80 rounded-full hover:bg-amber-500/80 transition-colors"
-                    >
-                      {isFavorite ? (
-                        <FaHeart className="text-amber-500" />
-                      ) : (
-                        <FaRegHeart className="text-white" />
-                      )}
-                    </button>
-                    <button
-                      onClick={() => {
-                        const action = isSaved ? "remove" : "add";
-                        handleSave(action);
-                      }}
-                      className="p-2 bg-gray-800/80 rounded-full hover:bg-amber-500/80 transition-colors"
-                    >
-                      {isSaved ? (
-                        <FaBookmark className="text-amber-500" />
-                      ) : (
-                        <FaRegBookmark className="text-white" />
-                      )}
-                    </button>
-                  </div>
-                </>
-              ))}
+                    <div className="absolute top-23 right-1/2 flex gap-2 opacity-40 hover:opacity-80">
+                      <button
+                        onClick={() => {
+                          const action = isFavorite ? "remove" : "add";
+                          handleFavourite(action);
+                        }}
+                        className="p-2 bg-gray-800/80 rounded-full hover:bg-amber-500/80 transition-colors"
+                      >
+                        {isFavorite ? (
+                          <FaHeart className="text-amber-500" />
+                        ) : (
+                          <FaRegHeart className="text-white" />
+                        )}
+                      </button>
+                      <button
+                        onClick={() => {
+                          const action = isSaved ? "remove" : "add";
+                          handleSave(action);
+                        }}
+                        className="p-2 bg-gray-800/80 rounded-full hover:bg-amber-500/80 transition-colors"
+                      >
+                        {isSaved ? (
+                          <FaBookmark className="text-amber-500" />
+                        ) : (
+                          <FaRegBookmark className="text-white" />
+                        )}
+                      </button>
+                    </div>
+                  </>
+                ))}
             {!gig?.isTaken && (
               <button
                 onClick={(e) => {

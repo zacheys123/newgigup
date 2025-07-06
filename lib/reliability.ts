@@ -1,5 +1,61 @@
 import { UserProps } from "@/types/userinterfaces";
 
+export const searchFunc = (users: UserProps[], searchQuery: string) => {
+  if (!users) return [];
+
+  // Calculate reliability and add additional metrics for sorting
+  const usersWithMetrics = users.map((user) => {
+    const completed = user.completedGigsCount || 0;
+    const canceled = user.cancelgigCount || 0;
+    const total = completed + canceled;
+
+    return {
+      ...user,
+      reliabilityScore: calculateReliability(completed, canceled),
+      completedGigs: completed,
+      canceledGigs: canceled,
+      totalGigs: total,
+    };
+  });
+
+  let filteredData = usersWithMetrics;
+
+  if (searchQuery) {
+    const query = searchQuery.toLowerCase();
+
+    filteredData = filteredData.filter((user: UserProps) => {
+      return (
+        user?.firstname?.toLowerCase().includes(query) ||
+        user?.lastname?.toLowerCase().includes(query) ||
+        user?.email?.toLowerCase().includes(query) ||
+        user?.instrument?.toLowerCase().includes(query) ||
+        user?.username?.toLowerCase().includes(query)
+      );
+    });
+  }
+
+  // Enhanced sorting logic
+  return filteredData.sort((a, b) => {
+    // First priority: Higher reliability score
+    if (b.reliabilityScore !== a.reliabilityScore) {
+      return b.reliabilityScore - a.reliabilityScore;
+    }
+
+    // Second priority: More completed gigs (among equally reliable users)
+    if (b.completedGigs !== a.completedGigs) {
+      return b.completedGigs - a.completedGigs;
+    }
+
+    // Third priority: Fewer canceled gigs (among equally reliable with same completed)
+    if (a.canceledGigs !== b.canceledGigs) {
+      return a.canceledGigs - b.canceledGigs;
+    }
+
+    // Final tiebreaker: More total gigs (more experienced)
+    return b.totalGigs - a.totalGigs;
+  });
+};
+
 export const calculateReliability = (
   completed: number,
   canceled: number

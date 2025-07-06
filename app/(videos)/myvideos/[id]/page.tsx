@@ -90,6 +90,7 @@ const VideoProfile = () => {
               cancelgigCount: 0,
               likedVideos: [],
               reportsCount: 0,
+              mpesaPhoneNumber: "",
               rate: {
                 regular: "",
                 function: "",

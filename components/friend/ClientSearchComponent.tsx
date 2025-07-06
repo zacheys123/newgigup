@@ -107,6 +107,7 @@ const ClientSearchComponent = () => {
               reportsCount: 0,
               cancelgigCount: 0,
               likedVideos: [],
+              mpesaPhoneNumber: "",
               rate: {
                 regular: "",
                 function: "",

@@ -5,9 +5,12 @@ import connectDb from "@/lib/connectDb";
 import { PendingPayment } from "@/models/pendingPayment";
 import User from "@/models/user";
 // import { sendConfirmationEmail } from "@/lib/subscription/sendConfirmationEmail";
-
-// In your verification endpoint
-// In your verification endpoint (/api/verify-payment)
+interface UserUpdateData {
+  tier: string;
+  nextBillingDate: Date;
+  renewalAttempts: number;
+  mpesaPhoneNumber?: string; // Optional property
+}
 export async function POST(req: NextRequest) {
   const { checkoutRequestId, attempt = 1 } = await req.json(); // 👈 Add attempt with default 1
 
@@ -25,15 +28,23 @@ export async function POST(req: NextRequest) {
     );
 
     if (verification.success && pendingPayment && checkoutRequestId) {
-      // Update user and payment status
+      // Create base update object
+      const updateData: UserUpdateData = {
+        tier: "pro",
+        nextBillingDate: new Date(
+          new Date().setMonth(new Date().getMonth() + 1)
+        ),
+        renewalAttempts: 0,
+      };
+
+      // Conditionally add phone number for new subscriptions
+      if (!pendingPayment.isRenewal) {
+        updateData.mpesaPhoneNumber = pendingPayment.phoneNumber;
+      }
+
       const updatedUser = await User.findOneAndUpdate(
         { clerkId: pendingPayment.clerkId },
-        {
-          tier: "pro",
-          nextBillingDate: new Date(
-            new Date().setMonth(new Date().getMonth() + 1)
-          ),
-        },
+        updateData, // Pass the dynamic object
         { new: true }
       );
 
@@ -45,9 +56,6 @@ export async function POST(req: NextRequest) {
         { checkoutRequestId },
         { status: "success" }
       );
-
-      // Optional: Send confirmation email
-      // await sendConfirmationEmail(updatedUser.email, updatedUser.username);
 
       return NextResponse.json({
         success: true,

@@ -176,6 +176,7 @@ export const postedBy = {
   },
   firstTimeInProfile: false,
   likedVideos: [],
+  mpesaPhoneNumber: "",
 };
 
 export const instruments = [

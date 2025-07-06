@@ -475,7 +475,7 @@ const calculateRating = (
 
 const calculateConfirmedPayments = (gigs: MyGigProps[], userId: string) => {
   if (!gigs || !Array.isArray(gigs)) return [];
-  return gigs.filter((gig) => gig.postedBy._id === userId);
+  return gigs.filter((gig) => gig?.postedBy?._id === userId);
 };
 
 export default MainUser;

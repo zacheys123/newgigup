@@ -86,6 +86,7 @@ export interface UserProps {
   firstTimeInProfile?: boolean;
   reportsCount: number;
   likedVideos: VideoProps[];
+  mpesaPhoneNumber?: string;
 }
 export interface Users {
   users: UserProps[]; // Optional}
