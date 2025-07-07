@@ -9,6 +9,7 @@ import {
 import {
   BookA,
   BookCopy,
+  Gamepad,
   Home,
   Menu,
   MessageCircle,
@@ -62,6 +63,7 @@ const navLinks = (userId: string | undefined, user: UserProps) => [
     icon: <Music size={20} />,
   },
   { label: "Settings", href: "/settings", icon: <Settings size={20} /> },
+  { label: "Games", href: "/game", icon: <Gamepad size={20} /> },
 ];
 
 const MobileSheet = () => {
