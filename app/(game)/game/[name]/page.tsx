@@ -6,13 +6,19 @@ import { useParams, useRouter } from "next/navigation";
 import { topics } from "@/data";
 import { Question } from "@/types/gamesiinterface";
 import { AnimatePresence, motion } from "framer-motion";
+import { v4 as uuidv4 } from "uuid";
+
+import Confetti from "react-confetti";
+import { useWindowSize } from "react-use"; // Also install this if not yet
+
+// inside QuizPage:
 
 export default function QuizPage() {
   const { name } = useParams();
   const router = useRouter();
   const decodedTopic = decodeURIComponent(name as string);
   const topicData = topics.find((t) => t.name === decodedTopic);
-
+  const { width, height } = useWindowSize();
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [isAnswered, setIsAnswered] = useState(false);
@@ -26,13 +32,9 @@ export default function QuizPage() {
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [scorePosted, setScorePosted] = useState(false);
   const [showToast, setShowToast] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const { user } = useUser();
-
-  const correctSound =
-    typeof Audio !== "undefined" ? new Audio("/sounds/correct.mp3") : null;
-  const wrongSound =
-    typeof Audio !== "undefined" ? new Audio("/sounds/wrong.mp3") : null;
 
   const getRandomQuestion = (): Question | null => {
     if (!topicData || topicData.questions.length === 0) return null;
@@ -81,9 +83,6 @@ export default function QuizPage() {
     if (answer === currentQuestion.correctAnswer) {
       setScore((prev) => prev + 1);
       setShowCorrect(true);
-      correctSound?.play();
-    } else {
-      wrongSound?.play();
     }
 
     setAnsweredQuestions((prev) => [...prev, currentQuestion]);
@@ -106,7 +105,7 @@ export default function QuizPage() {
     }, 1500);
   };
 
-  // 🧠 Post score to backend only if not already posted and is higher than previous
+  // Post score only if not posted + it's a new high score
   useEffect(() => {
     const postScore = async () => {
       if (!currentQuestion && score > 0 && user && topicData && !scorePosted) {
@@ -117,8 +116,8 @@ export default function QuizPage() {
             )}&userId=${user.id}`
           );
           const existing = await res.json();
-
           const bestPrevScore = existing?.[0]?.score || 0;
+
           if (score > bestPrevScore) {
             await fetch("/api/leaderboard", {
               method: "POST",
@@ -129,16 +128,17 @@ export default function QuizPage() {
                 username: user.username || user.fullName || "Anonymous",
               }),
             });
+            setShowConfetti(true); // 🎉 Show confetti only on new high score
             setShowToast(true);
             setTimeout(() => setShowToast(false), 3000);
           }
+
           setScorePosted(true);
         } catch (err) {
           console.error("Score posting failed", err);
         }
       }
     };
-
     postScore();
   }, [currentQuestion, score, topicData, user, scorePosted]);
 
@@ -161,9 +161,7 @@ export default function QuizPage() {
   const exitQuiz = () => router.push("/game");
 
   const handleBackdropClick = () => {
-    if (!isTransitioning) {
-      setShowExitConfirm(true);
-    }
+    if (!isTransitioning) setShowExitConfirm(true);
   };
 
   if (!topicData) return null;
@@ -174,6 +172,15 @@ export default function QuizPage() {
         className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50"
         onClick={handleBackdropClick}
       >
+        {showConfetti && (
+          <Confetti
+            width={width}
+            height={height}
+            numberOfPieces={300}
+            recycle={false}
+          />
+        )}
+
         <div
           className="bg-white rounded-xl p-6 w-full max-w-sm text-center shadow-xl animate-fade-in"
           onClick={(e) => e.stopPropagation()}
@@ -206,79 +213,100 @@ export default function QuizPage() {
   }
 
   return (
-    <div
-      className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 font-sans"
+    <motion.div
+      className="fixed inset-0 flex items-center justify-center p-4 z-50 font-sans"
       onClick={handleBackdropClick}
+      initial={{
+        backdropFilter: "blur(0px)",
+        backgroundColor: "rgba(0,0,0,0)",
+      }}
+      animate={{
+        backdropFilter: "blur(8px)",
+        backgroundColor: "rgba(0,0,0,0.6)",
+      }}
+      exit={{ backdropFilter: "blur(0px)", backgroundColor: "rgba(0,0,0,0)" }}
+      transition={{ duration: 0.4, ease: "easeInOut" }}
     >
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        transition={{ duration: 0.3 }}
-        className={`bg-white rounded-lg p-5 w-full max-w-sm shadow-xl transition-all duration-500 ${
-          isTransitioning ? "opacity-0 scale-95" : "opacity-100 scale-100"
-        }`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="text-md text-gray-800 mb-4">
-          {currentQuestion.question}
-        </div>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentQuestion?.question} // 👈 forces remount
+          initial={{ x: "100%", opacity: 0, scale: 0.95 }}
+          animate={{ x: 0, opacity: 1, scale: 1 }}
+          exit={{ x: "-100%", opacity: 0, scale: 0.95 }}
+          transition={{ duration: 0.4, ease: "easeInOut" }}
+          className={`bg-white rounded-lg p-5 w-full max-w-sm shadow-xl`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="text-md text-gray-800 mb-4">
+            {currentQuestion.question}
+          </div>
 
-        <div className="space-y-3 mb-4">
-          <AnimatePresence>
-            {allAnswers.map((answer) => (
-              <motion.button
-                key={answer}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                onClick={() => handleAnswer(answer)}
-                disabled={isAnswered}
-                className={`w-full text-left px-4 py-2 rounded-md border transition-all text-sm font-medium ${
-                  isAnswered && answer === currentQuestion.correctAnswer
-                    ? "bg-green-100 border-green-500 text-green-700"
-                    : selectedAnswer === answer && isAnswered
-                    ? "bg-red-100 border-red-500 text-red-700"
-                    : selectedAnswer === answer
-                    ? "bg-blue-50 border-blue-400 text-blue-700"
-                    : "border-gray-200 hover:bg-gray-50"
+          <div className="space-y-3 mb-4">
+            <AnimatePresence mode="popLayout">
+              {allAnswers.map((answer, i) => (
+                <motion.button
+                  key={answer}
+                  initial={{ x: -30, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: -30, opacity: 0 }}
+                  transition={{
+                    delay: i * 0.05,
+                    duration: 0.3,
+                    ease: "easeOut",
+                  }}
+                  onClick={() => handleAnswer(answer)}
+                  disabled={isAnswered}
+                  className={`w-full text-left px-4 py-2 rounded-md border transition-all text-sm font-medium ${
+                    isAnswered && answer === currentQuestion.correctAnswer
+                      ? "bg-green-100 border-green-500 text-green-700"
+                      : selectedAnswer === answer && isAnswered
+                      ? "bg-red-100 border-red-500 text-red-700"
+                      : selectedAnswer === answer
+                      ? "bg-blue-50 border-blue-400 text-blue-700"
+                      : "border-gray-200 hover:bg-gray-50"
+                  }`}
+                >
+                  {answer}
+                </motion.button>
+              ))}
+            </AnimatePresence>
+          </div>
+          {isAnswered && (
+            <div className="relative">
+              <div
+                className={`text-sm text-center rounded-md py-2 mb-2 font-medium ${
+                  showCorrect
+                    ? "text-green-700 bg-green-50"
+                    : "text-red-700 bg-red-50"
                 }`}
               >
-                {answer}
-              </motion.button>
-            ))}
-          </AnimatePresence>
-        </div>
+                {showCorrect
+                  ? "Correct! 🎉"
+                  : `Wrong! Answer: ${currentQuestion.correctAnswer}`}
+              </div>
+              {showCorrect && <SparkleBurst />}
+            </div>
+          )}
 
-        {isAnswered && (
-          <div
-            className={`text-sm text-center rounded-md py-2 mb-2 font-medium ${
-              showCorrect
-                ? "text-green-700 bg-green-50"
-                : "text-red-700 bg-red-50"
-            }`}
-          >
-            {showCorrect
-              ? "Correct! 🎉"
-              : `Wrong! Answer: ${currentQuestion.correctAnswer}`}
+          <div className="text-center text-xs text-gray-500 mt-1">
+            {timeLeft}s
           </div>
-        )}
-
-        <div className="text-center text-xs text-gray-500 mt-1">
-          {timeLeft}s
-        </div>
-        <div className="text-center text-xs text-gray-400 mt-1">
-          Question {questionCount + 1} / {topicData.questions.length}
-        </div>
-      </motion.div>
-
+          <div className="text-center text-xs text-gray-400 mt-1">
+            Question {questionCount + 1} / {topicData.questions.length}
+          </div>
+        </motion.div>
+      </AnimatePresence>
+      {/* Exit Confirm Modal - also slide from left */}
       {showExitConfirm && (
-        <div
+        <motion.div
           className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center"
           onClick={() => setShowExitConfirm(false)}
+          initial={{ x: "-100%" }}
+          animate={{ x: 0 }}
+          exit={{ x: "-100%" }}
+          transition={{ duration: 0.4 }}
         >
-          <div
+          <motion.div
             className="bg-white p-6 rounded-xl shadow-xl text-center max-w-sm w-full"
             onClick={(e) => e.stopPropagation()}
           >
@@ -299,15 +327,52 @@ export default function QuizPage() {
                 Exit
               </button>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
 
       {showToast && (
-        <div className="fixed bottom-6 right-6 bg-green-500 text-white px-4 py-2 rounded shadow-lg animate-fade-in-out">
+        <motion.div
+          className="fixed bottom-6 right-6 bg-green-500 text-white px-4 py-2 rounded shadow-lg"
+          initial={{ opacity: 0, x: 100 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: 100 }}
+        >
           🎉 New High Score Saved!
-        </div>
+        </motion.div>
       )}
+    </motion.div>
+  );
+}
+
+function SparkleBurst() {
+  const sparkles = Array.from({ length: 12 }).map(() => ({
+    id: uuidv4(),
+    x: Math.random() * 100 - 50,
+    y: Math.random() * 100 - 50,
+    delay: Math.random() * 0.3,
+  }));
+
+  return (
+    <div className="absolute inset-0 flex justify-center items-center pointer-events-none">
+      {sparkles.map((sparkle) => (
+        <motion.div
+          key={sparkle.id}
+          initial={{ opacity: 1, x: 0, y: 0, scale: 0.5 }}
+          animate={{
+            opacity: 0,
+            x: sparkle.x,
+            y: sparkle.y,
+            scale: 1.5,
+          }}
+          transition={{
+            duration: 0.8,
+            delay: sparkle.delay,
+            ease: "easeOut",
+          }}
+          className="w-2 h-2 rounded-full bg-yellow-300 shadow-md"
+        />
+      ))}
     </div>
   );
 }
