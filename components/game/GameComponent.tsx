@@ -19,9 +19,13 @@ export default function GameComponent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8 relative">
-      {/* Background video */}
-      <div className="absolute inset-0 -z-10 overflow-hidden">
+    <div className="min-h-screen bg-gray-100 p-8 relative overflow-y-auto">
+      {" "}
+      {/* Added overflow-y-auto */}
+      {/* Background video - made fixed so it doesn't scroll */}
+      <div className="fixed inset-0 -z-10">
+        {" "}
+        {/* Changed from absolute to fixed */}
         <video
           autoPlay
           loop
@@ -34,15 +38,16 @@ export default function GameComponent() {
           />
         </video>
       </div>
-
-      <div className="max-w-4xl mx-auto bg-white/90 backdrop-blur-sm rounded-xl p-8 shadow-xl">
+      {/* Content container with max height */}
+      <div className="max-w-4xl mx-auto bg-white/90 backdrop-blur-sm rounded-xl p-8 shadow-xl min-h-[calc(100vh-4rem)]">
+        {" "}
+        {/* Added min-h */}
         <h1 className="text-4xl font-bold mb-6 text-center text-indigo-700">
           Quiz Challenge
         </h1>
         <p className="text-lg text-center mb-8 text-gray-600">
           Select a topic and test your knowledge!
         </p>
-
         <div className="mb-8">
           <label
             htmlFor="topic-select"
@@ -64,7 +69,6 @@ export default function GameComponent() {
             ))}
           </select>
         </div>
-
         <div className="flex justify-center gap-4">
           <button
             onClick={handleStartGame}
@@ -81,15 +85,14 @@ export default function GameComponent() {
             View Leaderboard
           </button>
         </div>
-
         <div className="mt-12">
           <h2 className="text-2xl font-semibold mb-6">Or browse all topics:</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-y-auto max-h-[60vh] pb-8 scrollbar-thin scrollbar-thumb-indigo-300 scrollbar-track-gray-100">
             {topics.map((topic) => (
               <button
                 key={topic.name}
                 onClick={() => setSelectedTopic(topic.name)}
-                className={`p-4 rounded-lg border-2 transition-all ${
+                className={`p-4 rounded-lg border-2 transition-all min-w-[100px] ${
                   selectedTopic === topic.name
                     ? "border-indigo-500 bg-indigo-50"
                     : "border-gray-200 hover:border-indigo-300 hover:bg-gray-50"
