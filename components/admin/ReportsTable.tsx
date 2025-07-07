@@ -316,7 +316,7 @@ export default function ReportsTable({
                     size="sm"
                     className="text-primary h-auto p-0"
                     onClick={() =>
-                      viewAllReports(report.reportedUser._id as string)
+                      viewAllReports(report.reportedUser._id.toString())
                     }
                   >
                     View all reports for this user
@@ -333,7 +333,7 @@ export default function ReportsTable({
                   onClick={() =>
                     setSelectedUser({
                       ...report.reportedUser,
-                      _id: report.reportedUser._id as string,
+                      _id: report.reportedUser._id.toString(),
                       firstname: report.reportedUser.firstname,
                       lastname: report.reportedUser.lastname || "",
                       email: report.reportedUser.email,
@@ -443,7 +443,7 @@ export default function ReportsTable({
                           variant="ghost"
                           size="sm"
                           onClick={() =>
-                            viewAllReports(report.reportedUser._id as string)
+                            viewAllReports(report.reportedUser._id.toString())
                           }
                         >
                           View All
@@ -458,7 +458,7 @@ export default function ReportsTable({
                           onClick={() =>
                             setSelectedUser({
                               ...report.reportedUser,
-                              _id: report.reportedUser._id as string,
+                              _id: report.reportedUser._id.toString(),
                               firstname: report.reportedUser.firstname,
                               lastname: report.reportedUser.lastname || "",
                               email: report.reportedUser.email,
