@@ -7,11 +7,8 @@ import { topics } from "@/data";
 import { Question } from "@/types/gamesiinterface";
 import { AnimatePresence, motion } from "framer-motion";
 import { v4 as uuidv4 } from "uuid";
-
 import Confetti from "react-confetti";
-import { useWindowSize } from "react-use"; // Also install this if not yet
-
-// inside QuizPage:
+import { useWindowSize } from "react-use";
 
 export default function QuizPage() {
   const { name } = useParams();
@@ -105,7 +102,6 @@ export default function QuizPage() {
     }, 1500);
   };
 
-  // Post score only if not posted + it's a new high score
   useEffect(() => {
     const postScore = async () => {
       if (!currentQuestion && score > 0 && user && topicData && !scorePosted) {
@@ -128,7 +124,7 @@ export default function QuizPage() {
                 username: user.username || user.fullName || "Anonymous",
               }),
             });
-            setShowConfetti(true); // 🎉 Show confetti only on new high score
+            setShowConfetti(true);
             setShowToast(true);
             setTimeout(() => setShowToast(false), 3000);
           }
@@ -169,7 +165,7 @@ export default function QuizPage() {
   if (!currentQuestion) {
     return (
       <div
-        className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50"
+        className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50"
         onClick={handleBackdropClick}
       >
         {showConfetti && (
@@ -182,27 +178,27 @@ export default function QuizPage() {
         )}
 
         <div
-          className="bg-white rounded-xl p-6 w-full max-w-sm text-center shadow-xl animate-fade-in"
+          className="bg-gray-800/90 backdrop-blur-sm rounded-xl p-6 w-full max-w-sm text-center shadow-xl border border-gray-700"
           onClick={(e) => e.stopPropagation()}
         >
-          <h2 className="text-xl font-bold mb-3 text-gray-800">
+          <h2 className="text-xl sm:text-2xl font-bold mb-3 text-white">
             Quiz Complete
           </h2>
-          <p className="text-gray-600 mb-4">
+          <p className="text-gray-300 mb-4 text-sm sm:text-base">
             Score:{" "}
-            <span className="text-indigo-600 font-semibold">{score}</span> /{" "}
+            <span className="text-purple-400 font-semibold">{score}</span> /{" "}
             {answeredQuestions.length}
           </p>
-          <div className="flex justify-center gap-4">
+          <div className="flex flex-col sm:flex-row justify-center gap-3">
             <button
               onClick={resetQuiz}
-              className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
+              className="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition text-sm sm:text-base"
             >
               Play Again
             </button>
             <button
               onClick={exitQuiz}
-              className="bg-gray-100 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-200 transition"
+              className="px-4 py-2 bg-gray-700 text-gray-200 rounded-lg hover:bg-gray-600 transition text-sm sm:text-base"
             >
               Change Topic
             </button>
@@ -229,19 +225,19 @@ export default function QuizPage() {
     >
       <AnimatePresence mode="wait">
         <motion.div
-          key={currentQuestion?.question} // 👈 forces remount
+          key={currentQuestion?.question}
           initial={{ x: "100%", opacity: 0, scale: 0.95 }}
           animate={{ x: 0, opacity: 1, scale: 1 }}
           exit={{ x: "-100%", opacity: 0, scale: 0.95 }}
           transition={{ duration: 0.4, ease: "easeInOut" }}
-          className={`bg-white rounded-lg p-5 w-full max-w-sm shadow-xl`}
+          className={`bg-gray-800/90 backdrop-blur-sm rounded-lg p-4 sm:p-6 w-full max-w-sm shadow-xl border border-gray-700`}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="text-md text-gray-800 mb-4">
+          <div className="text-sm sm:text-base text-gray-100 mb-4">
             {currentQuestion.question}
           </div>
 
-          <div className="space-y-3 mb-4">
+          <div className="space-y-2 sm:space-y-3 mb-4">
             <AnimatePresence mode="popLayout">
               {allAnswers.map((answer, i) => (
                 <motion.button
@@ -256,14 +252,14 @@ export default function QuizPage() {
                   }}
                   onClick={() => handleAnswer(answer)}
                   disabled={isAnswered}
-                  className={`w-full text-left px-4 py-2 rounded-md border transition-all text-sm font-medium ${
+                  className={`w-full text-left px-3 py-2 sm:px-4 sm:py-2 rounded-md border transition-all text-xs sm:text-sm font-medium ${
                     isAnswered && answer === currentQuestion.correctAnswer
-                      ? "bg-green-100 border-green-500 text-green-700"
+                      ? "bg-green-900/50 border-green-500 text-green-300"
                       : selectedAnswer === answer && isAnswered
-                      ? "bg-red-100 border-red-500 text-red-700"
+                      ? "bg-red-900/50 border-red-500 text-red-300"
                       : selectedAnswer === answer
-                      ? "bg-blue-50 border-blue-400 text-blue-700"
-                      : "border-gray-200 hover:bg-gray-50"
+                      ? "bg-blue-900/50 border-blue-400 text-blue-300"
+                      : "border-gray-600 hover:bg-gray-700/50 text-gray-200"
                   }`}
                 >
                   {answer}
@@ -274,29 +270,29 @@ export default function QuizPage() {
           {isAnswered && (
             <div className="relative">
               <div
-                className={`text-sm text-center rounded-md py-2 mb-2 font-medium ${
+                className={`text-xs sm:text-sm text-center rounded-md py-2 mb-2 font-medium ${
                   showCorrect
-                    ? "text-green-700 bg-green-50"
-                    : "text-red-700 bg-red-50"
+                    ? "text-green-300 bg-green-900/30"
+                    : "text-red-300 bg-red-900/30"
                 }`}
               >
                 {showCorrect
                   ? "Correct! 🎉"
-                  : `Wrong! Answer: ${currentQuestion.correctAnswer}`}
+                  : `Answer: ${currentQuestion.correctAnswer}`}
               </div>
               {showCorrect && <SparkleBurst />}
             </div>
           )}
 
-          <div className="text-center text-xs text-gray-500 mt-1">
-            {timeLeft}s
-          </div>
-          <div className="text-center text-xs text-gray-400 mt-1">
-            Question {questionCount + 1} / {topicData.questions.length}
+          <div className="flex justify-between text-xs text-gray-400 mt-2">
+            <div>{timeLeft}s remaining</div>
+            <div>
+              Q{questionCount + 1}/{topicData.questions.length}
+            </div>
           </div>
         </motion.div>
       </AnimatePresence>
-      {/* Exit Confirm Modal - also slide from left */}
+
       {showExitConfirm && (
         <motion.div
           className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center"
@@ -307,22 +303,22 @@ export default function QuizPage() {
           transition={{ duration: 0.4 }}
         >
           <motion.div
-            className="bg-white p-6 rounded-xl shadow-xl text-center max-w-sm w-full"
+            className="bg-gray-800 p-6 rounded-xl shadow-xl text-center max-w-sm w-full border border-gray-700"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="mb-4 text-gray-700">
+            <p className="mb-4 text-gray-300 text-sm sm:text-base">
               Are you sure you want to exit the quiz?
             </p>
-            <div className="flex justify-center gap-4">
+            <div className="flex flex-col sm:flex-row justify-center gap-3">
               <button
                 onClick={() => setShowExitConfirm(false)}
-                className="bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200"
+                className="px-4 py-2 bg-gray-700 text-gray-200 rounded-lg hover:bg-gray-600 transition text-sm sm:text-base"
               >
                 Cancel
               </button>
               <button
                 onClick={exitQuiz}
-                className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm sm:text-base"
               >
                 Exit
               </button>
@@ -333,7 +329,7 @@ export default function QuizPage() {
 
       {showToast && (
         <motion.div
-          className="fixed bottom-6 right-6 bg-green-500 text-white px-4 py-2 rounded shadow-lg"
+          className="fixed bottom-4 right-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded shadow-lg text-sm sm:text-base"
           initial={{ opacity: 0, x: 100 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: 100 }}

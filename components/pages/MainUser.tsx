@@ -294,7 +294,11 @@ const MainUser = ({
           </div>
 
           {_id && (
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={(ev) => ev.stopPropagation()}
+            >
               <FollowButton _id={_id} followers={followers} />
             </motion.div>
           )}

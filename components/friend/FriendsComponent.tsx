@@ -214,7 +214,7 @@ const FriendsComponent = () => {
               {optimisticFollow ? (
                 <Button
                   variant="outline"
-                  className={`px-6 py-2 rounded-full text-indigo-600 border-indigo-600 hover:bg-indigo-50 transition-all duration-300 ${
+                  className={`px-6 py-2 rounded-full shadow-md shadow-neutral-400 text-indigo-600 border-indigo-600 hover:bg-indigo-50 transition-all duration-300 ${
                     isMutating ? "opacity-70 cursor-not-allowed" : ""
                   }`}
                   onClick={handleUnfollowClick}
@@ -226,8 +226,8 @@ const FriendsComponent = () => {
                       following...
                     </span>
                   ) : (
-                    <span className="flex items-center">
-                      <IoCheckmarkDone className="mr-2 text-lg" />
+                    <span className="flex items-center shadow-md shadow-neutral-400">
+                      <IoCheckmarkDone className="mr-2 text-lg text-white" />
                       Following
                     </span>
                   )}
@@ -240,9 +240,9 @@ const FriendsComponent = () => {
                   onClick={handleFollowClick}
                   disabled={isMutating}
                 >
-                  {isMutating ? (
-                    <span className="flex items-center">
-                      <span className="loading-spinner-light mr-2" />{" "}
+                  {isMutating || isFollowing ? (
+                    <span className="flex items-center bg-neutral-400 ">
+                      <span className="loading-spinner-light mr-2 text-purple-300" />{" "}
                       UnFollowing...
                     </span>
                   ) : (
