@@ -2,8 +2,7 @@
   "crons": [
     {
       "path": "/api/cron/init",
-      "schedule": "25 3 * * *",
-      "timezone": "Africa/Nairobi"
+      "schedule": "24 3 * * *"
     }
   ]
 }

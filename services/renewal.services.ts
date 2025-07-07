@@ -13,7 +13,7 @@ const CRON_SCHEDULE =
   process.env.NODE_ENV === "production"
     ? "25 3 * * *" // 2:55 AM in production
     : " * * * * *"; // Every minute in development
-const TIMEZONE = "Africa/Nairobi";
+
 const MAX_RETRIES = 3;
 let activeCronTask: cron.ScheduledTask | null = null;
 
@@ -52,7 +52,6 @@ export function startSubscriptionRenewalCron() {
         }
       },
       {
-        timezone: TIMEZONE,
         scheduled: false,
         recoverMissedExecutions: false,
       }
