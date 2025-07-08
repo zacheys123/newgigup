@@ -4,11 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { topics } from "@/data";
 import { ArrowLeft } from "lucide-react";
+import { useAuth } from "@clerk/nextjs";
 
 export default function GameComponent() {
   const router = useRouter();
   const [selectedTopic, setSelectedTopic] = useState<string>("");
-
+  const { userId } = useAuth();
   const handleStartGame = () => {
     if (selectedTopic) {
       router.push(`/game/${encodeURIComponent(selectedTopic)}`);
@@ -42,7 +43,7 @@ export default function GameComponent() {
         <div className="text-center mb-6 sm:mb-8 md:mb-10">
           <div className="flex items-center gap-[70px]">
             <ArrowLeft
-              onClick={() => router.back()}
+              onClick={() => router.push("/av_gigs/" + userId)}
               className="text-gray-200"
               size={27}
             />

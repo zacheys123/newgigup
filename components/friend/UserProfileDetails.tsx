@@ -213,7 +213,7 @@ const UserProfileDetails = ({
     },
     {
       name: "Reliable Gigster",
-      icon: <IoShieldCheckmark className="text-blue-500" />,
+      icon: <IoShieldCheckmark className="text-blue-400" />,
       description: "Completed 5+ gigs with 90%+ reliability",
       condition: (user) =>
         (user.completedGigsCount || 0) >= 5 && reliabilityScore >= 90,
@@ -223,7 +223,7 @@ const UserProfileDetails = ({
     },
     {
       name: "Top Performer",
-      icon: <FaAward className="text-yellow-500" />,
+      icon: <FaAward className="text-yellow-400" />,
       description: "Completed 10+ gigs with 95%+ reliability",
       condition: (user) =>
         (user.completedGigsCount || 0) >= 10 && reliabilityScore >= 95,
@@ -233,7 +233,7 @@ const UserProfileDetails = ({
     },
     {
       name: "Gig Champion",
-      icon: <FaCrown className="text-purple-500" />, // Fixed typo here
+      icon: <FaCrown className="text-purple-400" />,
       description: "Completed 25+ gigs with 98%+ reliability",
       condition: (user) =>
         (user.completedGigsCount || 0) >= 25 && reliabilityScore >= 98,
@@ -243,7 +243,7 @@ const UserProfileDetails = ({
     },
     {
       name: "Highly Rated",
-      icon: <FaStar className="text-amber-400" />,
+      icon: <FaStar className="text-amber-300" />,
       description: "Maintained 4.5+ average rating across 5+ gigs",
       condition: (user) =>
         averageRating >= 4.5 && (user.completedGigsCount || 0) >= 5,
@@ -253,7 +253,7 @@ const UserProfileDetails = ({
     },
     {
       name: "Client Favorite",
-      icon: <FaHeart className="text-pink-500" />,
+      icon: <FaHeart className="text-pink-400" />,
       description: "Received 10+ positive reviews (4.8+ rating)",
       condition: (user) =>
         averageRating >= 4.8 && (user.allreviews?.length || 0) >= 10,
@@ -263,7 +263,7 @@ const UserProfileDetails = ({
     },
     {
       name: "Early Bird",
-      icon: <FaRegClock className="text-green-500" />,
+      icon: <FaRegClock className="text-green-400" />,
       description: "Consistently arrives early to gigs (tracked via check-ins)",
       condition: (user) => (user.completedGigsCount || 0) >= 90,
       upcomingCondition: (user) => (user.completedGigsCount || 0) >= 80,
@@ -271,7 +271,7 @@ const UserProfileDetails = ({
     },
     {
       name: "Cancellation Risk",
-      icon: <FaThumbsDown className="text-red-500" />,
+      icon: <FaThumbsDown className="text-red-400" />,
       description: "Cancelled 3+ gigs",
       condition: (user) => (user.cancelgigCount || 0) >= 3,
       upcomingCondition: (user) => (user.cancelgigCount || 0) >= 2,
@@ -279,7 +279,7 @@ const UserProfileDetails = ({
     },
     {
       name: "Frequent Canceller",
-      icon: <FaFrownOpen className="text-red-700" />,
+      icon: <FaFrownOpen className="text-red-500" />,
       description: "Cancelled 5+ gigs",
       condition: (user) => (user.cancelgigCount || 0) >= 5,
       upcomingCondition: (user) => (user.cancelgigCount || 0) >= 4,
@@ -287,7 +287,7 @@ const UserProfileDetails = ({
     },
     {
       name: "Gig Streak",
-      icon: <FaFire className="text-orange-500" />,
+      icon: <FaFire className="text-orange-400" />,
       description: "Completed 5 gigs in a row without cancellations",
       condition: (user) => (user.completedGigsCount || 0) >= 5,
       upcomingCondition: (user) => (user.completedGigsCount || 0) >= 3,
@@ -295,7 +295,7 @@ const UserProfileDetails = ({
     },
     {
       name: "Seasoned Performer",
-      icon: <GiAchievement className="text-blue-600" />,
+      icon: <GiAchievement className="text-blue-400" />,
       description: "Completed 50+ gigs with 90%+ reliability",
       condition: (user) =>
         (user.completedGigsCount || 0) >= 50 && reliabilityScore >= 90,
@@ -305,7 +305,7 @@ const UserProfileDetails = ({
     },
     {
       name: "Perfect Attendance",
-      icon: <IoRibbon className="text-green-600" />,
+      icon: <IoRibbon className="text-green-400" />,
       description: "100% reliability with 10+ gigs",
       condition: (user) =>
         reliabilityScore === 100 && (user.completedGigsCount || 0) >= 10,
@@ -322,13 +322,13 @@ const UserProfileDetails = ({
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full shadow-lg"
+          className="w-12 h-12 border-4 border-indigo-400 border-t-transparent rounded-full shadow-lg"
         />
-        <h6 className="ml-4 text-xl font-semibold text-gray-700 animate-pulse">
+        <h6 className="ml-4 text-xl font-semibold text-gray-300 animate-pulse">
           Loading user details...
         </h6>
       </div>
@@ -337,14 +337,14 @@ const UserProfileDetails = ({
 
   if (error || !friend) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-        <div className="bg-white p-10 rounded-2xl shadow-xl border border-gray-100 text-center">
-          <p className="text-gray-700 text-xl font-medium mb-4">
+      <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
+        <div className="bg-gray-800 p-10 rounded-2xl shadow-xl border border-gray-700 text-center">
+          <p className="text-gray-300 text-xl font-medium mb-4">
             {error || "Couldn't load user details"}
           </p>
           <Button
             onClick={() => router.back()}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors duration-300"
+            className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold py-2 px-6 rounded-lg transition-all duration-300 shadow-lg"
           >
             Go Back
           </Button>
@@ -354,7 +354,7 @@ const UserProfileDetails = ({
   }
 
   return (
-    <div className="overflow-y-auto h-screen w-full bg-gradient-to-b from-gray-50 to-gray-100 p-6">
+    <div className="overflow-y-auto h-screen w-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6">
       {showNotification && (
         <NotificationToast
           title={notification.title}
@@ -363,7 +363,7 @@ const UserProfileDetails = ({
         />
       )}
 
-      <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-lg p-8 mt-10 border border-gray-100">
+      <div className="max-w-3xl mx-auto bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl shadow-2xl p-8 mt-10 border border-gray-700">
         <UserProfileHeader username={friend.username} setShow={setShow} />
 
         <RatingOverview
@@ -388,7 +388,7 @@ const UserProfileDetails = ({
 
         <PerformanceImpact />
 
-        <div className="mt-8 pt-6 border-t border-gray-200 text-center text-sm text-gray-500">
+        <div className="mt-8 pt-6 border-t border-gray-700 text-center text-sm text-gray-400">
           {friend.createdAt && friend.updatedAt && (
             <p>
               Last updated: {new Date(friend.updatedAt).toLocaleDateString()} •
