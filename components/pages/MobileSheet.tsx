@@ -40,7 +40,7 @@ const navLinks = (userId: string | undefined, user: UserProps) => [
     href: `/allreviews/${user?._id}/*${user?.firstname}${user?.lastname}`,
     icon: <BookA size={20} />,
   },
-  { label: "Search", href: "/search", icon: <Search size={20} /> },
+  { label: "Search", href: "/auth/search", icon: <Search size={20} /> },
   { label: "Profile", href: "/profile", icon: <User size={20} /> },
   {
     label: "Personal Reviews",

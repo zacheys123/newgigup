@@ -245,6 +245,7 @@ const PagesNav = () => {
 
   return (
     <>
+      {}
       {/* Modern Drag Handle */}
       <motion.div
         className="fixed right-0 top-1/2 -translate-y-1/2 z-150 bg-gray-800 p-3 rounded-l-lg cursor-grab active:cursor-grabbing md:hidden shadow-lg border-l border-y border-gray-700"
