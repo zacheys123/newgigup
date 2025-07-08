@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { topics } from "@/data";
+import { ArrowLeft } from "lucide-react";
 
 export default function GameComponent() {
   const router = useRouter();
@@ -39,9 +40,16 @@ export default function GameComponent() {
       <div className="max-w-4xl mx-auto bg-gray-800/70 backdrop-blur-lg rounded-xl p-4 sm:p-6 md:p-8 shadow-2xl border border-gray-700/50 min-h-[calc(100vh-2rem)] sm:min-h-[calc(100vh-3rem)] md:min-h-[calc(100vh-4rem)]">
         {/* Header */}
         <div className="text-center mb-6 sm:mb-8 md:mb-10">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-3 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-indigo-500">
-            Quiz Challenge
-          </h1>
+          <div className="flex items-center gap-[70px]">
+            <ArrowLeft
+              onClick={() => router.back()}
+              className="text-gray-200"
+              size={27}
+            />
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-3 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-indigo-500">
+              Quiz Challenge
+            </h1>{" "}
+          </div>
           <p className="text-sm sm:text-base md:text-lg text-gray-300">
             Select a topic and test your knowledge!
           </p>
