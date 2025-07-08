@@ -2,27 +2,60 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaClock, FaTrophy, FaRedo } from "react-icons/fa";
-import { IoMdDoneAll } from "react-icons/io";
+import {
+  FaClock,
+  FaTrophy,
+  FaRedo,
+  FaShieldAlt,
+  FaBrain,
+  FaFire,
+} from "react-icons/fa";
+
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { WORD_LIST } from "@/data";
 
-const TIMER_DURATION = 60;
+type Difficulty = "basic" | "intermediate" | "advanced";
+
+const TIMER_DURATION = {
+  basic: 40,
+  intermediate: 60,
+  advanced: 70,
+};
+
+const WORDS_REQUIRED_TO_WIN = {
+  basic: 8,
+  intermediate: 7,
+  advanced: 10,
+};
 
 export default function WordScrambleGame() {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [progress, setProgress] = useState(0);
+  const [difficulty, setDifficulty] = useState<Difficulty>("basic");
+  const [wordList, setWordList] = useState<string[]>([]);
   const [currentWord, setCurrentWord] = useState("");
   const [scrambledWord, setScrambledWord] = useState("");
   const [userGuess, setUserGuess] = useState("");
   const [score, setScore] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(TIMER_DURATION);
-  const [gameStatus, setGameStatus] = useState("playing");
+  const [timeLeft, setTimeLeft] = useState(TIMER_DURATION[difficulty]);
+  const [gameStatus, setGameStatus] = useState<"playing" | "won" | "lost">(
+    "playing"
+  );
   const [wordsCompleted, setWordsCompleted] = useState(0);
   const [hintUsed, setHintUsed] = useState(false);
   const [showHint, setShowHint] = useState(false);
-  const router = useRouter();
+
+  // Load words based on difficulty
+  useEffect(() => {
+    const loadWords = async () => {
+      const words = await import("../words.json");
+      setWordList(words[difficulty]);
+      setTimeLeft(TIMER_DURATION[difficulty]);
+      newWord();
+    };
+    loadWords();
+  }, [difficulty]);
 
   // Loading animation
   useEffect(() => {
@@ -40,7 +73,6 @@ export default function WordScrambleGame() {
     return () => clearInterval(timer);
   }, []);
 
-  // Rest of your game logic remains the same...
   const scrambleWord = useCallback((word: string) => {
     const letters = word.split("");
     for (let i = letters.length - 1; i > 0; i--) {
@@ -51,14 +83,15 @@ export default function WordScrambleGame() {
   }, []);
 
   const newWord = useCallback(() => {
-    const randomIndex = Math.floor(Math.random() * WORD_LIST.length);
-    const word = WORD_LIST[randomIndex];
+    if (wordList.length === 0) return;
+    const randomIndex = Math.floor(Math.random() * wordList.length);
+    const word = wordList[randomIndex];
     setCurrentWord(word);
     setScrambledWord(scrambleWord(word));
     setUserGuess("");
     setShowHint(false);
     setHintUsed(false);
-  }, [scrambleWord]);
+  }, [wordList, scrambleWord]);
 
   const checkGuess = useCallback(() => {
     if (userGuess.toUpperCase() === currentWord) {
@@ -78,15 +111,17 @@ export default function WordScrambleGame() {
 
   const resetGame = () => {
     setScore(0);
-    setTimeLeft(TIMER_DURATION);
+    setTimeLeft(TIMER_DURATION[difficulty]);
     setGameStatus("playing");
     setWordsCompleted(0);
     newWord();
   };
 
   useEffect(() => {
-    newWord();
-  }, [newWord]);
+    if (wordList.length > 0) {
+      newWord();
+    }
+  }, [wordList, newWord]);
 
   useEffect(() => {
     if (gameStatus !== "playing") return;
@@ -103,13 +138,31 @@ export default function WordScrambleGame() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [gameStatus]);
+  }, [gameStatus, difficulty]);
 
   useEffect(() => {
-    if (wordsCompleted >= 5) {
+    if (wordsCompleted >= WORDS_REQUIRED_TO_WIN[difficulty]) {
       setGameStatus("won");
     }
-  }, [wordsCompleted]);
+  }, [wordsCompleted, difficulty]);
+
+  const DifficultyBadge = () => {
+    const config = {
+      basic: { icon: <FaShieldAlt />, color: "green", label: "Easy" },
+      intermediate: { icon: <FaBrain />, color: "blue", label: "Medium" },
+      advanced: { icon: <FaFire />, color: "red", label: "Hard" },
+    };
+
+    const current = config[difficulty];
+
+    return (
+      <span
+        className={`flex items-center gap-1 bg-${current.color}-900/30 text-${current.color}-400 px-3 py-1 rounded-full text-sm`}
+      >
+        {current.icon} {current.label}
+      </span>
+    );
+  };
 
   if (isLoading) {
     return (
@@ -238,18 +291,19 @@ export default function WordScrambleGame() {
       </div>
     );
   }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white flex flex-col items-center justify-center p-4">
-      {/* Game Header */}
       <ArrowLeft
         onClick={() => router.back()}
         size={23}
-        className="text-neutral-300 absolute top-10 left-10"
+        className="text-neutral-300 absolute top-10 left-10 cursor-pointer"
       />
+
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="text-center mb-8"
+        className="text-center mb-4"
       >
         <h1 className="text-4xl font-bold mb-2 flex items-center justify-center gap-2">
           <span className="text-indigo-400">Lexicon</span> Legends
@@ -259,6 +313,32 @@ export default function WordScrambleGame() {
         </p>
       </motion.div>
 
+      {/* Difficulty Selector */}
+      <motion.div
+        className="flex gap-2 mb-6 bg-gray-800/50 p-2 rounded-full border border-gray-700"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+      >
+        {[
+          { level: "basic", icon: <FaShieldAlt />, label: "Easy" },
+          { level: "intermediate", icon: <FaBrain />, label: "Medium" },
+          { level: "advanced", icon: <FaFire />, label: "Hard" },
+        ].map((item) => (
+          <button
+            key={item.level}
+            onClick={() => setDifficulty(item.level as Difficulty)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all ${
+              difficulty === item.level
+                ? "bg-indigo-600 text-white"
+                : "bg-gray-700/50 hover:bg-gray-700"
+            }`}
+          >
+            {item.icon}
+            {item.label}
+          </button>
+        ))}
+      </motion.div>
+
       {/* Game Board */}
       <div className="w-full max-w-md bg-gray-800/50 rounded-xl border border-gray-700 p-6 shadow-lg backdrop-blur-sm">
         {/* Game Info Bar */}
@@ -266,12 +346,9 @@ export default function WordScrambleGame() {
           <div className="flex items-center gap-2 text-yellow-400">
             <FaTrophy /> <span className="font-bold">{score}</span>
           </div>
+          <DifficultyBadge />
           <div className="flex items-center gap-2 text-red-400">
             <FaClock /> <span className="font-bold">{timeLeft}s</span>
-          </div>
-          <div className="flex items-center gap-2 text-indigo-400">
-            <IoMdDoneAll />{" "}
-            <span className="font-bold">{wordsCompleted}/5</span>
           </div>
         </div>
 
@@ -303,8 +380,9 @@ export default function WordScrambleGame() {
           </h2>
           {showHint && (
             <p className="text-sm text-indigo-300 mt-2">
-              {`Hint: Starts with "${currentWord[0]}" and ends with 
-              ${currentWord[currentWord.length - 1]}`}
+              {`Hint: Starts with "${currentWord[0]}" and ends with "${
+                currentWord[currentWord.length - 1]
+              }"`}
             </p>
           )}
         </motion.div>
@@ -327,7 +405,7 @@ export default function WordScrambleGame() {
               </h3>
               <p className="text-gray-300">
                 {gameStatus === "won"
-                  ? `You unscrambled 5 words with ${score} points!`
+                  ? `You unscrambled ${WORDS_REQUIRED_TO_WIN[difficulty]} words with ${score} points!`
                   : `You completed ${wordsCompleted} words with ${score} points`}
               </p>
             </motion.div>
@@ -347,14 +425,6 @@ export default function WordScrambleGame() {
               autoFocus
             />
             <div className="flex gap-3">
-              {/* <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                onClick={checkGuess}
-                className="flex-1 bg-indigo-600 hover:bg-indigo-700 py-3 rounded-lg font-medium transition-all"
-              >
-                Submit
-              </motion.button> */}
               <motion.button
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
@@ -382,21 +452,37 @@ export default function WordScrambleGame() {
         )}
       </div>
 
+      {/* Progress Indicator */}
+      <div className="mt-6 w-full max-w-md bg-gray-800/20 rounded-full h-2.5">
+        <div
+          className="bg-indigo-600 h-2.5 rounded-full transition-all duration-300"
+          style={{
+            width: `${
+              (wordsCompleted / WORDS_REQUIRED_TO_WIN[difficulty]) * 100
+            }%`,
+          }}
+        ></div>
+      </div>
+      <p className="text-gray-400 mt-2 text-sm">
+        Completed: {wordsCompleted}/{WORDS_REQUIRED_TO_WIN[difficulty]} words
+      </p>
+
       {/* Game Instructions */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
-        className="mt-8 text-center text-gray-400 max-w-md text-sm"
+        className="mt-6 text-center text-gray-400 max-w-md text-sm"
       >
-        <p className="mb-2">
-          Type the unscrambled word and press Enter or click Submit
-        </p>
+        <p className="mb-2">Type the unscrambled word and press Enter</p>
         <p>
           Each correct word gives {hintUsed ? "5" : "10"} points (5 if hint
           used)
         </p>
-        <p className="mt-2">Complete 5 words before time runs out!</p>
+        <p className="mt-2">
+          Complete {WORDS_REQUIRED_TO_WIN[difficulty]} words before time runs
+          out!
+        </p>
       </motion.div>
     </div>
   );
