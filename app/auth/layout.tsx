@@ -4,10 +4,9 @@ import { Toaster } from "sonner";
 
 type SearchProps = {
   children: React.ReactNode;
-  editpage: React.ReactNode;
 };
 
-export default function Search({ children, editpage }: SearchProps) {
+export default function Search({ children }: SearchProps) {
   return (
     <div className="bg-black min-h-screen w-full ">
       <div className="flex items-center justify-between p-5">
@@ -27,7 +26,6 @@ export default function Search({ children, editpage }: SearchProps) {
       />
 
       <div className="flex-1 flex flex-col md:ml-[150px] lg:ml-[200px] w-full transition-all duration-300">
-        {editpage}
         <main className="h-[100%] overflow-auto w-full relative ">
           {" "}
           {/* Even more padding */}

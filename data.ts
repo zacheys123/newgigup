@@ -1685,3 +1685,21 @@ export const topics: Topic[] = [
     ],
   },
 ];
+export const WORD_LIST = [
+  "REACT",
+  "DEVELOP",
+  "COMPONENT",
+  "HOOK",
+  "STATE",
+  "PROPS",
+  "CONTEXT",
+  "EFFECT",
+  "MEMO",
+  "REF",
+  "ROUTER",
+  "ANIMATION",
+  "FRAMER",
+  "MOTION",
+  "TYPESCRIPT",
+  "JAVASCRIPT",
+];
