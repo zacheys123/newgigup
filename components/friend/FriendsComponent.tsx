@@ -257,8 +257,8 @@ const FriendsComponent = () => {
                 className="px-4 sm:px-6 py-1 sm:py-2 rounded-full text-xs sm:text-sm"
                 onClick={() => setShowMore(true)}
               >
-                <span className="flex items-center">
-                  <MenuIcon className="text-gray-300" size={16} />
+                <span className="flex items-center bg-neutral-200/40">
+                  <MenuIcon className="text-gray-600" size={16} />
                 </span>
               </Button>
             </div>
