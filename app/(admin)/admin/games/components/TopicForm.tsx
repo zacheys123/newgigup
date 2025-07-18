@@ -34,7 +34,9 @@ interface TopicFormProps {
     icon: string;
     questions: Question[];
   }) => Promise<void>;
+
   onCancel?: () => void;
+  selectedTopic: string;
 }
 
 const defaultInitialData = {
@@ -55,6 +57,7 @@ export function TopicForm({
   initialData = defaultInitialData,
   onSubmit,
   onCancel,
+  selectedTopic,
 }: TopicFormProps) {
   const [formData, setFormData] = useState(initialData);
 
@@ -156,19 +159,21 @@ export function TopicForm({
     <form onSubmit={handleSubmit} className="space-y-8">
       {/* Topic Info Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-        <div className="space-y-3">
-          <Label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-            Topic Name*
-          </Label>
-          <Input
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-            placeholder="Enter topic name"
-            className="text-base sm:text-lg font-light bg-transparent border-0 border-b border-gray-200 dark:border-gray-700 rounded-none px-0 py-2 focus-visible:ring-0 focus-visible:border-green-500 dark:focus-visible:border-green-400 transition-colors"
-          />
-        </div>
+        {!selectedTopic && (
+          <div className="space-y-3">
+            <Label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              Topic Name*
+            </Label>
+            <Input
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              placeholder="Enter topic name"
+              className="text-base sm:text-lg font-light bg-transparent border-0 border-b border-gray-200 dark:border-gray-700 rounded-none px-0 py-2 focus-visible:ring-0 focus-visible:border-green-500 dark:focus-visible:border-green-400 transition-colors"
+            />
+          </div>
+        )}
         <div className="space-y-3">
           <Label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
             Topic Icon

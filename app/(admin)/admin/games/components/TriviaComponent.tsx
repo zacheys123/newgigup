@@ -66,7 +66,7 @@ export default function TriviaComponent() {
         </Label>
         <div className="flex items-center gap-2">
           <Select value={selectedTopic} onValueChange={setSelectedTopic}>
-            <SelectTrigger className="flex-1 min-w-[200px]">
+            <SelectTrigger className="flex-1 min-w-[130px]">
               <SelectValue placeholder="Select a topic" />
             </SelectTrigger>
             <SelectContent>
@@ -77,7 +77,6 @@ export default function TriviaComponent() {
               ))}
             </SelectContent>
           </Select>
-
           {selectedTopic && (
             <Button
               variant="ghost"
@@ -88,7 +87,14 @@ export default function TriviaComponent() {
             >
               <X className="h-4 w-4" />
             </Button>
-          )}
+          )}{" "}
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setIsCreatingNewTopic(!isCreatingNewTopic)}
+          >
+            {isCreatingNewTopic ? "Cancel" : "Add New"}
+          </Button>
         </div>
       </div>
 
@@ -115,6 +121,7 @@ export default function TriviaComponent() {
           <TopicForm
             onSubmit={handleCreateTopic}
             onCancel={() => setIsCreatingNewTopic(false)}
+            selectedTopic={selectedTopic}
           />
         </div>
       )}
