@@ -12,8 +12,8 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { PlusIcon, MinusIcon, TrashIcon } from "lucide-react";
-import { createTopic } from "@/app/admin/games/actions/createTopic";
-import { useToast } from "@/components/ui/use-toast";
+import { createTopic } from "../actions/createTopics";
+import { toast } from "sonner";
 
 const fallbackTopics = [
   "Geography",
@@ -51,7 +51,6 @@ const initialFormState = {
 };
 
 export default function TriviaComponent() {
-  const { toast } = useToast();
   const [selectedTopic, setSelectedTopic] = useState<string>("");
   const [isCreatingNewTopic, setIsCreatingNewTopic] = useState(false);
   const [formData, setFormData] = useState(initialFormState);
@@ -143,21 +142,13 @@ export default function TriviaComponent() {
     e.preventDefault();
     try {
       await createTopic(formData);
-      toast({
-        title: "Success",
-        description: "Topic created successfully",
-        variant: "default",
-      });
+      toast("Topic created successfully");
       setFormData(initialFormState);
       setIsCreatingNewTopic(false);
       // You might want to refresh your topics list here
     } catch (error) {
       console.log(error);
-      toast({
-        title: "Error",
-        description: "Failed to create topic",
-        variant: "destructive",
-      });
+      toast("Failed to create topic");
     }
   };
 
