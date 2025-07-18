@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, RefreshCw } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
 import { Topic } from "@/types/gamesiinterface";
 
@@ -81,12 +81,24 @@ export default function GameComponent() {
       questions: [],
     },
   ];
+  const [refreshCounter, setRefreshCounter] = useState(0);
 
+  const forceRefresh = () => {
+    setRefreshCounter((prev) => prev + 1);
+  };
   useEffect(() => {
+    const controller = new AbortController();
+
     const fetchTopics = async () => {
       setIsLoading(true);
       try {
-        const res = await fetch("/api/topics");
+        const res = await fetch(`/api/topics?nocache=${Date.now()}`, {
+          method: "GET",
+          cache: "no-store",
+          headers: {
+            "Cache-Control": "no-cache",
+          },
+        });
         const data = await res.json();
 
         // More robust empty check
@@ -98,6 +110,7 @@ export default function GameComponent() {
           console.log("Using fallback topics");
           setTopics(fallbackTopics);
         } else {
+          console.log("Using main topics");
           // Handle both array responses and object responses
           const topicsData = Array.isArray(data) ? data : data.topics || [];
           setTopics(topicsData.length ? topicsData : fallbackTopics);
@@ -111,7 +124,8 @@ export default function GameComponent() {
     };
 
     fetchTopics();
-  }, []);
+    return () => controller.abort();
+  }, [refreshCounter]);
 
   const handleStartGame = () => {
     if (selectedTopic) {
@@ -217,9 +231,14 @@ export default function GameComponent() {
 
         {/* Topics Grid */}
         <div className="mt-8 sm:mt-10 md:mt-12">
-          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-4 sm:mb-5 md:mb-6 text-gray-200">
-            Browse all topics:
-          </h2>
+          ];
+          <div className="flex items-center justify-between">
+            {" "}
+            <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-4 sm:mb-5 md:mb-6 text-gray-200">
+              Browse all topics:
+            </h2>
+            <RefreshButton onClick={forceRefresh} />
+          </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 overflow-y-auto max-h-[50vh] sm:max-h-[55vh] md:max-h-[60vh] pb-6 sm:pb-8 scrollbar-thin scrollbar-thumb-purple-700 scrollbar-track-gray-700/50">
             {topics &&
               topics &&
@@ -250,3 +269,37 @@ export default function GameComponent() {
     </div>
   );
 }
+
+import { motion } from "framer-motion";
+
+const RefreshButton = ({ onClick }: { onClick: () => void }) => {
+  const [isRotating, setIsRotating] = useState(false);
+
+  const handleClick = () => {
+    setIsRotating(true);
+    onClick(); // This will call setRefetch(!refetch)
+
+    setTimeout(() => setIsRotating(false), 1000);
+  };
+
+  return (
+    <motion.div
+      className="flex items-center gap-2 text-gray-300 cursor-pointer select-none"
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      onClick={handleClick}
+    >
+      <motion.div
+        animate={{ rotate: isRotating ? 360 : 0 }}
+        transition={{
+          duration: 0.6,
+          repeat: isRotating ? Infinity : 0,
+          ease: "linear",
+        }}
+      >
+        <RefreshCw size={16} className="text-white" />
+      </motion.div>
+      <span>Refresh</span>
+    </motion.div>
+  );
+};

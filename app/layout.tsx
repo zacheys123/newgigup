@@ -10,12 +10,25 @@ import ToastWrapper from "@/components/ToastWrapper";
 import { PendingGigsProvider } from "./Context/PendinContext";
 import NetworkWrapper from "@/components/NetworkWrapper";
 import ToasterShad from "@/components/ToasterShad";
+import PWAProvider from "./PWAProvider";
+import InstallButton from "@/components/pwa/InstallButton";
 
 export const metadata: Metadata = {
   title: "Gigup",
   description: "New Gigup",
+  manifest: "/manifest.json",
+  themeColor: "#f59e0b",
+  appleWebApp: {
+    capable: true,
+    title: "gigup",
+    statusBarStyle: "default",
+  },
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+  },
 };
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -36,6 +49,8 @@ export default function RootLayout({
                   <ClerkLoaded>
                     <NetworkWrapper>
                       {children}
+                      <PWAProvider />
+                      <InstallButton />
                       <ToastWrapper />
                       <ToasterShad />
                     </NetworkWrapper>

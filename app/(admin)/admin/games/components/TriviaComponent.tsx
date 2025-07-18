@@ -1,156 +1,461 @@
+"use client";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { SeedTopicsButton } from "./seedButton";
-import { ResetTopicsButton } from "./ResetButton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { PlusIcon, MinusIcon, TrashIcon } from "lucide-react";
+import { createTopic } from "@/app/admin/games/actions/createTopic";
+import { useToast } from "@/components/ui/use-toast";
+
+const fallbackTopics = [
+  "Geography",
+  "History",
+  "Science",
+  "Movies",
+  "Music",
+  "Sports",
+  "Literature",
+  "Technology",
+  "Food & Drink",
+  "Animals",
+  "Art",
+];
+
+interface Question {
+  question: string;
+  correctAnswer: string;
+  otherGuesses: string[];
+  timeLimit: number;
+}
+
+const initialFormState = {
+  name: "",
+  description: "",
+  icon: "",
+  questions: [
+    {
+      question: "",
+      correctAnswer: "",
+      otherGuesses: ["", "", ""],
+      timeLimit: 30,
+    },
+  ],
+};
 
 export default function TriviaComponent() {
+  const { toast } = useToast();
+  const [selectedTopic, setSelectedTopic] = useState<string>("");
+  const [isCreatingNewTopic, setIsCreatingNewTopic] = useState(false);
+  const [formData, setFormData] = useState(initialFormState);
+
+  // Handle text input changes
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Handle question text changes
+  const handleTextChange = (
+    qIndex: number,
+    field: keyof Question,
+    value: string
+  ) => {
+    const updatedQuestions = [...formData.questions];
+    updatedQuestions[qIndex] = { ...updatedQuestions[qIndex], [field]: value };
+    setFormData({ ...formData, questions: updatedQuestions });
+  };
+
+  // Handle number changes (like timeLimit)
+  const handleNumberChange = (
+    qIndex: number,
+    field: keyof Question,
+    value: number
+  ) => {
+    const updatedQuestions = [...formData.questions];
+    updatedQuestions[qIndex] = { ...updatedQuestions[qIndex], [field]: value };
+    setFormData({ ...formData, questions: updatedQuestions });
+  };
+
+  // Handle option changes for incorrect answers
+  const handleOptionChange = (
+    qIndex: number,
+    oIndex: number,
+    value: string
+  ) => {
+    const updatedQuestions = [...formData.questions];
+    updatedQuestions[qIndex].otherGuesses[oIndex] = value;
+    setFormData({ ...formData, questions: updatedQuestions });
+  };
+
+  // Add a new question to the form
+  const addQuestion = () => {
+    setFormData((prev) => ({
+      ...prev,
+      questions: [
+        ...prev.questions,
+        {
+          question: "",
+          correctAnswer: "",
+          otherGuesses: ["", "", ""],
+          timeLimit: 30,
+        },
+      ],
+    }));
+  };
+
+  // Remove a question from the form
+  const removeQuestion = (index: number) => {
+    if (formData.questions.length <= 1) return;
+    setFormData((prev) => ({
+      ...prev,
+      questions: prev.questions.filter((_, i) => i !== index),
+    }));
+  };
+
+  // Add an incorrect option to a question
+  const addOption = (qIndex: number) => {
+    if (formData.questions[qIndex].otherGuesses.length >= 5) return;
+    const updatedQuestions = [...formData.questions];
+    updatedQuestions[qIndex].otherGuesses.push("");
+    setFormData({ ...formData, questions: updatedQuestions });
+  };
+
+  // Remove an incorrect option from a question
+  const removeOption = (qIndex: number, oIndex: number) => {
+    if (formData.questions[qIndex].otherGuesses.length <= 3) return;
+    const updatedQuestions = [...formData.questions];
+    updatedQuestions[qIndex].otherGuesses.splice(oIndex, 1);
+    setFormData({ ...formData, questions: updatedQuestions });
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await createTopic(formData);
+      toast({
+        title: "Success",
+        description: "Topic created successfully",
+        variant: "default",
+      });
+      setFormData(initialFormState);
+      setIsCreatingNewTopic(false);
+      // You might want to refresh your topics list here
+    } catch (error) {
+      console.log(error);
+      toast({
+        title: "Error",
+        description: "Failed to create topic",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
-    <div className="space-y-8 max-w-6xl mx-auto px-4 py-8">
-      {/* Header Section */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-        <h1 className="text-3xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
-          Trivia Dashboard
-        </h1>
-        <div className="flex items-center gap-3">
-          <SeedTopicsButton />
-          <ResetTopicsButton />
+    <div className="bg-white dark:bg-gray-900 rounded-xl p-6 sm:p-8 lg:p-10 shadow-lg dark:shadow-xl dark:shadow-gray-800/10">
+      {/* Topic Selection */}
+      <div className="mb-8">
+        <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+          Select Topic
+        </Label>
+        <div className="flex gap-4">
+          <Select value={selectedTopic} onValueChange={setSelectedTopic}>
+            <SelectTrigger className="flex-1">
+              <SelectValue placeholder="Select a topic" />
+            </SelectTrigger>
+            <SelectContent>
+              {fallbackTopics.map((topic) => (
+                <SelectItem key={topic} value={topic}>
+                  {topic}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setIsCreatingNewTopic(!isCreatingNewTopic)}
+          >
+            {isCreatingNewTopic ? "Cancel" : "Add New Topic"}
+          </Button>
         </div>
       </div>
 
-      {/* Statistics Section */}
-      <div className="space-y-6">
-        <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
-          <span className="p-2 bg-blue-100 rounded-full">📊</span>
-          Trivia Statistics
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {[
-            {
-              title: "Total Questions",
-              value: "1,245",
-              bg: "bg-blue-50/80",
-              border: "border-blue-100",
-            },
-            {
-              title: "Daily Players",
-              value: "3,421",
-              bg: "bg-green-50/80",
-              border: "border-green-100",
-            },
-            {
-              title: "Categories",
-              value: "28",
-              bg: "bg-yellow-50/80",
-              border: "border-yellow-100",
-            },
-            {
-              title: "Avg. Rating",
-              value: "4.8",
-              bg: "bg-purple-50/80",
-              border: "border-purple-100",
-            },
-          ].map((stat, index) => (
-            <div
-              key={index}
-              className={`${stat.bg} ${stat.border} p-4 rounded-xl border transition-all hover:shadow-md hover:translate-y-[-2px]`}
-            >
-              <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
-                {stat.value}
-              </p>
+      {isCreatingNewTopic && (
+        <>
+          <div className="mb-8 sm:mb-10">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
+              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 text-xl">
+                ➕
+              </div>
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-light tracking-tight text-gray-900 dark:text-gray-100">
+                  <span className="bg-gradient-to-r from-green-600 to-teal-600 dark:from-green-500 dark:to-teal-500 bg-clip-text text-transparent">
+                    New Topic Creation
+                  </span>
+                </h2>
+                <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm sm:text-base">
+                  Add a new topic with associated questions
+                </p>
+              </div>
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
 
-      {/* Form and Management Sections */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
-        {/* Add Question Section */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-          <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center gap-2">
-            <span className="p-2 bg-green-100 rounded-full">➕</span>
-            Add New Question
-          </h2>
-          <div className="space-y-5">
-            <div className="space-y-2">
-              <Label className="text-gray-700 font-medium">Question</Label>
-              <Input
-                placeholder="Enter the question"
-                className="focus-visible:ring-2 focus-visible:ring-green-500"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-gray-700 font-medium">Category</Label>
-              <Input
-                placeholder="Enter category"
-                className="focus-visible:ring-2 focus-visible:ring-green-500"
-              />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div className="space-y-2">
-                <Label className="text-gray-700 font-medium">
-                  Correct Answer
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Topic Info Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+              <div className="space-y-3">
+                <Label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Topic Name*
                 </Label>
                 <Input
-                  placeholder="Correct answer"
-                  className="focus-visible:ring-2 focus-visible:ring-green-500"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                  placeholder="Enter topic name"
+                  className="text-base sm:text-lg font-light bg-transparent border-0 border-b border-gray-200 dark:border-gray-700 rounded-none px-0 py-2 focus-visible:ring-0 focus-visible:border-green-500 dark:focus-visible:border-green-400 transition-colors"
                 />
               </div>
-              <div className="space-y-2">
-                <Label className="text-gray-700 font-medium">
-                  Incorrect Answers
+              <div className="space-y-3">
+                <Label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Topic Icon
                 </Label>
-                <Input placeholder="Option 1" />
-                <Input placeholder="Option 2" className="mt-2" />
-                <Input placeholder="Option 3" className="mt-2" />
+                <Input
+                  name="icon"
+                  value={formData.icon}
+                  onChange={handleChange}
+                  placeholder="e.g., 🌍"
+                  className="text-base sm:text-lg font-light bg-transparent border-0 border-b border-gray-200 dark:border-gray-700 rounded-none px-0 py-2 focus-visible:ring-0 focus-visible:border-green-500 dark:focus-visible:border-green-400 transition-colors"
+                />
               </div>
             </div>
-            <Button className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 shadow-md">
-              Add Question
-            </Button>
-          </div>
-        </div>
 
-        {/* Question Management Section */}
-        <div>
-          <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center gap-2">
-            <span className="p-2 bg-indigo-100 rounded-full">📝</span>
-            Question Management
-          </h2>
-          <div className="space-y-4">
-            {[1, 2, 3].map((item) => (
-              <div
-                key={item}
-                className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 rounded-xl bg-white border border-gray-200 shadow-xs hover:shadow-sm transition-all"
-              >
-                <div className="mb-3 sm:mb-0">
-                  <p className="font-medium text-gray-900">
-                    Question #{item} about science
-                  </p>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Category: Science
+            {/* Description */}
+            <div className="space-y-3">
+              <Label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                Topic Description
+              </Label>
+              <Textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                placeholder="Brief description of this topic"
+                rows={2}
+                className="text-base font-light bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus-visible:ring-2 focus-visible:ring-green-500/30 focus-visible:border-green-500 dark:focus-visible:border-green-400 transition-colors min-h-[100px]"
+              />
+            </div>
+
+            {/* Questions Section */}
+            <div className="space-y-6 sm:space-y-8">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 dark:border-gray-700 pb-4">
+                <div>
+                  <h3 className="text-lg sm:text-xl font-light text-gray-900 dark:text-gray-100">
+                    Questions
+                  </h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Add all related questions for this topic
                   </p>
                 </div>
-                <div className="flex gap-2 self-end sm:self-auto">
-                  <Button
-                    variant="outline"
-                    className="border-gray-300 hover:bg-gray-50 text-gray-700"
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    className="shadow-sm hover:shadow-md"
-                  >
-                    Delete
-                  </Button>
-                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={addQuestion}
+                  className="text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 px-3 py-1.5 text-sm"
+                >
+                  <PlusIcon className="w-4 h-4 mr-2" />
+                  Add Question
+                </Button>
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
+
+              {/* Questions List */}
+              <div className="space-y-6">
+                {formData.questions.map((question, qIndex) => (
+                  <div
+                    key={qIndex}
+                    className="p-5 sm:p-6 bg-gray-50 dark:bg-gray-800/30 rounded-lg border border-gray-200 dark:border-gray-700"
+                  >
+                    {/* Question Header */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                      <span className="text-sm font-medium text-green-600 dark:text-green-400">
+                        Question {qIndex + 1}
+                      </span>
+                      {formData.questions.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeQuestion(qIndex)}
+                          className="text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 px-2 py-1 text-xs"
+                        >
+                          <TrashIcon className="w-3.5 h-3.5 mr-1.5" />
+                          Remove
+                        </Button>
+                      )}
+                    </div>
+
+                    {/* Question Content */}
+                    <div className="space-y-5">
+                      {/* Question Text */}
+                      <div className="space-y-2">
+                        <Label className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                          Question Text*
+                        </Label>
+                        <Input
+                          value={question.question}
+                          onChange={(e) =>
+                            handleTextChange(qIndex, "question", e.target.value)
+                          }
+                          required
+                          placeholder="Enter the question"
+                          className="text-base font-light bg-transparent border-0 border-b border-gray-200 dark:border-gray-700 rounded-none px-0 py-2 focus-visible:ring-0 focus-visible:border-green-500 dark:focus-visible:border-green-400 transition-colors"
+                        />
+                      </div>
+
+                      {/* Answer & Time Limit */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+                        <div className="space-y-2">
+                          <Label className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                            Correct Answer*
+                          </Label>
+                          <Input
+                            value={question.correctAnswer}
+                            onChange={(e) =>
+                              handleTextChange(
+                                qIndex,
+                                "correctAnswer",
+                                e.target.value
+                              )
+                            }
+                            required
+                            placeholder="Correct answer"
+                            className="text-base font-light bg-transparent border-0 border-b border-gray-200 dark:border-gray-700 rounded-none px-0 py-2 focus-visible:ring-0 focus-visible:border-green-500 dark:focus-visible:border-green-400 transition-colors"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                            Time Limit
+                          </Label>
+                          <Select
+                            value={question.timeLimit.toString()}
+                            onValueChange={(value) =>
+                              handleNumberChange(
+                                qIndex,
+                                "timeLimit",
+                                parseInt(value)
+                              )
+                            }
+                          >
+                            <SelectTrigger className="text-base font-light bg-transparent border-0 border-b border-gray-200 dark:border-gray-700 rounded-none px-0 py-2 h-auto focus:ring-0 focus:border-green-500 dark:focus:border-green-400">
+                              <SelectValue placeholder="Select time limit" />
+                            </SelectTrigger>
+                            <SelectContent className="rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+                              {[15, 30, 45, 60].map((time) => (
+                                <SelectItem
+                                  key={time}
+                                  value={time.toString()}
+                                  className="text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                                >
+                                  {time} seconds
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      {/* Incorrect Options */}
+                      <div className="space-y-3">
+                        <Label className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                          Incorrect Options*
+                        </Label>
+                        <div className="space-y-3">
+                          {question.otherGuesses.map((option, oIndex) => (
+                            <div
+                              key={oIndex}
+                              className="flex items-center gap-3"
+                            >
+                              <Input
+                                value={option}
+                                onChange={(e) =>
+                                  handleOptionChange(
+                                    qIndex,
+                                    oIndex,
+                                    e.target.value
+                                  )
+                                }
+                                required
+                                placeholder={`Incorrect option ${oIndex + 1}`}
+                                className="text-base font-light bg-transparent border-0 border-b border-gray-200 dark:border-gray-700 rounded-none px-0 py-2 focus-visible:ring-0 focus-visible:border-green-500 dark:focus-visible:border-green-400 transition-colors flex-1"
+                              />
+                              {oIndex >= 3 && (
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => removeOption(qIndex, oIndex)}
+                                  className="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 h-8 w-8"
+                                >
+                                  <MinusIcon className="w-3.5 h-3.5" />
+                                </Button>
+                              )}
+                            </div>
+                          ))}
+                          {question.otherGuesses.length < 4 && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => addOption(qIndex)}
+                              className="text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 mt-1 px-2 py-1 text-xs"
+                            >
+                              <PlusIcon className="w-3.5 h-3.5 mr-1.5" />
+                              Add Option
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Form Actions */}
+            <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setFormData(initialFormState);
+                  setIsCreatingNewTopic(false);
+                }}
+                className="order-2 sm:order-1 w-full sm:w-auto border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-6 py-2 text-sm"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                className="order-1 sm:order-2 w-full sm:w-auto px-8 py-2.5 text-sm bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 dark:from-green-700 dark:to-teal-700 dark:hover:from-green-600 dark:hover:to-teal-600 shadow-md transition-all hover:shadow-lg"
+              >
+                Create Topic
+              </Button>
+            </div>
+          </form>
+        </>
+      )}
     </div>
   );
 }
