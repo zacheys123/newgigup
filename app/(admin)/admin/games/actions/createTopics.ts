@@ -15,6 +15,7 @@ interface TopicData {
   description?: string;
   icon?: string;
   questions: Question[];
+  selectedTopic: string;
 }
 
 export async function createTopic(data: TopicData) {
@@ -41,7 +42,7 @@ export async function createTopic(data: TopicData) {
 
     // Create the topic
     const newTopic = await Topic.create({
-      name: data.name,
+      name: data.name || data.selectedTopic,
       description: data.description || "",
       icon: data.icon || "",
       questions: data.questions.map((q) => ({

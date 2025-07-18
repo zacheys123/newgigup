@@ -31,12 +31,13 @@ const pwaConfig = {
   // Optional: Add runtimeCaching if needed
   runtimeCaching: [
     {
-      urlPattern: /^https?.*/,
-      handler: "NetworkFirst",
+      urlPattern: /\.(?:png|jpg|jpeg|svg)$/,
+      handler: "CacheFirst",
       options: {
         cacheName: "offlineCache",
         expiration: {
           maxEntries: 200,
+          maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
         },
       },
     },
