@@ -42,7 +42,7 @@ export async function createTopic(data: TopicData) {
 
     // Create the topic
     const newTopic = await Topic.create({
-      name: data.name || data.selectedTopic,
+      name: data.name ? data.name : data.selectedTopic,
       description: data.description || "",
       icon: data.icon || "",
       questions: data.questions.map((q) => ({

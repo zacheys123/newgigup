@@ -67,11 +67,17 @@ export default function TriviaComponent() {
               <SelectValue placeholder="Select a topic" />
             </SelectTrigger>
             <SelectContent>
-              {fallbackTopics.map((topic) => (
-                <SelectItem key={topic} value={topic}>
-                  {topic}
-                </SelectItem>
-              ))}
+              {fallbackTopics.map((topic) => {
+                return (
+                  <>
+                    {" "}
+                    <SelectItem value="">Select Topic</SelectItem>
+                    <SelectItem key={topic} value={topic}>
+                      {topic}
+                    </SelectItem>
+                  </>
+                );
+              })}
             </SelectContent>
           </Select>
           <Button
