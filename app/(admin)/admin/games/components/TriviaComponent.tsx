@@ -12,6 +12,7 @@ import { TopicForm } from "./TopicForm";
 import { Label } from "@/components/ui/label";
 import { createTopic } from "../actions/createTopics";
 import { toast } from "sonner";
+import { X } from "lucide-react";
 
 const fallbackTopics = [
   "Geography",
@@ -53,7 +54,9 @@ export default function TriviaComponent() {
       throw error;
     }
   };
-
+  const handleReset = () => {
+    setSelectedTopic(""); // Reset to empty string to show placeholder
+  };
   return (
     <div className="bg-white dark:bg-gray-900 rounded-xl p-6 sm:p-8 lg:p-10 shadow-lg dark:shadow-xl dark:shadow-gray-800/10">
       {/* Topic Selection */}
@@ -61,32 +64,31 @@ export default function TriviaComponent() {
         <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
           Select Topic
         </Label>
-        <div className="flex gap-4">
+        <div className="flex items-center gap-2">
           <Select value={selectedTopic} onValueChange={setSelectedTopic}>
-            <SelectTrigger className="flex-1">
+            <SelectTrigger className="flex-1 min-w-[200px]">
               <SelectValue placeholder="Select a topic" />
             </SelectTrigger>
             <SelectContent>
-              {fallbackTopics.map((topic) => {
-                return (
-                  <>
-                    {" "}
-                    <SelectItem value="">Select Topic</SelectItem>
-                    <SelectItem key={topic} value={topic}>
-                      {topic}
-                    </SelectItem>
-                  </>
-                );
-              })}
+              {fallbackTopics.map((topic) => (
+                <SelectItem key={topic} value={topic}>
+                  {topic}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => setIsCreatingNewTopic(!isCreatingNewTopic)}
-          >
-            {isCreatingNewTopic ? "Cancel" : "Add New Topic"}
-          </Button>
+
+          {selectedTopic && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleReset}
+              className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+              aria-label="Clear selection"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
 
