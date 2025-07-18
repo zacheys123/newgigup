@@ -18,6 +18,7 @@ import { SaveAll } from "lucide-react";
 
 import { useCheckTrial } from "@/hooks/useCheckTrials";
 import LoadingSpinner from "./loading";
+import MetaTags from "@/components/pwa/MetTags";
 
 export default function Home() {
   const { isLoaded, userId } = useAuth();
@@ -27,6 +28,16 @@ export default function Home() {
   const [showVideo, setShowVideo] = useState(false);
   const [isClientSide, setIsClientSide] = useState(false);
   const { isFirstMonthEnd } = useCheckTrial(user?.user);
+
+  useEffect(() => {
+    // Detect if the app is running as a PWA
+    const isStandalone = window.matchMedia(
+      "(display-mode: standalone)"
+    ).matches;
+    if (isStandalone) {
+      console.log("Running as PWA");
+    }
+  }, []);
   useEffect(() => {
     setIsClientSide(true);
     if (!isLoaded && !userId) {
@@ -70,7 +81,7 @@ export default function Home() {
   }
   return (
     <div className="bg-gray-950 text-white font-sans h-screen overflow-y-scroll snap-mandatory snap-y scroll-smooth">
-      {/* Hero Section */}
+      <MetaTags /> {/* Hero Section */}
       <section className="relative flex flex-col items-center justify-center min-h-screen text-center snap-start">
         <video
           autoPlay

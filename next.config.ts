@@ -25,10 +25,8 @@ const nextConfig: NextConfig = {
 
 export default withPWA({
   ...nextConfig,
-  pwa: {
-    dest: "public",
-    register: true,
-    skipWaiting: true,
-    disable: process.env.NODE_ENV === "development",
-  },
+  dest: "public", // Correct placement - top level
+  register: true, // Correct placement - top level
+
+  disable: process.env.NODE_ENV === "development",
 });
