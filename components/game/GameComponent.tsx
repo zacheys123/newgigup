@@ -1,15 +1,118 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { topics } from "@/data";
 import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
+import { Topic } from "@/types/gamesiinterface";
 
 export default function GameComponent() {
   const router = useRouter();
   const [selectedTopic, setSelectedTopic] = useState<string>("");
   const { userId } = useAuth();
+  const [topics, setTopics] = useState<Topic[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fallbackTopics: Topic[] = [
+    {
+      name: "Geography",
+      description: "Test your knowledge of world geography",
+      icon: "🌍",
+      questions: [],
+    },
+    {
+      name: "History",
+      description: "Journey through historical events",
+      icon: "🏛️",
+      questions: [],
+    },
+    {
+      name: "Science",
+      description: "Explore the wonders of science",
+      icon: "🔬",
+      questions: [],
+    },
+    {
+      name: "Movies",
+      description: "Test your film knowledge",
+      icon: "🎬",
+      questions: [],
+    },
+    {
+      name: "Music",
+      description: "How well do you know music?",
+      icon: "🎵",
+      questions: [],
+    },
+    {
+      name: "Sports",
+      description: "Challenge your sports knowledge",
+      icon: "⚽",
+      questions: [],
+    },
+    {
+      name: "Literature",
+      description: "Dive into books and authors",
+      icon: "📚",
+      questions: [],
+    },
+    {
+      name: "Technology",
+      description: "Test your tech-savviness",
+      icon: "💻",
+      questions: [],
+    },
+    {
+      name: "Food & Drink",
+      description: "Test your culinary knowledge",
+      icon: "🍴",
+      questions: [],
+    },
+    {
+      name: "Animals",
+      description: "Test your knowledge of the animal kingdom",
+      icon: "🐾",
+      questions: [],
+    },
+    {
+      name: "Art",
+      description: "Test your knowledge of art history",
+      icon: "🎨",
+      questions: [],
+    },
+  ];
+
+  useEffect(() => {
+    const fetchTopics = async () => {
+      setIsLoading(true);
+      try {
+        const res = await fetch("/api/topics");
+        const data = await res.json();
+
+        // More robust empty check
+        if (
+          !data ||
+          (Array.isArray(data) && data.length === 0) ||
+          (data.topics && data.topics.length === 0)
+        ) {
+          console.log("Using fallback topics");
+          setTopics(fallbackTopics);
+        } else {
+          // Handle both array responses and object responses
+          const topicsData = Array.isArray(data) ? data : data.topics || [];
+          setTopics(topicsData.length ? topicsData : fallbackTopics);
+        }
+      } catch (err) {
+        console.error("Failed to load topics", err);
+        setTopics(fallbackTopics);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTopics();
+  }, []);
+
   const handleStartGame = () => {
     if (selectedTopic) {
       router.push(`/game/${encodeURIComponent(selectedTopic)}`);
@@ -20,8 +123,17 @@ export default function GameComponent() {
     router.push("/game/leaderboard");
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-purple-900 to-gray-800">
+        <div className="text-white">Loading topics...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-800 p-4 sm:p-6 md:p-8 relative overflow-y-auto">
+      {" "}
       {/* Gradient overlay for video */}
       <div className="fixed inset-0 -z-10 bg-gradient-to-br from-gray-900/80 via-purple-900/50 to-gray-800/80">
         <video
@@ -36,7 +148,6 @@ export default function GameComponent() {
           />
         </video>
       </div>
-
       {/* Main content container */}
       <div className="max-w-4xl mx-auto bg-gray-800/70 backdrop-blur-lg rounded-xl p-4 sm:p-6 md:p-8 shadow-2xl border border-gray-700/50 min-h-[calc(100vh-2rem)] sm:min-h-[calc(100vh-3rem)] md:min-h-[calc(100vh-4rem)]">
         {/* Header */}
@@ -73,15 +184,16 @@ export default function GameComponent() {
             <option value="" className="text-gray-400">
               -- Select a topic --
             </option>
-            {topics.map((topic) => (
-              <option
-                key={topic.name}
-                value={topic.name}
-                className="bg-gray-800 text-gray-200 text-sm sm:text-base"
-              >
-                {topic.icon} {topic.name} ({topic.questions.length} q)
-              </option>
-            ))}
+            {topics &&
+              topics.map((topic) => (
+                <option
+                  key={topic.name}
+                  value={topic.name}
+                  className="bg-gray-800 text-gray-200 text-sm sm:text-base"
+                >
+                  {topic.icon} {topic.name} ({topic.questions.length} q)
+                </option>
+              ))}
           </select>
         </div>
 
@@ -109,27 +221,29 @@ export default function GameComponent() {
             Browse all topics:
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 overflow-y-auto max-h-[50vh] sm:max-h-[55vh] md:max-h-[60vh] pb-6 sm:pb-8 scrollbar-thin scrollbar-thumb-purple-700 scrollbar-track-gray-700/50">
-            {topics.map((topic) => (
-              <button
-                key={topic.name}
-                onClick={() => setSelectedTopic(topic.name)}
-                className={`p-2 sm:p-3 md:p-4 rounded-lg border-2 transition-all min-w-0 backdrop-blur-sm ${
-                  selectedTopic === topic.name
-                    ? "border-purple-500 bg-purple-900/30 shadow-lg"
-                    : "border-gray-700 bg-gray-700/50 hover:border-purple-400 hover:bg-gray-700/70"
-                }`}
-              >
-                <div className="text-xl sm:text-2xl mb-1 sm:mb-2 text-purple-300">
-                  {topic.icon}
-                </div>
-                <h3 className="font-medium text-xs sm:text-sm md:text-base text-gray-100 truncate">
-                  {topic.name}
-                </h3>
-                <p className="text-xs sm:text-sm text-gray-400">
-                  {topic.questions.length} questions
-                </p>
-              </button>
-            ))}
+            {topics &&
+              topics &&
+              topics.map((topic) => (
+                <button
+                  key={topic.name}
+                  onClick={() => setSelectedTopic(topic.name)}
+                  className={`p-2 sm:p-3 md:p-4 rounded-lg border-2 transition-all min-w-0 backdrop-blur-sm ${
+                    selectedTopic === topic.name
+                      ? "border-purple-500 bg-purple-900/30 shadow-lg"
+                      : "border-gray-700 bg-gray-700/50 hover:border-purple-400 hover:bg-gray-700/70"
+                  }`}
+                >
+                  <div className="text-xl sm:text-2xl mb-1 sm:mb-2 text-purple-300">
+                    {topic.icon}
+                  </div>
+                  <h3 className="font-medium text-xs sm:text-sm md:text-base text-gray-100 truncate">
+                    {topic.name}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-gray-400">
+                    {topic.questions.length} questions
+                  </p>
+                </button>
+              ))}
           </div>
         </div>
       </div>

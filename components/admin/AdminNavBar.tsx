@@ -11,6 +11,7 @@ import {
   LogOut,
   User as UserIcon,
   Ban,
+  Gamepad,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -93,6 +94,14 @@ const AdminNavbar = ({ user }: NavbarProps) => {
       allowedRoles: ["super", "support"],
       isMpesa: true,
     },
+
+    {
+      href: "/admin/games",
+      icon: Gamepad,
+      label: "GameHub",
+      allowedRoles: ["super", "content", "analytics"],
+      isGame: true,
+    },
     {
       href: "/admin/content",
       icon: FileText,
@@ -152,6 +161,8 @@ const AdminNavbar = ({ user }: NavbarProps) => {
               const isActive = pathname.startsWith(item.href);
               const isMpesa = item.isMpesa;
 
+              const isGame = item.isGame;
+
               return (
                 <Link
                   key={item.href}
@@ -160,6 +171,8 @@ const AdminNavbar = ({ user }: NavbarProps) => {
                     "flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors",
                     isMpesa
                       ? "bg-[#1C8F45] text-white hover:bg-[#157A38]"
+                      : isGame
+                      ? "bg-[#31d7dd] text-black hover:bg-[#157A38]"
                       : isActive
                       ? resolvedTheme === "dark"
                         ? "bg-gray-800 text-white shadow-sm ring-1 ring-gray-700"

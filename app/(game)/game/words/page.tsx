@@ -13,6 +13,7 @@ import {
 
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 type Difficulty = "basic" | "intermediate" | "advanced";
 
@@ -45,7 +46,7 @@ export default function WordScrambleGame() {
   const [wordsCompleted, setWordsCompleted] = useState(0);
   const [hintUsed, setHintUsed] = useState(false);
   const [showHint, setShowHint] = useState(false);
-
+  const { user } = useCurrentUser();
   // Load words based on difficulty
   useEffect(() => {
     const loadWords = async () => {
@@ -123,6 +124,61 @@ export default function WordScrambleGame() {
     }
   }, [wordList, newWord]);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // Update your submitScore function
+  const submitScore = async () => {
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      const response = await fetch("/api/leaderboard", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          gameSlug: "lexicon-legends",
+          score,
+          timeTaken: TIMER_DURATION[difficulty] - timeLeft,
+          difficulty,
+          gameSpecific: {
+            wordsSolved: wordsCompleted,
+            longestStreak: wordsCompleted,
+            hintsUsed: hintUsed ? 1 : 0,
+            bonusPoints: score - wordsCompleted * (hintUsed ? 5 : 10),
+          },
+          username: user?.user?.username,
+          picture: user?.user?.picture,
+          id: user?.user?._id,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error((await response.text()) || "Failed to submit score");
+      }
+
+      const data = await response.json();
+      console.log("Score submitted successfully:", data);
+    } catch (error) {
+      console.error("Error submitting score:", error);
+      setSubmitError(
+        error instanceof Error ? error.message : "Failed to submit score"
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  // In your WordScrambleGame component, update the useEffect for game completion
+  useEffect(() => {
+    if (wordsCompleted >= WORDS_REQUIRED_TO_WIN[difficulty]) {
+      setGameStatus("won");
+      submitScore(); // Submit score when player wins
+    }
+  }, [wordsCompleted, difficulty]);
+
+  // Also update the timeLeft useEffect to submit on timeout
   useEffect(() => {
     if (gameStatus !== "playing") return;
 
@@ -131,6 +187,7 @@ export default function WordScrambleGame() {
         if (prev <= 1) {
           clearInterval(timer);
           setGameStatus("lost");
+          submitScore(); // Submit score when time runs out
           return 0;
         }
         return prev - 1;
@@ -140,12 +197,6 @@ export default function WordScrambleGame() {
     return () => clearInterval(timer);
   }, [gameStatus, difficulty]);
 
-  useEffect(() => {
-    if (wordsCompleted >= WORDS_REQUIRED_TO_WIN[difficulty]) {
-      setGameStatus("won");
-    }
-  }, [wordsCompleted, difficulty]);
-
   const DifficultyBadge = () => {
     const config = {
       basic: { icon: <FaShieldAlt />, color: "green", label: "Easy" },
@@ -154,6 +205,8 @@ export default function WordScrambleGame() {
     };
 
     const current = config[difficulty];
+
+    // Add this to your WordScrambleGame component
 
     return (
       <span
@@ -300,6 +353,24 @@ export default function WordScrambleGame() {
         className="text-neutral-300 absolute top-10 left-10 cursor-pointer"
       />
 
+      {submitError && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-red-400 text-sm mt-2"
+        >
+          Error submitting score: {submitError}
+        </motion.div>
+      )}
+      {isSubmitting && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-gray-400 text-sm mt-2"
+        >
+          Submitting score...
+        </motion.div>
+      )}
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -441,14 +512,25 @@ export default function WordScrambleGame() {
             </div>
           </div>
         ) : (
-          <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={resetGame}
-            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2"
-          >
-            <FaRedo /> Play Again
-          </motion.button>
+          <div className="flex just\ items-center">
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={resetGame}
+              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2"
+            >
+              <FaRedo /> Play Again
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => router.push("/leaderboard")}
+              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2 mt-4"
+            >
+              <FaTrophy /> View Leaderboard
+            </motion.button>
+          </div>
         )}
       </div>
 

@@ -3,18 +3,24 @@
 import { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useParams, useRouter } from "next/navigation";
-import { topics } from "@/data";
-import { Question } from "@/types/gamesiinterface";
+import { Question, Topic } from "@/types/gamesiinterface";
 import { AnimatePresence, motion } from "framer-motion";
 import { v4 as uuidv4 } from "uuid";
 import Confetti from "react-confetti";
 import { useWindowSize } from "react-use";
 
+const shuffleArray = (array: string[]): string[] => {
+  const newArray = [...array];
+  for (let i = newArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+  }
+  return newArray;
+};
 export default function QuizPage() {
   const { name } = useParams();
   const router = useRouter();
   const decodedTopic = decodeURIComponent(name as string);
-  const topicData = topics.find((t) => t.name === decodedTopic);
   const { width, height } = useWindowSize();
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
@@ -33,6 +39,45 @@ export default function QuizPage() {
 
   const { user } = useUser();
 
+  const [topics, setTopics] = useState<Topic[]>([]);
+
+  const [loadingState, setLoadingState] = useState<
+    "loading" | "timeout" | "not-found" | "ready"
+  >("loading");
+  useEffect(() => {
+    const fetchTopics = async () => {
+      try {
+        const res = await fetch("/api/topics");
+        const data = await res.json();
+        setTopics(data);
+
+        // Check if our topic exists in the fetched data
+        const topicExists = data.some((t: Topic) => t.name === decodedTopic);
+        if (!topicExists) {
+          setLoadingState("not-found");
+          setTimeout(() => router.push("/game/quiz"), 2000);
+          return;
+        }
+
+        setLoadingState("ready");
+      } catch (err) {
+        console.error("Failed to load topics", err);
+        setLoadingState("timeout");
+      }
+    };
+
+    // Set a timeout to prevent infinite loading
+    const loadingTimeout = setTimeout(() => {
+      if (loadingState === "loading") {
+        setLoadingState("timeout");
+      }
+    }, 8000); // 8 second timeout
+
+    fetchTopics();
+
+    return () => clearTimeout(loadingTimeout);
+  }, [decodedTopic, router]);
+  const topicData = topics.find((t) => t.name === decodedTopic);
   const getRandomQuestion = (): Question | null => {
     if (!topicData || topicData.questions.length === 0) return null;
     const unanswered = topicData.questions.filter(
@@ -42,19 +87,14 @@ export default function QuizPage() {
     const randomIndex = Math.floor(Math.random() * unanswered.length);
     return unanswered[randomIndex];
   };
-
-  useEffect(() => {
-    if (!topicData) {
-      router.push("/game");
-      return;
-    }
-    const first = getRandomQuestion();
-    if (first) {
-      setCurrentQuestion(first);
-      setAllAnswers([first.correctAnswer, ...first.otherGuesses]);
-      setTimeLeft(first.timeLimit || 30);
-    }
-  }, [topicData, router]);
+  // useEffect(() => {
+  //   if (topics.length > 0 && !topicData) {
+  //     const timer = setTimeout(() => {
+  //       router.push("/game");
+  //     }, 2000);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [topics, topicData, router]);
 
   useEffect(() => {
     if (!currentQuestion || isAnswered) return;
@@ -95,7 +135,9 @@ export default function QuizPage() {
         setShowCorrect(false);
         setIsTransitioning(false);
         if (next) {
-          setAllAnswers([next.correctAnswer, ...next.otherGuesses]);
+          setAllAnswers(
+            shuffleArray([next.correctAnswer, ...next.otherGuesses])
+          );
           setTimeLeft(next.timeLimit || 30);
         }
       }, 500);
@@ -154,13 +196,78 @@ export default function QuizPage() {
     }
   };
 
-  const exitQuiz = () => router.push("/game");
+  const exitQuiz = () => router.push("/game/quiz");
 
   const handleBackdropClick = () => {
     if (!isTransitioning) setShowExitConfirm(true);
   };
 
-  if (!topicData) return null;
+  if (loadingState !== "ready") {
+    return (
+      <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+        <div className="bg-gray-800/90 backdrop-blur-sm rounded-xl p-6 w-full max-w-sm text-center shadow-xl border border-gray-700">
+          {/* Loading State */}
+          {loadingState === "loading" && (
+            <>
+              <h2 className="text-xl sm:text-2xl font-bold mb-3 text-white">
+                Loading Quiz...
+              </h2>
+              <div className="flex justify-center">
+                <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+              </div>
+              <p className="text-gray-400 mt-4 text-sm">
+                Please wait while we prepare your quiz
+              </p>
+            </>
+          )}
+
+          {/* Timeout State */}
+          {loadingState === "timeout" && (
+            <>
+              <h2 className="text-xl sm:text-2xl font-bold mb-3 text-white">
+                Taking Too Long
+              </h2>
+              <p className="text-gray-300 mb-4">
+                The quiz is taking longer than expected to load.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <button
+                  onClick={() => window.location.reload()}
+                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition flex-1"
+                >
+                  Try Again
+                </button>
+                <button
+                  onClick={() => router.push("/game")}
+                  className="px-4 py-2 bg-gray-700 text-gray-200 rounded-lg hover:bg-gray-600 transition flex-1"
+                >
+                  Choose Another Topic
+                </button>
+              </div>
+            </>
+          )}
+
+          {/* Not Found State */}
+          {loadingState === "not-found" && (
+            <>
+              <h2 className="text-xl sm:text-2xl font-bold mb-3 text-white">
+                Topic Not Found
+              </h2>
+              <p className="text-gray-300 mb-4">
+                Redirecting to topic selection...
+              </p>
+              <div className="flex justify-center">
+                <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+              </div>
+              <p className="text-gray-400 mt-4 text-sm">
+                You'll be automatically redirected
+              </p>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   if (!currentQuestion) {
     return (
@@ -287,7 +394,7 @@ export default function QuizPage() {
           <div className="flex justify-between text-xs text-gray-400 mt-2">
             <div>{timeLeft}s remaining</div>
             <div>
-              Q{questionCount + 1}/{topicData.questions.length}
+              Q{questionCount + 1}/{topicData && topicData.questions.length}
             </div>
           </div>
         </motion.div>

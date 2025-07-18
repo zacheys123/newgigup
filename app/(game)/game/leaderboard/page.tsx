@@ -4,17 +4,42 @@ import { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 
+import Image from "next/image";
+import {
+  GameCategory,
+  MathGameFields,
+  PlayfulGameFields,
+  TriviaGameFields,
+  WordGameFields,
+} from "@/types/gamesiinterface";
+
+type GameSpecificData =
+  | { category: "word"; fields: WordGameFields }
+  | { category: "math"; fields: MathGameFields }
+  | { category: "trivia"; fields: TriviaGameFields }
+  | { category: "playful"; fields: PlayfulGameFields }
+  | { category: "puzzle" | "strategy"; fields: Record<string, unknown> };
+
 interface LeaderboardEntry {
-  topic: string;
+  _id: string;
+  gameId: string;
+  gameName: string;
+  userId: string;
+  username: string;
+  avatar?: string;
   score: number;
-  userId?: string;
-  username?: string;
-  date?: string;
+  rank?: number;
+  category: GameCategory;
+  timeTaken?: number;
+  accuracy?: number;
+  levelReached?: number;
+  gameSpecific: GameSpecificData["fields"];
+  createdAt: string;
 }
 
 export default function LeaderboardPage() {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
-  const [filter, setFilter] = useState<string>("all");
+  const [filter, setFilter] = useState<GameCategory | "all">("all");
   const [showMineOnly, setShowMineOnly] = useState(false);
   const { user } = useUser();
   const router = useRouter();
@@ -23,7 +48,7 @@ export default function LeaderboardPage() {
     const fetchLeaderboard = async () => {
       try {
         const params = new URLSearchParams();
-        if (filter !== "all") params.append("topic", filter);
+        if (filter !== "all") params.append("category", filter);
         if (showMineOnly && user?.id) params.append("userId", user.id);
 
         const res = await fetch(`/api/leaderboard?${params.toString()}`);
@@ -37,7 +62,53 @@ export default function LeaderboardPage() {
     fetchLeaderboard();
   }, [filter, showMineOnly, user]);
 
-  const uniqueTopics = Array.from(new Set(entries.map((e) => e.topic)));
+  const gameCategories: GameCategory[] = [
+    "word",
+    "math",
+    "trivia",
+    "puzzle",
+    "strategy",
+    "playful",
+  ];
+
+  const getGameSpecificField = (entry: LeaderboardEntry) => {
+    switch (entry.category) {
+      case "word":
+        const wordFields = entry.gameSpecific as WordGameFields;
+        return `Words: ${wordFields.wordsSolved || 0} | Streak: ${
+          wordFields.longestStreak || 0
+        }`;
+      case "math":
+        const mathFields = entry.gameSpecific as MathGameFields;
+        return `Accuracy: ${mathFields.correctPercentage || 0}% | Solved: ${
+          mathFields.equationsSolved || 0
+        }`;
+      case "trivia":
+        const triviaFields = entry.gameSpecific as TriviaGameFields;
+        return `Correct: ${triviaFields.correctAnswers || 0} | Fastest: ${
+          triviaFields.fastestAnswer || 0
+        }s`;
+      case "playful":
+        const playfulFields = entry.gameSpecific as PlayfulGameFields;
+        return `Items: ${playfulFields.itemsCollected || 0} | Time: ${
+          playfulFields.timeSurvived || 0
+        }s`;
+      default:
+        return `Score: ${entry.score}`;
+    }
+  };
+
+  const getCategoryDisplayName = (category: GameCategory) => {
+    const names: Record<GameCategory, string> = {
+      word: "Lexicon Legends",
+      math: "Math Sprint",
+      trivia: "Trivia Showdown",
+      puzzle: "Emoji Enigma",
+      strategy: "Chess Royale",
+      playful: "Hungry Bear",
+    };
+    return names[category];
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-800 p-4 sm:p-6 font-sans">
@@ -62,24 +133,26 @@ export default function LeaderboardPage() {
               htmlFor="filter"
               className="block text-sm sm:text-base font-medium mb-1 text-gray-300"
             >
-              Filter by Topic:
+              Filter by Game:
             </label>
             <select
               id="filter"
               value={filter}
-              onChange={(e) => setFilter(e.target.value)}
+              onChange={(e) =>
+                setFilter(e.target.value as GameCategory | "all")
+              }
               className="w-full p-2 sm:p-3 text-sm sm:text-base bg-gray-700 border border-gray-600 rounded-md text-gray-200"
             >
               <option value="all" className="text-gray-400">
-                All Topics
+                All Games
               </option>
-              {uniqueTopics.map((topic) => (
+              {gameCategories.map((category) => (
                 <option
-                  key={topic}
-                  value={topic}
+                  key={category}
+                  value={category}
                   className="bg-gray-800 text-gray-200"
                 >
-                  {topic}
+                  {getCategoryDisplayName(category)}
                 </option>
               ))}
             </select>
@@ -104,20 +177,38 @@ export default function LeaderboardPage() {
           </p>
         ) : (
           <ul className="divide-y divide-gray-700 mt-4">
-            {entries.map((entry, index) => (
+            {entries.map((entry) => (
               <li
-                key={`${entry.topic}-${index}`}
+                key={entry._id}
                 className="py-3 flex items-center justify-between hover:bg-gray-700/50 transition-colors rounded px-2"
               >
-                <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-white truncate text-sm sm:text-base">
-                    {entry.username || "Guest"}
+                <div className="flex items-center gap-3">
+                  <div className="text-gray-400 font-bold w-6 text-right">
+                    {entry.rank || "?"}
                   </div>
-                  <div className="text-xs sm:text-sm text-gray-400 truncate">
-                    {entry.topic} •{" "}
-                    {entry.date
-                      ? new Date(entry.date).toLocaleDateString()
-                      : "Unknown date"}
+                  {entry.avatar ? (
+                    <Image
+                      src={entry.avatar}
+                      alt={entry.username}
+                      className="w-8 h-8 rounded-full"
+                      height={8}
+                      width={8}
+                    />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
+                      <span className="text-xs">
+                        {entry.username.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <div className="font-semibold text-white truncate text-sm sm:text-base">
+                      {entry.username}
+                    </div>
+                    <div className="text-xs sm:text-sm text-gray-400 truncate">
+                      {entry.gameName || getCategoryDisplayName(entry.category)}{" "}
+                      • {getGameSpecificField(entry)}
+                    </div>
                   </div>
                 </div>
                 <div className="ml-4 text-purple-400 font-bold text-sm sm:text-base">

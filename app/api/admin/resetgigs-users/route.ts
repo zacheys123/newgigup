@@ -4,16 +4,16 @@ import { getAuth } from "@clerk/nextjs/server";
 import connectDb from "@/lib/connectDb";
 import Gig from "@/models/gigs";
 import User from "@/models/user";
+import { isAdmin } from "@/lib/actions/isAdmin";
 
 export async function POST(req: NextRequest) {
   const { userId: clerkId } = getAuth(req);
 
   try {
     await connectDb();
-
+    await isAdmin(clerkId || "");
     // Optional: restrict to admin Clerk ID
-    const currentuser = await User.findOne({ clerkId });
-    if (!currentuser?.isAdmin) {
+    if (!isAdmin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
