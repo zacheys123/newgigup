@@ -28,10 +28,14 @@ interface STKPushQueryResponse {
 }
 
 function getCallbackUrl(): string {
-  return process.env.NODE_ENV === "development"
-    ? "https://dadf-105-29-165-231.ngrok-free.app/api/stkcallback"
-    : "https://gigup1.vercel.app/api/stkcallback";
+  if (process.env.NODE_ENV === "development") {
+    return process.env.NGROK_URL 
+      ? `${process.env.NGROK_URL}/api/stkcallback`
+      : "https://b70837ffc232.ngrok-free.app/api/stkcallback";
+  }
+  return "https://gigup1.vercel.app/api/stkcallback";
 }
+
 export class MpesaService {
   private consumerKey: string;
   private consumerSecret: string;
@@ -42,16 +46,26 @@ export class MpesaService {
   private tokenExpiry: Date | null = null;
 
   constructor() {
+        console.log("Initializing M-Pesa Service with environment variables");
+    console.log("Callback URL:", getCallbackUrl());
+    console.log("Consumer Key:", process.env.MPESA_CONSUMER_KEY);
+    console.log("Consumer Secret:", process.env.MPESA_CONSUMER_SECRET);
+    console.log("Short Code:", process.env.MPESA_BUSINESS_SHORTCODE);
+    console.log("Passkey:", process.env.MPESA_PASSKEY);
+    console.log("Callback URL:", getCallbackUrl());
+    
     if (
       !process.env.MPESA_CONSUMER_KEY ||
       !process.env.MPESA_CONSUMER_SECRET ||
       !process.env.MPESA_BUSINESS_SHORTCODE ||
       !process.env.MPESA_PASSKEY ||
-      !process.env.NEXT_PUBLIC_MPESA_CALLBACK_URL
+      !getCallbackUrl
     ) {
       throw new Error("Missing M-Pesa environment variables");
     }
 
+
+ 
     this.consumerKey = process.env.MPESA_CONSUMER_KEY;
     this.consumerSecret = process.env.MPESA_CONSUMER_SECRET;
     this.shortCode = process.env.MPESA_BUSINESS_SHORTCODE;

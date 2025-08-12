@@ -67,9 +67,41 @@ export async function POST(req: NextRequest) {
     }
 
     const userEmail = transformedUser.emailAddresses[0]?.emailAddress;
+
+
+    const currentUser = await User.findOne({ clerkId: userId });
+    if (currentUser) {
+      return NextResponse.json({
+        userstatus: "error",
+        message: "User already exists",
+      });
+    }
+    if (!userEmail) {
+      return NextResponse.json({
+        userstatus: "error",
+        message: "Email address is required",
+      });
+    }
+    // Check if the email is already registered
+    const existingUser = await User.findOne({ email: userEmail });
+    if (existingUser) {
+      return NextResponse.json({
+        userstatus: "error",
+        message: "Email address already registered",
+      });
+    }
+    // Check if the user is an admin based on a whitelist
+    if (!transformedUser.emailAddresses[0]?.verification?.status) {
+      return NextResponse.json({
+        userstatus: "error",
+        message: "Email address is not verified",
+      });
+    }
+    
     const adminWhitelist = process.env.ADMIN_WHITELIST?.split(",") || [];
     const isAdmin = adminWhitelist.includes(userEmail);
 
+    
     const userData = {
       firstname: transformedUser.firstName,
       lastname: transformedUser.lastName,

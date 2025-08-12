@@ -15,7 +15,8 @@ const nextConfig: NextConfig = {
       // "gravatar.net",
       // "cdn.discordapp.com",
       // "cdn.discordcdn.com",
-      // "i.stack.imgur.com",
+      // "i.stack.imgur.com", 
+        "images.clerk.dev",
       "res.cloudinary.com",
       // "i.imgur.com",
       "lh3.googleusercontent.com",
@@ -46,5 +47,5 @@ const pwaConfig = {
 
 export default withPWA({
   ...nextConfig,
-  ...pwaConfig, // Spread the PWA config at the top level
+  pwa:pwaConfig, // Spread the PWA config at the top level
 });
