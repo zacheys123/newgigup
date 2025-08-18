@@ -105,8 +105,7 @@ const ProfilePage = () => {
           className=" md:mb-14"
         >
           <div className="bg-gradient-to-br from-gray-900/50 to-gray-800/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-6 md:p-8">
-            <RouteProfile isMobile={isMobile} />
-          </div>
+            <RouteProfile isMobile={isMobile} />          </div>
         </motion.section>
 
         {/* Musicians Section */}

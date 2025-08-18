@@ -1,7 +1,6 @@
 "use client";
 import { useAuth } from "@clerk/nextjs";
 import { Pencil, Upload } from "lucide-react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useState } from "react";
 import { BsCameraFill } from "react-icons/bs";
@@ -85,8 +84,8 @@ const RouteProfile = ({ isMobile }: { isMobile: boolean }) => {
           )}
 
           {user?.user?.picture && (
-            <Image
-              priority
+            <img
+              
               src={fileUrl || user.user.picture}
               className="object-cover w-full h-full rounded-full border-2 border-amber-500/30 hover:border-amber-400 transition-all"
               alt={user.user.firstname || "User"}

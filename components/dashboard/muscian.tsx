@@ -13,6 +13,7 @@ import {
 } from "react-icons/fi";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 export function MusicianDashboard({
   gigsBooked,
@@ -26,6 +27,8 @@ export function MusicianDashboard({
   onboarding: boolean;
 }) {
   const { subscriptiondata: data } = useStore();
+
+    const { user } = useCurrentUser();
 
   const router = useRouter();
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
@@ -148,7 +151,7 @@ export function MusicianDashboard({
         )}
       </AnimatePresence>
       <AnimatePresence>
-        {showUpgradeModal && (
+        {showUpgradeModal && !user?.user?.date || !user?.user?.year || !user?.user?.month &&(
           <motion.div
             initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
             animate={{ opacity: 1, backdropFilter: "blur(4px)" }}
@@ -190,7 +193,7 @@ export function MusicianDashboard({
                     </h3>
                     <p className="text-gray-400 text-sm leading-relaxed">
                       Showcase your talent! A complete profile with skills,
-                      experience, and portfolio receives{" "}
+                      experience, and portfolio receives{" "} add your date of birth and more details
                       <span className="text-yellow-300">3× more bookings</span>{" "}
                       and better visibility.
                     </p>

@@ -31,7 +31,7 @@ import VideoProfileComponent from "../user/VideoProfileComponent";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import Image from "next/image";
+
 import Link from "next/link";
 
 import { motion } from "framer-motion";
@@ -345,7 +345,7 @@ const CurrentUserProfile = () => {
           <div className="flex items-center gap-4 mb-4 md:mb-0">
             <div className="relative">
               {user?.user?.picture ? (
-                <Image
+                <img
                   src={user.user?.picture}
                   alt="Profile"
                   className="w-20 h-20 rounded-full object-cover border-2 border-rose-600"
