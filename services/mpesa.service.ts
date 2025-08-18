@@ -64,7 +64,11 @@ export class MpesaService {
       throw new Error("Missing M-Pesa environment variables");
     }
 
-
+console.log(      process.env.MPESA_CONSUMER_KEY ||
+    process.env.MPESA_CONSUMER_SECRET ||
+    process.env.MPESA_BUSINESS_SHORTCODE ||
+    process.env.MPESA_PASSKEY ||
+    getCallbackUrl)
  
     this.consumerKey = process.env.MPESA_CONSUMER_KEY;
     this.consumerSecret = process.env.MPESA_CONSUMER_SECRET;
