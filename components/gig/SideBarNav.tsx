@@ -43,7 +43,7 @@ const SidebarNav = () => {
     links.push({
       href: `/av_gigs/${userId}`,
       Icon: FaHome,
-      label: "MyHome",
+      label: "Home",
     });
     links.push({
       href: `/av_gigs/${userId}`,
