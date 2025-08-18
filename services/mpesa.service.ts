@@ -31,11 +31,11 @@ function getCallbackUrl(): string {
   if (process.env.NODE_ENV === "development") {
     return process.env.NGROK_URL 
       ? `${process.env.NGROK_URL}/api/stkcallback`
-      : "https://b70837ffc232.ngrok-free.app/api/stkcallback";
+      : "https://36972bacafe8.ngrok-free.app/api/stkcallback";
   }
   return "https://gigup1.vercel.app/api/stkcallback";
 }
-
+// 31Cjs9sEoKmym0kHXTCEiYy3ASl_LWnsiatFW6EgsrpBYh4x
 export class MpesaService {
   private consumerKey: string;
   private consumerSecret: string;
