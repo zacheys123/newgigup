@@ -14,7 +14,7 @@ import {
 import { FaHome } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import Image from "next/image";
+
 
 const SidebarNav = () => {
   const { userId } = useAuth();
