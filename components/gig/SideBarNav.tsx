@@ -120,7 +120,7 @@ const SidebarNav = () => {
         {/* User Profile Card */}
         <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-4">
           {user?.user?.picture ? (
-            <Image
+            <img
               src={user?.user.picture}
               alt="Profile"
               width={40}
