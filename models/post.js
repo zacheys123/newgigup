@@ -4,16 +4,16 @@ import { models, Schema } from "mongoose";
 const postSchema = new mongoose.Schema(
   {
     postedBy: { type: Schema.Types.ObjectId, ref: "User" },
-    title: {
+    companyName: {
       type: String,
-      required: true,
+     
     },
     description: {
       type: String,
       lowercase: true,
     },
-    media: { type: String },
-    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  rating: { type: Number, default: 0 },
+
   },
   { timestamps: true }
 );

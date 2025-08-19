@@ -239,13 +239,13 @@ const GigCustomization: React.FC<GigCustomizationProps> = ({
                     </span>
                   </span>
                   <div className="h-[27px] w-[27px] rounded-full bg-gray-400 flex justify-center items-center">
-                    <Image
-                      src={logo ? logo : altlogo}
-                      className="h-[24px] w-[24px] rounded-full"
-                      alt="C"
-                      width={24}
-                      height={24}
-                    />
+                <img
+  src={logo ? logo : typeof altlogo === 'string' ? altlogo : altlogo.src}
+  className="h-[24px] w-[24px] rounded-full"
+  alt="C"
+  width={24}
+  height={24}
+/>
                   </div>
                 </div>
               </Box>

@@ -56,6 +56,7 @@ export default function Home() {
     );
   }
 
+
   const getDynamicHref = () => {
     if (
       !userId ||
@@ -84,7 +85,7 @@ export default function Home() {
       <MetaTags /> {/* Hero Section */}
       <section className="relative flex flex-col items-center justify-center min-h-screen text-center snap-start">
         <video
-          autoPlay
+          autoPlay//gigupserver-d94fc174e3bf.herokuapp.com
           loop
           muted
           playsInline

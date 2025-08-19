@@ -10,7 +10,6 @@ import { useAllGigs } from "@/hooks/useAllGigs";
 
 import { useAuth } from "@clerk/nextjs";
 // import { ArrowRight } from "lucide-react";
-import Image from "next/image";
 import { useSocketContext } from "@/app/Context/socket";
 import { useBookGig } from "@/hooks/useBookGig";
 import { isCreatorIsCurrentUserAndTaken } from "@/constants";
@@ -479,7 +478,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
           <div className="flex items-center">
             <div className="w-6 h-6 rounded-full overflow-hidden border border-white/10 mr-2">
               {gig?.logo ? (
-                <Image
+                <img
                   src={gig.logo}
                   alt="gig-logo"
                   width={24}
@@ -487,7 +486,7 @@ const AllGigsComponent: React.FC<AllGigsComponentProps> = ({ gig }) => {
                   className="w-full h-full object-cover"
                 />
               ) : gig?.postedBy?.picture ? (
-                <Image
+                <img
                   src={gig.postedBy.picture}
                   alt="user-picture"
                   width={24}

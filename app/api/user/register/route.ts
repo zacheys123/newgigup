@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
     const adminWhitelist = process.env.ADMIN_WHITELIST?.split(",") || [];
     const isAdmin = adminWhitelist.includes(userEmail);
 
-    
+    console.log(body)
     const userData = {
       firstname: transformedUser.firstName,
       lastname: transformedUser.lastName,

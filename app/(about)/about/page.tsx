@@ -13,6 +13,10 @@ import {
   FiUsers,
 } from "react-icons/fi";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useAllUsers } from "@/hooks/useAllUsers";
+import { UserProps } from "@/types/userinterfaces";
+import { useAllGigs } from "@/hooks/useAllGigs";
+import { GigProps } from "@/types/giginterface";
 
 // Animation variants
 const fadeInUp = {
@@ -32,7 +36,11 @@ const staggerContainer = {
 
 export default function AboutPage() {
   const user = useCurrentUser();
-
+const{users}=useAllUsers()
+const{gigs}=useAllGigs()
+const allmusicians=users?.users?.filter((u:UserProps)=>u?.isMusician).length
+const allClients=users?.users?.filter((u:UserProps)=>u?.isClient).length
+const allBookedGigs=gigs?.gigs?.filter((u:GigProps)=>u?.isTaken).length
   return (
     <div className="bg-gray-50 h-screen overflow-y-auto">
       {/* Hero Section */}
@@ -55,7 +63,7 @@ export default function AboutPage() {
             transition={{ delay: 0.3, duration: 0.8 }}
             className="text-xl max-w-3xl mx-auto mb-10 text-blue-100"
           >
-            {`Whether you're a talented performer seeking gigs or a venue looking
+            {`Whether you're a talented performer seeking gigs or a restaurant,hotel a club looking
             for exceptional entertainment, we create perfect matches that
             inspire.`}
           </motion.p>
@@ -76,13 +84,13 @@ export default function AboutPage() {
             ) : (
               <>
                 <Link
-                  href="/signup?role=artist"
+                  href="/signup"
                   className="bg-amber-400 hover:bg-amber-300 text-indigo-900 font-bold py-4 px-8 rounded-full text-lg transition-all transform hover:scale-105 inline-flex items-center justify-center"
                 >
                   <FiMic className="mr-2" /> Artists Sign Up
                 </Link>
                 <Link
-                  href="/signup?role=client"
+                  href="/signup"
                   className="bg-white hover:bg-gray-100 text-indigo-900 font-bold py-4 px-8 rounded-full text-lg transition-all transform hover:scale-105 inline-flex items-center justify-center"
                 >
                   <FiUsers className="mr-2" /> Clients Sign Up
@@ -108,17 +116,17 @@ export default function AboutPage() {
         <div className="max-w-6xl mx-auto grid md:grid-cols-4 gap-8 text-center">
           <div>
             <div className="text-4xl font-bold text-indigo-900 mb-2">
-              1,500+
+            {allmusicians}+
             </div>
             <div className="text-gray-600">Talented Artists</div>
           </div>
           <div>
-            <div className="text-4xl font-bold text-indigo-900 mb-2">800+</div>
-            <div className="text-gray-600">Verified Venues</div>
+            <div className="text-4xl font-bold text-indigo-900 mb-2">{allClients}+</div>
+            <div className="text-gray-600">Verified Clients</div>
           </div>
           <div>
             <div className="text-4xl font-bold text-indigo-900 mb-2">
-              5,000+
+              {allBookedGigs <1 ? 0 :allBookedGigs}+
             </div>
             <div className="text-gray-600">Successful Bookings</div>
           </div>

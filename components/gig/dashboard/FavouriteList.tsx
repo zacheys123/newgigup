@@ -5,7 +5,6 @@ import { toast } from "react-hot-toast";
 import { useAuth } from "@clerk/nextjs";
 import { FaTrash, FaRegBookmark } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image";
 
 export default function FavouritesList({
   gigs: initialGigs,
@@ -42,7 +41,7 @@ export default function FavouritesList({
       <div className="flex flex-col items-center justify-center py-16 space-y-4">
         <FaRegBookmark className="text-4xl text-gray-500/50" />
         <p className="text-lg font-light text-gray-400">
-          Your saved gigs will appear here
+          Your Favourite gigs will appear here.
         </p>
         <p className="text-sm text-gray-500/80">
           Browse gigs and save your favorites
@@ -69,7 +68,7 @@ export default function FavouritesList({
             {/* Image/Thumbnail Placeholder */}
             {gig.logo ? (
               <div className="h-40 w-full bg-gray-800 relative overflow-hidden">
-                <Image
+                <img
                   src={gig.logo}
                   alt={gig.title || "Gig image"}
                   className="w-full h-full object-cover"

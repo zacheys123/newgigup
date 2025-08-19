@@ -144,11 +144,14 @@ const ActionPage = () => {
       }
       const errors = isMusician
         ? validateMusicianFields()
-        : validateClientFields();
+        : validateClientFields(); 
       if (errors.length > 0) {
         setError(errors);
         return false;
       }
+              if (!isMusician && !organization || organization ==='undefined') { toast.error("Organization is Required");
+                 return false}
+  
 
       try {
         const res = await fetch(`/api/user/register`, {
@@ -289,6 +292,7 @@ const ActionPage = () => {
       setMusicianLoad(false);
     }
   }, [registerUser, router, roleType]);
+  // Register as client
   const connectAsClient = useCallback(async () => {
     setClientLoad(true);
     try {
