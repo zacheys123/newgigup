@@ -112,7 +112,7 @@ export default function Home() {
               Discover. Create. Perform.
             </h1>
             <p className="text-lg text-gray-300 my-6">
-              Join a global community of musicians and music lovers.
+              Join a global community of musicians and music lover
             </p>
             {/* {firstname && (
               <Link

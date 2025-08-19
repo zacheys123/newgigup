@@ -29,8 +29,8 @@ interface STKPushQueryResponse {
 
 function getCallbackUrl(): string {
   if (process.env.NODE_ENV === "development") {
-    return process.env.NGROK_URL 
-      ? `${process.env.NGROK_URL}/api/stkcallback`
+    return process.env.NEXT_PUBLIC_NGROK_URL 
+      ? `${process.env.NEXT_PUBLIC_NGROK_URL}/api/stkcallback`
       : "https://36972bacafe8.ngrok-free.app/api/stkcallback";
   }
   return "https://gigup1.vercel.app/api/stkcallback";
@@ -48,32 +48,27 @@ export class MpesaService {
   constructor() {
         console.log("Initializing M-Pesa Service with environment variables");
     console.log("Callback URL:", getCallbackUrl());
-    console.log("Consumer Key:", process.env.MPESA_CONSUMER_KEY);
-    console.log("Consumer Secret:", process.env.MPESA_CONSUMER_SECRET);
-    console.log("Short Code:", process.env.MPESA_BUSINESS_SHORTCODE);
-    console.log("Passkey:", process.env.MPESA_PASSKEY);
+    console.log("Consumer Key:", process.env.NEXT_PUBLIC_MPESA_CONSUMER_KEY);
+    console.log("Consumer Secret:", process.env.NEXT_PUBLIC_MPESA_CONSUMER_SECRET);
+    console.log("Short Code:", process.env.NEXT_PUBLIC_MPESA_BUSINESS_SHORTCODE);
+    console.log("Passkey:", process.env.NEXT_PUBLIC_MPESA_PASSKEY);
     console.log("Callback URL:", getCallbackUrl());
     
     if (
-      !process.env.MPESA_CONSUMER_KEY ||
-      !process.env.MPESA_CONSUMER_SECRET ||
-      !process.env.MPESA_BUSINESS_SHORTCODE ||
-      !process.env.MPESA_PASSKEY ||
+      !process.env.NEXT_PUBLIC_MPESA_CONSUMER_KEY ||
+      !process.env.NEXT_PUBLIC_MPESA_CONSUMER_SECRET ||
+      !process.env.NEXT_PUBLIC_MPESA_BUSINESS_SHORTCODE ||
+      !process.env.NEXT_PUBLIC_MPESA_PASSKEY ||
       !getCallbackUrl
     ) {
       throw new Error("Missing M-Pesa environment variables");
     }
 
-console.log(      process.env.MPESA_CONSUMER_KEY ||
-    process.env.MPESA_CONSUMER_SECRET ||
-    process.env.MPESA_BUSINESS_SHORTCODE ||
-    process.env.MPESA_PASSKEY ||
-    getCallbackUrl)
  
-    this.consumerKey = process.env.MPESA_CONSUMER_KEY;
-    this.consumerSecret = process.env.MPESA_CONSUMER_SECRET;
-    this.shortCode = process.env.MPESA_BUSINESS_SHORTCODE;
-    this.passkey = process.env.MPESA_PASSKEY;
+    this.consumerKey = process.env.NEXT_PUBLIC_MPESA_CONSUMER_KEY;
+    this.consumerSecret = process.env.NEXT_PUBLIC_MPESA_CONSUMER_SECRET;
+    this.shortCode = process.env.NEXT_PUBLIC_MPESA_BUSINESS_SHORTCODE;
+    this.passkey = process.env.NEXT_PUBLIC_MPESA_PASSKEY;
     this.callbackUrl = getCallbackUrl().trim();
   }
 
