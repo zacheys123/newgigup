@@ -1,7 +1,6 @@
 import React from "react";
 import { Button } from "../ui/button";
 import { Box, CircularProgress, Divider } from "@mui/material";
-import Image from "next/image";
 import { BsCameraFill } from "react-icons/bs";
 import { colors, fonts } from "@/utils";
 import "../loaders/word.css";
@@ -74,11 +73,10 @@ const GigCustomization: React.FC<GigCustomizationProps> = ({
               {colors.map((color) => (
                 <div
                   key={color}
-                  className={`w-6 h-6 rounded-full cursor-pointer transition-all border-2 shadow-md hover:scale-110 ${
-                    customization.fontColor === color
+                  className={`w-6 h-6 rounded-full cursor-pointer transition-all border-2 shadow-md hover:scale-110 ${customization.fontColor === color
                       ? "border-white"
                       : "border-transparent"
-                  }`}
+                    }`}
                   style={{ backgroundColor: color }}
                   onClick={() =>
                     setCustomization((prev) => ({ ...prev, fontColor: color }))
@@ -97,11 +95,10 @@ const GigCustomization: React.FC<GigCustomizationProps> = ({
               {colors.map((color) => (
                 <div
                   key={color}
-                  className={`w-6 h-6 rounded-full cursor-pointer transition-all border-2 shadow-md hover:scale-110 ${
-                    customization.backgroundColor === color
+                  className={`w-6 h-6 rounded-full cursor-pointer transition-all border-2 shadow-md hover:scale-110 ${customization.backgroundColor === color
                       ? "border-white"
                       : "border-transparent"
-                  }`}
+                    }`}
                   style={{ backgroundColor: color }}
                   onClick={() =>
                     setCustomization((prev) => ({
@@ -165,9 +162,9 @@ const GigCustomization: React.FC<GigCustomizationProps> = ({
             <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-gradient-to-r from-blue-500/20 to-teal-500/20 rounded-full blur-2xl"></div>
 
             {!customization?.fontColor &&
-            !customization?.font &&
-            !customization?.backgroundColor &&
-            !logo ? (
+              !customization?.font &&
+              !customization?.backgroundColor &&
+              !logo ? (
               <>
                 <h3 className="text-lg font-semibold text-white/80">
                   Gig Preview
@@ -239,13 +236,13 @@ const GigCustomization: React.FC<GigCustomizationProps> = ({
                     </span>
                   </span>
                   <div className="h-[27px] w-[27px] rounded-full bg-gray-400 flex justify-center items-center">
-                <img
-  src={logo ? logo : typeof altlogo === 'string' ? altlogo : altlogo.src}
-  className="h-[24px] w-[24px] rounded-full"
-  alt="C"
-  width={24}
-  height={24}
-/>
+                    <img
+                      src={logo ? logo : typeof altlogo === 'string' ? altlogo : altlogo.src}
+                      className="h-[24px] w-[24px] rounded-full"
+                      alt="C"
+                      width={24}
+                      height={24}
+                    />
                   </div>
                 </div>
               </Box>
