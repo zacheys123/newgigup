@@ -11,12 +11,16 @@ import {
   FiMusic,
   FiMic,
   FiUsers,
+  FiRefreshCw, // Add refresh icon
 } from "react-icons/fi";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAllUsers } from "@/hooks/useAllUsers";
 import { UserProps } from "@/types/userinterfaces";
 import { useAllGigs } from "@/hooks/useAllGigs";
 import { GigProps } from "@/types/giginterface";
+import { ResponseProps, usePostComments } from "@/hooks/usePostComments";
+import PostFeedBack from "@/components/user/PostFeedBack";
+import { useState, useEffect } from "react"; // Add useState and useEffect
 
 // Animation variants
 const fadeInUp = {
@@ -36,11 +40,38 @@ const staggerContainer = {
 
 export default function AboutPage() {
   const user = useCurrentUser();
-const{users}=useAllUsers()
-const{gigs}=useAllGigs()
-const allmusicians=users?.users?.filter((u:UserProps)=>u?.isMusician).length
-const allClients=users?.users?.filter((u:UserProps)=>u?.isClient).length
-const allBookedGigs=gigs?.gigs?.filter((u:GigProps)=>u?.isTaken).length
+  const { users } = useAllUsers();
+  const { gigs } = useAllGigs();
+  const { Allposts, isLoading: postsLoading } = usePostComments();
+  const allmusicians = users?.users?.filter((u: UserProps) => u?.isMusician).length;
+  const allClients = users?.users?.filter((u: UserProps) => u?.isClient).length;
+  const allBookedGigs = gigs?.gigs?.filter((u: GigProps) => u?.isTaken).length;
+  
+  // State for shuffled posts
+  const [shuffledPosts, setShuffledPosts] = useState<ResponseProps[]>([]);
+  
+  // Function to shuffle and select 2 random posts
+  const shufflePosts = () => {
+    if (!Allposts || Allposts.length === 0) return;
+    
+    // Copy the array to avoid mutating the original
+    const postsCopy = [...Allposts];
+    
+    // Shuffle the array using Fisher-Yates algorithm
+    for (let i = postsCopy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [postsCopy[i], postsCopy[j]] = [postsCopy[j], postsCopy[i]];
+    }
+    
+    // Take the first 2 posts
+    setShuffledPosts(postsCopy.slice(0, 2));
+  };
+  
+  // Shuffle posts when Allposts changes or on component mount
+  useEffect(() => {
+    shufflePosts();
+  }, [Allposts]);
+
   return (
     <div className="bg-gray-50 h-screen overflow-y-auto">
       {/* Hero Section */}
@@ -291,79 +322,66 @@ const allBookedGigs=gigs?.gigs?.filter((u:GigProps)=>u?.isTaken).length
         </div>
       </section>
       {/* Testimonial Section */}
-      <section className="py-20 bg-gradient-to-br from-indigo-900 to-purple-800 text-white">
+      <section className="py-14 bg-gradient-to-br from-indigo-900 to-purple-800 text-white">
         <div className="max-w-6xl mx-auto px-4">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+            className="text-center mb-12"
+          >
+            <motion.h2
+              variants={fadeInUp}
+              className="text-3xl font-bold mb-4"
+            >
+              What Our Users Say
+            </motion.h2>
+            <motion.p
+              variants={fadeInUp}
+              className="text-xl text-blue-100 max-w-3xl mx-auto"
+            >
+              Discover why artists and clients love using our platform
+            </motion.p>
+          </motion.div>
+          
+          {/* Shuffle button */}
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="flex justify-center mb-8"
           >
-            <h2 className="text-3xl font-bold mb-6">Success Stories</h2>
-            <p className="text-xl text-indigo-200 max-w-3xl mx-auto">
-              {` Hear from artists and clients who've transformed their experiences
-              using our platform`}
-            </p>
+            <button
+              onClick={shufflePosts}
+              className="flex items-center gap-2 px-6 py-3 bg-indigo-700 hover:bg-indigo-600 text-white rounded-full transition-all duration-300 hover:scale-105"
+            >
+              <FiRefreshCw className="w-5 h-5" />
+              Show Different Testimonials
+            </button>
           </motion.div>
-
+          
+          {/* Shuffled testimonials */}
           <div className="grid md:grid-cols-2 gap-8">
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="bg-white bg-opacity-10 p-8 rounded-xl backdrop-blur-sm"
-            >
-              <div className="flex items-center mb-6">
-                <div className="w-12 h-12 rounded-full bg-indigo-700 flex items-center justify-center text-xl font-bold mr-4">
-                  J
+            {shuffledPosts.length > 0 ? (
+              shuffledPosts.map((post) => (
+                <PostFeedBack key={post._id} post={post} />
+              ))
+            ) : (
+              // Placeholder when no posts are available
+              <>
+                <div className="bg-indigo-800/50 p-8 rounded-2xl border border-indigo-700">
+                  <p className="text-center text-blue-200 italic">
+                    No testimonials available yet. Be the first to share your experience!
+                  </p>
                 </div>
-                <div>
-                  <div className="font-bold">Jazz Ensemble</div>
-                  <div className="text-indigo-200">
-                    Regular performers at 5 venues
-                  </div>
+                <div className="bg-indigo-800/50 p-8 rounded-2xl border border-indigo-700">
+                  <p className="text-center text-blue-200 italic">
+                    Share how our platform has helped you connect with amazing talent!
+                  </p>
                 </div>
-              </div>
-              <p className="text-lg italic">
-                {`"We've doubled our bookings since joining. The platform handles
-                all the logistics so we can focus on our music. The direct
-                communication with venues is game-changing."`}
-              </p>
-              <div className="flex mt-4">
-                {[...Array(5)].map((_, i) => (
-                  <FiStar key={i} className="text-amber-400 fill-current" />
-                ))}
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="bg-white bg-opacity-10 p-8 rounded-xl backdrop-blur-sm"
-            >
-              <div className="flex items-center mb-6">
-                <div className="w-12 h-12 rounded-full bg-indigo-700 flex items-center justify-center text-xl font-bold mr-4">
-                  H
-                </div>
-                <div>
-                  <div className="font-bold">Hotel Grand</div>
-                  <div className="text-indigo-200">Luxury Hotel Chain</div>
-                </div>
-              </div>
-              <p className="text-lg italic">
-                {`"Finding quality lounge musicians used to take weeks. Now we
-                book in minutes. The caliber of artists has elevated our guest
-                experience significantly."`}
-              </p>
-              <div className="flex mt-4">
-                {[...Array(5)].map((_, i) => (
-                  <FiStar key={i} className="text-amber-400 fill-current" />
-                ))}
-              </div>
-            </motion.div>
+              </>
+            )}
           </div>
         </div>
       </section>

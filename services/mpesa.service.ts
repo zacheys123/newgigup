@@ -48,15 +48,15 @@ export class MpesaService {
   constructor() {
         console.log("Initializing M-Pesa Service with environment variables");
     console.log("Callback URL:", getCallbackUrl());
-    console.log("Consumer Key:", process.env.NEXT_PUBLIC_MPESA_CONSUMER_KEY);
-    console.log("Consumer Secret:", process.env.NEXT_PUBLIC_MPESA_CONSUMER_SECRET);
+    console.log("Consumer Key:", process.env.MPESA_CONSUMER_KEY);
+    console.log("Consumer Secret:", process.env.CONSUMER_SECRET);
     console.log("Short Code:", process.env.NEXT_PUBLIC_MPESA_BUSINESS_SHORTCODE);
     console.log("Passkey:", process.env.NEXT_PUBLIC_MPESA_PASSKEY);
     console.log("Callback URL:", getCallbackUrl());
     
     if (
-      !process.env.NEXT_PUBLIC_MPESA_CONSUMER_KEY ||
-      !process.env.NEXT_PUBLIC_MPESA_CONSUMER_SECRET ||
+      !process.env.MPESA_CONSUMER_KEY ||
+      !process.env.MPESA_CONSUMER_SECRET ||
       !process.env.NEXT_PUBLIC_MPESA_BUSINESS_SHORTCODE ||
       !process.env.NEXT_PUBLIC_MPESA_PASSKEY ||
       !getCallbackUrl
@@ -65,8 +65,8 @@ export class MpesaService {
     }
 
  
-    this.consumerKey = process.env.NEXT_PUBLIC_MPESA_CONSUMER_KEY;
-    this.consumerSecret = process.env.NEXT_PUBLIC_MPESA_CONSUMER_SECRET;
+    this.consumerKey = process.env.MPESA_CONSUMER_KEY;
+    this.consumerSecret = process.env.MPESA_CONSUMER_SECRET;
     this.shortCode = process.env.NEXT_PUBLIC_MPESA_BUSINESS_SHORTCODE;
     this.passkey = process.env.NEXT_PUBLIC_MPESA_PASSKEY;
     this.callbackUrl = getCallbackUrl().trim();
