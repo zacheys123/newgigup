@@ -103,7 +103,7 @@ function PostFeedBack({ post }: FeedBackProps) {
             </svg>
             
             <p className="text-gray-300 text-lg italic relative z-10 pl-6">
-              "{post?.description}"
+              {`"${post?.description}"`}
             </p>
           </div>
         </div>
