@@ -33,7 +33,7 @@ function getCallbackUrl(): string {
       ? `${process.env.NEXT_PUBLIC_NGROK_URL}/api/stkcallback`
       : "https://36972bacafe8.ngrok-free.app/api/stkcallback";
   }
-  return "https://newgigup-nu.vercel.app/api/stkcallback";
+  return "https://gupp.vercel.app/api/stkcallback";
 }
 // 31Cjs9sEoKmym0kHXTCEiYy3ASl_LWnsiatFW6EgsrpBYh4x
 export class MpesaService {
