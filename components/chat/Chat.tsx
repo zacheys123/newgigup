@@ -183,7 +183,7 @@ const Chat: React.FC<ChatProps> = ({ myuser, modal, onClose, onOpenX }) => {
           />
           <div className="flex justify-center w-full mt-2">
             <small className="text-center text-muted-foreground text-xs py-2 text-neutral-500">
-              Powered By: gigMeUp
+              Powered By: guup
             </small>
           </div>
         </div>

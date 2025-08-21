@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { UserProps } from "@/types/userinterfaces";
 import { useAllGigs } from "@/hooks/useAllGigs";
-import Image from "next/image";
 import { User } from "lucide-react";
 import { fonts } from "@/utils";
 import useStore from "@/app/zustand/useStore";
@@ -122,7 +121,7 @@ const ChatModal: React.FC<ProfileModalProps> = ({ user, onClose }) => {
       </button>
       <div className="text-center">
         {user.picture && (
-          <Image
+          <img
             src={user.picture}
             alt={user.firstname as string}
             className="w-24 h-24 rounded-full mx-auto"
