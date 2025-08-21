@@ -363,7 +363,7 @@ export default function AboutPage() {
           
           {/* Shuffled testimonials */}
           <div className="grid md:grid-cols-2 gap-8">
-            {postsloading && <div >loading posts...</>}
+            {postsloading && <div >loading posts...</div>}
             {shuffledPosts.length > 0 ? (
               shuffledPosts.map((post) => (
                 <PostFeedBack key={post._id} post={post} />
