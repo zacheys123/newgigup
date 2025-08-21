@@ -2,7 +2,6 @@
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { ChatProps, MessageProps } from "@/types/chatinterfaces";
 import { UserProps } from "@/types/userinterfaces";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import useSWR, { mutate } from "swr";
 import { useCallback, useEffect, useMemo, useState } from "react"; // Import useState
@@ -292,8 +291,8 @@ const AllChats = () => {
                     onClick={() => handleAddChat(user?._id as string)}
                   >
                     {user?.picture && (
-                      <Image
-                        src={user.picture}
+                      <img
+                        src={user?.picture}
                         alt={user.firstname as string}
                         width={40}
                         height={40}
@@ -470,7 +469,7 @@ const AllChats = () => {
                       {/* User Avatar */}
                       <div className="flex-shrink-0">
                         {otherUser?.picture ? (
-                          <Image
+                          <img
                             src={otherUser?.picture}
                             alt={otherUser?.firstname as string}
                             width={40}

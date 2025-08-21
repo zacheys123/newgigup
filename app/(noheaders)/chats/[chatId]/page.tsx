@@ -10,7 +10,7 @@ import useSocket from "@/hooks/useSocket";
 import { MessageProps } from "@/types/chatinterfaces";
 import { Review, UserProps, VideoProps } from "@/types/userinterfaces";
 import moment from "moment";
-import Image from "next/image";
+
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import React, { useEffect, useState, useRef } from "react";
 import { IoArrowBack, IoEllipsisVertical, IoSearch } from "react-icons/io5";
@@ -230,7 +230,7 @@ const ChatPage = () => {
         </button>
         {otherUser?.user?.picture && (
           <div className="flex items-center" onClick={handleAvatarClick}>
-            <Image
+            <img
               src={otherUser?.user?.picture}
               alt={otherUser?.user?.firstname?.split("")[0] as string}
               className="w-8 h-8 rounded-full mr-2"
