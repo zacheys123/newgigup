@@ -18,7 +18,7 @@ export default function GigLayout({ children, editpage }: GigLayoutProps) {
   const [company, setCompany] = useState("");
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
-  const { commentsCount, isLoading ,Allposts} = usePostComments();
+  const { commentsCount, isLoading } = usePostComments();
   const { user } = useCurrentUser();
 console.log("userPostsCount",commentsCount)
   // Effect to show modal based on comments count and timer

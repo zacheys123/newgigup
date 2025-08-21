@@ -42,7 +42,7 @@ export default function AboutPage() {
   const user = useCurrentUser();
   const { users } = useAllUsers();
   const { gigs } = useAllGigs();
-  const { Allposts, isLoading: postsLoading } = usePostComments();
+  const { Allposts, isLoading: postsloading } = usePostComments();
   const allmusicians = users?.users?.filter((u: UserProps) => u?.isMusician).length;
   const allClients = users?.users?.filter((u: UserProps) => u?.isClient).length;
   const allBookedGigs = gigs?.gigs?.filter((u: GigProps) => u?.isTaken).length;
@@ -363,6 +363,7 @@ export default function AboutPage() {
           
           {/* Shuffled testimonials */}
           <div className="grid md:grid-cols-2 gap-8">
+            {postsloading && <div >loading posts...</>}
             {shuffledPosts.length > 0 ? (
               shuffledPosts.map((post) => (
                 <PostFeedBack key={post._id} post={post} />
